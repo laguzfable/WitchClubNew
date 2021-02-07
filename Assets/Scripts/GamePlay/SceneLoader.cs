@@ -54,7 +54,7 @@ public class SceneLoader : MonoBehaviour
 
     public void GotoScript(string scriptName)
     {
-        Toolbox.Instance.GetOrAddComponent<DataService>().paramArr = new Naninovel.Commands.StringParameter[] { "", "", scriptName, "" };
+        Toolbox.Instance.GetOrAddComponent<DataService>().startScript = scriptName;
         GoScene("NaniDialogTest");
     }
 

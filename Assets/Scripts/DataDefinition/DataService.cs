@@ -14,6 +14,8 @@ public class DataService : MonoBehaviour {
     //暫時先用這邊紀錄NANI過來的資源
     public Naninovel.Commands.StringParameter[] paramArr;
 
+    public Naninovel.Commands.StringParameter startScript;
+
 
     // Use this for initialization
     void Awake()

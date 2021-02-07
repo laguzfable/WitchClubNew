@@ -22,7 +22,7 @@ public class NaniTestShit : MonoBehaviour
     {
         // Engine is initialized here, it's safe to use the APIs.
         var player = Engine.GetService<IScriptPlayer>();
-
+        
         var paramArr = Toolbox.Instance.GetOrAddComponent<DataService>().paramArr;
         if (paramArr != null && !string.IsNullOrEmpty(paramArr[2]))
         {
@@ -39,9 +39,9 @@ public class NaniTestShit : MonoBehaviour
         {
             var gotoScript = defaultScript;
 
-            if (Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[2] != null)
+            if (!string.IsNullOrEmpty(Toolbox.Instance.GetOrAddComponent<DataService>().startScript))
             {
-                gotoScript = Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[2];
+                gotoScript = Toolbox.Instance.GetOrAddComponent<DataService>().startScript;
             }
             player.PreloadAndPlayAsync(gotoScript).Forget();
         }
