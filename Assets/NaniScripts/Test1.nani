@@ -1,0 +1,26 @@
+@back bg01
+@char 2
+2: 哈嚕
+@char 赫菲.idle
+赫菲: QQ
+@choice "這ㄍ" goto:.aaa
+@choice "辣ㄍ" goto:.bbb
+
+
+# aaa
+赫菲.what: 123
+@char ved.idle pos:50
+ved: 666
+ved.love: 好ㄛ
+ved.idle: 00000
+@goto .ccc
+
+# bbb
+@hide 2
+aaa
+bbb
+赫菲: ccc
+@goto .ccc
+
+# ccc
+@stop

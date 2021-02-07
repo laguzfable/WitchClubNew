@@ -1,0 +1,229 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e0c2324a9ab1224ebe3edad393e3544, type: 3}
+  m_Name: CardEffect_Fire
+  m_EditorClassIdentifier: 
+  nodes:
+  - {fileID: 114818725047140178}
+  - {fileID: 114299426730278808}
+  - {fileID: 114609281855967124}
+  editorStates:
+  - {fileID: 114785239022113742}
+  livesInScene: 0
+--- !u!114 &114049782564551296
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4caff27366054dd44a30ddb5be369acc, type: 3}
+  m_Name: RGBA
+  m_EditorClassIdentifier: 
+  body: {fileID: 114609281855967124}
+  side: 4
+  sidePosition: 125
+  sideOffset: 0
+  connection: {fileID: 114462633904242370}
+  typeID: SuperFloat4
+--- !u!114 &114078581254695570
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4caff27366054dd44a30ddb5be369acc, type: 3}
+  m_Name: UV
+  m_EditorClassIdentifier: 
+  body: {fileID: 114299426730278808}
+  side: 4
+  sidePosition: 52.9
+  sideOffset: 0
+  connection: {fileID: 0}
+  typeID: SuperFloat2
+--- !u!114 &114299426730278808
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c27b9a5c05a327b429e00e673cb560ea, type: 3}
+  m_Name: New Texture
+  m_EditorClassIdentifier: 
+  rect:
+    serializedVersion: 2
+    x: -706.8
+    y: 34.4
+    width: 150
+    height: 210
+  nodeKnobs:
+  - {fileID: 114078581254695570}
+  - {fileID: 114462633904242370}
+  Inputs:
+  - {fileID: 114078581254695570}
+  Outputs:
+  - {fileID: 114462633904242370}
+  tex: {fileID: 2800000, guid: 3697facff31f5b44b86aa827b71e5636, type: 3}
+  MemoCount: 1
+--- !u!114 &114462633904242370
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42e7026d0da7df848ab67d517ac12d74, type: 3}
+  m_Name: RGBA
+  m_EditorClassIdentifier: 
+  body: {fileID: 114299426730278808}
+  side: 2
+  sidePosition: 52.9
+  sideOffset: 0
+  connections:
+  - {fileID: 114049782564551296}
+  typeID: SuperFloat4
+  calculationBlockade: 0
+--- !u!114 &114590487596338052
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42e7026d0da7df848ab67d517ac12d74, type: 3}
+  m_Name: RGBA
+  m_EditorClassIdentifier: 
+  body: {fileID: 114609281855967124}
+  side: 2
+  sidePosition: 102.9
+  sideOffset: 0
+  connections:
+  - {fileID: 114980211918732060}
+  typeID: SuperFloat4
+  calculationBlockade: 0
+--- !u!114 &114609281855967124
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cda82f893517afd47be4026a2e165a6c, type: 3}
+  m_Name: Destroyer
+  m_EditorClassIdentifier: 
+  rect:
+    serializedVersion: 2
+    x: 75.2
+    y: -40
+    width: 172
+    height: 260
+  nodeKnobs:
+  - {fileID: 114847165719468074}
+  - {fileID: 114049782564551296}
+  - {fileID: 114590487596338052}
+  Inputs:
+  - {fileID: 114847165719468074}
+  - {fileID: 114049782564551296}
+  Outputs:
+  - {fileID: 114590487596338052}
+  Variable: 0
+  Variable2: 0.5
+  result: 
+  HDR: 0
+  HDRvalue: 1
+  parametersOK: 1
+  MemoCount: 1
+--- !u!114 &114785239022113742
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6ab6487237ff124ea4c2aa5de9ce3fb, type: 3}
+  m_Name: MainEditorState
+  m_EditorClassIdentifier: 
+  canvas: {fileID: 11400000}
+  parentEditor: {fileID: 0}
+  drawing: 1
+  selectedNode: {fileID: 0}
+  LivePreviewShaderPath: Assets/CardEffect/CardEffect_Fire.shader
+  ShaderName: CardEffect_Fire
+  ShaderInMemory: {fileID: 4800000, guid: 03d17602db549eb4faa616db2c08754f, type: 3}
+  panOffset: {x: -258.3998, y: 82.99989}
+  zoom: 1.4
+--- !u!114 &114818725047140178
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0a24bab1293f04d997dae2ec51c468, type: 3}
+  m_Name: Build Shader
+  m_EditorClassIdentifier: 
+  rect:
+    serializedVersion: 2
+    x: 546
+    y: -88.5
+    width: 300
+    height: 400
+  nodeKnobs:
+  - {fileID: 114980211918732060}
+  Inputs:
+  - {fileID: 114980211918732060}
+  Outputs: []
+  BuildErrorFlag: 0
+  BuildLightningSupport: 0
+--- !u!114 &114847165719468074
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4caff27366054dd44a30ddb5be369acc, type: 3}
+  m_Name: UV
+  m_EditorClassIdentifier: 
+  body: {fileID: 114609281855967124}
+  side: 4
+  sidePosition: 102.9
+  sideOffset: 0
+  connection: {fileID: 0}
+  typeID: SuperFloat2
+--- !u!114 &114980211918732060
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4caff27366054dd44a30ddb5be369acc, type: 3}
+  m_Name: RGBA
+  m_EditorClassIdentifier: 
+  body: {fileID: 114818725047140178}
+  side: 4
+  sidePosition: 53
+  sideOffset: 0
+  connection: {fileID: 114590487596338052}
+  typeID: SuperFloat4

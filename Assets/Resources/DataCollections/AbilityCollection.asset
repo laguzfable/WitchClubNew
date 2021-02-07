@@ -1,0 +1,826 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff93a18833edcb347a771fcabcbbff01, type: 3}
+  m_Name: AbilityCollection
+  m_EditorClassIdentifier: 
+  abilityList:
+  - id: 4
+    name: "\u6708\u6842\u6A39\u5C0F\u7CBE\u9748"
+    description: "\u6D17\u6389\u624B\u4E0A\u6240\u6709\u624B\u724C"
+    image: {fileID: 21300000, guid: 34364da0109aac8479f83618e8157089, type: 3}
+    portrait: {fileID: 0}
+    fx: {fileID: 6744405501240614627, guid: fd5de6e4c89a14442a80ea1a7cb7298f, type: 3}
+    specialFX: {fileID: 854986357, guid: 4648314a2eb79f3438119b19f1a9cec6, type: 3}
+    element: 3
+    cardAttr:
+    - ATK: 0
+      DEF: 5
+      HEAL: 15
+      EN: 0
+    - ATK: 0
+      DEF: 7
+      HEAL: 16
+      EN: 0
+    - ATK: 0
+      DEF: 8
+      HEAL: 17
+      EN: 0
+    - ATK: 0
+      DEF: 9
+      HEAL: 18
+      EN: 0
+    - ATK: 0
+      DEF: 10
+      HEAL: 20
+      EN: 0
+    requireEnergy: 3
+    effect:
+    - type: 16
+      value: 0
+      param: 
+  - id: "\u6A39\u5DEB"
+    name: "\u5149\u4E4B\u6A39\u6DB2"
+    description: 
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 3
+    cardAttr: []
+    requireEnergy: 0
+    effect: []
+  - id: "\u51A5\u60F3\u863F\u8389\u5DEB"
+    name: "\u51DD\u795E\u51A5\u60F3"
+    description: 
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 3
+    cardAttr: []
+    requireEnergy: 0
+    effect:
+    - type: 5
+      value: 0
+      param: 
+    - type: 6
+      value: 0
+      param: 
+  - id: "\u548C\u5E73\u5DEB"
+    name: "\u81EA\u7136\u7D50\u754C"
+    description: 
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 3
+    cardAttr: []
+    requireEnergy: 0
+    effect:
+    - type: 7
+      value: 0
+      param: 
+    - type: 8
+      value: 0
+      param: 
+  - id: "\u6B50\u82E5\u62C9"
+    name: "\u8774\u8776\u5E7B\u8853"
+    description: 
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 3
+    cardAttr: []
+    requireEnergy: 0
+    effect:
+    - type: 2
+      value: 0
+      param: 
+  - id: 2
+    name: "\u6383\u5E1A\u7CBE\u9748"
+    description: "\u63D0\u534750\u9EDE\u9632\u79A6"
+    image: {fileID: 21300000, guid: 3453b53eb0eb4064ea5454cd881fefd3, type: 3}
+    portrait: {fileID: 0}
+    fx: {fileID: 5844712443726212508, guid: 9f6ea589ab3e1774da1a6630c5bd3f13, type: 3}
+    specialFX: {fileID: 8396477690298054141, guid: dad2dff41d0c19844903f32ba94b1846,
+      type: 3}
+    element: 0
+    cardAttr:
+    - ATK: 5
+      DEF: 15
+      HEAL: 0
+      EN: 0
+    - ATK: 6
+      DEF: 17
+      HEAL: 0
+      EN: 0
+    - ATK: 7
+      DEF: 18
+      HEAL: 0
+      EN: 0
+    - ATK: 8
+      DEF: 20
+      HEAL: 0
+      EN: 0
+    - ATK: 10
+      DEF: 20
+      HEAL: 0
+      EN: 0
+    requireEnergy: 6
+    effect:
+    - type: 1
+      value: 50
+      param: 
+  - id: "\u80FD\u5E79\u7684\u5B78\u5F92"
+    name: "\u80FD\u5E79\u7684\u5B78\u5F92"
+    description: 
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 0
+    cardAttr: []
+    requireEnergy: 0
+    effect:
+    - type: 13
+      value: 1.5
+      param: 
+    - type: 14
+      value: 1.5
+      param: 
+  - id: "\u98DB\u884C\u5DEB"
+    name: "\u98DB\u884C\u5DEB"
+    description: 
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 0
+    cardAttr: []
+    requireEnergy: 0
+    effect:
+    - type: 15
+      value: 0
+      param: 
+  - id: "\u5BF6\u528D\u5DEB"
+    name: "\u5BF6\u528D\u5DEB"
+    description: 
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 0
+    cardAttr: []
+    requireEnergy: 0
+    effect:
+    - type: 16
+      value: 5
+      param: 
+  - id: "\u5DE8\u4E73\u5DEB"
+    name: "\u5DE8\u4E73\u5DEB"
+    description: 
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 0
+    cardAttr: []
+    requireEnergy: 0
+    effect:
+    - type: 17
+      value: 0
+      param: 
+  - id: 1
+    name: "\u737B\u796D"
+    description: "\u5438\u53D6\u751F\u547D\uFF0C\u6CBB\u7642\u540C\u7B49\u65BC\u9020\u6210\u6575\u4EBA\u50B7\u5BB3\u7684HP"
+    image: {fileID: 21300000, guid: 35e032757c0b26f478a5352f031e673a, type: 3}
+    portrait: {fileID: 0}
+    fx: {fileID: 3179709944716776686, guid: ee7588c4a47d79049aa21b2b31908a96, type: 3}
+    specialFX: {fileID: 45553926698148221, guid: 167d5d70e5efc7f4cb96cfd3a232e2ab,
+      type: 3}
+    element: 1
+    cardAttr:
+    - ATK: 15
+      DEF: 5
+      HEAL: 0
+      EN: 0
+    - ATK: 18
+      DEF: 5
+      HEAL: 0
+      EN: 0
+    - ATK: 20
+      DEF: 5
+      HEAL: 0
+      EN: 0
+    - ATK: 23
+      DEF: 5
+      HEAL: 0
+      EN: 0
+    - ATK: 25
+      DEF: 5
+      HEAL: 0
+      EN: 0
+    requireEnergy: 3
+    effect:
+    - type: 7
+      value: 0
+      param: 
+  - id: "\u5438\u8840\u5DEB"
+    name: "\u5438\u8840\u5DEB"
+    description: 
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 1
+    cardAttr: []
+    requireEnergy: 0
+    effect:
+    - type: 22
+      value: 2
+      param: 
+  - id: "\u760B\u72C2\u5DEB"
+    name: "\u760B\u72C2\u5DEB"
+    description: 
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 1
+    cardAttr: []
+    requireEnergy: 0
+    effect:
+    - type: 18
+      value: 0
+      param: 
+  - id: "\u6BD2\u5DEB"
+    name: "\u6BD2\u5DEB"
+    description: 
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 1
+    cardAttr: []
+    requireEnergy: 0
+    effect:
+    - type: 3
+      value: 0.01
+      param: 
+  - id: "??\u5DEB"
+    name: "??\u5DEB"
+    description: 
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 1
+    cardAttr: []
+    requireEnergy: 0
+    effect:
+    - type: 19
+      value: 0
+      param: 
+    - type: 20
+      value: 0.05
+      param: 
+  - id: 8
+    name: "\u74F6\u4E2D\u7684\u60E1\u9B54"
+    description: "\u4F7F\u5361\u724C\u7B49\u7D1A\u63D0\u5347\u81F3\u6700\u9AD8\u7B49\u7D1A"
+    image: {fileID: 21300000, guid: 3bde656f8f1e1de44b9169d4b4b12574, type: 3}
+    portrait: {fileID: 0}
+    fx: {fileID: 5647101435895647069, guid: d33049f43f77cac44a9a2b15eff63546, type: 3}
+    specialFX: {fileID: 3221504776910088335, guid: 697e714962893c243897d0e005c47ffb,
+      type: 3}
+    element: 2
+    cardAttr:
+    - ATK: 13
+      DEF: 5
+      HEAL: 0
+      EN: 2
+    - ATK: 15
+      DEF: 6
+      HEAL: 0
+      EN: 2
+    - ATK: 16
+      DEF: 7
+      HEAL: 0
+      EN: 2
+    - ATK: 18
+      DEF: 8
+      HEAL: 0
+      EN: 2
+    - ATK: 19
+      DEF: 9
+      HEAL: 0
+      EN: 3
+    requireEnergy: 5
+    effect:
+    - type: 3
+      value: 5
+      param: 
+  - id: "\u89F8\u624B\u5DEB"
+    name: "\u89F8\u624B\u5DEB"
+    description: 
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 1
+    cardAttr: []
+    requireEnergy: 0
+    effect:
+    - type: 22
+      value: 0.1
+      param: 
+  - id: "\u7981\u5492\u7684\u60E1\u9B54"
+    name: "\u7981\u5492\u7684\u60E1\u9B54"
+    description: 
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 2
+    cardAttr: []
+    requireEnergy: 0
+    effect:
+    - type: 24
+      value: 0.75
+      param: 
+  - id: "\u9AB7\u9ACF\u863F\u8389\u5DEB"
+    name: "\u9AB7\u9ACF\u863F\u8389\u5DEB"
+    description: 
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 2
+    cardAttr: []
+    requireEnergy: 0
+    effect:
+    - type: 23
+      value: 0
+      param: 
+  - id: "\u91D1\u8272\u7684\u60E1\u9B54"
+    name: "\u91D1\u8272\u7684\u60E1\u9B54"
+    description: 
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 2
+    cardAttr: []
+    requireEnergy: 0
+    effect:
+    - type: 4
+      value: 0
+      param: 
+  - id: 101
+    name: "\u7D05\u8272\u57FA\u672C\u5143\u7D20\u5361"
+    description: 
+    image: {fileID: 21300000, guid: 0fe996d40f104294fb848c3c27500667, type: 3}
+    portrait: {fileID: 0}
+    fx: {fileID: 5952740983178019785, guid: 45bdba77395e79d48a4e19762beaf6e4, type: 3}
+    specialFX: {fileID: 0}
+    element: 1
+    cardAttr:
+    - ATK: 10
+      DEF: 0
+      HEAL: 0
+      EN: 0
+    - ATK: 13
+      DEF: 0
+      HEAL: 0
+      EN: 0
+    - ATK: 15
+      DEF: 0
+      HEAL: 0
+      EN: 0
+    - ATK: 18
+      DEF: 0
+      HEAL: 0
+      EN: 0
+    - ATK: 20
+      DEF: 0
+      HEAL: 0
+      EN: 0
+    requireEnergy: 0
+    effect: []
+  - id: 102
+    name: "\u85CD\u8272\u57FA\u672C\u5143\u7D20\u5361"
+    description: 
+    image: {fileID: 21300000, guid: 21e74a6a024f72745a4981d36fc8bd43, type: 3}
+    portrait: {fileID: 0}
+    fx: {fileID: 6256497939349084677, guid: 85453827ee7b00a4384dba0f0eebf7b9, type: 3}
+    specialFX: {fileID: 0}
+    element: 0
+    cardAttr:
+    - ATK: 3
+      DEF: 7
+      HEAL: 0
+      EN: 0
+    - ATK: 4
+      DEF: 9
+      HEAL: 0
+      EN: 0
+    - ATK: 5
+      DEF: 10
+      HEAL: 0
+      EN: 0
+    - ATK: 6
+      DEF: 12
+      HEAL: 0
+      EN: 0
+    - ATK: 7
+      DEF: 13
+      HEAL: 0
+      EN: 0
+    requireEnergy: 0
+    effect: []
+  - id: 103
+    name: "\u7DA0\u8272\u57FA\u672C\u5143\u7D20\u5361"
+    description: 
+    image: {fileID: 21300000, guid: ab7320c305850f342b3e8ef20eb9b506, type: 3}
+    portrait: {fileID: 0}
+    fx: {fileID: 5310999398464235453, guid: 3efa411b5a3145c43bd319a9b44b7319, type: 3}
+    specialFX: {fileID: 0}
+    element: 3
+    cardAttr:
+    - ATK: 0
+      DEF: 5
+      HEAL: 5
+      EN: 0
+    - ATK: 0
+      DEF: 5
+      HEAL: 8
+      EN: 0
+    - ATK: 0
+      DEF: 5
+      HEAL: 10
+      EN: 0
+    - ATK: 0
+      DEF: 5
+      HEAL: 13
+      EN: 0
+    - ATK: 0
+      DEF: 5
+      HEAL: 15
+      EN: 0
+    requireEnergy: 0
+    effect: []
+  - id: 104
+    name: "\u9EC3\u8272\u57FA\u672C\u5143\u7D20\u5361"
+    description: 
+    image: {fileID: 21300000, guid: 7f867d8c509a2ab4ca7daaa4432c247c, type: 3}
+    portrait: {fileID: 0}
+    fx: {fileID: 1909222898046196639, guid: 960bc2eb05e5a2e4bbdbeb0111d3ee9f, type: 3}
+    specialFX: {fileID: 0}
+    element: 2
+    cardAttr:
+    - ATK: 6
+      DEF: 3
+      HEAL: 0
+      EN: 1
+    - ATK: 7
+      DEF: 5
+      HEAL: 0
+      EN: 1
+    - ATK: 8
+      DEF: 6
+      HEAL: 0
+      EN: 1
+    - ATK: 10
+      DEF: 7
+      HEAL: 0
+      EN: 1
+    - ATK: 12
+      DEF: 7
+      HEAL: 0
+      EN: 1
+    requireEnergy: 0
+    effect: []
+  - id: "\u5B78\u9662\u9810\u8A2D"
+    name: "\u5B78\u9662\u9810\u8A2D"
+    description: "\u63D0\u5347\u9632\u79A630\u9EDE"
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 0
+    cardAttr: []
+    requireEnergy: 3
+    effect:
+    - type: 1
+      value: 30
+      param: 
+  - id: "\u540C\u5B78"
+    name: "\u540C\u5B78"
+    description: "\u76F4\u63A5\u6253\u65B7\u5C0D\u65B9\u884C\u52D5"
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 0
+    cardAttr: []
+    requireEnergy: 2
+    effect:
+    - type: 10
+      value: 0
+      param: 
+  - id: "\u8B1B\u5E2B"
+    name: "\u8B1B\u5E2B"
+    description: "\u5C07\u5C0D\u65B9\u672C\u56DE\u5408\u7684\u9632\u79A6\u529B\u964D\u81F30"
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 0
+    cardAttr: []
+    requireEnergy: 5
+    effect:
+    - type: 17
+      value: 0
+      param: 
+  - id: "\u827E\u59AE(\u5B78\u9662)"
+    name: "\u827E\u59AE(\u5B78\u9662)"
+    description: 
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 0
+    cardAttr: []
+    requireEnergy: 0
+    effect: []
+  - id: "\u8840\u7CFB\u5973\u5DEB"
+    name: "\u8840\u7CFB\u5973\u5DEB"
+    description: 
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 0
+    cardAttr: []
+    requireEnergy: 0
+    effect: []
+  - id: "\u827E\u59AE(\u8840\u7CFB)"
+    name: "\u827E\u59AE(\u8840\u7CFB)"
+    description: "\u51FA\u724C\u4E0D\u53D7\u984F\u8272\u9650\u5236(\u7576\u56DE\u5408)"
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 0
+    cardAttr: []
+    requireEnergy: 8
+    effect:
+    - type: 18
+      value: 0
+      param: 
+  - id: "\u8840\u7CFB\u9810\u8A2D"
+    name: "\u8840\u7CFB\u9810\u8A2D"
+    description: "\u9020\u621050\u9EDE\u50B7\u5BB3"
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 1
+    cardAttr: []
+    requireEnergy: 6
+    effect:
+    - type: 4
+      value: 50
+      param: 
+  - id: "\u9B54\u66F8"
+    name: "\u9B54\u66F8"
+    description: "\u5438\u53D6\u751F\u547D \u6CBB\u7642\u540C\u7B49\u65BC\u9020\u6210\u6575\u4EBA\u50B7\u5BB3\u7684HP"
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 1
+    cardAttr: []
+    requireEnergy: 3
+    effect:
+    - type: 7
+      value: 0
+      param: 
+  - id: "\u8C61\u7259\u5854\u4E4B\u773C"
+    name: "\u8C61\u7259\u5854\u4E4B\u773C"
+    description: 
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 1
+    cardAttr: []
+    requireEnergy: 0
+    effect: []
+  - id: "\u4F0A\u838E\u8C9D\u62C9"
+    name: "\u4F0A\u838E\u8C9D\u62C9"
+    description: 
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 1
+    cardAttr: []
+    requireEnergy: 0
+    effect: []
+  - id: "\u8840\u7CFB\u5973\u5DEB2"
+    name: "\u8840\u7CFB\u5973\u5DEB"
+    description: "\u5C07\u6240\u6709\u724C\u63DB\u6210\u9BAE\u8840\u7CFB"
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 1
+    cardAttr: []
+    requireEnergy: 7
+    effect:
+    - type: 16
+      value: 1
+      param: 
+  - id: "\u8D6B\u83F2"
+    name: "\u8D6B\u83F2"
+    description: "\u53CD\u5F48\u6575\u4EBA\u7684\u4E0B\u500B\u653B\u64CA(\u7121\u8996\u9632\u79A6)"
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 1
+    cardAttr: []
+    requireEnergy: 8
+    effect:
+    - type: 5
+      value: 0
+      param: 
+  - id: "\u81EA\u7136\u9810\u8A2D"
+    name: "\u81EA\u7136\u9810\u8A2D"
+    description: "\u6062\u5FA920\u9EDEHP\uFF0C\u6301\u7E8C3\u56DE\u5408"
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 3
+    cardAttr: []
+    requireEnergy: 2
+    effect:
+    - type: 19
+      value: 20
+      param: 3
+  - id: "\u72FC"
+    name: "\u72FC"
+    description: "\u6539\u8B8A\u74B0\u5883\u6548\u679C(\u96A8\u6A5F)"
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 3
+    cardAttr: []
+    requireEnergy: 4
+    effect:
+    - type: 20
+      value: -1
+      param: 
+  - id: "\u6A39\u5973"
+    name: "\u6A39\u5973"
+    description: "\u6062\u5FA960\u9EDEHP"
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 3
+    cardAttr: []
+    requireEnergy: 5
+    effect:
+    - type: 12
+      value: 60
+      param: 
+  - id: "\u6F7C"
+    name: "\u6F7C"
+    description: "\u6D17\u6389\u624B\u4E0A\u6240\u6709\u624B\u724C"
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 3
+    cardAttr: []
+    requireEnergy: 3
+    effect:
+    - type: 16
+      value: 0
+      param: 
+  - id: "\u5409\u5152"
+    name: "\u5409\u5152"
+    description: "\u6CBB\u7642\u540C\u6642\u7D66\u4E88\u6575\u4EBA\u540C\u7B49\u50B7\u5BB3"
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 3
+    cardAttr: []
+    requireEnergy: 3
+    effect:
+    - type: 21
+      value: 0
+      param: 
+  - id: "\u6A39\u6BCD"
+    name: "\u6A39\u6BCD"
+    description: "\u6539\u8B8A\u74B0\u5883\u6548\u679C-->\u6CBB\u7642\u52A0\u500D"
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 3
+    cardAttr: []
+    requireEnergy: 4
+    effect:
+    - type: 20
+      value: 3
+      param: 
+  - id: "\u60E1\u9B54\u9810\u8A2D"
+    name: "\u60E1\u9B54\u9810\u8A2D"
+    description: 
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 2
+    cardAttr: []
+    requireEnergy: 0
+    effect: []
+  - id: "\u5996\u7CBE\u6253\u67B6"
+    name: "\u5996\u7CBE\u6253\u67B6"
+    description: 
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 2
+    cardAttr: []
+    requireEnergy: 0
+    effect: []
+  - id: "\u5403\u53F2\u840A\u59C6"
+    name: "\u5403\u53F2\u840A\u59C6"
+    description: 
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 2
+    cardAttr: []
+    requireEnergy: 0
+    effect: []
+  - id: "\u9ED1\u8089\u7CBE\u9748"
+    name: "\u9ED1\u8089\u7CBE\u9748"
+    description: "\u4F7F\u6240\u6709\u5361\u7247\u63D0\u5347\u81F3\u6700\u9AD8\u7B49\u7D1A"
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 2
+    cardAttr: []
+    requireEnergy: 5
+    effect:
+    - type: 3
+      value: 5
+      param: 
+  - id: "\u5438\u8840\u7CBE\u9748"
+    name: "\u5438\u8840\u7CBE\u9748"
+    description: "\u5C0D\u65B9\u4E0B\u56DE\u5408\u7121\u6CD5\u884C\u52D5"
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 2
+    cardAttr: []
+    requireEnergy: 6
+    effect:
+    - type: 22
+      value: 0
+      param: 
+  - id: "\u737B\u796D\u5973\u5DEB"
+    name: "\u737B\u796D\u5973\u5DEB"
+    description: "HP\u4E0A\u9650\u6539\u70BA200"
+    image: {fileID: 0}
+    portrait: {fileID: 0}
+    fx: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 2
+    cardAttr: []
+    requireEnergy: 10
+    effect:
+    - type: 14
+      value: 100
+      param: 

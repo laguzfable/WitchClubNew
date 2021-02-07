@@ -1,0 +1,92 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: SelectCardOutline2
+  m_Shader: {fileID: 4800000, guid: 5f91e9585151d834db3df21b8042b6c4, type: 3}
+  m_ShaderKeywords: ETC1_EXTERNAL_ALPHA
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - DistortionUV_DistanceX_1: 0.3
+    - DistortionUV_DistanceY_1: 0.3
+    - DistortionUV_Speed_1: 1
+    - DistortionUV_WaveX_1: 10
+    - DistortionUV_WaveY_1: 10
+    - DoodleUV_Frame_1: 5
+    - DoodleUV_Size_1: 7
+    - LiquidUV_DistanceX_1: 0.3
+    - LiquidUV_DistanceY_1: 0.3
+    - LiquidUV_Speed_1: 1
+    - LiquidUV_WaveX_1: 2
+    - LiquidUV_WaveY_1: 2
+    - _CircleFade_Dist_1: 0.2
+    - _CircleFade_PosX_1: 0.5
+    - _CircleFade_PosY_1: 0.5
+    - _CircleFade_Size_1: 0.3
+    - _ColorMask: 15
+    - _Emboss_Angle_1: 0
+    - _Emboss_Distance_1: 0.3
+    - _Emboss_Intensity_1: 1
+    - _Emboss_grayfade_1: 1
+    - _Emboss_original_1: 1
+    - _Generate_Circle_Dist_1: 0.01
+    - _Generate_Circle_PosX_1: 0.5
+    - _Generate_Circle_PosY_1: 0.5
+    - _Generate_Circle_Size_1: 0.4
+    - _Generate_Spiral_LineSize_1: 5
+    - _Generate_Spiral_PosX_1: 0.5
+    - _Generate_Spiral_PosY_1: 0.5
+    - _Generate_Spiral_Size_1: 1
+    - _Generate_Spiral_Speed_1: 0
+    - _Generate_Starfield_Number_1: 10.6
+    - _Generate_Starfield_PosX_1: 0.5
+    - _Generate_Starfield_PosY_1: 0.5
+    - _Generate_Starfield_Size_1: 7.6
+    - _Generate_Starfield_Speed_1: 3
+    - _Generate_Xray_Number_1: 16
+    - _Generate_Xray_PosX_1: 0.5
+    - _Generate_Xray_PosY_1: 0.5
+    - _Generate_Xray_Speed_1: 0
+    - _GhostFX_ClipDown_1: 0.7
+    - _GhostFX_ClipLeft_1: 0.7
+    - _GhostFX_ClipRight_1: 0.7
+    - _GhostFX_ClipUp_1: 0.7
+    - _GhostFX_Smooth_1: 1
+    - _Hologram_Speed_1: 1
+    - _Hologram_Value_1: 1
+    - _ShadowLight_Intensity_1: 1.5
+    - _ShadowLight_NoSprite_1: 1
+    - _ShadowLight_PosX_1: 0
+    - _ShadowLight_PosY_1: 0
+    - _ShadowLight_Precision_1: 8
+    - _ShadowLight_Size_1: 1.2
+    - _ShinyFX_Intensity_1: 1
+    - _ShinyFX_Pos_1: 0
+    - _ShinyFX_Size_1: -0.1
+    - _ShinyFX_Smooth_1: 0.25
+    - _ShinyFX_Speed_1: 1
+    - _SpriteFade: 0.57
+    - _Stencil: 0
+    - _StencilComp: 8
+    - _StencilOp: 0
+    - _StencilReadMask: 255
+    - _StencilWriteMask: 255
+    m_Colors:
+    - _ShadowLight_Color_1: {r: 0, g: 0.7, b: 1, a: 1}

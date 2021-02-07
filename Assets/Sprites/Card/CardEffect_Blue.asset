@@ -1,0 +1,226 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e0c2324a9ab1224ebe3edad393e3544, type: 3}
+  m_Name: CardEffect_Blue
+  m_EditorClassIdentifier: 
+  nodes:
+  - {fileID: 114135695221457826}
+  - {fileID: 114896225463100448}
+  - {fileID: 114858956962433596}
+  editorStates:
+  - {fileID: 114615257948455272}
+  livesInScene: 0
+--- !u!114 &114135695221457826
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0a24bab1293f04d997dae2ec51c468, type: 3}
+  m_Name: Build Shader
+  m_EditorClassIdentifier: 
+  rect:
+    serializedVersion: 2
+    x: -52.5
+    y: -538.4
+    width: 400
+    height: 520
+  nodeKnobs:
+  - {fileID: 114515113916896592}
+  Inputs:
+  - {fileID: 114515113916896592}
+  Outputs: []
+  BuildErrorFlag: 0
+  BuildLightningSupport: 0
+--- !u!114 &114429595380738004
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42e7026d0da7df848ab67d517ac12d74, type: 3}
+  m_Name: RGBA
+  m_EditorClassIdentifier: 
+  body: {fileID: 114896225463100448}
+  side: 2
+  sidePosition: 103.5
+  sideOffset: 0
+  connections:
+  - {fileID: 114515113916896592}
+  typeID: SuperFloat4
+  calculationBlockade: 0
+--- !u!114 &114515113916896592
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4caff27366054dd44a30ddb5be369acc, type: 3}
+  m_Name: RGBA
+  m_EditorClassIdentifier: 
+  body: {fileID: 114135695221457826}
+  side: 4
+  sidePosition: 53.5
+  sideOffset: 0
+  connection: {fileID: 114429595380738004}
+  typeID: SuperFloat4
+--- !u!114 &114570670729411768
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4caff27366054dd44a30ddb5be369acc, type: 3}
+  m_Name: RGBA
+  m_EditorClassIdentifier: 
+  body: {fileID: 114896225463100448}
+  side: 4
+  sidePosition: 126.5
+  sideOffset: 0
+  connection: {fileID: 114795710472876006}
+  typeID: SuperFloat4
+--- !u!114 &114615257948455272
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6ab6487237ff124ea4c2aa5de9ce3fb, type: 3}
+  m_Name: MainEditorState
+  m_EditorClassIdentifier: 
+  canvas: {fileID: 11400000}
+  parentEditor: {fileID: 0}
+  drawing: 1
+  selectedNode: {fileID: 114858956962433596}
+  LivePreviewShaderPath: Assets/CardEffect/CardEffect_BlueEffect.shader
+  ShaderName: CardEffect_BlueEffect
+  ShaderInMemory: {fileID: 4800000, guid: 6fd6440c82d281344b23c2a15e97c8b5, type: 3}
+  panOffset: {x: 177.39992, y: 404.19983}
+  zoom: 1.8
+--- !u!114 &114644357749832204
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4caff27366054dd44a30ddb5be369acc, type: 3}
+  m_Name: UV
+  m_EditorClassIdentifier: 
+  body: {fileID: 114858956962433596}
+  side: 4
+  sidePosition: 53.5
+  sideOffset: 0
+  connection: {fileID: 0}
+  typeID: SuperFloat2
+--- !u!114 &114731898254465066
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4caff27366054dd44a30ddb5be369acc, type: 3}
+  m_Name: UV
+  m_EditorClassIdentifier: 
+  body: {fileID: 114896225463100448}
+  side: 4
+  sidePosition: 103.5
+  sideOffset: 0
+  connection: {fileID: 0}
+  typeID: SuperFloat2
+--- !u!114 &114795710472876006
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42e7026d0da7df848ab67d517ac12d74, type: 3}
+  m_Name: RGBA
+  m_EditorClassIdentifier: 
+  body: {fileID: 114858956962433596}
+  side: 2
+  sidePosition: 53.5
+  sideOffset: 0
+  connections:
+  - {fileID: 114570670729411768}
+  typeID: SuperFloat4
+  calculationBlockade: 0
+--- !u!114 &114858956962433596
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90ec3a51e031a9f42a8eeb9d470525f6, type: 3}
+  m_Name: Main Texture
+  m_EditorClassIdentifier: 
+  rect:
+    serializedVersion: 2
+    x: -569.39996
+    y: -525.4001
+    width: 148
+    height: 215
+  nodeKnobs:
+  - {fileID: 114644357749832204}
+  - {fileID: 114795710472876006}
+  Inputs:
+  - {fileID: 114644357749832204}
+  Outputs:
+  - {fileID: 114795710472876006}
+  Variable: _MainTex_
+  MemoCount: 1
+--- !u!114 &114896225463100448
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78c967241a244d74bb4613b41560717c, type: 3}
+  m_Name: Desintegration
+  m_EditorClassIdentifier: 
+  rect:
+    serializedVersion: 2
+    x: -319.59995
+    y: -405.59976
+    width: 172
+    height: 250
+  nodeKnobs:
+  - {fileID: 114731898254465066}
+  - {fileID: 114570670729411768}
+  - {fileID: 114429595380738004}
+  Inputs:
+  - {fileID: 114731898254465066}
+  - {fileID: 114570670729411768}
+  Outputs:
+  - {fileID: 114429595380738004}
+  Variable: 0.5
+  Variable2: 0.5
+  parametersOK: 1
+  MemoCount: 1

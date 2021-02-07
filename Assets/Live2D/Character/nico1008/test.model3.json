@@ -1,0 +1,50 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "nico15.moc3",
+		"Textures": [
+			"nico15.2048/texture_00.png"
+		],
+		"DisplayInfo": "nico15.cdi3.json",
+		"Expressions": [
+			{
+				"Name": "Scene1.exp3.json",
+				"File": "expressions/Scene1.exp3.json"
+			},
+			{
+				"Name": "smile.exp3.json",
+				"File": "smile.exp3.json"
+			},
+			{
+				"Name": "smile2.exp3.json",
+				"File": "smile2.exp3.json"
+			},
+			{
+				"Name": "angry.exp3.json",
+				"File": "angry.exp3.json"
+			},
+			{
+				"Name": "sad.exp3.json",
+				"File": "sad.exp3.json"
+			}
+		]
+	},
+	"Groups": [
+		{
+			"Target": "Parameter",
+			"Name": "EyeBlink",
+			"Ids": [
+				"ParamEyeLOpen",
+				"ParamEyeLSmile",
+				"ParamEyeRSmile",
+				"ParamEyeROpen"
+			]
+		},
+		{
+			"Target": "Parameter",
+			"Name": "LipSync",
+			"Ids": []
+		}
+	],
+	"HitAreas": []
+}

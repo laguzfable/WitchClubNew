@@ -1,0 +1,396 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e0c2324a9ab1224ebe3edad393e3544, type: 3}
+  m_Name: WarFog
+  m_EditorClassIdentifier: 
+  nodes:
+  - {fileID: 114899178406488546}
+  - {fileID: 114836709767179716}
+  - {fileID: 114864259488786834}
+  - {fileID: 114251965515181564}
+  - {fileID: 114448964290748322}
+  editorStates:
+  - {fileID: 114862738633779288}
+  livesInScene: 0
+--- !u!114 &114041697576801618
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42e7026d0da7df848ab67d517ac12d74, type: 3}
+  m_Name: RGBA
+  m_EditorClassIdentifier: 
+  body: {fileID: 114899178406488546}
+  side: 2
+  sidePosition: 102.9
+  sideOffset: 0
+  connections: []
+  typeID: SuperFloat4
+  calculationBlockade: 0
+--- !u!114 &114167309422848070
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4caff27366054dd44a30ddb5be369acc, type: 3}
+  m_Name: UV
+  m_EditorClassIdentifier: 
+  body: {fileID: 114899178406488546}
+  side: 4
+  sidePosition: 102.9
+  sideOffset: 0
+  connection: {fileID: 0}
+  typeID: SuperFloat2
+--- !u!114 &114183091788754870
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4caff27366054dd44a30ddb5be369acc, type: 3}
+  m_Name: RGBA
+  m_EditorClassIdentifier: 
+  body: {fileID: 114899178406488546}
+  side: 4
+  sidePosition: 125
+  sideOffset: 0
+  connection: {fileID: 0}
+  typeID: SuperFloat4
+--- !u!114 &114246116963004744
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42e7026d0da7df848ab67d517ac12d74, type: 3}
+  m_Name: RGBA
+  m_EditorClassIdentifier: 
+  body: {fileID: 114251965515181564}
+  side: 2
+  sidePosition: 102.9
+  sideOffset: 0
+  connections:
+  - {fileID: 114347738285380688}
+  typeID: SuperFloat4
+  calculationBlockade: 0
+--- !u!114 &114251965515181564
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cda82f893517afd47be4026a2e165a6c, type: 3}
+  m_Name: Destroyer
+  m_EditorClassIdentifier: 
+  rect:
+    serializedVersion: 2
+    x: -417.60013
+    y: -580.99976
+    width: 172
+    height: 260
+  nodeKnobs:
+  - {fileID: 114520287443115286}
+  - {fileID: 114742588231299574}
+  - {fileID: 114246116963004744}
+  Inputs:
+  - {fileID: 114520287443115286}
+  - {fileID: 114742588231299574}
+  Outputs:
+  - {fileID: 114246116963004744}
+  Variable: 0
+  Variable2: 0.5
+  result: 
+  HDR: 0
+  HDRvalue: 1
+  parametersOK: 1
+  MemoCount: 1
+--- !u!114 &114316832873536562
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42e7026d0da7df848ab67d517ac12d74, type: 3}
+  m_Name: RGBA
+  m_EditorClassIdentifier: 
+  body: {fileID: 114448964290748322}
+  side: 2
+  sidePosition: 52.9
+  sideOffset: 0
+  connections:
+  - {fileID: 114742588231299574}
+  typeID: SuperFloat4
+  calculationBlockade: 0
+--- !u!114 &114347738285380688
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4caff27366054dd44a30ddb5be369acc, type: 3}
+  m_Name: RGBA
+  m_EditorClassIdentifier: 
+  body: {fileID: 114836709767179716}
+  side: 4
+  sidePosition: 53
+  sideOffset: 0
+  connection: {fileID: 114246116963004744}
+  typeID: SuperFloat4
+--- !u!114 &114448964290748322
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90ec3a51e031a9f42a8eeb9d470525f6, type: 3}
+  m_Name: Main Texture
+  m_EditorClassIdentifier: 
+  rect:
+    serializedVersion: 2
+    x: -1033.6001
+    y: -397.20007
+    width: 148
+    height: 215
+  nodeKnobs:
+  - {fileID: 114798798564008700}
+  - {fileID: 114316832873536562}
+  Inputs:
+  - {fileID: 114798798564008700}
+  Outputs:
+  - {fileID: 114316832873536562}
+  Variable: _MainTex_
+  MemoCount: 1
+--- !u!114 &114520287443115286
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4caff27366054dd44a30ddb5be369acc, type: 3}
+  m_Name: UV
+  m_EditorClassIdentifier: 
+  body: {fileID: 114251965515181564}
+  side: 4
+  sidePosition: 102.9
+  sideOffset: 0
+  connection: {fileID: 0}
+  typeID: SuperFloat2
+--- !u!114 &114643898994648728
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42e7026d0da7df848ab67d517ac12d74, type: 3}
+  m_Name: UV
+  m_EditorClassIdentifier: 
+  body: {fileID: 114864259488786834}
+  side: 2
+  sidePosition: 102.9
+  sideOffset: 0
+  connections: []
+  typeID: SuperFloat2
+  calculationBlockade: 0
+--- !u!114 &114662011542618042
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4caff27366054dd44a30ddb5be369acc, type: 3}
+  m_Name: UV
+  m_EditorClassIdentifier: 
+  body: {fileID: 114864259488786834}
+  side: 4
+  sidePosition: 102.9
+  sideOffset: 0
+  connection: {fileID: 0}
+  typeID: SuperFloat2
+--- !u!114 &114742588231299574
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4caff27366054dd44a30ddb5be369acc, type: 3}
+  m_Name: RGBA
+  m_EditorClassIdentifier: 
+  body: {fileID: 114251965515181564}
+  side: 4
+  sidePosition: 125
+  sideOffset: 0
+  connection: {fileID: 114316832873536562}
+  typeID: SuperFloat4
+--- !u!114 &114798798564008700
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4caff27366054dd44a30ddb5be369acc, type: 3}
+  m_Name: UV
+  m_EditorClassIdentifier: 
+  body: {fileID: 114448964290748322}
+  side: 4
+  sidePosition: 52.9
+  sideOffset: 0
+  connection: {fileID: 0}
+  typeID: SuperFloat2
+--- !u!114 &114836709767179716
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da0a24bab1293f04d997dae2ec51c468, type: 3}
+  m_Name: Build Shader
+  m_EditorClassIdentifier: 
+  rect:
+    serializedVersion: 2
+    x: -52.5
+    y: -538.4
+    width: 400
+    height: 520
+  nodeKnobs:
+  - {fileID: 114347738285380688}
+  Inputs:
+  - {fileID: 114347738285380688}
+  Outputs: []
+  BuildErrorFlag: 0
+  BuildLightningSupport: 0
+--- !u!114 &114862738633779288
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6ab6487237ff124ea4c2aa5de9ce3fb, type: 3}
+  m_Name: MainEditorState
+  m_EditorClassIdentifier: 
+  canvas: {fileID: 11400000}
+  parentEditor: {fileID: 0}
+  drawing: 1
+  selectedNode: {fileID: 114448964290748322}
+  LivePreviewShaderPath: Assets/CardEffect/WarFogEffect.shader
+  ShaderName: WarFogEffect
+  ShaderInMemory: {fileID: 4800000, guid: 26cac9f7e024de140b844d46ee5cf7d2, type: 3}
+  panOffset: {x: 318.00003, y: 346.99988}
+  zoom: 1.4
+--- !u!114 &114864259488786834
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a74fa5f2246be054ba7dddc23d186ccf, type: 3}
+  m_Name: Twist UV
+  m_EditorClassIdentifier: 
+  rect:
+    serializedVersion: 2
+    x: -812.1999
+    y: -571.59973
+    width: 172
+    height: 340
+  nodeKnobs:
+  - {fileID: 114662011542618042}
+  - {fileID: 114643898994648728}
+  Inputs:
+  - {fileID: 114662011542618042}
+  Outputs:
+  - {fileID: 114643898994648728}
+  Variable: 0.504
+  Variable2: 0.493
+  Variable3: 0.5
+  Variable4: 0.5
+  AddParameters: 1
+  MemoCount: 1
+--- !u!114 &114899178406488546
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78c967241a244d74bb4613b41560717c, type: 3}
+  m_Name: Desintegration
+  m_EditorClassIdentifier: 
+  rect:
+    serializedVersion: 2
+    x: -456.39993
+    y: -273.59976
+    width: 172
+    height: 250
+  nodeKnobs:
+  - {fileID: 114167309422848070}
+  - {fileID: 114183091788754870}
+  - {fileID: 114041697576801618}
+  Inputs:
+  - {fileID: 114167309422848070}
+  - {fileID: 114183091788754870}
+  Outputs:
+  - {fileID: 114041697576801618}
+  Variable: 0.032
+  Variable2: 0.5
+  parametersOK: 1
+  MemoCount: 1
