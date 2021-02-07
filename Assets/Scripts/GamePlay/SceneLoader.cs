@@ -51,6 +51,13 @@ public class SceneLoader : MonoBehaviour
         Debug.Log("FungusGoSceneUse");
         GoScene(defaultSceneName);
     }
+
+    public void GotoScript(string scriptName)
+    {
+        Toolbox.Instance.GetOrAddComponent<DataService>().paramArr = new Naninovel.Commands.StringParameter[] { "", "", scriptName, "" };
+        GoScene("NaniDialogTest");
+    }
+
     public void GoScene(string sceneName)
     {
         loadScene = true;

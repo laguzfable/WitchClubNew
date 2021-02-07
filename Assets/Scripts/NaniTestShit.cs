@@ -37,7 +37,13 @@ public class NaniTestShit : MonoBehaviour
         }
         else
         {
-            player.PreloadAndPlayAsync(defaultScript).Forget();
+            var gotoScript = defaultScript;
+
+            if (Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[2] != null)
+            {
+                gotoScript = Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[2];
+            }
+            player.PreloadAndPlayAsync(gotoScript).Forget();
         }
 
         Debug.Log("Hey just play this shit!");
