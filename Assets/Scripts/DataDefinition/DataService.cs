@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Naninovel.Commands;
 using UnityEngine;
 
 public class DataService : MonoBehaviour {
@@ -12,9 +13,12 @@ public class DataService : MonoBehaviour {
 
 
     //暫時先用這邊紀錄NANI過來的資源
-    public Naninovel.Commands.StringParameter[] paramArr;
+    //public Naninovel.Commands.StringParameter[] paramArr;
+    public ScriptParameter scriptParameter;
 
-    public Naninovel.Commands.StringParameter startScript;
+    public StringParameter startScript;
+
+    public ScriptParameter afterChatScript;
 
 
     // Use this for initialization
@@ -43,4 +47,13 @@ public class DataService : MonoBehaviour {
     }
 
 
+}
+
+public class ScriptParameter
+{
+    public StringParameter background;
+
+    public StringParameter combatTarget;
+    public StringParameter scriptName;
+    public StringParameter scriptLabel;
 }

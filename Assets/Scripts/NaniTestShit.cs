@@ -11,7 +11,14 @@ public class NaniTestShit : MonoBehaviour
     // Start is called before the first frame update
     async void Start()
     {
-        await RuntimeInitializer.InitializeAsync();
+        if(!Engine.Initialized)
+        {
+            await RuntimeInitializer.InitializeAsync();
+            //先用很爛的方式初始化
+            PlayerData.Instance.usingRuneIDs[(int)ECardElement.Red] = "艾妮(血系)";
+            PlayerData.Instance.usingRuneIDs[(int)ECardElement.Green] = "樹女";
+            PlayerData.Instance.usingRuneIDs[(int)ECardElement.Blue] = "赫菲";
+        }
 
         Debug.Log("WTF?!");
         if (Engine.Initialized) DoMyCustomWork();
@@ -23,16 +30,16 @@ public class NaniTestShit : MonoBehaviour
         // Engine is initialized here, it's safe to use the APIs.
         var player = Engine.GetService<IScriptPlayer>();
         
-        var paramArr = Toolbox.Instance.GetOrAddComponent<DataService>().paramArr;
-        if (paramArr != null && !string.IsNullOrEmpty(paramArr[2]))
+        var scriptParameter = Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter;
+        if (scriptParameter != null && !string.IsNullOrEmpty(scriptParameter.scriptName))
         {
-            if(!string.IsNullOrEmpty(paramArr[3]))
+            if(!string.IsNullOrEmpty(scriptParameter.scriptLabel))
             {
-                player.PreloadAndPlayAsync(paramArr[2], label:paramArr[3]).Forget();
+                player.PreloadAndPlayAsync(scriptParameter.scriptName, label:scriptParameter.scriptLabel).Forget();
             }
             else
             {
-                player.PreloadAndPlayAsync(paramArr[2]).Forget();
+                player.PreloadAndPlayAsync(scriptParameter.scriptName).Forget();
             }
         }
         else

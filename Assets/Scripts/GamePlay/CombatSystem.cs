@@ -85,7 +85,8 @@ public class CombatSystem : MonoBehaviour
     RawImage blackMask;
 
 
-    public async UniTask SwitchStateToCombatModeAsync(CancellationToken cancellationToken = default)
+    // public async UniTask SwitchStateToCombatModeAsync(CancellationToken cancellationToken = default)
+    public void SwitchStateToCombatModeAsync()
     {
         // 1. Disable Naninovel input.
         //var inputManager = Engine.GetService<IInputManager>();
@@ -97,9 +98,9 @@ public class CombatSystem : MonoBehaviour
         var scriptPlayer = Engine.GetService<IScriptPlayer>();
         scriptPlayer.Stop();
 
-        // 3. Reset state.
-        var stateManager = Engine.GetService<IStateManager>();
-        await stateManager.ResetStateAsync();
+        // 3. Reset state. // 這一條指令會使整個nani重設回初始狀態 而我們只是想暫停而已
+        //var stateManager = Engine.GetService<IStateManager>();
+        //await stateManager.ResetStateAsync();
 
         
         // 4. Switch cameras.
@@ -137,7 +138,7 @@ public class CombatSystem : MonoBehaviour
     */
     void Awake()
     {
-        SwitchStateToCombatModeAsync().Forget();
+        // SwitchStateToCombatModeAsync().Forget();
 
         pc = GameObject.FindWithTag("Player").GetComponent<PlayerController>();
         combatTxtPanel = GameObject.FindWithTag("Respawn").GetComponent<UICombatTextPanel>();
@@ -150,12 +151,14 @@ public class CombatSystem : MonoBehaviour
         dialogText = dialogObj.transform.Find("Image/Text").GetComponent<Text>();
         mobUnit = GameObject.FindGameObjectWithTag("Enemy").GetComponent<EnemyUnit>();
         visualResource = GetComponent<CombatVisualResources>();
+
+        SwitchStateToCombatModeAsync();
     }
 
     void Init()
     {
-        Debug.Log($"Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[0] : {Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[0]}");
-        BG.sprite = visualResource.GetBGByName(Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[0]);
+        Debug.Log($"Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[0] : {Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter.background}");
+        BG.sprite = visualResource.GetBGByName(Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter.background);
         BG.gameObject.SetActive(true);
 
         blackMask.DOFade(0f, 0.3f).OnComplete(() =>
@@ -445,19 +448,21 @@ public class CombatSystem : MonoBehaviour
         {
             //SwitchStateToNovelModeAsync().ContinueWith(()=> SceneManager.LoadSceneAsync("NaniDialogTest")) .Forget();
 
-            blackMask.DOFade(1f, 0.5f).SetDelay(0.3f).OnComplete(() =>
-            {
-                var advCamera = GameObject.Find("CombatCamera").GetComponent<Camera>();
-                advCamera.enabled = false;
-                var naniCamera = Engine.GetService<ICameraManager>().Camera;
-                naniCamera.enabled = true;
-                //var inputManager = Engine.GetService<IInputManager>();
-                //inputManager.ProcessInput = true;
-                GameObject.FindObjectOfType<ContinueInputUI>().Visible = true;
-                Engine.GetService<ICustomVariableManager>().SetVariableValue("PlayerName", PlayerData.Instance.playerName);
-                SceneManager.LoadSceneAsync("NaniDialogTest");
-            });
+            blackMask.DOFade(1f, 0.5f).SetDelay(0.3f).OnComplete(BackToNani);
         }
+    }
+
+    public void BackToNani()
+    {
+        var advCamera = GameObject.Find("CombatCamera").GetComponent<Camera>();
+        advCamera.enabled = false;
+        var naniCamera = Engine.GetService<ICameraManager>().Camera;
+        naniCamera.enabled = true;
+        //var inputManager = Engine.GetService<IInputManager>();
+        //inputManager.ProcessInput = true;
+        GameObject.FindObjectOfType<ContinueInputUI>().Visible = true;
+        // Engine.GetService<ICustomVariableManager>().SetVariableValue("PlayerName", PlayerData.Instance.playerName);
+        SceneManager.LoadSceneAsync("NaniDialogTest");
     }
 
     public void ReloadScene()
@@ -467,7 +472,7 @@ public class CombatSystem : MonoBehaviour
 
     public void GotoChangeRuneScene()
     {
-        SceneManager.LoadScene("ChangeRuneScene");
+        // SceneManager.LoadScene("ChangeRuneScene");
     }
 
     public void CloseFightScene()

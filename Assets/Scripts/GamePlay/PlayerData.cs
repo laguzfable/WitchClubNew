@@ -25,7 +25,7 @@ public class PlayerData
 
     public int money = 0;
 
-    public string playerName;
+    // public string playerName;
 
     public Inventory inventory { private set; get; } = new Inventory();
 

@@ -64,8 +64,8 @@ public class EnemyUnit : BaseCombatUnit
     {
         base.Init();
 
-        Debug.Log($"Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[1] : {Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[1]}");
-        sprRend.sprite = combatSystem.visualResource.GetMobByName(Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[1]);
+        Debug.Log($"Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[1] : {Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter.combatTarget}");
+        sprRend.sprite = combatSystem.visualResource.GetMobByName(Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter.combatTarget);
         sprRend.enabled = true;
 
         HP.Restore();

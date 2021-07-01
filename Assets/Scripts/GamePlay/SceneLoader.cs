@@ -78,8 +78,8 @@ public class SceneLoader : MonoBehaviour
             //inputManager.ProcessInput = true;
             GameObject.FindObjectOfType<ContinueInputUI>().Visible = isEnable;
 
-            Toolbox.Instance.GetOrAddComponent<DataService>().paramArr = null;
-            PlayerData.Instance.playerName = null;
+            Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter = null;
+            // PlayerData.Instance.playerName = null;
         }
         
 

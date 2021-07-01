@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//沒在用了
 public class DialogueManager : MonoBehaviour
 {
 
