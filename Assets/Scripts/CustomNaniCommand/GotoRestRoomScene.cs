@@ -17,12 +17,11 @@ public class GotoRestRoomScene : Command, Command.IForceWait
         var printerMgr = Engine.GetService<ITextPrinterManager>();
         await printerMgr.GetActor(printerMgr.DefaultPrinterId).ChangeVisibilityAsync(false, 0.1f);
         
-        if(!Assigned(ScriptName))
+        if(Assigned(ScriptName))
         {
-            ScriptName = Engine.GetService<IScriptPlayer>().PlayedScript.Name;
+            Toolbox.Instance.GetOrAddComponent<DataService>().afterChatScript = new ScriptParameter() { scriptName = ScriptName, scriptLabel = Label };
         }
         // PlayerData.Instance.playerName = Engine.GetService<ICustomVariableManager>().GetVariableValue("PlayerName");
-        Toolbox.Instance.GetOrAddComponent<DataService>().afterChatScript = new ScriptParameter() { scriptName = ScriptName, scriptLabel = Label };
         Engine.GetService<ICustomVariableManager>().SetVariableValue("CanChat", "true");
         await SceneManager.LoadSceneAsync("RestRoom");
         //return UniTask.CompletedTask;
