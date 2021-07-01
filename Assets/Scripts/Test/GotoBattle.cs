@@ -7,7 +7,7 @@ using Naninovel;
 
 public class GotoBattle : MonoBehaviour
 {
-
+    /*
     private void Awake()
     {   
         // 1. Disable Naninovel input.
@@ -31,7 +31,7 @@ public class GotoBattle : MonoBehaviour
         var naniCamera = Engine.GetService<ICameraManager>().Camera;
         naniCamera.enabled = false;
     }
-
+    */
     // Use this for initialization
     void Start()
     {

@@ -77,7 +77,7 @@ public class RestRoom : MonoBehaviour
 
     void GotoNani()
     {
-        var advCamera = GameObject.Find("CombatCamera").GetComponent<Camera>();
+        var advCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
         advCamera.enabled = false;
         var naniCamera = Engine.GetService<ICameraManager>().Camera;
         naniCamera.enabled = true;
