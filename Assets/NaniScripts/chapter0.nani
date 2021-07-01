@@ -18,6 +18,8 @@
 
 我不以為意地按下開始遊戲，並且正要將零食拿回座位享用之際，卻因為一個重心不穩，狠狠地撞到了電腦螢幕－－
 
+@restroom scriptName:chapter0 label:ya2
+@stop
 
 @spawn ShakeBackground
 @back cg00 pos:50,100 time:0
@@ -62,6 +64,8 @@
 艾妮格玫.scared: 聞起來有種不祥的氣味，我們還是把它丟掉好了。
 赫菲.angry: 不要啦！那是人家花錢買來的耶，而且艾妮不是血系的女巫嗎！怎麼可以怕那種東西！妳可是連蛆還有羊的生殖器還有活人的眼球都碰過的女人欸！
 艾妮格玫.idle: 其實那些我都沒……
+
+# ya2
 
 @char 薇狄亞.smile pos:75 time:1
 @char 赫菲 pos:50 time:0
