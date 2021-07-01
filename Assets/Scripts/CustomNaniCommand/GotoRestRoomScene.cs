@@ -11,6 +11,12 @@ public class GotoRestRoomScene : Command, Command.IForceWait
     public StringParameter Label;
     public async override UniTask ExecuteAsync(CancellationToken cancellationToken = default)
     {
+
+        Engine.GetService<IUIManager>().SetUIVisibleWithToggle(false, false);
+
+        var printerMgr = Engine.GetService<ITextPrinterManager>();
+        await printerMgr.GetActor(printerMgr.DefaultPrinterId).ChangeVisibilityAsync(false, 0.1f);
+        
         if(!Assigned(ScriptName))
         {
             ScriptName = Engine.GetService<IScriptPlayer>().PlayedScript.Name;
