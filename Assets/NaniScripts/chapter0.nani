@@ -2,6 +2,14 @@
 
 
 
+
+ㄤㄤ
+@restroom scriptName:chapter0 label:ya
+@stop
+
+
+#ya
+
 @back bg00
 
 這是一個一如往常的平凡下午，家裡蹲的我，因為窮極無聊而打開最近在St**m大特賣購買的遊戲－－巫術戰爭。
@@ -24,6 +32,7 @@
 @back black pos:50,50 time:0
 @wait 1
 @back cg01
+@sfx bling loop:false
 ？？？: 真的在女巫的包包裡相遇了呢，異鄉人。
 ？？？: 我在這裡啦，這裡這裡。
 ？？？: 這樣貌……跟預言中的敘述好像不太一樣呢。
@@ -62,6 +71,7 @@
 赫菲.bling: 終於拿到了嗎？快點，我等不及了！
 艾妮格玫: 我來點火！
 @spawn Dust
+@sfx mist loop:false
 赫菲.smile: 呼啊～感覺真好。
 
 
@@ -84,7 +94,7 @@
 赫菲.idle: 巫術戰爭早就打完了啦～
 瓶中精靈: 真的假的？！看起來我真的被放在倉庫裡太久了……
 
-(敲門聲)
+@sfx knocking loop:false
 
 艾妮格玫.idle: 完了！一定是蘇菲亞要來收房租了！
 赫菲.what: 怎麼辦！艾妮妳去開門啦～
@@ -124,10 +134,13 @@
 赫菲.what: 別激動啊艾妮，再把牆壁打壞的話怎麼辦，我們已經快要沒錢付給蘇菲亞了。
 艾妮格玫: 妳少買一點東西不就有錢了！
 赫菲.angry: 不是啊，我買的東西至少都有用，妳這樣破壞根本沒意義嘛！
+@sfx explosion loop:false
 艾妮格玫: 妳買的東西是有什麼屁用，那個爛洗衣機把我的衣服都洗壞了，御血術－－
 @spawn ShakeBackground
-(爆炸聲)
+@sfx magicattack loop:false
 赫菲.angry: 豈有此理！奧術衝擊－－
+
+
 瓶中精靈.exc: 哇塞，這法術滿強的嘛，難道迷霧草真的有用？！
 @hide 瓶中精靈
 @hide 赫菲
@@ -218,43 +231,8 @@
 涅莉.yummy: 好啦，既然我都被放出來了，就傳授一些小精靈戰鬥秘訣給妳們吧。
 @hide 涅莉,赫菲,艾妮格玫,薇狄亞
 
-# battle000
-
-@hideAll
-@back b1
-@wait i
-@back b2
-@wait i
-@back b3
-@wait i
-@back b4
-@wait i
-@back b5
-@wait i
-@back b6
-@wait i
-@back b7
-@wait i
-@back b8
-@wait i
-@back b9
-@wait i
-@back bg02
-@char 涅莉 pos:50
-
-如何？準備好要戰鬥了嗎？
-
-@choice 我準備好了。 goto:.battle666
-
-
-@choice 可以再解釋一次嗎？ goto:.battle000
-@stop
-
-# battle666
-
-
-@battle background:bg03 target:monster00 scriptName:chapter0 label:afterbattle
-@stop
+--battle background:bg03 target:monster00 scriptName:chapter0 label:afterbattle
+--stop
 
 # afterbattle
 
@@ -291,7 +269,7 @@
 赫菲: 別擔心，蘇菲亞，妳還有我們呀。
 薇狄亞: 而且我們很快就會找到更多同伴了。
 赫菲: 趕緊去準備新的料理吧，明天開始，生意一定會越來越好。
-@hide 蘇菲亞
+
 @back bg02
 @char 涅莉 pos:50
 涅莉.yummy: 耶～食物！

@@ -184,6 +184,24 @@ MonoBehaviour:
     - Name: chapter2
       PathPrefix: Scripts
       Guid: 85659255b157c2d44bdd2b4b5b8c48e9
+    - Name: NewScript
+      PathPrefix: Scripts
+      Guid: 90765ecf581c7fa4eba0038f28eb5a7a
+    - Name: chapter3
+      PathPrefix: Scripts
+      Guid: fbda46458b00c31408bc653b963f2642
+    - Name: chapter4
+      PathPrefix: Scripts
+      Guid: 5ede668e4e6c33e4d99ed68ae707c57e
+    - Name: chapter5
+      PathPrefix: Scripts
+      Guid: 24bfd8d2772f5d64d9c9f2e709da389a
+    - Name: NewScript
+      PathPrefix: Scripts
+      Guid: a4a1b4ccf2f67ec4881926626e3d8e17
+    - Name: 111
+      PathPrefix: Scripts
+      Guid: c0f8e5b8f5cd6164ead0d2cd95c8a340
   - Id: CharacterAvatars
     Resources: []
   - Id: Characters/1b811ae2-016d-4e41-99d5-e3d5573de616
@@ -255,9 +273,48 @@ MonoBehaviour:
     - Name: cg10
       PathPrefix: Backgrounds/MainBackground
       Guid: 1abb2dcf313b8ff4aaeb3c44275afb5a
+    - Name: cg11
+      PathPrefix: Backgrounds/MainBackground
+      Guid: 
+    - Name: cg12
+      PathPrefix: Backgrounds/MainBackground
+      Guid: 
+    - Name: cg13
+      PathPrefix: Backgrounds/MainBackground
+      Guid: 
+    - Name: cg14
+      PathPrefix: Backgrounds/MainBackground
+      Guid: 
+    - Name: cg15
+      PathPrefix: Backgrounds/MainBackground
+      Guid: 
     - Name: cg16
       PathPrefix: Backgrounds/MainBackground
       Guid: 85e09844fcae15a4caf9ceac9af83010
+    - Name: cg17
+      PathPrefix: Backgrounds/MainBackground
+      Guid: 3d4216b37a275874eb84cc472ac305da
+    - Name: cg18
+      PathPrefix: Backgrounds/MainBackground
+      Guid: dd1bcdd5da5d1874d962ec5a1419a855
+    - Name: cg19
+      PathPrefix: Backgrounds/MainBackground
+      Guid: 119b9d22537d0b64caff83a0e0ff0829
+    - Name: cg20
+      PathPrefix: Backgrounds/MainBackground
+      Guid: 8f4add957fb9ca84490f8702131963b0
+    - Name: cg25
+      PathPrefix: Backgrounds/MainBackground
+      Guid: 70dfa7bb0520a7c4a89b8cc253df5f4d
+    - Name: cg26
+      PathPrefix: Backgrounds/MainBackground
+      Guid: 2c343949e82cc3040bc06ed376ca2970
+    - Name: cg27
+      PathPrefix: Backgrounds/MainBackground
+      Guid: 3201bdb8b890e3d499606713734980b3
+    - Name: cg28
+      PathPrefix: Backgrounds/MainBackground
+      Guid: df02c7197284a464e9f548e5ed714685
     - Name: star1
       PathPrefix: Backgrounds/MainBackground
       Guid: da8fcafa1ef663d49bbb3f72605a7a90
@@ -291,9 +348,12 @@ MonoBehaviour:
     - Name: b9
       PathPrefix: Backgrounds/MainBackground
       Guid: 112ad7196b145074b80914c00bf2518d
-    - Name: cg17
+    - Name: bg08
       PathPrefix: Backgrounds/MainBackground
-      Guid: 3d4216b37a275874eb84cc472ac305da
+      Guid: 95e5e24448dffb34f905716279a86aa5
+    - Name: bg08b
+      PathPrefix: Backgrounds/MainBackground
+      Guid: 4846961ad7ff0aa46bc79b00cb829777
   - Id: Characters/2e2ce2b9-5a12-417a-9d42-26ad8383d563
     Resources: []
   - Id: Characters/d2d55f76-39a6-459e-b8c6-994b1a1e77ab
@@ -345,3 +405,110 @@ MonoBehaviour:
     - Name: witch1and2
       PathPrefix: "Characters/\u5973\u5DEB"
       Guid: 209e3d099b761a94a8714bbd2639f8e9
+  - Id: Characters/36bb69a1-c468-4733-806b-b89d50c8931c
+    Resources:
+    - Name: syb
+      PathPrefix: Characters
+      Guid: 59dddb1117011984198dc4d37314e512
+  - Id: Characters/4bd11ee7-7271-4dce-8158-b5a79f5c7cf7
+    Resources:
+    - Name: may
+      PathPrefix: Characters
+      Guid: 9e580dd36d457c9488e9c56f88f3375c
+  - Id: Characters/49f2f6f0-fdc0-4590-a396-c1f94118d158
+    Resources:
+    - Name: nic
+      PathPrefix: Characters
+      Guid: c2a8adb7ebd63a54186040558ed5e36a
+  - Id: Characters/71bb56b5-386a-4bd6-8a1c-7cbf6b770c03
+    Resources:
+    - Name: witchf
+      PathPrefix: Characters/wf
+      Guid: df87de68aca1ccd419fd6f83aa563fe4
+  - Id: Characters/28a93c08-bfd0-4d7d-adc5-bf18710129a0
+    Resources:
+    - Name: chl
+      PathPrefix: Characters
+      Guid: f2f291407f1b3d440bf28116fb3f5c2f
+  - Id: Characters/e996eaa9-de2b-4f0e-ade5-c7043b0c2f94
+    Resources:
+    - Name: witch_a
+      PathPrefix: Characters/witcha
+      Guid: d262c22b5caef8943b009196dac8f9c5
+  - Id: Characters/849c30c5-1627-4bca-86c6-a0b5a1e8ecb5
+    Resources:
+    - Name: witch_b
+      PathPrefix: Characters/witchb
+      Guid: 4f863ee9acd60594db40cddaab56683c
+  - Id: Characters/f19162b0-85cd-4b54-80c6-dfba77a6a2ec
+    Resources:
+    - Name: witch_c
+      PathPrefix: Characters/witchc
+      Guid: f0bd3ba934d142a42b71a993a3520f3e
+  - Id: Characters/f0f97acf-f8e9-4293-b43b-d5bfe2b4644e
+    Resources:
+    - Name: witch_e
+      PathPrefix: Characters/witche
+      Guid: 4935cda4cb61e634f8bb475c79cf19e7
+  - Id: Characters/2c2e8947-f360-4a2a-8a7b-6d9c3dfab618
+    Resources:
+    - Name: witch_d
+      PathPrefix: Characters/witchd
+      Guid: 960006197d5c3b641b8189cc72ef4c20
+  - Id: Characters/07eee5f6-2661-46b4-8b14-9f26c2126e52
+    Resources:
+    - Name: witch_f
+      PathPrefix: Characters/witchf
+      Guid: b7baa15dbb2d39b43a4a2e25446fd449
+  - Id: Characters/d00c4d60-ee60-40a2-b2f2-d0f63f3934d6
+    Resources:
+    - Name: witch_g
+      PathPrefix: Characters/witchg
+      Guid: 4b21d257ab6e57a44907a012acedc842
+  - Id: Characters/2bfeb204-61e9-4548-9349-e4bad2892e88
+    Resources:
+    - Name: witch_h
+      PathPrefix: Characters/witchh
+      Guid: 3b819c2a758bc914ab40b1b4524358d6
+  - Id: Characters/3ee249a6-b157-4971-bf80-965fbe066400
+    Resources:
+    - Name: witch_girl
+      PathPrefix: Characters/witchgirl
+      Guid: 34eb4a90f3eb15a47b77d8268cd01ebe
+  - Id: Characters/25c7e8db-6435-4965-8660-0de7e4d13c5c
+    Resources:
+    - Name: witch_i
+      PathPrefix: Characters/witchi
+      Guid: 7f4ede88e357f3243be38d7b401af272
+  - Id: Characters/be5f1684-8dd2-4094-bcc1-5a7afdd3d20c
+    Resources:
+    - Name: witch_j
+      PathPrefix: Characters/witchj
+      Guid: 66a6cc714fb4e8148a740c46858d2fc8
+  - Id: Characters/982e384c-1c32-4c1b-9621-0cab3dd2718a
+    Resources:
+    - Name: broom
+      PathPrefix: Characters
+      Guid: c290e5bf6d518ec4b98de09d75e56ce3
+  - Id: Audio
+    Resources:
+    - Name: bling
+      PathPrefix: Audio
+      Guid: 2f57c36afebfe5f4f9c332feb74735e2
+    - Name: explosion
+      PathPrefix: Audio
+      Guid: f7bfba28c4d9c474e8a76927eef0275e
+    - Name: knocking
+      PathPrefix: Audio
+      Guid: df670f8bb19088d4ababa07ff83326d7
+    - Name: magicattack
+      PathPrefix: Audio
+      Guid: 58d430ce8ab812b448b79365f4b48f6e
+    - Name: mist
+      PathPrefix: Audio
+      Guid: 81d5cd5eabc6a644aac993870a58eb6d
+    - Name: pop
+      PathPrefix: Audio
+      Guid: 8b5f2d9c9b3009247a8d2852e226eb98
+  - Id: Unlockables
+    Resources: []

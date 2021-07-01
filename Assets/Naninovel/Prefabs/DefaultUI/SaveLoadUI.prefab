@@ -65,6 +65,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0.39215687}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -179,6 +180,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0.39215687}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -281,6 +283,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -454,6 +457,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 0.33333334}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -482,7 +486,7 @@ GameObject:
   - component: {fileID: 114608614909477186}
   - component: {fileID: 114078124005740442}
   m_Layer: 5
-  m_Name: ISaveLoadUI
+  m_Name: SaveLoadUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -544,17 +548,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   disableInteraction: 0
   visibleOnAwake: 0
+  controlOpacity: 1
   fadeTime: 0.3
+  ignoreTimeScale: 1
   focusObject: {fileID: 1709518715411574}
   focusMode: 1
-  onVisibilityChanged:
+  onShow:
+    m_PersistentCalls:
+      m_Calls: []
+  onHide:
     m_PersistentCalls:
       m_Calls: []
   hideOnLoad: 0
   saveVisibilityState: 0
   blockInputWhenVisible: 1
-  modalUI: 1
   allowedSamplers: []
+  modalUI: 1
+  fontChangeConfiguration: []
   quickLoadToggle: {fileID: 114549827182348502}
   saveToggle: {fileID: 114747713749170174}
   loadToggle: {fileID: 114617234096396544}
@@ -611,7 +621,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 55
 --- !u!1 &1299424693387602
 GameObject:
   m_ObjectHideFlags: 0
@@ -687,10 +697,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   disableInteraction: 0
   visibleOnAwake: 1
+  controlOpacity: 1
   fadeTime: 0.3
+  ignoreTimeScale: 1
   focusObject: {fileID: 0}
   focusMode: 0
-  onVisibilityChanged:
+  onShow:
+    m_PersistentCalls:
+      m_Calls: []
+  onHide:
     m_PersistentCalls:
       m_Calls: []
   slotPrototype: {fileID: 114579363058760492, guid: 2372d9693a905a1458cdfa2b90c076b7,
@@ -761,6 +776,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 0
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -882,10 +898,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   disableInteraction: 0
   visibleOnAwake: 1
+  controlOpacity: 1
   fadeTime: 0.3
+  ignoreTimeScale: 1
   focusObject: {fileID: 0}
   focusMode: 0
-  onVisibilityChanged:
+  onShow:
+    m_PersistentCalls:
+      m_Calls: []
+  onHide:
     m_PersistentCalls:
       m_Calls: []
   slotPrototype: {fileID: 114579363058760492, guid: 2372d9693a905a1458cdfa2b90c076b7,
@@ -955,6 +976,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1032,6 +1054,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1205,6 +1228,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 0.33333334}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1282,6 +1306,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1455,6 +1480,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 0.33333334}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1531,6 +1557,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0.39215687}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1644,10 +1671,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   disableInteraction: 0
   visibleOnAwake: 1
+  controlOpacity: 1
   fadeTime: 0.3
+  ignoreTimeScale: 1
   focusObject: {fileID: 0}
   focusMode: 0
-  onVisibilityChanged:
+  onShow:
+    m_PersistentCalls:
+      m_Calls: []
+  onHide:
     m_PersistentCalls:
       m_Calls: []
   slotPrototype: {fileID: 114579363058760492, guid: 2372d9693a905a1458cdfa2b90c076b7,
@@ -1718,6 +1750,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 0
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1825,6 +1858,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 0
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1934,6 +1968,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 0
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -2043,6 +2078,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -2113,10 +2149,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   disableInteraction: 0
   visibleOnAwake: 1
+  controlOpacity: 1
   fadeTime: 0.3
+  ignoreTimeScale: 1
   focusObject: {fileID: 0}
   focusMode: 0
-  onVisibilityChanged:
+  onShow:
+    m_PersistentCalls:
+      m_Calls: []
+  onHide:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &1949930471602468
@@ -2182,6 +2223,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0.39215687}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -2282,6 +2324,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0.39215687}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
