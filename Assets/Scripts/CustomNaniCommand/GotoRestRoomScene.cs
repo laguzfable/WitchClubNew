@@ -22,7 +22,7 @@ public class GotoRestRoomScene : Command, Command.IForceWait
             Toolbox.Instance.GetOrAddComponent<DataService>().afterChatScript = new ScriptParameter() { scriptName = ScriptName, scriptLabel = Label };
         }
         // PlayerData.Instance.playerName = Engine.GetService<ICustomVariableManager>().GetVariableValue("PlayerName");
-        Engine.GetService<ICustomVariableManager>().SetVariableValue("CanChat", "true");
+        Engine.GetService<ICustomVariableManager>().SetVariableValue("CanChat", Assigned(ScriptName).ToString());
         await SceneManager.LoadSceneAsync("RestRoom");
         //return UniTask.CompletedTask;
     }
