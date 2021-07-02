@@ -31761,15 +31761,15 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: -2
-  m_Sprite: {fileID: 0}
-  m_Color: {r: 0.4528302, g: 0.18583126, b: 0.22812061, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 635a24377f2586f4aa70958bc0ae125d, type: 3}
+  m_Color: {r: 0.7075472, g: 0.52398545, b: 0.5536792, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 19.2, y: 10.8}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!4 &1881787484
@@ -32439,7 +32439,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e95acfd2e3695442a8407dd41b1833b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  paramArr: []
+  startScript:
+    value: 
+    hasValue: 0
+    dynamicValueData:
+      PlaybackSpot:
+        scriptName: 
+        lineIndex: 0
+        inlineIndex: 0
+      ValueText: 
+      Expressions: []
 --- !u!114 &1959616813
 MonoBehaviour:
   m_ObjectHideFlags: 0

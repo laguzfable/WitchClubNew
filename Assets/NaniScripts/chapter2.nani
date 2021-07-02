@@ -320,7 +320,11 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 涅莉: 矮額，有股熟悉的詭異氣息呢。
 ？？？: 尤芙蘿絲！給我滾出來！
 @hide 涅莉
-02 黑黑的那坨(有點人形)
+
+@battle background:bg05 target:monsterez label:afterbattle5
+@stop
+
+# afterbattle5
 
 @char 蘇菲亞 pos:50
 蘇菲亞: 請妳們下來搬兩桶酒怎麼搞這麼久呢，大餐都準備好了說。
@@ -448,7 +452,10 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 ？？？: 挺有架式的嘛，血巫結社就是不一樣唷……我看看，四個系都到齊了嘛，居然還有異鄉人，這下有趣了。"
 may.happy: 來吧，讓我瞧瞧那異域之力－－"
 
-03 梅伊
+@battle background:bg05 target:monstermay label:afterbattle6
+@stop
+
+# afterbattle6
 
 @hide may
 

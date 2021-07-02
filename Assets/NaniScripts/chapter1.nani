@@ -60,14 +60,14 @@
 薇狄亞: 不行呀！牠一直對著我罵髒話！
 獵犬: 汪汪汪！
 涅莉: ……真是看不下去了，{PlayerName}，幫忙一下吧。
-
+@back black
 
 
 
 @hide 薇狄亞,涅莉,艾妮格玫
 
--@battle background:bg03 target:monster02 label:afterbattle2
--@stop
+@battle background:black target:monster02 label:afterbattle2
+@stop
 
 # afterbattle2
 
@@ -132,12 +132,13 @@
 @char 鬱鬱 pos:35
 ？？？: 要打架可以去別的地方嗎，我們這裡還要做生意的！
 @hide 陰陰,鬱鬱
-
--@battle background:bg02 target:monster01 label:afterbattle3
--@stop
+@back black
+@battle background:black target:monster01 label:afterbattle3
+@stop
 
 # afterbattle3
 
+@back bg02
 
 @char 莉莉娜.test pos:50
 莉莉娜: 什麼事情那麼吵呀？啊！赫菲！好久不見耶。
@@ -278,8 +279,8 @@
 
 @hide 涅莉
 
--@battle background:bg05 target:monster03 label:afterbattle4
--@stop
+@battle background:bg05 target:monster03 label:afterbattle4
+@stop
 
 # afterbattle4
 @back bg05 time:0
