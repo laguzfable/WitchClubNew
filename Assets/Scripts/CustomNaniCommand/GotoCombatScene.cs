@@ -16,6 +16,8 @@ public class GotoCombatScene : Command, Command.IForceWait
     {
 
         // Engine.GetService<IUIManager>().SetUIVisibleWithToggle(false, false);
+        
+        Engine.GetService<IBackgroundManager>().GetActor(BackgroundsConfiguration.MainActorId).Visible = false;
 
         var printerMgr = Engine.GetService<ITextPrinterManager>();
         await printerMgr.GetActor(printerMgr.DefaultPrinterId).ChangeVisibilityAsync(false, 0.1f);
@@ -32,6 +34,7 @@ public class GotoCombatScene : Command, Command.IForceWait
         PlayerData.Instance.usingRuneIDs[(int)ECardElement.Blue] = "赫菲";
         */
         Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter = new ScriptParameter() { background = Background, combatTarget = Target, scriptName = ScriptName, scriptLabel = Label };
+        TutorialController.isTutorial = false;
         await SceneManager.LoadSceneAsync("CombatScene");
         //return UniTask.CompletedTask;
     }

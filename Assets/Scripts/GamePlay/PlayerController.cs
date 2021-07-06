@@ -60,6 +60,8 @@ public class PlayerController : MonoBehaviour
         //playerUnit = GetComponent<PlayerUnit>();
         combatSystem = GameObject.FindWithTag("GameController").GetComponent<CombatSystem>();
         dataService = Toolbox.Instance.GetOrAddComponent<DataService>();
+
+        playBtn.onClick.AddListener(PlayAction);
     }
 
     // Use this for initialization

@@ -35,7 +35,7 @@ public class EnemyUnit : BaseCombatUnit
     MobAction[] actionArr;
     int curActIndex = 0;
 
-    SpriteRenderer sprRend;
+    public SpriteRenderer sprRend {private set; get; }
 
     private void Awake()
     {
@@ -64,10 +64,12 @@ public class EnemyUnit : BaseCombatUnit
     {
         base.Init();
 
-        Debug.Log($"Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[1] : {Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter.combatTarget}");
-        sprRend.sprite = combatSystem.visualResource.GetMobByName(Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter.combatTarget);
-        sprRend.enabled = true;
-
+        if(!TutorialController.isTutorial)
+        {
+            Debug.Log($"Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[1] : {Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter.combatTarget}");
+            sprRend.sprite = combatSystem.visualResource.GetMobByName(Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter.combatTarget);
+            sprRend.enabled = true;
+        }
         HP.Restore();
     }
 

@@ -152,6 +152,8 @@ public class CombatSystem : MonoBehaviour
         mobUnit = GameObject.FindGameObjectWithTag("Enemy").GetComponent<EnemyUnit>();
         visualResource = GetComponent<CombatVisualResources>();
 
+        //GetComponent<CombatUICollection>().SetRunesEnabled(false);
+
         SwitchStateToCombatModeAsync();
     }
 
