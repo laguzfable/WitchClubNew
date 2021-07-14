@@ -90,6 +90,7 @@ public class TutorialController : MonoBehaviour
             }
             else
             {
+                playerController.combatSystem.PrepareBeginTurn();
                 yield return new WaitUntil(()=> canGoNext);
                 yield return new WaitForSeconds(0.32f);
             }
@@ -104,7 +105,7 @@ public class TutorialController : MonoBehaviour
             leftDialog.SetActive(false);
             rightDialog.SetActive(false);
         }
-
+        playerController.combatSystem.GameOver(false);
     }
 
 }

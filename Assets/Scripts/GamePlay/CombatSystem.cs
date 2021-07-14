@@ -389,7 +389,7 @@ public class CombatSystem : MonoBehaviour
         PrepareBeginTurn();
     }
 
-    void PrepareBeginTurn()
+    public void PrepareBeginTurn()
     {
 
         if (!isContinue)
@@ -399,11 +399,14 @@ public class CombatSystem : MonoBehaviour
 
         pc.ReflashCards(true);
 
-        envEffect.remainTurn--;
-        if (envEffect.remainTurn <= 0)
+        if(!TutorialController.isTutorial)
         {
-            envEffect.SwitchToNextEffect();
-            envEffect.GetNextEffect();
+            envEffect.remainTurn--;
+            if (envEffect.remainTurn <= 0)
+            {
+                envEffect.SwitchToNextEffect();
+                envEffect.GetNextEffect();
+            }
         }
 
         MobGetNewAction();

@@ -413,37 +413,52 @@ public class PlayerController : MonoBehaviour
         // 這裡塞教學用指定的卡
         if(TutorialController.isTutorial)
         {
-            var tutorObj = FindObjectOfType<TutorialController>().curTutorialObj;
-            // 檢查id
             int[] cardArr = null;
-            switch(tutorObj.customActionID)
+
+            var tutorObj = FindObjectOfType<TutorialController>().curTutorialObj;
+            if(tutorObj != null)
             {
-            // 透過事件id判斷教學條件是否達成
-                case "playRed":
-                    {
-                        cardArr = new int[]{101, 102, 101, 101, 103};
-                    }
-                    break;
-                case "playRed2":
-                    {
-                        cardArr = new int[]{101, 101, 101, 102, 101};
-                    }
-                    break;
-                case "playBlue":
-                    {
-                        cardArr = new int[]{102, 102, 103, 102, 103};
-                    }
-                    break;
-                case "playGreen":
-                    {
-                        cardArr = new int[]{103, 101, 103, 102, 103};
-                    }
-                    break;
+                // 檢查id
+                switch(tutorObj.customActionID)
+                {
+                // 透過事件id判斷教學條件是否達成
+                    case "playRed":
+                        {
+                            cardArr = new int[]{101, 102, 101, 101, 103};
+                        }
+                        break;
+                    case "playRed2":
+                        {
+                            cardArr = new int[]{101, 101, 101, 102, 101};
+                        }
+                        break;
+                    case "playBlue":
+                        {
+                            cardArr = new int[]{102, 102, 103, 102, 103};
+                        }
+                        break;
+                    case "playGreen":
+                        {
+                            cardArr = new int[]{103, 101, 103, 102, 103};
+                        }
+                        break;
+                }
+            }
+            if(cardArr == null)
+            {
+                cardArr = new int[]{101, 102, 101, 101, 103};
             }
             for (var i = 0; i < cards.Length; i++)
             {
                 var card = cards[i];
-                card.ID = cardArr[i];
+                if(card.ID == cardArr[i])
+                {
+                    card.LevelUp();
+                }
+                else
+                {
+                    card.ID = cardArr[i];
+                }
                 card.element = GetCardElement(card.ID);
                 card.SetSelectState(false);
             }
