@@ -17,7 +17,7 @@ public class CombatSystem : MonoBehaviour
 
     public UICombatTextPanel combatTxtPanel { private set; get; }
 
-    bool isContinue = true;
+    public bool isContinue = true;
 
     public GameObject startBattleUI;
 
@@ -136,9 +136,13 @@ public class CombatSystem : MonoBehaviour
         //inputManager.ProcessInput = true;
     }
     */
+    [SerializeField]
+    GameObject localEventSystem;
+    public bool IsTestMode => localEventSystem.activeSelf;
     void Awake()
     {
         // SwitchStateToCombatModeAsync().Forget();
+        localEventSystem.SetActive(!Engine.Initialized);
 
         pc = GameObject.FindWithTag("Player").GetComponent<PlayerController>();
         combatTxtPanel = GameObject.FindWithTag("Respawn").GetComponent<UICombatTextPanel>();
@@ -153,14 +157,23 @@ public class CombatSystem : MonoBehaviour
         visualResource = GetComponent<CombatVisualResources>();
 
         //GetComponent<CombatUICollection>().SetRunesEnabled(false);
-
-        SwitchStateToCombatModeAsync();
+        if(!IsTestMode)
+        {
+            SwitchStateToCombatModeAsync();
+        }
+        else
+        {
+            Init();
+        }
     }
 
     void Init()
     {
-        Debug.Log($"Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[0] : {Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter.background}");
-        BG.sprite = visualResource.GetBGByName(Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter.background);
+        if(!IsTestMode)
+        {
+            Debug.Log($"Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[0] : {Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter.background}");
+            BG.sprite = visualResource.GetBGByName(Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter.background);
+        }
         BG.gameObject.SetActive(true);
 
         blackMask.DOFade(0f, 0.3f).OnComplete(() =>
@@ -435,7 +448,6 @@ public class CombatSystem : MonoBehaviour
     public void GameOver(bool isLose)
     {
         //actTxt.text = "";
-        isContinue = false;
         //StartCoroutine(ShowEnd(waitBattleTime, isPlayerVictory));
         //pc.GetPlayerUnit().HP.Restore();
         //mobUnit.HP.Restore();
@@ -456,6 +468,11 @@ public class CombatSystem : MonoBehaviour
 
     public void BackToNani()
     {
+        if(IsTestMode)
+        {
+            ReloadScene();
+            return;
+        }
         var advCamera = GameObject.Find("CombatCamera").GetComponent<Camera>();
         advCamera.enabled = false;
         var naniCamera = Engine.GetService<ICameraManager>().Camera;

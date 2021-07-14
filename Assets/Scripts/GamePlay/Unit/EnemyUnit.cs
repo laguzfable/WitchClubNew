@@ -64,17 +64,18 @@ public class EnemyUnit : BaseCombatUnit
     {
         base.Init();
 
-        if(!TutorialController.isTutorial)
+        if(!TutorialController.isTutorial && !combatSystem.IsTestMode)
         {
             Debug.Log($"Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[1] : {Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter.combatTarget}");
             sprRend.sprite = combatSystem.visualResource.GetMobByName(Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter.combatTarget);
-            sprRend.enabled = true;
         }
+        sprRend.enabled = true;
         HP.Restore();
     }
 
     protected override void OnDefeated()
     {
+        combatSystem.isContinue = false;
         isMovable = false;
         sprRend.DOFade(0f, 1f).OnComplete(() => combatSystem.GameOver(false));
         //combatSystem.GameOver(false);

@@ -78,6 +78,7 @@ public class PlayerUnit : BaseCombatUnit
 
     protected override void OnDefeated()
     {
+        combatSystem.isContinue = false;
         combatSystem.GameOver(true);
     }
     /*
