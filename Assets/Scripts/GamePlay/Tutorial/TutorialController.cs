@@ -46,6 +46,7 @@ public class TutorialController : MonoBehaviour
                 charImg.sprite = tutorial.displayImg;
                 charImg.SetNativeSize();
                 charImg.gameObject.SetActive(true);
+                charImg.GetComponent<RectTransform>().anchoredPosition = tutorial.unitPos;
                 uICollection.mob.sprRend.enabled = false;
             }
 
@@ -64,17 +65,17 @@ public class TutorialController : MonoBehaviour
 
                 if(tutorial.isClearDisplay)
                 {
-                        displayObj.GetComponent<Image>().CrossFadeAlpha(0f, 0f, true);
-                        displayObj.transform.localScale = Vector3.one * 0.6f;
-                        
-                        displayObj.GetComponent<Image>().CrossFadeAlpha(1f, 0.3f, true);
-                        // seq.Join(displayObj.GetComponent<Image>().DOFade(1f, 0.2f));
-                        seq.Join(displayObj.transform.DOScale(1f, 0.2f));
-                        seq.AppendInterval(0.2f);
+                    displayObj.GetComponent<Image>().CrossFadeAlpha(0f, 0f, true);
+                    displayObj.transform.localScale = Vector3.one * 0.6f;
+                    
+                    displayObj.GetComponent<Image>().CrossFadeAlpha(1f, 0.3f, true);
+                    // seq.Join(displayObj.GetComponent<Image>().DOFade(1f, 0.2f));
+                    seq.Join(displayObj.transform.DOScale(1f, 0.2f));
+                    seq.AppendInterval(0.2f);
                 }
             }
 
-            if(string.IsNullOrEmpty(tutorial.customActionID))
+            // if(string.IsNullOrEmpty(tutorial.customActionID))
             {
                 yield return new WaitUntil(()=> Input.GetMouseButtonUp(0));
                 yield return new WaitForSeconds(0.32f);
@@ -100,7 +101,8 @@ public class TutorialObject
 {
     public string dialog;
     public bool isRight;
-    public Sprite displayImg;
+    public Sprite displayImg;    
+    public Vector2 unitPos;
     public bool isMobUnit;
     public GameObject[] displayObjecArr;
     public bool isClearDisplay;
