@@ -97,6 +97,57 @@ public class PlayerController : MonoBehaviour
     {
         if(result != null)
         {
+            // 這邊插入教學的邏輯
+            if(TutorialController.isTutorial)
+            {
+                var tutorObj = FindObjectOfType<TutorialController>().curTutorialObj;
+                // 檢查id
+                switch(tutorObj.customActionID)
+                {
+                // 透過事件id判斷教學條件是否達成
+                    case "playRed":
+                    case "playRed2":
+                        {
+                            foreach (var card in result.cardList)
+                            {
+                                if(card.element != ECardElement.Red)
+                                {
+                                    combatSystem.combatTxtPanel.DisplaySystemText("請依教學指示執行動作");
+                                    return;
+                                }
+                            }
+                        }
+                        break;
+                    case "playBlue":
+                        {
+                            foreach (var card in result.cardList)
+                            {
+                                if(card.element != ECardElement.Blue)
+                                {
+                                    combatSystem.combatTxtPanel.DisplaySystemText("請依教學指示執行動作");
+                                    return;
+                                }
+                            }
+                        }
+                        break;
+                    case "playGreen":
+                        {
+                            foreach (var card in result.cardList)
+                            {
+                                if(card.element != ECardElement.Green)
+                                {
+                                    combatSystem.combatTxtPanel.DisplaySystemText("請依教學指示執行動作");
+                                    return;
+                                }
+                            }
+                        }
+                        break;
+                    default:
+                        combatSystem.combatTxtPanel.DisplaySystemText("請依教學指示執行動作");
+                        return;
+                        
+                }
+            }
 
             if (result.state == EElementState.Multiple && !playerUnit.HasEffect(EAbilityEffectType.IgnoreElement))
             {
@@ -359,6 +410,45 @@ public class PlayerController : MonoBehaviour
 
     public void ReflashCards(bool isOnlySelected)
     {
+        // 這裡塞教學用指定的卡
+        if(TutorialController.isTutorial)
+        {
+            var tutorObj = FindObjectOfType<TutorialController>().curTutorialObj;
+            // 檢查id
+            int[] cardArr = null;
+            switch(tutorObj.customActionID)
+            {
+            // 透過事件id判斷教學條件是否達成
+                case "playRed":
+                    {
+                        cardArr = new int[]{101, 102, 101, 101, 103};
+                    }
+                    break;
+                case "playRed2":
+                    {
+                        cardArr = new int[]{101, 101, 101, 102, 101};
+                    }
+                    break;
+                case "playBlue":
+                    {
+                        cardArr = new int[]{102, 102, 103, 102, 103};
+                    }
+                    break;
+                case "playGreen":
+                    {
+                        cardArr = new int[]{103, 101, 103, 102, 103};
+                    }
+                    break;
+            }
+            for (var i = 0; i < cards.Length; i++)
+            {
+                var card = cards[i];
+                card.ID = cardArr[i];
+                card.element = GetCardElement(card.ID);
+                card.SetSelectState(false);
+            }
+            return;
+        }
         foreach (var card in cards)
         {
             if (isOnlySelected)

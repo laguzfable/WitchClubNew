@@ -15,6 +15,8 @@ public class TutorialController : MonoBehaviour
 
     [SerializeField] TutorialObject[] tutorialArr;
 
+    public bool canGoNext = false;
+
     private void Start()
     {
         if(isTutorial)
@@ -26,6 +28,8 @@ public class TutorialController : MonoBehaviour
     }
 
 
+    public TutorialObject curTutorialObj { private set; get;} = null;
+
     Sequence seq;
 
     IEnumerator RunTutorialSequence()
@@ -35,6 +39,10 @@ public class TutorialController : MonoBehaviour
         foreach(var tutorial in tutorialArr)
         {
             seq.Kill();
+            
+            curTutorialObj = tutorial;
+            canGoNext = false;
+
             if(tutorial.isMobUnit)
             {
                 charImg.gameObject.SetActive(false);
@@ -75,9 +83,14 @@ public class TutorialController : MonoBehaviour
                 }
             }
 
-            // if(string.IsNullOrEmpty(tutorial.customActionID))
+            if(string.IsNullOrEmpty(tutorial.customActionID))
             {
                 yield return new WaitUntil(()=> Input.GetMouseButtonUp(0));
+                yield return new WaitForSeconds(0.32f);
+            }
+            else
+            {
+                yield return new WaitUntil(()=> canGoNext);
                 yield return new WaitForSeconds(0.32f);
             }
             if(tutorial.isClearDisplay)

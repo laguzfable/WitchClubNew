@@ -381,6 +381,11 @@ public class CombatSystem : MonoBehaviour
             envEffect.SetNextEffect(mobActResult.targetEnvEffect, 1);
         }
 
+        if(TutorialController.isTutorial)
+        {
+            FindObjectOfType<TutorialController>().canGoNext = true;
+            yield break;
+        }
         PrepareBeginTurn();
     }
 
