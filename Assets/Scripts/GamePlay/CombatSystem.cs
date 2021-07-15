@@ -198,6 +198,7 @@ public class CombatSystem : MonoBehaviour
             MapObj = GameObject.Find("MainCamera_Map").GetComponent<CombatMapDemo>();
         }
 
+        envEffect.SetCurrentEffect(EEnvEffectType.None);
         PrepareBeginTurn();
     }
 
@@ -398,7 +399,7 @@ public class CombatSystem : MonoBehaviour
         }
 
         pc.ReflashCards(true);
-
+        
         if(!TutorialController.isTutorial)
         {
             envEffect.remainTurn--;

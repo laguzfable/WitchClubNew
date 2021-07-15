@@ -34,7 +34,7 @@ public class TutorialController : MonoBehaviour
 
     IEnumerator RunTutorialSequence()
     {
-        
+        bool isDialogFinish = false;
         seq = DOTween.Sequence();
         foreach(var tutorial in tutorialArr)
         {
@@ -42,6 +42,7 @@ public class TutorialController : MonoBehaviour
             
             curTutorialObj = tutorial;
             canGoNext = false;
+            isDialogFinish = false;
 
             if(tutorial.isMobUnit)
             {
@@ -55,6 +56,7 @@ public class TutorialController : MonoBehaviour
                 charImg.SetNativeSize();
                 charImg.gameObject.SetActive(true);
                 charImg.GetComponent<RectTransform>().anchoredPosition = tutorial.unitPos;
+                charImg.GetComponent<CharacterMove>().SetOrgY();
                 uICollection.mob.sprRend.enabled = false;
             }
 
@@ -63,9 +65,14 @@ public class TutorialController : MonoBehaviour
             
             dialog.transform.localScale = Vector3.zero;
             dialog.GetComponentInChildren<Text>().text = "";
-            seq.Append(dialog.GetComponentInChildren<Text>().DOText(tutorial.dialog, 1f).SetEase(Ease.Linear));
+            seq.Append(dialog.GetComponentInChildren<Text>().DOText(tutorial.dialog, 1f).SetEase(Ease.Linear).OnComplete(()=>isDialogFinish = true));
             seq.Join(dialog.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack));
             seq.AppendInterval(0.5f);
+            
+            if(tutorial.isChangeEnv)
+            {
+                playerController.combatSystem.envEffect.SetNextEffect(tutorial.changeEnv);
+            }
 
             foreach(var displayObj in tutorial.displayObjecArr)
             {
@@ -85,12 +92,15 @@ public class TutorialController : MonoBehaviour
 
             if(string.IsNullOrEmpty(tutorial.customActionID))
             {
+                yield return new WaitUntil(()=> isDialogFinish);
                 yield return new WaitUntil(()=> Input.GetMouseButtonUp(0));
                 yield return new WaitForSeconds(0.32f);
             }
             else
             {
                 playerController.combatSystem.PrepareBeginTurn();
+                playerController.combatSystem.envEffect.SwitchToNextEffect();
+                playerController.combatSystem.envEffect.SetNextEffect(EEnvEffectType.None);
                 yield return new WaitUntil(()=> canGoNext);
                 yield return new WaitForSeconds(0.32f);
             }
@@ -121,4 +131,6 @@ public class TutorialObject
     public GameObject[] displayObjecArr;
     public bool isClearDisplay;
     public string customActionID;
+    public bool isChangeEnv;
+    public EEnvEffectType changeEnv;
 }

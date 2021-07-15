@@ -108,6 +108,11 @@ public class PlayerController : MonoBehaviour
                     case "playRed":
                     case "playRed2":
                         {
+                            if(result.cardList.Count == 0)
+                            {
+                                combatSystem.combatTxtPanel.DisplaySystemText("請依教學指示執行動作");
+                                return;
+                            }
                             foreach (var card in result.cardList)
                             {
                                 if(card.element != ECardElement.Red)
@@ -120,6 +125,11 @@ public class PlayerController : MonoBehaviour
                         break;
                     case "playBlue":
                         {
+                            if(result.cardList.Count == 0)
+                            {
+                                combatSystem.combatTxtPanel.DisplaySystemText("請依教學指示執行動作");
+                                return;
+                            }
                             foreach (var card in result.cardList)
                             {
                                 if(card.element != ECardElement.Blue)
@@ -132,6 +142,11 @@ public class PlayerController : MonoBehaviour
                         break;
                     case "playGreen":
                         {
+                            if(result.cardList.Count == 0)
+                            {
+                                combatSystem.combatTxtPanel.DisplaySystemText("請依教學指示執行動作");
+                                return;
+                            }
                             foreach (var card in result.cardList)
                             {
                                 if(card.element != ECardElement.Green)
@@ -429,7 +444,7 @@ public class PlayerController : MonoBehaviour
                         break;
                     case "playRed2":
                         {
-                            cardArr = new int[]{101, 101, 101, 102, 101};
+                            cardArr = new int[]{102, 101, 101, 102, 101};
                         }
                         break;
                     case "playBlue":
