@@ -14,7 +14,7 @@ public class EnemyUnit : BaseCombatUnit
 
     float orgY;
 
-    bool isMovable = true;
+    public bool isMovable = true;
 
     Animator animator;
 
@@ -40,7 +40,6 @@ public class EnemyUnit : BaseCombatUnit
     private void Awake()
     {
         audioSource = this.GetOrAddComponent<AudioSource>();
-        orgY = transform.position.y;
         animator = GetComponent<Animator>();
         sprRend = GetComponent<SpriteRenderer>();
 
@@ -63,7 +62,7 @@ public class EnemyUnit : BaseCombatUnit
     protected override void Init()
     {
         base.Init();
-
+        orgY = transform.position.y;
         if(!TutorialController.isTutorial && !combatSystem.IsTestMode)
         {
             Debug.Log($"Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[1] : {Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter.combatTarget}");
@@ -79,6 +78,11 @@ public class EnemyUnit : BaseCombatUnit
         isMovable = false;
         sprRend.DOFade(0f, 1f).OnComplete(() => combatSystem.GameOver(false));
         //combatSystem.GameOver(false);
+    }
+
+    public void SetOrgY(float y)
+    {
+        orgY = y;
     }
     
     void Update()

@@ -1398,6 +1398,7 @@ MonoBehaviour:
     EN: 0
   speed: 0.7
   offset: 0.15
+  isMovable: 1
   fxPos: {fileID: 0}
   fxSeq: {fileID: 0}
   audioClipList: []
@@ -9999,7 +10000,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 578, y: 279}
+  m_AnchoredPosition: {x: 663.95, y: 279}
   m_SizeDelta: {x: 645, y: 374}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &805395625
@@ -17756,7 +17757,7 @@ MonoBehaviour:
   - dialog: "\u6BCF\u500B\u56DE\u5408\uFF0C\u60A8\u5C07\u6703\u96A8\u6A5F\u7372\u5F975\u5F35\u724C\uFF0C\u53EA\u8981\u662F\u76F8\u540C\u984F\u8272\u90FD\u53EF\u4E00\u4F75\u6253\u51FA\u3002"
     isRight: 1
     displayImg: {fileID: 21300000, guid: ed68b8fd8c100984e8e677bf0ad49e9c, type: 3}
-    unitPos: {x: -125, y: 73}
+    unitPos: {x: -92, y: 129}
     isMobUnit: 0
     displayObjecArr:
     - {fileID: 385097730}
@@ -17777,9 +17778,9 @@ MonoBehaviour:
     isChangeEnv: 0
     changeEnv: 0
   - dialog: "\u9078\u597D\u8981\u51FA\u7684\u724C\u5F8C\uFF0C\u8981\u6309\u4E0B\u7D50\u675F\u56DE\u5408\uFF0C\u624D\u6703\u6253\u51FA\u53BB\u5537\uFF0C\u5728\u90A3\u4E4B\u524D\u90FD\u53EF\u4EE5\u4ED4\u7D30\u5730\u8A55\u4F30\u3002"
-    isRight: 0
+    isRight: 1
     displayImg: {fileID: 21300000, guid: fae8a38926a0c8a43a6270e671229014, type: 3}
-    unitPos: {x: -111, y: 47}
+    unitPos: {x: -111, y: 137.5}
     isMobUnit: 0
     displayObjecArr: []
     isClearDisplay: 0
@@ -17789,7 +17790,7 @@ MonoBehaviour:
   - dialog: "\u8A66\u8A66\u770B\u5427\uFF0C\u5148\u6253\u51FA\u9BAE\u8840\uFF08\u7D05\u8272\uFF09\u7684\u724C\uFF0C\u4E26\u6309\u4E0B\u7D50\u675F\u56DE\u5408\u3002"
     isRight: 0
     displayImg: {fileID: 21300000, guid: 8bcb3b7c32eb7e84288d13d1e16373f3, type: 3}
-    unitPos: {x: 0, y: 0}
+    unitPos: {x: 0, y: -0.5}
     isMobUnit: 1
     displayObjecArr: []
     isClearDisplay: 0
@@ -17799,7 +17800,7 @@ MonoBehaviour:
   - dialog: "\u633A\u6703\u7684\u561B\uFF0C\u73FE\u5728\u8981\u4F86\u771F\u7684\u56C9\uFF01"
     isRight: 0
     displayImg: {fileID: 21300000, guid: 8bcb3b7c32eb7e84288d13d1e16373f3, type: 3}
-    unitPos: {x: 0, y: 0}
+    unitPos: {x: 0, y: -0.5}
     isMobUnit: 1
     displayObjecArr: []
     isClearDisplay: 0
@@ -17809,7 +17810,7 @@ MonoBehaviour:
   - dialog: "\u9019\u908A\u662F\uFF30\u7684\u8840\u91CF\uFF0C\u53EF\u5225\u8CAA\u676F\u559D\u6389\u4E86\u5537\uFF0C\u8017\u76E1\u5C31\u8F38\u4E86\u3002"
     isRight: 0
     displayImg: {fileID: 21300000, guid: 1a9b888eba2174d4bb9db36360137af8, type: 3}
-    unitPos: {x: 0, y: 0}
+    unitPos: {x: 0, y: 0.88}
     isMobUnit: 1
     displayObjecArr:
     - {fileID: 83646554}
@@ -17821,7 +17822,7 @@ MonoBehaviour:
       \u540C\u6642\u9084\u6703\u63D0\u793A\u5C0D\u624B\u63A5\u4E0B\u4F86\u7684\u52D5\u4F5C\u3002"
     isRight: 0
     displayImg: {fileID: 21300000, guid: de811dfa1fde7f346b9e2ced7865ea1f, type: 3}
-    unitPos: {x: 0, y: 0}
+    unitPos: {x: 0, y: 0.88}
     isMobUnit: 1
     displayObjecArr:
     - {fileID: 1842982042}
@@ -17833,8 +17834,8 @@ MonoBehaviour:
   - dialog: "\u518D\u8A66\u4E00\u6B21\u5427\uFF0C\u7528\u5B78\u9662\uFF08\u85CD\u8272\uFF09\u5361\u4F86\u64CB\u4E0B\u6211\u7684\u653B\u64CA\u3002"
     isRight: 1
     displayImg: {fileID: 21300000, guid: 7841a2834970af74ca71a4504828601c, type: 3}
-    unitPos: {x: 0, y: 0}
-    isMobUnit: 1
+    unitPos: {x: -88, y: 145}
+    isMobUnit: 0
     displayObjecArr: []
     isClearDisplay: 0
     customActionID: playBlue
@@ -17863,7 +17864,7 @@ MonoBehaviour:
   - dialog: "\u628A\u5347\u7D1A\u904E\u7684\u81EA\u7136\uFF08\u7DA0\u8272\uFF09\u724C\uFF0C\u6253\u51FA\u4F86\u5427\uFF0C\u628A\u8840\u91CF\u88DC\u6EFF\u3002"
     isRight: 1
     displayImg: {fileID: 21300000, guid: 621ac13270fab3742a5b0109dabf5cac, type: 3}
-    unitPos: {x: 0, y: 0}
+    unitPos: {x: -0.83, y: 0}
     isMobUnit: 1
     displayObjecArr: []
     isClearDisplay: 0
@@ -17873,7 +17874,7 @@ MonoBehaviour:
   - dialog: "\u6C92\u932F\uFF0C\u5C31\u662F\u9019\u6A23\uFF5E"
     isRight: 1
     displayImg: {fileID: 21300000, guid: 621ac13270fab3742a5b0109dabf5cac, type: 3}
-    unitPos: {x: 0, y: 0}
+    unitPos: {x: -0.83, y: 0}
     isMobUnit: 1
     displayObjecArr: []
     isClearDisplay: 0
@@ -17902,9 +17903,9 @@ MonoBehaviour:
     isChangeEnv: 0
     changeEnv: 0
   - dialog: "\u4F86\u5427\uFF0C\u6253\u51FA\u9BAE\u8840\uFF08\u7D05\u8272\uFF09\u7684\u724C\u3002"
-    isRight: 0
+    isRight: 1
     displayImg: {fileID: 21300000, guid: c740a994dca255343b027226902be7c6, type: 3}
-    unitPos: {x: 0, y: 0}
+    unitPos: {x: 0.83, y: 1.74}
     isMobUnit: 1
     displayObjecArr: []
     isClearDisplay: 0
@@ -30950,7 +30951,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -513, y: 299}
+  m_AnchoredPosition: {x: -616.1, y: 299}
   m_SizeDelta: {x: 645, y: 374}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1606097824

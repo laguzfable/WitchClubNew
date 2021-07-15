@@ -62,6 +62,7 @@ public class PlayerController : MonoBehaviour
         dataService = Toolbox.Instance.GetOrAddComponent<DataService>();
 
         playBtn.onClick.AddListener(PlayAction);
+        MoveBaseCards(false);
     }
 
     // Use this for initialization

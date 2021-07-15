@@ -247,7 +247,7 @@ public class CombatSystem : MonoBehaviour
     IEnumerator PlayResult()
     {
         pc.SetControllable(false);
-        pc.MoveBaseCards(true);
+        // pc.MoveBaseCards(true);
 
         var playerUnit = pc.GetPlayerUnit();
         var mobActResult = mobUnit.GetActionResult();
@@ -412,7 +412,7 @@ public class CombatSystem : MonoBehaviour
 
         MobGetNewAction();
         isPlayerTurn = true;
-        pc.MoveBaseCards(false);
+        // pc.MoveBaseCards(false);
         pc.ResetAttr();
         //mobUnit.ClearEffect();
         var playerUnit = pc.GetPlayerUnit();
@@ -561,20 +561,20 @@ public class CombatSystem : MonoBehaviour
         {
             yield break;
         }
-        pc.MoveBaseCards(true);
+        // pc.MoveBaseCards(true);
         mainCanvas.FadeOut(0.15f);
         Camera.main.transform.DOPunchPosition(Vector3.right, 0.2f);
         Instantiate(animPrefab);
         CameraPlay.MangaFlash(2.5f);
         yield return new WaitForSeconds(2.5f);
         mainCanvas.FadeIn(0.15f);
-        pc.MoveBaseCards(false);
+        // pc.MoveBaseCards(false);
     }
 
     public IEnumerator DisplayBreakFinalCloth(GameObject animPrefab)
     {
         isContinue = false;
-        pc.MoveBaseCards(true);
+        // pc.MoveBaseCards(true);
         mainCanvas.FadeOut(0.15f);
         Camera.main.transform.DOPunchPosition(Vector3.right, 0.2f);
         if (animPrefab != null)
@@ -584,7 +584,7 @@ public class CombatSystem : MonoBehaviour
         CameraPlay.MangaFlash(2.5f);
         yield return new WaitForSeconds(2.5f);
         mainCanvas.FadeIn(0.15f);
-        pc.MoveBaseCards(false);
+        // pc.MoveBaseCards(false);
         GameOver(false);
     }
 

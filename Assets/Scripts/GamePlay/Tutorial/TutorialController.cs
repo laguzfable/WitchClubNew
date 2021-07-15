@@ -49,6 +49,10 @@ public class TutorialController : MonoBehaviour
                 charImg.gameObject.SetActive(false);
                 uICollection.mob.sprRend.sprite = tutorial.displayImg;
                 uICollection.mob.sprRend.enabled = true;
+                uICollection.mob.isMovable = false;
+                uICollection.mob.transform.position = tutorial.unitPos;
+                uICollection.mob.SetOrgY(tutorial.unitPos.y);
+                uICollection.mob.isMovable = true;
             }
             else
             {
@@ -101,6 +105,7 @@ public class TutorialController : MonoBehaviour
                 playerController.combatSystem.PrepareBeginTurn();
                 playerController.combatSystem.envEffect.SwitchToNextEffect();
                 playerController.combatSystem.envEffect.SetNextEffect(EEnvEffectType.None);
+                yield return new WaitForSeconds(1f);
                 yield return new WaitUntil(()=> canGoNext);
                 yield return new WaitForSeconds(0.32f);
             }
