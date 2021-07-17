@@ -13,8 +13,9 @@ public class GotoCombatTutorial : Command, Command.IForceWait
 
     public async override UniTask ExecuteAsync(CancellationToken cancellationToken = default)
     {
-
         // Engine.GetService<IUIManager>().SetUIVisibleWithToggle(false, false);
+        
+        Engine.GetService<IScriptPlayer>().SetSkipEnabled(false);
         Engine.GetService<IBackgroundManager>().GetActor(BackgroundsConfiguration.MainActorId).Visible = false;
         var printerMgr = Engine.GetService<ITextPrinterManager>();
         await printerMgr.GetActor(printerMgr.DefaultPrinterId).ChangeVisibilityAsync(false, 0.1f);
