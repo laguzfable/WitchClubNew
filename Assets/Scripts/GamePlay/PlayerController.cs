@@ -101,7 +101,7 @@ public class PlayerController : MonoBehaviour
             // 這邊插入教學的邏輯
             if(TutorialController.isTutorial)
             {
-                var tutorObj = FindObjectOfType<TutorialController>().curTutorialObj;
+                var tutorObj = combatSystem.tutorController.curTutorialObj;
                 // 檢查id
                 switch(tutorObj.customActionID)
                 {
@@ -431,7 +431,7 @@ public class PlayerController : MonoBehaviour
         {
             int[] cardArr = null;
 
-            var tutorObj = FindObjectOfType<TutorialController>().curTutorialObj;
+            var tutorObj = combatSystem.tutorController.curTutorialObj;
             if(tutorObj != null)
             {
                 // 檢查id

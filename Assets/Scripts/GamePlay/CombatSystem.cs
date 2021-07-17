@@ -84,6 +84,8 @@ public class CombatSystem : MonoBehaviour
     [SerializeField]
     RawImage blackMask;
 
+    public TutorialController tutorController;
+
 
     // public async UniTask SwitchStateToCombatModeAsync(CancellationToken cancellationToken = default)
     public void SwitchStateToCombatModeAsync()
@@ -159,6 +161,7 @@ public class CombatSystem : MonoBehaviour
         //GetComponent<CombatUICollection>().SetRunesEnabled(false);
         if(!IsTestMode)
         {
+            
             SwitchStateToCombatModeAsync();
         }
         else
@@ -173,6 +176,11 @@ public class CombatSystem : MonoBehaviour
         {
             Debug.Log($"Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[0] : {Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter.background}");
             BG.sprite = visualResource.GetBGByName(Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter.background);
+
+            var runeActive = true;
+            Engine.GetService<ICustomVariableManager>().TryGetVariableValue<bool>("RuneActive", out runeActive);
+            tutorController.uICollection.SetRunesEnabled(runeActive);
+
         }
         BG.gameObject.SetActive(true);
 
@@ -384,7 +392,7 @@ public class CombatSystem : MonoBehaviour
 
         if(TutorialController.isTutorial)
         {
-            FindObjectOfType<TutorialController>().canGoNext = true;
+            tutorController.canGoNext = true;
             yield break;
         }
         PrepareBeginTurn();
