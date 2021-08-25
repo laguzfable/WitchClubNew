@@ -1,10 +1,13 @@
-(背景 二樓走廊)No. 80193
+
 @back bg06
+@sfx morning
 @char 涅莉 pos:50
 涅莉.talk: 早啊Ｐ，昨晚睡得如何呀？該不會做春夢了吧？
 涅莉.happy: 開玩笑的啦，哈哈哈～
 
-(開門聲)
+@stopSfx
+@sfx dooropen
+@bgm chill
 
 @hide 涅莉
 @char 薇狄亞 pos:35
@@ -18,8 +21,7 @@
 @hide 薇狄亞,艾妮格玫
 @back bg07
 
-(背景 赫菲房間的門)
-(音效 敲三下)
+@sfx knocking
 ......
 
 @back cg09
@@ -56,8 +58,11 @@
 @back bg04
 
 @char 赫菲 pos:50
-赫菲: 莉莉娜以前可是在當鋪工作過的唷！
+赫菲: 莉莉娜以前可是開過當鋪的唷！
 赫菲: 如何？我的這些商品價值多少呢？
+@stopBgm
+@bgm lilina
+
 @char 鬱鬱 pos:25
 @char 陰陰 pos:75
 陰陰: 看起來都是一些廢物。
@@ -76,21 +81,26 @@
 莉莉娜: 赫菲，這些應該不是全部吧？說到象牙塔，從那邊留下來的遺物什麼的才真的值錢呢。
 
 @hide 陰陰,鬱鬱,莉莉娜,赫菲
+@stopBgm
+@bgm quiet
+@hide 莉莉娜
 @char syb pos:50
 ？？？: 陰陰鬱鬱，過來幫我試一下新的配方……哎呀？
 ？？？: 這不是赫菲嗎？真是久仰大名呢。
-@char syb pos:35
-@char 莉莉娜 pos:65
-莉莉娜: 她就是我之前提到的藥草專家，叫作西碧爾。
-@hide 莉莉娜
-赫菲: 西碧爾……有股特別的氣息，妳是從哪裡來的？
+@char syb pos:25
+@char 莉莉娜 pos:50
+@char 赫菲 pos:75
+莉莉娜: 她就是我之前提到的藥草專家，叫作西碧兒。
+
+赫菲: 西碧兒……有股特別的氣息，妳是從哪裡來的？
 syb.happy: 特別嗎？嘻嘻，妳才是吧。
 莉莉娜: 我們要工作了，真想要大筆現金的話，明天拿更好的東西來換吧。
-@hide syb
+@hide syb,莉莉娜,赫菲
 
 
 @back bg08b
-
+@stopBgm
+@bgm happy
 @char 蘇菲亞 pos:50
 蘇菲亞: 妳們今天都還順利嗎？
 @char 薇狄亞 pos:25
@@ -104,7 +114,7 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 薇狄亞: 別太勉強自己呢……涅莉，跟我一起上街賣藝也可以的唷。
 涅莉: 沒事沒事，反正我也喜歡泡澡，哈哈－－
 @hide 涅莉,薇狄亞,艾妮格玫
-@char 蘇菲亞
+@char 蘇菲亞 pos:50
 蘇菲亞: 慶祝大家都找到工作，我做了三種口味的特製炸雞，另外還有豬腳唷。
 
 
@@ -115,7 +125,8 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 
 
 @back bg08b
-
+@stopBgm
+@bgm white
 @char 蘇菲亞 pos:50
 蘇菲亞: 早安，{PlayerName}，大家都出門工作了呢。
 蘇菲亞: 要不要出去探班呢？她們一定會很開心的。
@@ -125,7 +136,13 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @choice 找涅莉
 @stop
 
+
+
+@stopBgm
+@bgm white
 @char 蘇菲亞 pos:50
+
+
 
 蘇菲亞: 大家今天真的都累了呢，這麼早就上去睡覺了。
 蘇菲亞: {PlayerName}，待在巫術世界這陣子，適應得還好嗎？
@@ -139,25 +156,28 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 
 @hide 蘇菲亞
 @back bg06
-@char 涅莉
+@char 涅莉 pos:50
 
 涅莉: 早哇，Ｐ～
 涅莉: 啊啊，大家都出門了，我也得快點才行，不然上班要遲到了。
 
 @hide 涅莉
 @back bg08b
-@char 蘇菲亞
-
+@char 蘇菲亞 pos:50
+@sfx pouring
 蘇菲亞: 早安呀，Ｐ，今天的早餐是炒菇跟歐姆蛋唷，還有剛醃好的火腿。
 蘇菲亞: 茶葉是高嶺的特有品種，最近才剛到貨的，嚐嚐看吧，搭配牛奶也很不錯呢。
 蘇菲亞: 這個早上真是安靜呀。
 蘇菲亞: 她們動作好快唷，一溜煙就不見了。
 蘇菲亞: 赫菲居然是第一個起來的，這孩子終於長大了……
 
-(開門聲)
+@sfx dooropen
 
 @char 蘇菲亞 pos:35
 @char 赫菲 pos:65
+@stopBgm
+@bgm hurry
+
 
 赫菲: Ｐ！我接到大生意了，我們趕快去找艾妮！
 蘇菲亞: 什麼生意呀？最好不要是什麼危險的事唷。
@@ -176,6 +196,9 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 
 @hide 女巫
 @back bg04
+
+@stopBgm
+@bgm lilina
 
 @char 莉莉娜 pos:50
 
@@ -196,6 +219,8 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @hide 莉莉娜,艾妮格玫,赫菲
 
 @back bg02
+@stopBgm
+@bgm peace
 @char 赫菲 pos:65
 @char 艾妮格玫 pos:35
 
@@ -231,6 +256,9 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @hide 赫菲,艾妮格玫
 @back cg17
 
+@stopBgm
+@bgm chill
+
 (CG 薇狄亞唱歌 涅莉彈琴)
 
 圍觀的民眾: 好好聽呀～
@@ -255,6 +283,10 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 
 @hide 薇狄亞,涅莉,艾妮格玫,赫菲
 @back bg08
+
+@stopBgm
+@bgm happy
+
 
 @char 薇狄亞 pos:35
 @char 涅莉 pos:65
@@ -298,6 +330,10 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @char 赫菲 pos:65
 赫菲: Ｐ，要不要趁這機會試試看義體的機能呢？搬這個酒桶看看！
 艾妮格玫: 不要找藉口使喚Ｐ做事好嗎，這種東西我自己都能應付的……呃？！
+
+@stopBgm
+@bgm strange
+
 艾妮格玫: 呀啊啊啊啊啊－－
 赫菲: 艾妮又在大驚小怪了啦，怎麼樣？這次又是看到什麼蒼蠅屍體之類的嗎？
 艾妮格玫: 那那那那那、那邊！
@@ -321,10 +357,20 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 ？？？: 尤芙蘿絲！給我滾出來！
 @hide 涅莉
 
+@stopBgm
+@bgm intense
+
 @battle background:bg05 target:monsterez label:afterbattle5
 @stop
 
 # afterbattle5
+
+
+
+@back bg05
+
+@stopBgm
+@bgm white
 
 @char 蘇菲亞 pos:50
 蘇菲亞: 請妳們下來搬兩桶酒怎麼搞這麼久呢，大餐都準備好了說。
@@ -374,6 +420,9 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 
 (隔天)
 @back bg06
+
+@stopBgm
+@bgm happy
 (二樓走廊)
 (撞擊聲)
 
@@ -440,6 +489,9 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 
 @char may pos:50
 
+@stopBgm
+@bgm hurry
+
 ？？？: 妳們好啊，這裡真熱鬧耶。
 @char 薇狄亞 pos:35
 @char may pos:65
@@ -452,12 +504,19 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 ？？？: 挺有架式的嘛，血巫結社就是不一樣唷……我看看，四個系都到齊了嘛，居然還有異鄉人，這下有趣了。"
 may.happy: 來吧，讓我瞧瞧那異域之力－－"
 
+@stopBgm
+@bgm energetic
+
 @battle background:bg05 target:monstermay label:afterbattle6
 @stop
 
 # afterbattle6
 
 @hide may
+
+
+@stopBgm
+@bgm peace
 
 @char 涅莉 pos:65
 @char 薇狄亞 pos:35

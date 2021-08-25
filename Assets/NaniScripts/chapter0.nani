@@ -1,5 +1,6 @@
 
 
+@bgm fantasy
 @back bg00
 
 這是一個一如往常的平凡下午，家裡蹲的我，因為窮極無聊而打開最近在St**m大特賣購買的遊戲－－巫術戰爭。
@@ -45,6 +46,8 @@
 @choice 比起那個，我更想再看看妳的內褲。
 @stop
 
+@stopBgm
+@bgm happy
 @back bg01
 @char 艾妮格玫 pos:40 time:0
 @char 赫菲 pos:60 time:0
@@ -140,9 +143,11 @@
 @hide 艾妮格玫
 @char 蘇菲亞 pos:50
 蘇菲亞.sad: 唉，這裡就交給妳了，薇狄亞。若有損壞照價賠償喔！
-(關門聲)
+@sfx doorclose
 @hide 蘇菲亞
 @char 薇狄亞 pos:50
+@stopBgm
+@bgm white
 薇狄亞: 妳們冷靜一點嘛，再這樣下去別說重建象牙塔了，要活下去都有問題的說。
 @char 艾妮格玫 pos:65
 @char 薇狄亞 pos:35
@@ -158,6 +163,8 @@
 @char 赫菲 pos:65
 @char 薇狄亞 pos:35
 薇狄亞: 艾妮，等等，先別靠近，前面好像有股騷動。
+@stopBgm
+@bgm intense
 
 
 @hide 赫菲,薇狄亞
@@ -192,6 +199,8 @@
 瓶中精靈.hmm: 為什麼妳們互打就那麼起勁，面對真的敵人卻那麼消極……
 薇狄亞: 可能宿命本來就是如此吧……不然巫術戰爭也不會打得那麼慘烈了。
 赫菲: 對嘛，也沒辦法啊，我們三人用的是不同派系的法術，真要合作也不知道該從哪裡開始。
+@stopBgm
+@bgm fantasy
 瓶中精靈: 那，不然這樣，妳們把力量借給我，我用我知道的方式替妳們結合。
 艾妮格玫.talking: 具體上來說……怎麼做呢？
 瓶中精靈: 先放我出來。
@@ -205,9 +214,13 @@
 瓶中精靈.heart: 好。
 艾妮格玫: 這是承諾嗎？感覺很敷衍耶！
 
-(瓶塞打開的聲音)
-(不祥的音樂)
+@stopBgm
+@sfx pop loop:false
+
 @hide 瓶中精靈,赫菲,艾妮格玫,薇狄亞
+
+@sfx evil loop:false
+
 @char 涅莉.happy pos:50
 涅莉: 啊啊，自由的空氣－－
 涅莉: 顫抖吧！凡人！臣服在我的威能之下吧！
@@ -216,6 +229,9 @@
 薇狄亞: 精、精靈小姐……變大了！
 @char 艾妮格玫 pos:25
 艾妮格玫.scared: 果然有陰謀嗎！卑鄙的小精靈！
+@stopSfx
+@bgm happy
+
 涅莉.idle: 沒有啦，我開玩笑的。
 @hide 薇狄亞
 @char 赫菲 pos:75
@@ -224,13 +240,19 @@
 涅莉.yummy: 好啦，既然我都被放出來了，就傳授一些小精靈戰鬥秘訣給妳們吧。
 @hide 涅莉,赫菲,艾妮格玫,薇狄亞
 
-@back black
+@stopBgm
+@bgm energetic
+@back bg00
 
-@battle scriptName:chapter0 label:afterbattle background:bg00 target:monster00
+@tutorial scriptName:chapter0 label:afterbattle background:bg01
 @stop
+
+
 
 # afterbattle
 
+@stopBgm
+@bgm happy
 @back bg03
 @char 薇狄亞 pos:60 time:0
 @char 赫菲 pos:40 time:0
@@ -269,7 +291,8 @@
 @char 涅莉 pos:50
 涅莉.yummy: 耶～食物！
 @hide 涅莉,薇狄亞,赫菲
-
+@stopBgm
+@bgm stardust
 @back star1
 
 
@@ -280,7 +303,7 @@
 ？？？: 繼續.……陪在我身邊好嗎？
 
 
-
+@stopBgm
 
 @goto chapter1
 @stop
