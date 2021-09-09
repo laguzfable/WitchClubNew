@@ -20,8 +20,8 @@
 
 # C01
 @stopsfx
-@sfx slame1 loop:false
-@sfx slame2 loop:false
+@sfx slam1 loop:false
+@sfx slam2 loop:false
 @sfx glassbreak loop:false
 
 涅莉.suprised: 媽呀，大清早是在拆房子嗎？我們快去看看怎麼回事。
@@ -80,7 +80,7 @@
 
 @hide 薇狄亞,涅莉,艾妮格玫
 
-@battle background:bg02 target:monster02 label:afterbattle2
+@battle background:bg02 target:monstermay label:afterbattle2
 @stop
 
 # afterbattle2
@@ -123,7 +123,7 @@
 @char 薇狄亞 pos:75
 @stopBgm
 @bgm strange
-艾妮格玫: 現在是買馬鈴薯的時候嗎？無腦也要看一下場合吧！
+艾妮格玫.talking: 現在是買馬鈴薯的時候嗎？無腦也要看一下場合吧！
 赫菲: 不要這麼兇好不好，薇狄亞也是為了我們的生計才這麼辛苦地買菜耶。
 艾妮格玫: 我不是說不能買菜，我的意思是現在不適合好嗎。
 薇狄亞.sad: 對不起嘛，艾妮，我下次會注意的。
@@ -139,7 +139,7 @@
 @char 艾妮格玫 pos:35
 @char 赫菲 pos:65
 艾妮格玫: 很好啊，妳自以為在戳我的痛處是嗎？
-艾妮格玫: 我就如妳所願，讓妳見識血巫結社那凌駕在象牙塔之上的力量。
+艾妮格玫.rage: 我就如妳所願，讓妳見識血巫結社那凌駕在象牙塔之上的力量。
 赫菲: 我怕妳嗎？來啊！
 艾妮格玫: 血祭－－
 @sfx explosion loop:false
@@ -187,7 +187,7 @@
 @char 薇狄亞 pos:35
 薇狄亞: 這個味道是……
 @char 艾妮格玫 pos:65
-艾妮格玫: 迷霧草……啊！！
+艾妮格玫.sad: 迷霧草……啊！！
 @sfx cat
 狂暴的黑貓: 喵！！！
 @char 薇狄亞 pos:25
@@ -210,9 +210,9 @@
 @char 陰陰 pos:60
 @char 鬱鬱 pos:20
 @char 艾妮格玫 pos:80
-艾妮: 以迷霧草來說，濃得有點嚇人。
+艾妮格玫.idle: 以迷霧草來說，濃得有點嚇人。
 莉莉娜: 眼光很好喔，這是我們最新的產品－－夢魘迷霧草，超強效，用過的都說讚！
-艾妮: 我不是那個意思……
+艾妮格玫: 我不是那個意思……
 @hide 艾妮格玫
 @char 赫菲 pos:80
 赫菲: 莉莉娜，最近女巫獵人好像變多了耶，妳知道為什麼嗎？
@@ -426,8 +426,8 @@
 @back bg08
 
 
-@char 蘇菲亞 pos:50
-蘇菲亞.beer: 整理好了嗎？哇！{PlayerName}的新造型真好看呢。
+@char 蘇菲亞.beer pos:50
+蘇菲亞: 整理好了嗎？哇！{PlayerName}的新造型真好看呢。
 蘇菲亞: 今天有上等的起司還有啤酒唷，吃飽了明天好好工作還錢吧。
 @hide 蘇菲亞
 @char 赫菲.smile pos:35

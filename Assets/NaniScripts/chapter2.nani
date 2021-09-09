@@ -184,9 +184,9 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 赫菲: 沒事的沒事的，Ｐ，趕快跟我來。
 @hide 蘇菲亞,赫菲
 
-(場景轉換 刺青店)
+@back cg12
 
-@char 女巫 pos:50 time:0
+
 女巫: 刺得好好看耶～
 女巫B: 真的！
 女巫D: 換我了，我要在胸口這邊刺一個魅惑烙印。
@@ -194,7 +194,7 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 艾妮格玫: 欸？妳確定嗎？我還在工作耶。
 赫菲: 相信我就對了！
 
-@hide 女巫
+
 @back bg04
 
 @stopBgm
@@ -315,12 +315,11 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 薇狄亞: 耶～～
 
 @hide 涅莉,赫菲,薇狄亞
-@char 蘇菲亞
+@char 蘇菲亞 pos:50
 蘇菲亞: 那我來準備大餐，妳們就去樓下酒窖幫忙搬兩桶酒上來吧。
 @hide 蘇菲亞
-(場景轉換 酒窖)
 
-@back bg05
+@back bg11
 @char 涅莉 pos:65
 @char 艾妮格玫 pos:35
 涅莉: 喔喔喔－－原來還有這樣的地方！
@@ -352,7 +351,7 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 赫菲: 喔喔喔～真的耶，這不是卡巴拉文具行出的限量版星空貓頭鷹毛筆嗎？真的好精緻啊。
 艾妮格玫: 等等等、別碰！
 @hide 艾妮格玫,薇狄亞,赫菲
-@char 涅莉
+@char 涅莉 pos:50
 涅莉: 矮額，有股熟悉的詭異氣息呢。
 ？？？: 尤芙蘿絲！給我滾出來！
 @hide 涅莉
@@ -360,14 +359,14 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @stopBgm
 @bgm intense
 
-@battle background:bg05 target:monsterez label:afterbattle5
+@battle background:bg11 target:monsterez label:afterbattle5
 @stop
 
 # afterbattle5
 
 
 
-@back bg05
+@back bg11
 
 @stopBgm
 @bgm white
@@ -455,14 +454,16 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @hide 艾妮格玫,薇狄亞,涅莉
 @char 赫菲 pos:50
 赫菲: 哼！我就做給妳們看！
-(赫菲消失)
+
 @hide 赫菲
 @char 涅莉 pos:65
 @char 薇狄亞 pos:35
 涅莉: 真的沒問題嗎？
-(敲擊+爆炸聲)
+@sfx slam1
+@sfx slam2
+@sfx explosion
 薇狄亞: 我去看看。
-(薇狄亞消失)
+
 @hide 薇狄亞
 薇狄亞: 呀啊啊－－
 @char 艾妮格玫 pos:35
