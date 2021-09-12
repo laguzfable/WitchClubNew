@@ -30,7 +30,8 @@ public class EnemyUnit : BaseCombatUnit
 
     [SerializeField]
     MobAction[] defActionArr;
-
+    
+    // [SerializeField] MobActionCollection mobActCollectoin;
 
     MobAction[] actionArr;
     int curActIndex = 0;

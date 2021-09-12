@@ -212,6 +212,7 @@ public class CombatSystem : MonoBehaviour
 
     private void Update()
     {
+        // !Todo: 正式版要拿掉
         if(Input.GetKeyUp(KeyCode.KeypadPeriod))
         {
             GameOver(false);
@@ -234,6 +235,9 @@ public class CombatSystem : MonoBehaviour
     bool isBreakAciton = false;
 
     WaitForSeconds waitPlay = null;
+
+
+    enum Order { PlayerDealDamage = 1, InterruptMobsAction, PlayerHealing, MobDealDamage, MobHealing };
 
     void CreateOrder(int order, int value, BaseCombatUnit owner, System.Action action)
     {
@@ -286,7 +290,7 @@ public class CombatSystem : MonoBehaviour
         orderList.Clear();
         if(!isBreakAciton)
         {
-            CreateOrder(4, mobActResult.attr.ATK, mobUnit, () => { // Mob deal damage
+            CreateOrder((int)Order.MobDealDamage, mobActResult.attr.ATK, mobUnit, () => { // Mob deal damage
 
                 var dmg = mobActResult.attr.ATK - pc.DEF;
 
@@ -310,7 +314,7 @@ public class CombatSystem : MonoBehaviour
 
             });
 
-            CreateOrder(5, mobActResult.attr.HEAL, mobUnit, () => { // Mob deal healing
+            CreateOrder((int)Order.MobHealing, mobActResult.attr.HEAL, mobUnit, () => { // Mob deal healing
 
                 mobUnit.ApplyHealing(mobActResult.attr.HEAL);
                 if (mobUnit.HasEffect(EAbilityEffectType.HealingAttack)) // healing attack
@@ -321,7 +325,7 @@ public class CombatSystem : MonoBehaviour
             });
         }
 
-        CreateOrder(1, pc.ATK, playerUnit, () => { // player deal damage
+        CreateOrder((int)Order.PlayerDealDamage, pc.ATK, playerUnit, () => { // player deal damage
             visualResource.GetCardFX(pc.result.fxID);
 
             if (mobUnit.HasEffect(EAbilityEffectType.Shield)) // shield effect
@@ -343,14 +347,14 @@ public class CombatSystem : MonoBehaviour
             }
         });
 
-        CreateOrder(2, isBreakAciton? 1: 0, playerUnit, () => { // interrupt
+        CreateOrder((int)Order.InterruptMobsAction, isBreakAciton? 1: 0, playerUnit, () => { // interrupt
             if(!mobUnit.HasEffect(EAbilityEffectType.BreakAction))
             {
                 combatTxtPanel.EnqueueText("成功打斷行動", ECombatTextType.Debuff, false);
             }
         });
 
-        CreateOrder(3, pc.HEAL, playerUnit, () => { // player deal healing
+        CreateOrder((int)Order.PlayerHealing, pc.HEAL, playerUnit, () => { // player deal healing
 
             playerUnit.ApplyHealing(pc.HEAL);
             if(playerUnit.HasEffect(EAbilityEffectType.HealingAttack)) // healing attack

@@ -17,7 +17,7 @@ public class CombatVisualResources : MonoBehaviour
     Vector3 fxPos = new Vector3(0, 1.7f, -1f);
 
     public Sprite[] bgArr;
-    public Sprite[] mobArr;
+    // public Sprite[] mobArr;
 
 
     private void Awake()
@@ -64,6 +64,7 @@ public class CombatVisualResources : MonoBehaviour
 
     public Sprite GetMobByName(string name)
     {
+        /*
         foreach (var spr in mobArr)
         {
             if (spr.name.Equals(name))
@@ -71,7 +72,8 @@ public class CombatVisualResources : MonoBehaviour
                 return spr;
             }
         }
+        */
 
-        return null;
+        return Resources.Load<Sprite>($"monsters/{name}");
     }
 }
