@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using Naninovel;
 
 public class TutorialController : MonoBehaviour
 {
@@ -69,7 +70,12 @@ public class TutorialController : MonoBehaviour
             
             dialog.transform.localScale = Vector3.zero;
             dialog.GetComponentInChildren<Text>().text = "";
-            seq.Append(dialog.GetComponentInChildren<Text>().DOText(tutorial.dialog, 1f).SetEase(Ease.Linear).OnComplete(()=>isDialogFinish = true));
+            var dialogContent = tutorial.dialog;
+            if(dialogContent.Contains("P"))
+            {
+                dialogContent = dialogContent.Replace("P", Engine.GetService<ICustomVariableManager>().GetVariableValue("PlayerName"));
+            }
+            seq.Append(dialog.GetComponentInChildren<Text>().DOText(dialogContent, 1f).SetEase(Ease.Linear).OnComplete(()=>isDialogFinish = true));
             seq.Join(dialog.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack));
             seq.AppendInterval(0.5f);
             
