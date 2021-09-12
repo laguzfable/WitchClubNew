@@ -422,9 +422,7 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 
 @stopBgm
 @bgm happy
-(二樓走廊)
-(撞擊聲)
-
+@sfx construction
 @char 涅莉 pos:50
 涅莉: 呼～早啊Ｐ，大清早的好吵啊。
 @char 赫菲 pos:25
@@ -432,9 +430,10 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @char 薇狄亞 pos:75
 薇狄亞: 似乎很快就能有漂亮的空間了呢。
 
+@stopSfx
 @hide 涅莉,赫菲,薇狄亞
-@back bg01
-(一樓大廳(裝修中))
+@back bg12
+
 
 @char 艾妮格玫 pos:50
 艾妮格玫: 這些麻煩搬過去，那一面牆的顏色要統一。
@@ -478,7 +477,7 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 薇狄亞: 耶～
 涅莉: 開動～
 
-@back bg01
+@back bg12
 @char 艾妮格玫 pos:50
 @char 涅莉 pos:75
 @char 薇狄亞 pos:25
@@ -521,6 +520,7 @@ may.happy: 來吧，讓我瞧瞧那異域之力－－
 @stopBgm
 @bgm peace
 
+@back bg12
 @char 涅莉 pos:65
 @char 薇狄亞 pos:35
 涅莉: 好強啊……
@@ -564,16 +564,37 @@ may: 只要有錢，什麼都能搞定的！
 赫菲: 好厲害呀，這可是只有在課本上面看過的神器耶。
 
 
+@back bg12
+
+@char 薇狄亞 pos:25
+@char may pos:50
+@char 艾妮格玫 pos:75
 
 薇狄亞: 那麼，這個要怎麼使用呢？
 may: 嗯～要先解除封印。
 艾妮格玫: 這加密的程度似乎要一陣子才能破解……
+
+@stopBgm
+@bgm stardust
+
+@hide may,艾妮格玫
+@char 薇狄亞 pos:50
 薇狄亞: 赫菲？
-赫菲: 我覺得……它好像在呼喚我……
+
+@hide 薇狄亞
+@char 赫菲 pos:50
+
+赫菲: 它好像在呼喚……
+赫菲: 我……
 
 
 
 (強光)
+
+@hide 赫菲
+
+
+
 @back star1
 
 ？？？: 比我想像的還要快呢。
