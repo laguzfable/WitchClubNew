@@ -167,9 +167,12 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @back cg13
 薇狄亞: ……香芹、鼠尾草、迷迭香與百里香……
 薇狄亞: 請代我問候住在那裡的某個人……
-薇狄亞: ……她曾是我的真愛。
+薇狄亞: ……他曾是我的真愛。
+
 
 @back bg022
+@stopBgm
+@bgm night
 
 @char 薇狄亞 pos:50
 薇狄亞: 是{PlayerName}啊……
@@ -177,6 +180,7 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 
 @choice 很好聽。
 @choice 真是悲傷的歌。
+@stop
 
 薇狄亞: 還想要唱得更好呢。
 薇狄亞: 啊，都這麼晚了。
@@ -305,9 +309,7 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @back cg17
 
 @stopBgm
-@bgm chill
-
-(CG 薇狄亞唱歌 涅莉彈琴)
+@bgm party
 
 圍觀的民眾: 好好聽呀～
 圍觀的民眾: 琴也彈得很好呢。
@@ -318,10 +320,10 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 薇狄亞: 如果喜歡我們的表演，來闇鴉農舍旁邊的女巫俱樂部也會有不定時現場演出唷。
 
 @back bg02
-@char 薇狄亞 pos:20
-@char 涅莉 pos:40
-@char 艾妮格玫 pos:60
-@char 赫菲 pos:80
+@char 薇狄亞 pos:20 time:0
+@char 涅莉 pos:40 time:0
+@char 艾妮格玫 pos:60 time:0
+@char 赫菲 pos:80 time:0
 
 艾妮格玫: 生意還真好耶。
 赫菲: 涅莉怎麼也在這呀？
