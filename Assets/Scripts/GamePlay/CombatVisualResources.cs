@@ -51,6 +51,7 @@ public class CombatVisualResources : MonoBehaviour
 
     public Sprite GetBGByName(string name)
     {
+        /*
         foreach(var spr in bgArr)
         {
             if(spr.name.Equals(name))
@@ -59,7 +60,8 @@ public class CombatVisualResources : MonoBehaviour
             }
         }
 
-        return null;
+        return null;*/
+        return Resources.Load<Sprite>($"background/{name}");
     }
 
     public Sprite GetMobByName(string name)
