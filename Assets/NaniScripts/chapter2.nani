@@ -130,12 +130,60 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @char 蘇菲亞 pos:50
 蘇菲亞: 早安，{PlayerName}，大家都出門工作了呢。
 蘇菲亞: 要不要出去探班呢？她們一定會很開心的。
-@choice 找赫菲
-@choice 找艾妮
-@choice 找薇狄亞
-@choice 找涅莉
+
+
+
+@choice 出去看看吧。
+@stop
+@stopBgm
+@bgm peace
+@hide 蘇菲亞
+
+@back bg02
+
+@char 艾妮格玫 pos:50
+
+艾妮格玫: 是{PlayerName}啊，真巧。
+艾妮格玫: 有人要刺特殊的顏色，所以我出來買墨水。
+艾妮格玫: 這樣應該夠了，那我先回去工作囉，晚點見。
+
+@hide 艾妮格玫
+@back bg022
+
+@char 涅莉 pos:50
+涅莉: 哇嗚，{PlayerName}也是出來摸魚的嗎？
+涅莉: 哈哈哈－－誰叫天氣那麼好嘛。
+
+@hide 涅莉
+
+……
+
+@stopBgm
+@bgm singing
+
+@choice 薇狄亞？
 @stop
 
+@back cg13
+薇狄亞: ……香芹、鼠尾草、迷迭香與百里香……
+薇狄亞: 請代我問候住在那裡的某個人……
+薇狄亞: ……她曾是我的真愛。
+
+@back bg022
+
+@char 薇狄亞 pos:50
+薇狄亞: 是{PlayerName}啊……
+薇狄亞: 抱歉，什麼時候在旁邊的呢？我都沒注意到。
+
+@choice 很好聽。
+@choice 真是悲傷的歌。
+
+薇狄亞: 還想要唱得更好呢。
+薇狄亞: 啊，都這麼晚了。
+薇狄亞: {PlayerName}都特地出來了，我們一起吃晚餐再回去吧～
+
+@hide 薇狄亞
+@back bg08b
 
 
 @stopBgm
@@ -357,7 +405,7 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @hide 涅莉
 
 @stopBgm
-@bgm intense
+@bgm battle03
 
 @battle background:bg11 target:monsterez label:afterbattle5
 @stop
@@ -470,6 +518,7 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @hide 艾妮格玫,涅莉
 
 @back cg18
+@sfx success loop:false
 涅莉: 媽呀，看起來也太好吃了吧！
 薇狄亞: 居然這麼快就做好了。
 艾妮格玫: 用奧術嗎……
@@ -507,7 +556,7 @@ may.happy: 來吧，讓我瞧瞧那異域之力－－
 
 
 @stopBgm
-@bgm energetic
+@bgm battle02
 
 @battle background:bg05 target:monstermay label:afterbattle6
 @stop

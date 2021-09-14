@@ -38,7 +38,9 @@
 @sfx magicattack loop:false
 赫菲: 奧術之箭！
 @sfx bark loop:false
+@sfx hitmetal loop:false
 獵犬: 汪汪汪汪汪－－汪！
+
 赫菲: 居然是抗魔裝甲，啊－－
 
 
@@ -67,8 +69,9 @@
 @char 薇狄亞 pos:50 time:0
 @char 涅莉 pos:75
 @char 艾妮格玫 pos:25
-薇狄亞: 別怕，我來補血！呀啊啊－－地板好滑－－
 @sfx slip loop:false
+薇狄亞: 別怕，我來補血！呀啊啊－－地板好滑－－
+
 赫菲: 妳不是可以跟動物溝通嗎？快點呀！跟牠溝通啊！
 薇狄亞: 不行呀！牠一直對著我罵髒話！
 @sfx bark loop:false
@@ -316,8 +319,8 @@
 
 @hide 涅莉
 @stopBgm
-@bgm energetic
-@battle background:bg05 target:monster03 label:afterbattle4
+@bgm battle03
+@battle background:bg11 target:monster03 label:afterbattle4
 @stop
 
 # afterbattle4
