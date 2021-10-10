@@ -73,6 +73,7 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
         atkTxt = transform.Find("ATKText").GetComponent<TextMeshPro>();
         defTxt = transform.Find("DEFText").GetComponent<TextMeshPro>();
         enTxt = transform.Find("ENText").GetComponent<TextMeshPro>();
+        // enTxt.enabled = pc.combatSystem.IsEnergyActive();
         healTxt = transform.Find("HEALText").GetComponent<TextMeshPro>();
 
         orgPos = transform.localPosition;
@@ -112,7 +113,7 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
         enTxt.text = ability.EN.ToString();
         healTxt.text = ability.HEAL.ToString();
 
-        enTxt.enabled = ability.EN > 0;
+        enTxt.enabled = pc.combatSystem.IsEnergyActive() && ability.EN > 0;
         healTxt.enabled = ability.HEAL > 0;
         atkTxt.enabled = !healTxt.enabled;
     }

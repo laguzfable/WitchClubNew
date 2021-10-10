@@ -2,13 +2,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Events;
+using Naninovel;
 
 public enum EEnvEffectType { None, Attack, Defense, Heal, Energy, RedSilence, BlueSilence, GreenSilence, YellowSilence, LimitCards, NoCharacter, NoRune, NoHeal, NoDefense, Length };
 
+
+/// <summary>
+/// 日後要將他移除MonoBehaviour 因為沒用到
+/// </summary>
 [RequireComponent(typeof(CombatSystem))]
 public class EnvironmentEffect : MonoBehaviour
 {
-    CombatSystem cbtSys;
+    CombatSystem combatSystem;
 
     public EEnvEffectType curType { private set; get; } = EEnvEffectType.None;
 
@@ -18,7 +23,7 @@ public class EnvironmentEffect : MonoBehaviour
 
     static readonly string[] envEffName = { "風和日麗", "絳紅之夜", "高塔之暮", "生命之雨", "魔力狂潮", "沉默：紅", "沉默：藍", "沉默：綠", "沉默：黃", "能量束縛", "寂靜破曉", "符文封印", "虛弱結界", "護盾瓦解" };
 
-    static readonly int[] envWeight = {10000, 2000, 2000, 2000, 2000, 500, 500, 500, 500, 500, 500, 500, 500, 500};
+    static int[] envWeight = {10000, 2000, 2000, 2000, 2000, 500, 500, 500, 500, 500, 500, 500, 500, 500};
 
     public int remainTurn = 1;
 
@@ -30,7 +35,9 @@ public class EnvironmentEffect : MonoBehaviour
 
     void Awake()
     {
-        cbtSys = GetComponent<CombatSystem>();
+        combatSystem = GetComponent<CombatSystem>();
+        // 黃色卡還沒可以使用之前將魔力狂潮的權重設為0
+        envWeight[(int)EEnvEffectType.Energy] = combatSystem.IsEnergyActive() ? 2000 : 0;
     }
 
     public void SetNextEffect(EEnvEffectType newEffect, int turn = 1)

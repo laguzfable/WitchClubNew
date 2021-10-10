@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using Naninovel;
+using UniRx.Async;
+using System;
 
 public class TutorialController : MonoBehaviour
 {
@@ -24,7 +26,7 @@ public class TutorialController : MonoBehaviour
         {
             uICollection.TurnOffAll();
 
-            StartCoroutine(RunTutorialSequence());
+            RunTutorialSequenceAsync().Forget();
         }
     }
 
@@ -33,7 +35,7 @@ public class TutorialController : MonoBehaviour
 
     Sequence seq;
 
-    IEnumerator RunTutorialSequence()
+    async UniTaskVoid RunTutorialSequenceAsync()
     {
         bool isDialogFinish = false;
         seq = DOTween.Sequence();
@@ -102,18 +104,20 @@ public class TutorialController : MonoBehaviour
 
             if(string.IsNullOrEmpty(tutorial.customActionID))
             {
-                yield return new WaitUntil(()=> isDialogFinish);
-                yield return new WaitUntil(()=> Input.GetMouseButtonUp(0));
-                yield return new WaitForSeconds(0.32f);
+                playerController.SetControllable(false);
+                await UniTask.WaitUntil(()=> isDialogFinish);
+                await UniTask.WaitUntil(()=> Input.GetMouseButtonUp(0));
+                await UniTask.Delay(TimeSpan.FromSeconds(0.32f));
             }
             else
             {
                 playerController.combatSystem.PrepareBeginTurn();
                 playerController.combatSystem.envEffect.SwitchToNextEffect();
                 playerController.combatSystem.envEffect.SetNextEffect(EEnvEffectType.None);
-                yield return new WaitForSeconds(1f);
-                yield return new WaitUntil(()=> canGoNext);
-                yield return new WaitForSeconds(0.32f);
+                playerController.SetControllable(true);
+                await UniTask.Delay(TimeSpan.FromSeconds(1));
+                await UniTask.WaitUntil(()=> canGoNext);
+                await UniTask.Delay(TimeSpan.FromSeconds(0.32f));
             }
             if(tutorial.isClearDisplay)
             {

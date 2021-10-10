@@ -1,11 +1,11 @@
-# @processInput set:Rollback.false
+; @processInput set:Rollback.false
 @back bg00
 
-# @set RuneActive=true
+; @set RuneActive=true
 WOW
 
 @battle scriptName:AAA label:afterbattle background:bg00 target:monster00
-# @tutorial scriptName:AAA label:afterbattle background:bg00
+; @tutorial scriptName:AAA label:afterbattle background:bg00
 @stop
 
 # afterbattle

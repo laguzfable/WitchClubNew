@@ -101,6 +101,9 @@ public class PlayerController : MonoBehaviour
         if (TutorialController.isTutorial)
         {
             var tutorObj = combatSystem.tutorController.curTutorialObj;
+
+            var isEmptyCards = result == null || result.cardList.Count == 0;
+
             // 檢查id
             switch (tutorObj.customActionID)
             {
@@ -108,7 +111,7 @@ public class PlayerController : MonoBehaviour
                 case "playRed":
                 case "playRed2":
                     {
-                        if (result == null || result.cardList.Count == 0)
+                        if (isEmptyCards)
                         {
                             combatSystem.combatTxtPanel.DisplaySystemText("請依教學指示執行動作");
                             return;
@@ -125,7 +128,7 @@ public class PlayerController : MonoBehaviour
                     break;
                 case "playBlue":
                     {
-                        if (result == null || result.cardList.Count == 0)
+                        if (isEmptyCards)
                         {
                             combatSystem.combatTxtPanel.DisplaySystemText("請依教學指示執行動作");
                             return;
@@ -142,7 +145,7 @@ public class PlayerController : MonoBehaviour
                     break;
                 case "playGreen":
                     {
-                        if (result == null || result.cardList.Count == 0)
+                        if (isEmptyCards)
                         {
                             combatSystem.combatTxtPanel.DisplaySystemText("請依教學指示執行動作");
                             return;

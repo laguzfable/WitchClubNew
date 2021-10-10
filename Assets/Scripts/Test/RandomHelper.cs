@@ -39,7 +39,7 @@ namespace RandomTool
             int totalWeight = Range_List[Range_List.Count - 1].y;
             Range_List[Range_List.Count - 1] = new Vector2Int(min, totalWeight + 1);
 
-            Debug.Log("totalWeight:" + totalWeight);
+            // Debug.Log("totalWeight:" + totalWeight);
 
 
 

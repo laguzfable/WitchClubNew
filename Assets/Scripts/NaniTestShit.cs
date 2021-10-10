@@ -20,7 +20,7 @@ public class NaniTestShit : MonoBehaviour
             PlayerData.Instance.usingRuneIDs[(int)ECardElement.Blue] = "赫菲";
         }
 
-        Debug.Log("WTF?!");
+        // Debug.Log("WTF?!");
         if (Engine.Initialized) DoMyCustomWork();
         else Engine.OnInitializationFinished += DoMyCustomWork;
     }
@@ -53,6 +53,6 @@ public class NaniTestShit : MonoBehaviour
             player.PreloadAndPlayAsync(gotoScript).Forget();
         }
 
-        Debug.Log("Hey just play this shit!");
+        // Debug.Log("Hey just play this shit!");
     }
 }
