@@ -12,7 +12,9 @@ public class TutorialController : MonoBehaviour
     [SerializeField] PlayerController playerController;
     [SerializeField] Image charImg;
     [SerializeField] GameObject leftDialog;
+    [SerializeField] GameObject leftArrow;
     [SerializeField] GameObject rightDialog;
+    [SerializeField] GameObject rightArrow;
 
     static public bool isTutorial;
 
@@ -66,6 +68,10 @@ public class TutorialController : MonoBehaviour
                 charImg.GetComponent<CharacterMove>().SetOrgY();
                 uICollection.mob.sprRend.enabled = false;
             }
+            
+            leftArrow.SetActive(false);
+            rightArrow.SetActive(false);
+            var arrow = tutorial.isRight? rightArrow : leftArrow;
 
             var dialog = tutorial.isRight? rightDialog : leftDialog;
             dialog.SetActive(true);
@@ -77,7 +83,13 @@ public class TutorialController : MonoBehaviour
             {
                 dialogContent = dialogContent.Replace("P", Engine.GetService<ICustomVariableManager>().GetVariableValue("PlayerName"));
             }
-            seq.Append(dialog.GetComponentInChildren<Text>().DOText(dialogContent, 1f).SetEase(Ease.Linear).OnComplete(()=>isDialogFinish = true));
+            seq.Append(dialog.GetComponentInChildren<Text>().DOText(dialogContent, 1f).SetEase(Ease.Linear)
+                .OnComplete(()=>
+                {
+                    isDialogFinish = true;
+                    arrow.SetActive(true);
+                })
+            );
             seq.Join(dialog.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack));
             seq.AppendInterval(0.5f);
             

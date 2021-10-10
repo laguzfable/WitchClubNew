@@ -409,13 +409,13 @@ public class CombatSystem : MonoBehaviour
     public void MobGetNewAction()
     {
         var act = mobUnit.GetNewAction(isBreakAciton);
-        actTxt.text = mobUnit.GetActionString();
+        mobActTxt.text = mobUnit.GetActionString();
         isBreakAciton = false;
     }
 
     public void UpdateMobActionInfo(string actionStr)
     {
-        actTxt.text = actionStr;
+        mobActTxt.text = actionStr;
     }
 
     WaitForSeconds waitForNextTurn = new WaitForSeconds(0.5f);
@@ -437,7 +437,7 @@ public class CombatSystem : MonoBehaviour
     }
 
     [SerializeField]
-    Text actTxt;
+    Text mobActTxt;
 
     public void GameOver(bool isLose)
     {
