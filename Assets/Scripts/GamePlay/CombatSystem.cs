@@ -418,14 +418,12 @@ public class CombatSystem : MonoBehaviour
         mobActTxt.text = actionStr;
     }
 
-    WaitForSeconds waitForNextTurn = new WaitForSeconds(0.5f);
-
-    IEnumerator DisplayDialog(string str)
+    async UniTaskVoid DisplayDialog(string str)
     {
         dialogText.text = str;
-        yield return new WaitForSeconds(0.5f);
+        await UniTask.Delay(TimeSpan.FromSeconds(0.5f));
         dialogObj.SetActive(true);
-        yield return new WaitForSeconds(4f);
+        await UniTask.Delay(TimeSpan.FromSeconds(4f));
         dialogObj.SetActive(false);
     }
 
@@ -511,12 +509,12 @@ public class CombatSystem : MonoBehaviour
         dialogObj.SetActive(false);
         dialogBtn.onClick.RemoveListener(() => ClickEndDialog(isVictory));
         audioSource.DOFade(0, 1f);
-        StartCoroutine(ShowEnd(waitBattleTime, isVictory));
+        ShowEnd(waitBattleTime, isVictory).Forget();
     }
 
-    IEnumerator ShowEnd(float time, bool isPlayerVictory) 
+    async UniTaskVoid ShowEnd(float time, bool isPlayerVictory) 
     {
-        yield return new WaitForSeconds(3f);
+        await UniTask.Delay(TimeSpan.FromSeconds(3f));
         if (!isPlayerVictory)
         {
             endObj[0].SetActive(true);
@@ -525,7 +523,7 @@ public class CombatSystem : MonoBehaviour
         {
             endObj[1].SetActive(true);
         }
-        yield return new WaitForSeconds(time);
+        await UniTask.Delay(TimeSpan.FromSeconds(time));
         endObj[0].SetActive(false);
         endObj[1].SetActive(false);
         
@@ -540,23 +538,23 @@ public class CombatSystem : MonoBehaviour
         }
     }
 
-    public IEnumerator DisplayBreakCloth(GameObject animPrefab)
+    public async UniTaskVoid DisplayBreakCloth(GameObject animPrefab)
     {
         if(animPrefab == null)
         {
-            yield break;
+            return;
         }
         // pc.MoveBaseCards(true);
         mainCanvas.FadeOut(0.15f);
         Camera.main.transform.DOPunchPosition(Vector3.right, 0.2f);
         Instantiate(animPrefab);
         CameraPlay.MangaFlash(2.5f);
-        yield return new WaitForSeconds(2.5f);
+        await UniTask.Delay(TimeSpan.FromSeconds(2.5f));
         mainCanvas.FadeIn(0.15f);
         // pc.MoveBaseCards(false);
     }
 
-    public IEnumerator DisplayBreakFinalCloth(GameObject animPrefab)
+    public async UniTaskVoid DisplayBreakFinalCloth(GameObject animPrefab)
     {
         isContinue = false;
         // pc.MoveBaseCards(true);
@@ -567,7 +565,7 @@ public class CombatSystem : MonoBehaviour
             Instantiate(animPrefab);
         }
         CameraPlay.MangaFlash(2.5f);
-        yield return new WaitForSeconds(2.5f);
+        await UniTask.Delay(TimeSpan.FromSeconds(2.5f));
         mainCanvas.FadeIn(0.15f);
         // pc.MoveBaseCards(false);
         GameOver(false);

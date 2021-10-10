@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UniRx.Async;
 using UnityEngine;
 
 //Use Respawn tag
@@ -41,46 +42,28 @@ public class UICombatTextPanel : MonoBehaviour {
     public void DisplaySystemText(string content)
     {
         UICombatText txt = GetText();
-        txt.Display(content, ECombatTextType.System, systemPos.position);
+        txt.Display(content, ECombatTextType.System, systemPos.position).Forget();
     }
-
-    Coroutine displayCoroutine = null;
     public void EnqueueText(string content, ECombatTextType type, bool isPlayer)
     {
         contentQueue.Enqueue(new TextContent() {content = content, type = type, isPlayer = isPlayer });
-        if(displayCoroutine == null)
-        {
-            displayCoroutine = StartCoroutine(DisplayAllContent());
-        }
-        
+        DisplayAllContent().Forget();
     }
 
-    WaitForSeconds waitingTime = new WaitForSeconds(0.25f);
-    IEnumerator DisplayAllContent()
+    public float popDelayTime = 0.25f;
+    async UniTaskVoid DisplayAllContent()
     {
         while(contentQueue.Count > 0)
         {
             PopUpText(contentQueue.Dequeue());
-            yield return waitingTime;
+            await UniTask.Delay(System.TimeSpan.FromSeconds(popDelayTime), cancellationToken:this.GetCancellationTokenOnDestroy());
         }
-
-        displayCoroutine = null;
-
-        /*var displayContentArr = contentList.ToArray();
-        contentList.Clear();
-
-        foreach (var content in displayContentArr)
-        {
-            PopUpText(content);
-            yield return waitingTime;
-        }
-        */
     }
 
     void PopUpText(TextContent txtContent)
     {
         UICombatText txt = GetText();
-        txt.Display(txtContent.content, txtContent.type, txtContent.isPlayer ? playerPos.position : enemyPos.position);
+        txt.Display(txtContent.content, txtContent.type, txtContent.isPlayer ? playerPos.position : enemyPos.position).Forget();
     }
 
     UICombatText GetText()

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using System.Text;
+using UniRx.Async;
 
 public class EnemyUnit : BaseCombatUnit
 {
@@ -321,7 +322,7 @@ public class EnemyUnit : BaseCombatUnit
 
             transform.DOShakePosition(0.7f, new Vector3(2f, 0f, 0f)).onComplete += OnShakeComplete;
             
-            StartCoroutine(DamagedFlash());
+            DamagedFlash().Forget();
 
             if (audioClipList.Count > 0)
             {
@@ -336,10 +337,10 @@ public class EnemyUnit : BaseCombatUnit
         }
     }
 
-    IEnumerator DamagedFlash()
+    async UniTaskVoid DamagedFlash()
     {
         sprRend.material.SetFloat("_FlashAmount", 0.8f);
-        yield return new WaitForSeconds(0.15f);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(0.15f));
         sprRend.material.SetFloat("_FlashAmount", 0f);
     }
 

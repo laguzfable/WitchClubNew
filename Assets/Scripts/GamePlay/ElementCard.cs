@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using DG.Tweening;
 using TMPro;
+using UniRx.Async;
 
 public enum ECardElement { Blue, Red, Yellow, Green, None }
 
@@ -81,9 +82,9 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
         orgScale = transform.localScale;
     }
 
-    IEnumerator Start()
+    async UniTaskVoid Start()
     {
-        yield return new WaitForSeconds(0.3f);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(0.3f));
 
         orgPos = transform.localPosition;
         orgRot = transform.localRotation.eulerAngles;

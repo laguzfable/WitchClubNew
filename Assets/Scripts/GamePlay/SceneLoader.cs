@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using Naninovel;
 using Naninovel.UI;
+using UniRx.Async;
 
 public class SceneLoader : MonoBehaviour
 {
@@ -62,12 +63,12 @@ public class SceneLoader : MonoBehaviour
     {
         loadScene = true;
         loadingObj = Instantiate(loadingScreenPrefab, loadingScreenPrefab.transform.position, loadingScreenPrefab.transform.rotation);
-        StartCoroutine(LoadNewScene(sceneName));
+        LoadNewSceneAsync(sceneName).Forget();
         audioSource.clip = ac;
         audioSource.Play();
     }
 
-    IEnumerator LoadNewScene(string sceneName)
+    async UniTaskVoid LoadNewSceneAsync(string sceneName)
     {
         if(Engine.Initialized)
         {
@@ -82,24 +83,16 @@ public class SceneLoader : MonoBehaviour
             // PlayerData.Instance.playerName = null;
         }
         
+        // !到底是誰做個多場景讀取還要去抄網路上的東西啦 2021/10/10改掉了 by K
+        await UniTask.Delay(System.TimeSpan.FromSeconds(1f));
 
-        // This line waits for 3 seconds before executing the next line in the coroutine.
-        // This line is only necessary for this demo. The scenes are so simple that they load too fast to read the "Loading..." text.
-        yield return new WaitForSeconds(1);
+        await SceneManager.LoadSceneAsync(sceneName, is_multiScene? LoadSceneMode.Additive : LoadSceneMode.Single);
 
-        // Start an asynchronous operation to load the scene that was passed to the LoadNewScene coroutine.
-        AsyncOperation async;
-        if (!is_multiScene) async = Application.LoadLevelAsync(sceneName);
-        else async = Application.LoadLevelAdditiveAsync(sceneName);
         is_multiScene = false;
 
-        // While the asynchronous operation to load the new scene is not yet complete, continue waiting until it's done.
-        while (!async.isDone)
-        {
-            yield return null;
-        }
         Destroy(loadingObj);  //加載場景時loading要消失才行
     }
+
     public void ExitGame()
     {
         Application.Quit();

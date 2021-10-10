@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using Kenaz;
+using UniRx.Async;
 
 public class PlayerUnit : BaseCombatUnit 
 {
@@ -70,9 +71,9 @@ public class PlayerUnit : BaseCombatUnit
         } */
     }
 
-    IEnumerator TurnScreenBlackWhite()
+    async UniTaskVoid TurnScreenBlackWhite()
     {
-        yield return new WaitForSeconds(0.5f);
+        await UniTask.Delay(System.TimeSpan.FromSeconds(0.5f));
         CameraPlay.BlackWhite_ON();
     }
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UniRx.Async;
 using UnityEngine;
 
 public enum EFXSequenceType { Enemy, Player, UI, None }
@@ -16,14 +17,14 @@ public class FXSequence : MonoBehaviour
 
     public FXSequence nextFX;
 
-    static public IEnumerator PlayFX(FXSequence fxSeq)
+    static public async UniTaskVoid PlayFX(FXSequence fxSeq)
     {
         var displayFX = fxSeq;
         while (displayFX != null)
         {
             var go = Instantiate(fxSeq.fx);
             go.transform.position = fxSeq.position;
-            yield return new WaitForSeconds(fxSeq.duration);
+            await UniTask.Delay(System.TimeSpan.FromSeconds(fxSeq.duration));
             Destroy(go, fxSeq.lifeTime);
             displayFX = displayFX.nextFX;
         }

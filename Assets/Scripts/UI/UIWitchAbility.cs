@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using Kenaz;
+using UniRx.Async;
 
 public class UIWitchAbility : MonoBehaviour
 {
@@ -107,11 +108,11 @@ public class UIWitchAbility : MonoBehaviour
             }
             //cost.Value = 0f;
             pc.CostEN(cost.Value);
-            StartCoroutine(SpecialFXCoroutine());
+            SpecialFXCoroutine().Forget();
         }
     }
 
-    IEnumerator SpecialFXCoroutine()
+    async UniTaskVoid SpecialFXCoroutine()
     {
         if (specialFX != null)
         {
@@ -119,7 +120,7 @@ public class UIWitchAbility : MonoBehaviour
             CameraPlay.WidescreenH_ON(0.2f);
             blackScreen.FadeIn(0.15f);
             specialFX.SetActive(true);
-            yield return new WaitForSeconds(specialFXTime);
+            await UniTask.Delay(System.TimeSpan.FromSeconds(specialFXTime));
             specialFX.SetActive(false);
             blackScreen.FadeOut(0.15f);
             CameraPlay.WidescreenH_OFF(0.2f);
@@ -129,7 +130,7 @@ public class UIWitchAbility : MonoBehaviour
             var displayFX = ability.specialFX.GetComponent<FXSequence>();
             if (displayFX != null)
             {
-                yield return StartCoroutine(FXSequence.PlayFX(displayFX));
+                await FXSequence.PlayFX(displayFX);
             }
         }
         unit.CastAbility(ability);

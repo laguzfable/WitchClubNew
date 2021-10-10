@@ -54,7 +54,7 @@ public class BossUnit : EnemyUnit
         else if (breakLv == EClothBreakLevel.Half && HP.Value <= (HP.GetTotalValue() * 0.3f))
         {
             breakLv = EClothBreakLevel.Full;
-            StartCoroutine(combatSystem.DisplayBreakCloth(breakClothAnimPrefab));
+            combatSystem.DisplayBreakCloth(breakClothAnimPrefab).Forget();
 
             if(brokenClothFx.Length > 2 && brokenClothFx[1] != null)
             {
