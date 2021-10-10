@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using TMPro;
+using UniRx.Async;
 
 public class PlayerController : MonoBehaviour
 {
@@ -96,75 +97,75 @@ public class PlayerController : MonoBehaviour
 
     public void PlayAction()
     {
-        if(result != null)
+        // 這邊插入教學的邏輯
+        if (TutorialController.isTutorial)
         {
-            // 這邊插入教學的邏輯
-            if(TutorialController.isTutorial)
+            var tutorObj = combatSystem.tutorController.curTutorialObj;
+            // 檢查id
+            switch (tutorObj.customActionID)
             {
-                var tutorObj = combatSystem.tutorController.curTutorialObj;
-                // 檢查id
-                switch(tutorObj.customActionID)
-                {
                 // 透過事件id判斷教學條件是否達成
-                    case "playRed":
-                    case "playRed2":
+                case "playRed":
+                case "playRed2":
+                    {
+                        if (result == null || result.cardList.Count == 0)
                         {
-                            if(result.cardList.Count == 0)
+                            combatSystem.combatTxtPanel.DisplaySystemText("請依教學指示執行動作");
+                            return;
+                        }
+                        foreach (var card in result.cardList)
+                        {
+                            if (card.element != ECardElement.Red)
                             {
                                 combatSystem.combatTxtPanel.DisplaySystemText("請依教學指示執行動作");
                                 return;
                             }
-                            foreach (var card in result.cardList)
-                            {
-                                if(card.element != ECardElement.Red)
-                                {
-                                    combatSystem.combatTxtPanel.DisplaySystemText("請依教學指示執行動作");
-                                    return;
-                                }
-                            }
                         }
-                        break;
-                    case "playBlue":
+                    }
+                    break;
+                case "playBlue":
+                    {
+                        if (result == null || result.cardList.Count == 0)
                         {
-                            if(result.cardList.Count == 0)
+                            combatSystem.combatTxtPanel.DisplaySystemText("請依教學指示執行動作");
+                            return;
+                        }
+                        foreach (var card in result.cardList)
+                        {
+                            if (card.element != ECardElement.Blue)
                             {
                                 combatSystem.combatTxtPanel.DisplaySystemText("請依教學指示執行動作");
                                 return;
                             }
-                            foreach (var card in result.cardList)
-                            {
-                                if(card.element != ECardElement.Blue)
-                                {
-                                    combatSystem.combatTxtPanel.DisplaySystemText("請依教學指示執行動作");
-                                    return;
-                                }
-                            }
                         }
-                        break;
-                    case "playGreen":
+                    }
+                    break;
+                case "playGreen":
+                    {
+                        if (result == null || result.cardList.Count == 0)
                         {
-                            if(result.cardList.Count == 0)
+                            combatSystem.combatTxtPanel.DisplaySystemText("請依教學指示執行動作");
+                            return;
+                        }
+                        foreach (var card in result.cardList)
+                        {
+                            if (card.element != ECardElement.Green)
                             {
                                 combatSystem.combatTxtPanel.DisplaySystemText("請依教學指示執行動作");
                                 return;
                             }
-                            foreach (var card in result.cardList)
-                            {
-                                if(card.element != ECardElement.Green)
-                                {
-                                    combatSystem.combatTxtPanel.DisplaySystemText("請依教學指示執行動作");
-                                    return;
-                                }
-                            }
                         }
-                        break;
-                    default:
-                        combatSystem.combatTxtPanel.DisplaySystemText("請依教學指示執行動作");
-                        return;
-                        
-                }
-            }
+                    }
+                    break;
+                default:
+                    // combatSystem.combatTxtPanel.DisplaySystemText("請依教學指示執行動作");
+                    return;
 
+            }
+        }
+
+        if (result != null)
+        {
             if (result.state == EElementState.Multiple && !playerUnit.HasEffect(EAbilityEffectType.IgnoreElement))
             {
                 combatSystem.combatTxtPanel.DisplaySystemText("不能選擇不同系列生物");
@@ -225,7 +226,7 @@ public class PlayerController : MonoBehaviour
 
         audioSource.clip = sfx[0];
         audioSource.Play();
-        combatSystem.PlayCard();
+        combatSystem.PlayCardAsync().Forget();
     }
 
     public void SetControllable(bool controllable)

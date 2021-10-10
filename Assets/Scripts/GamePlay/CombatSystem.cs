@@ -8,6 +8,7 @@ using System.Linq;
 using Naninovel;
 using UniRx.Async;
 using Naninovel.UI;
+using System;
 
 public class CombatSystem : MonoBehaviour
 {
@@ -219,55 +220,15 @@ public class CombatSystem : MonoBehaviour
         }
     }
 
-    public void PlayCard()
+    public async UniTask PlayCardAsync()
     {
-        StartCoroutine(PlayResult());
-    }
+        //StartCoroutine(PlayResult());
 
-    class ResultOrder
-    {
-        public int value;
-        public BaseCombatUnit owner;
-        public System.Action action;
-    }
-
-    List<ResultOrder> orderList = new List<ResultOrder>();
-    bool isBreakAciton = false;
-
-    WaitForSeconds waitPlay = null;
-
-
-    enum Order { PlayerDealDamage = 1, InterruptMobsAction, PlayerHealing, MobDealDamage, MobHealing };
-
-    void CreateOrder(int order, int value, BaseCombatUnit owner, System.Action action)
-    {
-        if (value > 0 && !owner.HasEffect(EAbilityEffectType.Stun))
-        {
-            var resultOrder = new ResultOrder();
-            resultOrder.value = order;
-            resultOrder.owner = owner;
-            resultOrder.action = action;
-            orderList.Add(resultOrder);
-        }
-    }
-
-    [SerializeField]
-    CGFadeHelper blackScreen;
-    [SerializeField]
-    Image comboSpecialImg;
-
-    IEnumerator PlayResult()
-    {
         pc.SetControllable(false);
-        // pc.MoveBaseCards(true);
 
         var playerUnit = pc.GetPlayerUnit();
         var mobActResult = mobUnit.GetActionResult();
 
-        if(null == waitPlay)
-        {
-            waitPlay = new WaitForSeconds(waitTurnTime);
-        }
 
         var mobDmg = pc.ATK - mobActResult.attr.DEF;
 
@@ -288,7 +249,7 @@ public class CombatSystem : MonoBehaviour
         }
 
         orderList.Clear();
-        if(!isBreakAciton)
+        if (!isBreakAciton)
         {
             CreateOrder((int)Order.MobDealDamage, mobActResult.attr.ATK, mobUnit, () => { // Mob deal damage
 
@@ -298,7 +259,7 @@ public class CombatSystem : MonoBehaviour
                 {
                     return;
                 }
-                if(playerUnit.HasEffect(EAbilityEffectType.Reflect)) // reflect effect
+                if (playerUnit.HasEffect(EAbilityEffectType.Reflect)) // reflect effect
                 {
                     mobUnit.ApplyDamage(mobActResult.attr.ATK);
                 }
@@ -343,12 +304,12 @@ public class CombatSystem : MonoBehaviour
 
             if (playerUnit.HasEffect(EAbilityEffectType.LifeSteal) && (!playerUnit.HasEffect(EAbilityEffectType.IgnoreEnvironmentEffect) && envEffect.curType != EEnvEffectType.NoHeal) && mobDmg > 0) // life steal
             {
-                playerUnit.ApplyHealing(!playerUnit.HasEffect(EAbilityEffectType.IgnoreEnvironmentEffect) && envEffect.curType == EEnvEffectType.Heal? mobDmg * 2f : mobDmg);
+                playerUnit.ApplyHealing(!playerUnit.HasEffect(EAbilityEffectType.IgnoreEnvironmentEffect) && envEffect.curType == EEnvEffectType.Heal ? mobDmg * 2f : mobDmg);
             }
         });
 
-        CreateOrder((int)Order.InterruptMobsAction, isBreakAciton? 1: 0, playerUnit, () => { // interrupt
-            if(!mobUnit.HasEffect(EAbilityEffectType.BreakAction))
+        CreateOrder((int)Order.InterruptMobsAction, isBreakAciton ? 1 : 0, playerUnit, () => { // interrupt
+            if (!mobUnit.HasEffect(EAbilityEffectType.BreakAction))
             {
                 combatTxtPanel.EnqueueText("成功打斷行動", ECombatTextType.Debuff, false);
             }
@@ -357,13 +318,13 @@ public class CombatSystem : MonoBehaviour
         CreateOrder((int)Order.PlayerHealing, pc.HEAL, playerUnit, () => { // player deal healing
 
             playerUnit.ApplyHealing(pc.HEAL);
-            if(playerUnit.HasEffect(EAbilityEffectType.HealingAttack)) // healing attack
+            if (playerUnit.HasEffect(EAbilityEffectType.HealingAttack)) // healing attack
             {
                 mobUnit.ApplyDamage(pc.HEAL);
             }
         });
 
-        if(pc.result != null && pc.result.IsCombo())
+        if (pc.result != null && pc.result.IsCombo())
         {
             CameraPlay.Shockwave(0.9f, 0.5f, 1.25f, 2f);
             CameraPlay.WidescreenH_ON(0.2f);
@@ -371,36 +332,214 @@ public class CombatSystem : MonoBehaviour
             comboSpecialImg.sprite = pc.GetCompboSpr();
 
             comboSpecialImg.gameObject.SetActive(true);
-            yield return new WaitForSeconds(1f);
+            await UniTask.Delay(TimeSpan.FromSeconds(1));
             comboSpecialImg.gameObject.SetActive(false);
 
             blackScreen.FadeOut(0.15f);
             CameraPlay.WidescreenH_OFF(0.2f);
-            yield return new WaitForSeconds(0.2f);
+            await UniTask.Delay(TimeSpan.FromSeconds(0.2f));
         }
 
         foreach (var or in orderList.OrderBy(or => or.value)/*orderList.OrderByDescending(or => or.value)*/)
         {
             or.action();
-            yield return waitPlay;
-            if(!isContinue)
+            await UniTask.Delay(TimeSpan.FromSeconds(waitTurnTime));
+            if (!isContinue)
             {
-                yield break;
+                return;
             }
         }
 
-        if(mobActResult.targetEnvEffect != EEnvEffectType.None && !isBreakAciton)
+        if (mobActResult.targetEnvEffect != EEnvEffectType.None && !isBreakAciton)
         {
             envEffect.SetNextEffect(mobActResult.targetEnvEffect, 1);
         }
 
-        if(TutorialController.isTutorial)
+        if (TutorialController.isTutorial)
         {
             tutorController.canGoNext = true;
-            yield break;
+            return;
         }
         PrepareBeginTurn();
     }
+
+    class ResultOrder
+    {
+        public int value;
+        public BaseCombatUnit owner;
+        public System.Action action;
+    }
+
+    List<ResultOrder> orderList = new List<ResultOrder>();
+    bool isBreakAciton = false;
+
+    //WaitForSeconds waitPlay = null;
+
+
+    enum Order { PlayerDealDamage = 1, InterruptMobsAction, PlayerHealing, MobDealDamage, MobHealing };
+
+    void CreateOrder(int order, int value, BaseCombatUnit owner, System.Action action)
+    {
+        if (value > 0 && !owner.HasEffect(EAbilityEffectType.Stun))
+        {
+            var resultOrder = new ResultOrder();
+            resultOrder.value = order;
+            resultOrder.owner = owner;
+            resultOrder.action = action;
+            orderList.Add(resultOrder);
+        }
+    }
+
+    [SerializeField]
+    CGFadeHelper blackScreen;
+    [SerializeField]
+    Image comboSpecialImg;
+// 
+//     IEnumerator PlayResult()
+//     {
+//         pc.SetControllable(false);
+//         // pc.MoveBaseCards(true);
+// 
+//         var playerUnit = pc.GetPlayerUnit();
+//         var mobActResult = mobUnit.GetActionResult();
+// 
+//         if(null == waitPlay)
+//         {
+//             waitPlay = new WaitForSeconds(waitTurnTime);
+//         }
+// 
+//         var mobDmg = pc.ATK - mobActResult.attr.DEF;
+// 
+//         if (mobActResult.curAct.type == EMobActionType.Power)
+//         {
+//             if (mobActResult.breakType == EBreakConditionType.ATK && pc.ATK >= mobActResult.breakValue)
+//             {
+//                 isBreakAciton = true;
+//             }
+//             else if (mobActResult.breakType == EBreakConditionType.HP)
+//             {
+//                 mobActResult.breakValue -= mobDmg;
+//                 if (mobActResult.breakValue <= 0)
+//                 {
+//                     isBreakAciton = true;
+//                 }
+//             }
+//         }
+// 
+//         orderList.Clear();
+//         if(!isBreakAciton)
+//         {
+//             CreateOrder((int)Order.MobDealDamage, mobActResult.attr.ATK, mobUnit, () => { // Mob deal damage
+// 
+//                 var dmg = mobActResult.attr.ATK - pc.DEF;
+// 
+//                 if (playerUnit.HasEffect(EAbilityEffectType.Shield)) // shield effect
+//                 {
+//                     return;
+//                 }
+//                 if(playerUnit.HasEffect(EAbilityEffectType.Reflect)) // reflect effect
+//                 {
+//                     mobUnit.ApplyDamage(mobActResult.attr.ATK);
+//                 }
+//                 else // normal
+//                 {
+//                     playerUnit.ApplyDamage(dmg);
+//                 }
+// 
+//                 if (mobUnit.HasEffect(EAbilityEffectType.LifeSteal) && (!mobUnit.HasEffect(EAbilityEffectType.IgnoreEnvironmentEffect) && envEffect.curType != EEnvEffectType.NoHeal) && dmg > 0)// life steal
+//                 {
+//                     mobUnit.ApplyHealing(!mobUnit.HasEffect(EAbilityEffectType.IgnoreEnvironmentEffect) && envEffect.curType == EEnvEffectType.Heal ? dmg * 2f : dmg);
+//                 }
+// 
+//             });
+// 
+//             CreateOrder((int)Order.MobHealing, mobActResult.attr.HEAL, mobUnit, () => { // Mob deal healing
+// 
+//                 mobUnit.ApplyHealing(mobActResult.attr.HEAL);
+//                 if (mobUnit.HasEffect(EAbilityEffectType.HealingAttack)) // healing attack
+//                 {
+//                     playerUnit.ApplyDamage(mobActResult.attr.HEAL);
+//                 }
+// 
+//             });
+//         }
+// 
+//         CreateOrder((int)Order.PlayerDealDamage, pc.ATK, playerUnit, () => { // player deal damage
+//             visualResource.GetCardFX(pc.result.fxID);
+// 
+//             if (mobUnit.HasEffect(EAbilityEffectType.Shield)) // shield effect
+//             {
+//                 return;
+//             }
+//             if (mobUnit.HasEffect(EAbilityEffectType.Reflect)) // reflect effect
+//             {
+//                 playerUnit.ApplyDamage(mobActResult.attr.ATK);
+//             }
+//             else // normal
+//             {
+//                 mobUnit.ApplyDamage(mobDmg);
+//             }
+// 
+//             if (playerUnit.HasEffect(EAbilityEffectType.LifeSteal) && (!playerUnit.HasEffect(EAbilityEffectType.IgnoreEnvironmentEffect) && envEffect.curType != EEnvEffectType.NoHeal) && mobDmg > 0) // life steal
+//             {
+//                 playerUnit.ApplyHealing(!playerUnit.HasEffect(EAbilityEffectType.IgnoreEnvironmentEffect) && envEffect.curType == EEnvEffectType.Heal? mobDmg * 2f : mobDmg);
+//             }
+//         });
+// 
+//         CreateOrder((int)Order.InterruptMobsAction, isBreakAciton? 1: 0, playerUnit, () => { // interrupt
+//             if(!mobUnit.HasEffect(EAbilityEffectType.BreakAction))
+//             {
+//                 combatTxtPanel.EnqueueText("成功打斷行動", ECombatTextType.Debuff, false);
+//             }
+//         });
+// 
+//         CreateOrder((int)Order.PlayerHealing, pc.HEAL, playerUnit, () => { // player deal healing
+// 
+//             playerUnit.ApplyHealing(pc.HEAL);
+//             if(playerUnit.HasEffect(EAbilityEffectType.HealingAttack)) // healing attack
+//             {
+//                 mobUnit.ApplyDamage(pc.HEAL);
+//             }
+//         });
+// 
+//         if(pc.result != null && pc.result.IsCombo())
+//         {
+//             CameraPlay.Shockwave(0.9f, 0.5f, 1.25f, 2f);
+//             CameraPlay.WidescreenH_ON(0.2f);
+//             blackScreen.FadeIn(0.15f);
+//             comboSpecialImg.sprite = pc.GetCompboSpr();
+// 
+//             comboSpecialImg.gameObject.SetActive(true);
+//             yield return new WaitForSeconds(1f);
+//             comboSpecialImg.gameObject.SetActive(false);
+// 
+//             blackScreen.FadeOut(0.15f);
+//             CameraPlay.WidescreenH_OFF(0.2f);
+//             yield return new WaitForSeconds(0.2f);
+//         }
+// 
+//         foreach (var or in orderList.OrderBy(or => or.value)/*orderList.OrderByDescending(or => or.value)*/)
+//         {
+//             or.action();
+//             yield return waitPlay;
+//             if(!isContinue)
+//             {
+//                 yield break;
+//             }
+//         }
+// 
+//         if(mobActResult.targetEnvEffect != EEnvEffectType.None && !isBreakAciton)
+//         {
+//             envEffect.SetNextEffect(mobActResult.targetEnvEffect, 1);
+//         }
+// 
+//         if(TutorialController.isTutorial)
+//         {
+//             tutorController.canGoNext = true;
+//             yield break;
+//         }
+//         PrepareBeginTurn();
+//     }
 
     public void PrepareBeginTurn()
     {
