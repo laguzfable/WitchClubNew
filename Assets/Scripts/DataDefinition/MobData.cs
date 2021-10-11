@@ -4,7 +4,9 @@ using UnityEngine;
 public class MobData : ScriptableObject
 {
     public int HP;
-    public MobElementData elementData;
+    public MobElementData[] elementData;
+
+    public MobAbility[] ability;
 
 }
 
@@ -17,5 +19,13 @@ public class MobElementData
 
     public int decisionWeight;
 
+    public GameObject fx;
+}
+
+[System.Serializable]
+public class MobAbility
+{
+    public int requireEnergy;
+    public AbilityEffect[] effect;
     public GameObject fx;
 }
