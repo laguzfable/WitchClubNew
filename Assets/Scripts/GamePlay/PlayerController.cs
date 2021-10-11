@@ -8,15 +8,19 @@ using UniRx.Async;
 
 public class PlayerController : MonoBehaviour
 {
+
+    static readonly int MaxCardCount = 5;
+    static readonly int MaxRuneAbilityCount = 4;
+
     public CombatSystem combatSystem { private set; get; }
 
     PlayerUnit playerUnit;
 
     [SerializeField]
-    ElementCard[] cards = new ElementCard[5];
+    ElementCard[] cards = new ElementCard[MaxCardCount];
 
     [SerializeField]
-    UIWitchAbility[] witchCards = new UIWitchAbility[4];
+    UIWitchAbility[] witchCards = new UIWitchAbility[MaxRuneAbilityCount];
 
     AudioSource audioSource;
 

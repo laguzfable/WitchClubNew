@@ -189,7 +189,7 @@ public class CombatSystem : MonoBehaviour
 
     private void Update()
     {
-        // !Todo: 正式版要拿掉
+        // TODO: 正式版要拿掉
         if(Input.GetKeyUp(KeyCode.KeypadPeriod))
         {
             GameOver(false);
@@ -208,21 +208,22 @@ public class CombatSystem : MonoBehaviour
 
         var mobDmg = pc.ATK - mobActResult.attr.DEF;
 
-        if (mobActResult.curAct.type == EMobActionType.Power)
-        {
-            if (mobActResult.breakType == EBreakConditionType.ATK && pc.ATK >= mobActResult.breakValue)
-            {
-                isBreakAciton = true;
-            }
-            else if (mobActResult.breakType == EBreakConditionType.HP)
-            {
-                mobActResult.breakValue -= mobDmg;
-                if (mobActResult.breakValue <= 0)
-                {
-                    isBreakAciton = true;
-                }
-            }
-        }
+        // TODO 之後再來review
+        // if (mobActResult.curAct.type == EMobActionType.Power)
+        // {
+        //     if (mobActResult.breakType == EBreakConditionType.ATK && pc.ATK >= mobActResult.breakValue)
+        //     {
+        //         isBreakAciton = true;
+        //     }
+        //     else if (mobActResult.breakType == EBreakConditionType.HP)
+        //     {
+        //         mobActResult.breakValue -= mobDmg;
+        //         if (mobActResult.breakValue <= 0)
+        //         {
+        //             isBreakAciton = true;
+        //         }
+        //     }
+        // }
 
         orderList.Clear();
         if (!isBreakAciton)
@@ -404,7 +405,8 @@ public class CombatSystem : MonoBehaviour
 
     public void MobGetNewAction()
     {
-        var act = mobUnit.GetNewAction(isBreakAciton);
+        // var act = mobUnit.GetNewAction(isBreakAciton);
+        mobUnit.GetNewAction(isBreakAciton);
         mobActTxt.text = mobUnit.GetActionString();
         isBreakAciton = false;
     }

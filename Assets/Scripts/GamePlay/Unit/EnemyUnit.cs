@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using System.Text;
+using System.Linq;
 using UniRx.Async;
+using Kenaz;
 
 public class EnemyUnit : BaseCombatUnit
 {
@@ -17,8 +19,6 @@ public class EnemyUnit : BaseCombatUnit
 
     public bool isMovable = true;
 
-    // Animator animator;
-
     public Transform fxPos;
     
 
@@ -29,24 +29,30 @@ public class EnemyUnit : BaseCombatUnit
     List<AudioClip> audioClipList;
     AudioSource audioSource;
 
-    [SerializeField]
-    MobAction[] defActionArr;
-    
-    // [SerializeField] MobActionCollection mobActCollectoin;
-
-    MobAction[] actionArr;
-    int curActIndex = 0;
-
     public SpriteRenderer sprRend {private set; get; }
+
+    MobData mobData;
+
+    static readonly int MaxCardCount = 5;
+
+    // TODO 之後要加上留卡沒出的等級數值加成
+    struct MobCard
+    {
+        public ECardElement element;
+        public bool isUse;
+    }
+
+    MobCard[] cardArr = new MobCard[MaxCardCount];
+
+    MobActionResult actResult = null;
+
+    UnitAttribute abilityEnergy;
 
     private void Awake()
     {
         audioSource = this.GetOrAddComponent<AudioSource>();
-        // animator = GetComponent<Animator>();
         sprRend = GetComponent<SpriteRenderer>();
 
-        actionArr = defActionArr;
-        ShuffleAction();
         if (target == null)
         {
             target = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerUnit>();
@@ -63,15 +69,23 @@ public class EnemyUnit : BaseCombatUnit
 
     protected override void Init()
     {
-        base.Init();
         orgY = transform.position.y;
         if(!TutorialController.isTutorial && !combatSystem.IsTestMode)
         {
-            Debug.Log($"Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[1] : {DataService.Instance.scriptParameter.combatTarget}");
-            sprRend.sprite = combatSystem.visualResource.GetMobByName(DataService.Instance.scriptParameter.combatTarget);
+            var mobName = DataService.Instance.scriptParameter.combatTarget;
+            Debug.Log($"Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[1] : {mobName}");
+            sprRend.sprite = combatSystem.visualResource.GetMobByName(mobName);
+
+            // TODO 因為還沒定義各個敵人的資料 先統一抓測試資料
+            // mobData = Resources.Load<MobData>($"MobData/{mobName}");
+            mobData = Resources.Load<MobData>("MobData/TestMobData");
+            HP.SetBaseValue(mobData.HP);
         }
         sprRend.enabled = true;
-        HP.Restore();
+        
+        base.Init();
+
+        ShuffleCards(true);
     }
 
     protected override void OnDefeated()
@@ -96,208 +110,141 @@ public class EnemyUnit : BaseCombatUnit
         }
     }
 
-    void ShuffleAction()
+    /// <summary>
+    /// 洗牌
+    /// </summary>
+    /// <param name="isAll">是不是全洗</param>
+    public void ShuffleCards(bool isAll)
     {
-        int i = actionArr.Length - 1;
-        while (i != 0)
+        var rndList = new List<RandomTool.RandomObject>();
+        for (int i = 0; i < (int)ECardElement.None; i++)
         {
-            int rnd = Random.Range(0, actionArr.Length);
-            var tmp = actionArr[i];
-            actionArr[i] = actionArr[rnd];
-            actionArr[rnd] = tmp;
-            i--;
+            var rndObj = new RandomTool.RandomObject();
+            rndObj.SetIndex((int)mobData.elementData[i].element);
+            rndObj.Weight = mobData.elementData[i].randomWeight;
+            rndList.Add(rndObj);
+        }
+
+        for(var i = 0; i < MaxCardCount; i++)
+        {
+            var card = cardArr[i];
+            if(isAll || card.isUse)
+            {
+                var rnd = RandomTool.RandomHelper.GetRandomList(rndList);
+                cardArr[i].element = (ECardElement)rnd.Index;
+                cardArr[i].isUse = false;
+            }
         }
     }
 
-    public void CheckIsBreak(float damageValue)
-    {
-        if(actResult.curAct.type == EMobActionType.Power && !HasEffect(EAbilityEffectType.BreakAction) && damageValue >= actResult.breakValue)
-        {
-            AddEffect(AbilityEffectRef.Create(EAbilityEffectType.BreakAction, new AbilityEffect() { type = EAbilityEffectType.BreakAction }));
-        }
-    }
+    // 流程: GetNewAction > GetActString > GetActResult
 
     public class MobActionResult
     {
         public CardAttribute attr;
-        public int turnRemain;
-        public EBreakConditionType breakType;
-        public int breakValue;
-        public MobAction curAct;
+        // public int turnRemain;
+        // public EBreakConditionType breakType;
+        // public int breakValue;
         public EEnvEffectType targetEnvEffect;
     }
 
-    MobActionResult actResult = null;
-
-    public MobAction GetNewAction(bool isBreak)
-    {
-        MobAction act = null;
-        
-        if(HasEffect(EAbilityEffectType.Stun) || HasEffect(EAbilityEffectType.BreakAction))
-        {
-            isBreak = true;
-        }
-        ClearEffect();
-        if (actResult != null && actResult.turnRemain > 0 && !isBreak)
-        {
-            actResult.turnRemain--;
-            return actResult.curAct;
-        }
-        if (actResult != null && !isBreak && actResult.curAct.turn > 0 && actResult.turnRemain <= 0)
-        {
-            act = actResult.curAct.nextAction;
-        }
-        else if(curActIndex > actionArr.Length -1)
-        {
-            ShuffleAction();
-            curActIndex = 0;
-        }
-
-        if(act == null)
-        {
-            act = actionArr[curActIndex];
-        }
-
-        actResult = new MobActionResult();
-        actResult.attr = bonusAttr;
-        actResult.attr.ATK += Random.Range(act.minATK, act.maxATK);
-        actResult.attr.DEF += Random.Range(act.minDEF, act.maxDEF);
-        actResult.attr.HEAL += Random.Range(act.minHEAL, act.minHEAL);
-        actResult.turnRemain = act.turn-1;
-        actResult.breakType = act.breakType;
-        actResult.breakValue = act.breakValue;
-        actResult.curAct = act;
-        actResult.targetEnvEffect = act.targetEnvEffect;
-        curActIndex++;
-
-        var envEff = combatSystem.envEffect;
-        switch (envEff.curType)
-        {
-            case EEnvEffectType.Attack:
-                {
-                    actResult.attr.ATK = actResult.attr.ATK * 2;
-                }
-                break;
-            case EEnvEffectType.Defense:
-                {
-                    actResult.attr.DEF = actResult.attr.DEF * 2;
-                }
-                break;
-            case EEnvEffectType.Heal:
-                {
-                    actResult.attr.HEAL = actResult.attr.HEAL * 2;
-                }
-                break;
-            case EEnvEffectType.NoHeal:
-                {
-                    actResult.attr.HEAL = 0;
-                }
-                break;
-            case EEnvEffectType.NoDefense:
-                {
-                    actResult.attr.DEF = 0;
-                }
-                break;
-        }
-        /*if (HasEffect(EAbilityEffectType.NoArmor))
-        {
-            actResult.attr.DEF = 0;
-        }*/
-        return act;
-    }
-
+    /// <summary>
+    /// 取得敵人行動文字資訊
+    /// TODO 日後要改成圖片搭配文字
+    /// </summary>
+    /// <returns></returns>
     public string GetActionString()
     {
-        var act = actResult.curAct;
+        // var act = actResult.curAct;
 
-        if (act.displayType == EMobActionDisplayType.HideAll)
-        {
-            if (act.type == EMobActionType.Power)
-            {
-                var str = "??? ";
+        // if (act.displayType == EMobActionDisplayType.HideAll)
+        // {
+        //     if (act.type == EMobActionType.Power)
+        //     {
+        //         var str = "??? ";
 
-                switch(act.breakType)
-                {
-                    case EBreakConditionType.HP:
-                        {
-                            str = str + $" 受到{actResult.breakValue}傷害後打斷行動";
-                        }
-                        break;
-                    case EBreakConditionType.ATK:
-                        {
-                            str = str + $" 需要{act.breakValue}ATK打斷行動";
-                        }
-                        break;
-                    /*case EBreakConditionType.DEF:
-                        break;
-                    case EBreakConditionType.HEAL:
-                        break;*/
-                }
-                return str;
-                //return $"??? Break ATK:{act.breakCondition_ATK}";
-            }
-            else
-            {
-                return "???";
-            }
-        }
+        //         switch(act.breakType)
+        //         {
+        //             case EBreakConditionType.HP:
+        //                 {
+        //                     str = str + $" 受到{actResult.breakValue}傷害後打斷行動";
+        //                 }
+        //                 break;
+        //             case EBreakConditionType.ATK:
+        //                 {
+        //                     str = str + $" 需要{act.breakValue}ATK打斷行動";
+        //                 }
+        //                 break;
+        //             /*case EBreakConditionType.DEF:
+        //                 break;
+        //             case EBreakConditionType.HEAL:
+        //                 break;*/
+        //         }
+        //         return str;
+        //         //return $"??? Break ATK:{act.breakCondition_ATK}";
+        //     }
+        //     else
+        //     {
+        //         return "???";
+        //     }
+        // }
 
         string atkStr = actResult.attr.ATK > 0 && !HasEffect(EAbilityEffectType.Stun) ? $"ATK:{actResult.attr.ATK} " : "";
         string defStr = actResult.attr.DEF > 0 ? $"DEF:{actResult.attr.DEF} " : "";
         string healStr = actResult.attr.HEAL > 0 && !HasEffect(EAbilityEffectType.Stun) ? $"HEAL:{actResult.attr.HEAL} " : "";
 
-        if(act.displayType == EMobActionDisplayType.HideATK && actResult.attr.ATK > 0)
-        {
-            var atkSB = new StringBuilder();
-            atkSB.Append(atkStr.Substring(0, 5));
-            for (int i = 1; i < actResult.attr.ATK.ToString().Length; i++)
-            {
-                atkSB.Append("?");
-            }
-            atkStr = atkSB.ToString();
-        }
-        if (act.displayType == EMobActionDisplayType.HideDEF && actResult.attr.DEF > 0)
-        {
-            var defSB = new StringBuilder();
-            defSB.Append(defStr.Substring(0, 5));
-            for (int i = 1; i < actResult.attr.DEF.ToString().Length; i++)
-            {
-                defSB.Append("?");
-            }
-            defStr = defSB.ToString();
-        }
-        if (act.displayType == EMobActionDisplayType.HideHEAL && actResult.attr.HEAL > 0)
-        {
-            var healSB = new StringBuilder();
-            healSB.Append(healStr.Substring(0, 6));
-            for (int i = 1; i < actResult.attr.HEAL.ToString().Length; i++)
-            {
-                healSB.Append("?");
-            }
-            healStr = healSB.ToString();
-        }
+        // if(act.displayType == EMobActionDisplayType.HideATK && actResult.attr.ATK > 0)
+        // {
+        //     var atkSB = new StringBuilder();
+        //     atkSB.Append(atkStr.Substring(0, 5));
+        //     for (int i = 1; i < actResult.attr.ATK.ToString().Length; i++)
+        //     {
+        //         atkSB.Append("?");
+        //     }
+        //     atkStr = atkSB.ToString();
+        // }
+        // if (act.displayType == EMobActionDisplayType.HideDEF && actResult.attr.DEF > 0)
+        // {
+        //     var defSB = new StringBuilder();
+        //     defSB.Append(defStr.Substring(0, 5));
+        //     for (int i = 1; i < actResult.attr.DEF.ToString().Length; i++)
+        //     {
+        //         defSB.Append("?");
+        //     }
+        //     defStr = defSB.ToString();
+        // }
+        // if (act.displayType == EMobActionDisplayType.HideHEAL && actResult.attr.HEAL > 0)
+        // {
+        //     var healSB = new StringBuilder();
+        //     healSB.Append(healStr.Substring(0, 6));
+        //     for (int i = 1; i < actResult.attr.HEAL.ToString().Length; i++)
+        //     {
+        //         healSB.Append("?");
+        //     }
+        //     healStr = healSB.ToString();
+        // }
 
         string conditionStr = "";
-        if (act.type == EMobActionType.Power)
-        {
-            switch (act.breakType)
-            {
-                case EBreakConditionType.HP:
-                    {
-                        conditionStr = $" 受到{actResult.breakValue}傷害後打斷行動";
-                    }
-                    break;
-                case EBreakConditionType.ATK:
-                    {
-                        conditionStr = $" 需要{act.breakValue}ATK打斷行動";
-                    }
-                    break;
-                    /*case EBreakConditionType.DEF:
-                        break;
-                    case EBreakConditionType.HEAL:
-                        break;*/
-            }
-        }
+        // if (act.type == EMobActionType.Power)
+        // {
+        //     switch (act.breakType)
+        //     {
+        //         case EBreakConditionType.HP:
+        //             {
+        //                 conditionStr = $" 受到{actResult.breakValue}傷害後打斷行動";
+        //             }
+        //             break;
+        //         case EBreakConditionType.ATK:
+        //             {
+        //                 conditionStr = $" 需要{act.breakValue}ATK打斷行動";
+        //             }
+        //             break;
+        //             /*case EBreakConditionType.DEF:
+        //                 break;
+        //             case EBreakConditionType.HEAL:
+        //                 break;*/
+        //     }
+        // }
         if(HasEffect(EAbilityEffectType.Stun))
         {
             conditionStr = "昏迷";
@@ -306,15 +253,158 @@ public class EnemyUnit : BaseCombatUnit
         return atkStr + defStr + healStr + conditionStr;
     }
 
+    public void GetNewAction(bool isBreakAciton)
+    {
+        actResult = new MobActionResult();
+        actResult.attr = SelectCards(MakeDecision());
+        // actResult.breakType = act.breakType;
+        // actResult.breakValue = act.breakValue;
+        // actResult.targetEnvEffect = act.targetEnvEffect;
+
+    }
+    
+    /// <summary>
+    /// 透過權重選擇這一次的元素
+    /// TODO 要因為環境效果改變權重
+    /// </summary>
+    /// <returns>所選擇的元素</returns>
+    public ECardElement MakeDecision()
+    {
+        var rndMap = new Dictionary<ECardElement, RandomTool.RandomObject>();
+
+        foreach(var card in cardArr)
+        {
+            var index = (int)card.element;
+            if(!rndMap.ContainsKey(card.element))
+            {
+                rndMap[card.element] = new RandomTool.RandomObject();
+                rndMap[card.element].SetIndex(index);
+            }
+            rndMap[card.element].Weight += mobData.elementData[index].decisionWeight;
+        }
+
+        var envType = combatSystem.envEffect.curType;
+        switch(envType)
+        {
+            case EEnvEffectType.BlueSilence:
+                rndMap[ECardElement.Blue].Weight = 0;
+                break;
+            case EEnvEffectType.RedSilence:
+                rndMap[ECardElement.Red].Weight = 0;
+                break;
+            case EEnvEffectType.YellowSilence:
+                rndMap[ECardElement.Yellow].Weight = 0;
+                break;
+            case EEnvEffectType.GreenSilence:
+                rndMap[ECardElement.Green].Weight = 0;
+                break;
+            case EEnvEffectType.Energy:
+                rndMap[ECardElement.Yellow].Weight *= 2;
+                break;
+        }
+
+        return (ECardElement)RandomTool.RandomHelper.GetRandomList(rndMap.Values.ToList()).Index;
+    }
+
+    /// <summary>
+    /// 選擇卡片 所選到的卡片改為已經使用的狀態
+    /// </summary>
+    /// <param name="selectElement"></param>
+    /// <returns>返回素質的總和</returns>
+    public CardAttribute SelectCards(ECardElement selectElement)
+    {
+        var attr = bonusAttr;
+
+        var targetAttr = mobData.elementData[(int)selectElement].attribute;
+
+        var isLimitedCards = combatSystem.envEffect.curType == EEnvEffectType.LimitCards;
+
+        var isIgnoreElement = HasEffect(EAbilityEffectType.IgnoreElement);
+
+        var selectCardCount = 0;
+        for(var i = 0; i < MaxCardCount; i++)
+        {
+            var card = cardArr[i];
+            if(isIgnoreElement || card.element == selectElement)
+            {
+                card.isUse = true;
+                selectCardCount++;
+
+                attr.ATK += targetAttr.ATK;
+                attr.DEF += targetAttr.DEF;
+                attr.HEAL += targetAttr.HEAL;
+                attr.EN += targetAttr.EN;
+
+                if(isLimitedCards && selectCardCount == 2)
+                {
+                    break;
+                }
+            }
+        }
+
+        if (!HasEffect(EAbilityEffectType.IgnoreEnvironmentEffect))
+        {
+            var envEff = combatSystem.envEffect;
+            switch (envEff.curType)
+            {
+                case EEnvEffectType.Attack:
+                    {
+                        attr.ATK = attr.ATK * 2;
+                    }
+                    break;
+                case EEnvEffectType.Defense:
+                    {
+                        attr.DEF = attr.DEF * 2;
+                    }
+                    break;
+                case EEnvEffectType.Heal:
+                    {
+                        attr.HEAL = attr.HEAL * 2;
+                    }
+                    break;
+                case EEnvEffectType.Energy:
+                    {
+                        attr.EN = attr.EN * 2;
+                    }
+                    break;
+                case EEnvEffectType.NoHeal:
+                    {
+                        attr.HEAL = 0;
+                    }
+                    break;
+                case EEnvEffectType.NoDefense:
+                    {
+                        attr.DEF = 0;
+                    }
+                    break;
+            }
+        }
+        if(HasEffect(EAbilityEffectType.NoArmor))
+        {
+            attr.DEF = 0;
+        }
+
+        return attr;
+    }
+
     public MobActionResult GetActionResult()
     {
         return actResult;
     }
 
+    // public void CheckIsBreak(float damageValue)
+    // {
+    //     if(actResult.curAct.type == EMobActionType.Power && !HasEffect(EAbilityEffectType.BreakAction) && damageValue >= actResult.breakValue)
+    //     {
+    //         AddEffect(AbilityEffectRef.Create(EAbilityEffectType.BreakAction, new AbilityEffect() { type = EAbilityEffectType.BreakAction }));
+    //     }
+    // }
+
     //敵人被攻擊
     public override void ApplyDamage(float damageValue)
     {
-        CheckIsBreak(damageValue);
+        // TODO 被中斷動作的部分先暫停 之後看看有沒有要加回來
+        // CheckIsBreak(damageValue);
         float dmg = GetAppliedDamage(damageValue);
         if (dmg > 0f)
         {

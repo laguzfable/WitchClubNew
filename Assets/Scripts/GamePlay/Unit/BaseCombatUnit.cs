@@ -111,6 +111,7 @@ public class BaseCombatUnit : MonoBehaviour
         combatSystem.SpawnCombatText(finalValue.ToString("F0"), ECombatTextType.Heal, gameObject.CompareTag("Player"));
     }
 
+    // TODO 要改成雙方都可以用
     /// <summary>
     /// 製造效果 給予自己或敵方 造成直接的影響或加入狀態佇列
     /// </summary>

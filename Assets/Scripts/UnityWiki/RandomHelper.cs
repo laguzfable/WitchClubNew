@@ -61,7 +61,7 @@ namespace RandomTool
 
 
 		/// <summary>
-		/// 随机种子值
+		/// 隨機種子
 		/// </summary>
 		/// <returns></returns>
 		private static int GetRandomSeed()
@@ -80,15 +80,16 @@ namespace RandomTool
 
 
 	/// <summary>
-	/// 权重对象
+	/// 權重物件
 	/// </summary>
 	[System.Serializable]
 	public class RandomObject
 	{
-		/// <summary>
-		/// 权重
-		/// </summary>
 		public int Index { private set; get; }
+
+		/// <summary>
+		/// 權重
+		/// </summary>
         public int Weight;// { set; get; }
         public string Name;
         public void SetIndex(int _Value)
