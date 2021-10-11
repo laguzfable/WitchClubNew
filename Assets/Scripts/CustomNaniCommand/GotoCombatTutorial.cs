@@ -31,7 +31,7 @@ public class GotoCombatTutorial : Command, Command.IForceWait
         PlayerData.Instance.usingRuneIDs[(int)ECardElement.Green] = "樹女";
         PlayerData.Instance.usingRuneIDs[(int)ECardElement.Blue] = "赫菲";
         */
-        Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter = new ScriptParameter() { background = Background, scriptName = ScriptName, scriptLabel = Label };
+        DataService.Instance.scriptParameter = new ScriptParameter() { background = Background, scriptName = ScriptName, scriptLabel = Label };
         TutorialController.isTutorial = true;
         await SceneManager.LoadSceneAsync("CombatScene");
         //return UniTask.CompletedTask;

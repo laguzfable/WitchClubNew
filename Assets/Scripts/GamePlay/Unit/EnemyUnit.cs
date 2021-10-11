@@ -67,8 +67,8 @@ public class EnemyUnit : BaseCombatUnit
         orgY = transform.position.y;
         if(!TutorialController.isTutorial && !combatSystem.IsTestMode)
         {
-            Debug.Log($"Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[1] : {Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter.combatTarget}");
-            sprRend.sprite = combatSystem.visualResource.GetMobByName(Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter.combatTarget);
+            Debug.Log($"Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[1] : {DataService.Instance.scriptParameter.combatTarget}");
+            sprRend.sprite = combatSystem.visualResource.GetMobByName(DataService.Instance.scriptParameter.combatTarget);
         }
         sprRend.enabled = true;
         HP.Restore();

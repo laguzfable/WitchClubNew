@@ -20,7 +20,7 @@ public class GotoRestRoomScene : Command, Command.IForceWait
         
         if(Assigned(ScriptName))
         {
-            Toolbox.Instance.GetOrAddComponent<DataService>().afterChatScript = new ScriptParameter() { scriptName = ScriptName, scriptLabel = Label };
+            DataService.Instance.afterChatScript = new ScriptParameter() { scriptName = ScriptName, scriptLabel = Label };
         }
         // PlayerData.Instance.playerName = Engine.GetService<ICustomVariableManager>().GetVariableValue("PlayerName");
         Engine.GetService<ICustomVariableManager>().SetVariableValue("CanChat", Assigned(ScriptName).ToString());

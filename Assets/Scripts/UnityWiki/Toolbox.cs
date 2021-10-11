@@ -5,7 +5,7 @@ using System.Collections.Generic;
  * http://wiki.unity3d.com/index.php/Toolbox
  changed name to ServiceLocator
      */
-public class Toolbox : Singleton<Toolbox> {
+public class Toolbox : MonoSingleton<Toolbox> {
     protected Toolbox () {} // guarantee this will be always a singleton only - can't use the constructor!
     /*
     void Awake () {

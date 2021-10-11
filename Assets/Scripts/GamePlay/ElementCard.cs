@@ -35,7 +35,7 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
 
     TextMeshPro atkTxt, defTxt, enTxt, healTxt;
 
-    DataService ds;// = Toolbox.Instance.GetOrAddComponent<DataService>();//.GetAbilityById(abilityID)
+    DataService dataService;// = Toolbox.Instance.GetOrAddComponent<DataService>();//.GetAbilityById(abilityID)
 
     Vector3 orgPos, orgRot, orgScale;
 
@@ -69,7 +69,7 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
         pc = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         unit = pc.GetPlayerUnit();
 
-        ds = Toolbox.Instance.GetOrAddComponent<DataService>();//.GetAbilityById(abilityID)
+        dataService = DataService.Instance;//.GetAbilityById(abilityID)
 
         atkTxt = transform.Find("ATKText").GetComponent<TextMeshPro>();
         defTxt = transform.Find("DEFText").GetComponent<TextMeshPro>();
@@ -107,7 +107,7 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
 
     void UpdateValue()
     {
-        var ability = ds.GetAbilityById(ID.ToString()).cardAttr[level-1];
+        var ability = dataService.GetAbilityById(ID.ToString()).cardAttr[level-1];
 
         atkTxt.text = ability.ATK.ToString();
         defTxt.text = ability.DEF.ToString();

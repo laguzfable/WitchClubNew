@@ -141,8 +141,8 @@ public class CombatSystem : MonoBehaviour
         {
             SwitchStateToCombatMode();
 
-            Debug.Log($"Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[0] : {Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter.background}");
-            BG.sprite = visualResource.GetBGByName(Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter.background);
+            Debug.Log($"Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[0] : {DataService.Instance.scriptParameter.background}");
+            BG.sprite = visualResource.GetBGByName(DataService.Instance.scriptParameter.background);
 
             var runeActive = true;
             Engine.GetService<ICustomVariableManager>().TryGetVariableValue<bool>("RuneActive", out runeActive);

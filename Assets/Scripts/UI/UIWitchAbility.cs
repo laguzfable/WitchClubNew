@@ -72,7 +72,7 @@ public class UIWitchAbility : MonoBehaviour
         //Check(0f);
         abilityID = PlayerData.Instance.usingRuneIDs[(int)element];
 
-        ability = Toolbox.Instance.GetOrAddComponent<DataService>().GetAbilityById(abilityID);
+        ability = DataService.Instance.GetAbilityById(abilityID);
         //Debug.Log($"abilityID : {abilityID} ability.requireEnergy : {ability.requireEnergy}");
         cost.SetBaseValue(ability.requireEnergy);
         fullChargedImage.DOFade(0f, 0.15f);

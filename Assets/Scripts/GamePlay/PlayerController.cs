@@ -60,7 +60,7 @@ public class PlayerController : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         //playerUnit = GetComponent<PlayerUnit>();
         combatSystem = GameObject.FindWithTag("GameController").GetComponent<CombatSystem>();
-        dataService = Toolbox.Instance.GetOrAddComponent<DataService>();
+        dataService = DataService.Instance;
 
         playBtn.onClick.AddListener(PlayAction);
         MoveBaseCards(false);

@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using Naninovel.Commands;
 using UnityEngine;
 
-public class DataService : MonoBehaviour {
+public class DataService : Singleton<DataService>
+{
+    // AbilityCollection abilityCollection;
 
-    AbilityCollection abilityCollection;
+    Dictionary<string, Ability> abilityDict = new Dictionary<string, Ability>();
 
-    Ability emptyAbility = new Ability();
+    readonly Ability emptyAbility = new Ability();
 
 
     //暫時先用這邊紀錄NANI過來的資源
@@ -18,23 +20,23 @@ public class DataService : MonoBehaviour {
 
     public ScriptParameter afterChatScript;
 
-
-    // Use this for initialization
-    void Awake()
+    protected override void Init()
     {
-        Toolbox.RegisterComponent<DataService>();
-        abilityCollection = Resources.Load<AbilityCollection>("DataCollections/AbilityCollection");
+        var abilityCollection = Resources.Load<AbilityCollection>("DataCollections/AbilityCollection");
+        var abilityList = abilityCollection.abilityList;
+        foreach (var ability in abilityList)
+        {
+            abilityDict[ability.id] = ability;
+        }
     }
 
     public Ability GetAbilityById(string id)
     {
-        foreach (var abi in abilityCollection.abilityList)
+        if(abilityDict.ContainsKey(id))
         {
-            if(abi.id.Equals(id))
-            {
-                return abi;
-            }
+            return abilityDict[id];
         }
+        
         return emptyAbility;
     }
 
@@ -42,7 +44,6 @@ public class DataService : MonoBehaviour {
     {
         return string.IsNullOrEmpty(ability.id);
     }
-
 
 }
 

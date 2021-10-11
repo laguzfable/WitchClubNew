@@ -31,7 +31,7 @@ public class UIShowInfoScreen : MonoBehaviour
     {
         if(!string.IsNullOrEmpty(abilityID))
         {
-            Ability cardAbility = Toolbox.Instance.GetOrAddComponent<DataService>().GetAbilityById(GetComponent<UIWitchAbility>().abilityID);
+            Ability cardAbility = DataService.Instance.GetAbilityById(GetComponent<UIWitchAbility>().abilityID);
             infoStr = cardAbility.description;
         }
     }

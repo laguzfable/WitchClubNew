@@ -55,7 +55,7 @@ public class SceneLoader : MonoBehaviour
 
     public void GotoScript(string scriptName)
     {
-        Toolbox.Instance.GetOrAddComponent<DataService>().startScript = scriptName;
+        DataService.Instance.startScript = scriptName;
         GoScene("NaniDialogTest");
     }
 
@@ -79,7 +79,7 @@ public class SceneLoader : MonoBehaviour
             //inputManager.ProcessInput = true;
             GameObject.FindObjectOfType<ContinueInputUI>().Visible = isEnable;
 
-            Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter = null;
+            DataService.Instance.scriptParameter = null;
             // PlayerData.Instance.playerName = null;
         }
         

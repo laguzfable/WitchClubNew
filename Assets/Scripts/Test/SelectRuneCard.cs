@@ -18,7 +18,7 @@ public class SelectRuneCard : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        ability = Toolbox.Instance.GetOrAddComponent<DataService>().GetAbilityById(abilityID);
+        ability = DataService.Instance.GetAbilityById(abilityID);
 
         if (ability.image != null)
         {

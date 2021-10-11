@@ -51,7 +51,7 @@ public class RestRoom : MonoBehaviour
 
     public void Sleep()
     {
-        var dataService = Toolbox.Instance.GetOrAddComponent<DataService>();
+        var dataService = DataService.Instance;
         dataService.scriptParameter = dataService.afterChatScript;
         GotoNani();
     }
@@ -70,7 +70,7 @@ public class RestRoom : MonoBehaviour
             scriptParameter.scriptLabel = label;
         }
 
-        Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter = scriptParameter;
+        DataService.Instance.scriptParameter = scriptParameter;
         Engine.GetService<ICustomVariableManager>().SetVariableValue("CanChat", "false");
         GotoNani();
     }

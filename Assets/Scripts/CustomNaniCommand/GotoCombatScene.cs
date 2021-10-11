@@ -33,7 +33,7 @@ public class GotoCombatScene : Command, Command.IForceWait
         PlayerData.Instance.usingRuneIDs[(int)ECardElement.Green] = "樹女";
         PlayerData.Instance.usingRuneIDs[(int)ECardElement.Blue] = "赫菲";
         */
-        Toolbox.Instance.GetOrAddComponent<DataService>().scriptParameter = new ScriptParameter() { background = Background, combatTarget = Target, scriptName = ScriptName, scriptLabel = Label };
+        DataService.Instance.scriptParameter = new ScriptParameter() { background = Background, combatTarget = Target, scriptName = ScriptName, scriptLabel = Label };
         TutorialController.isTutorial = false;
         await SceneManager.LoadSceneAsync("CombatScene");
         //return UniTask.CompletedTask;

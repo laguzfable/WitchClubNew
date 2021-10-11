@@ -2,27 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class PlayerData
+public class PlayerData : Singleton<PlayerData>
 {
-    static PlayerData instance;
-    private static object m_Lock = new object();
-
-    public static PlayerData Instance
-    {
-        get
-        {
-            lock (m_Lock)
-            {
-                if (instance == null)
-                {
-                    instance = new PlayerData();
-                    instance.Reset();
-                }
-                return instance;
-            }
-        }
-    }
-
     // public string playerName;
 
     public string[] usingRuneIDs = new string[4] { "2", "1", "8", "4" };
