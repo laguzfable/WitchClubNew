@@ -9,8 +9,6 @@ public class DataService : MonoBehaviour {
 
     Ability emptyAbility = new Ability();
 
-    public DataCollection<ItemData> itemData { private set; get; } = new DataCollection<ItemData>();
-
 
     //暫時先用這邊紀錄NANI過來的資源
     //public Naninovel.Commands.StringParameter[] paramArr;
@@ -26,7 +24,6 @@ public class DataService : MonoBehaviour {
     {
         Toolbox.RegisterComponent<DataService>();
         abilityCollection = Resources.Load<AbilityCollection>("DataCollections/AbilityCollection");
-        itemData.Init("ItemCollection");
     }
 
     public Ability GetAbilityById(string id)

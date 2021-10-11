@@ -15,9 +15,7 @@ public class NaniTestShit : MonoBehaviour
         {
             await RuntimeInitializer.InitializeAsync();
             //先用很爛的方式初始化
-            PlayerData.Instance.usingRuneIDs[(int)ECardElement.Red] = "艾妮(血系)";
-            PlayerData.Instance.usingRuneIDs[(int)ECardElement.Green] = "樹女";
-            PlayerData.Instance.usingRuneIDs[(int)ECardElement.Blue] = "赫菲";
+            PlayerData.Instance.Reset();
         }
 
         // Debug.Log("WTF?!");

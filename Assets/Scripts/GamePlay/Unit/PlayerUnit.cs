@@ -7,9 +7,6 @@ using UniRx.Async;
 
 public class PlayerUnit : BaseCombatUnit 
 {
-    //public EquipmentItem[] equipSlotArr = new EquipmentItem[4];
-    public Inventory inventory;
-
     PlayerController pc;
 
 

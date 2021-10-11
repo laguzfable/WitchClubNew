@@ -23,23 +23,14 @@ public class PlayerData
         }
     }
 
-    public int money = 0;
-
     // public string playerName;
-
-    public Inventory inventory { private set; get; } = new Inventory();
 
     public string[] usingRuneIDs = new string[4] { "2", "1", "8", "4" };
 
     public void Reset()
     {
-        money = 10000;
-        inventory.Reset();
-        //inventory.AddItem("0", 5);
-        //inventory.AddItem("TestArm");
-        //inventory.AddItem("TestLeg");
-        //inventory.AddItem("TestLeg1");
-        //inventory.AddItem("TestArm1");
-        //Toolbox.Instance.GetOrAddComponent<NPCPerferenceDataCollection>().InitPerferenceData();
+        usingRuneIDs[(int)ECardElement.Red] = "艾妮(血系)";
+        Instance.usingRuneIDs[(int)ECardElement.Green] = "樹女";
+        Instance.usingRuneIDs[(int)ECardElement.Blue] = "赫菲";
     }
 }

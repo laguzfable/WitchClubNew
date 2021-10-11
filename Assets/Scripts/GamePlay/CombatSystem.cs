@@ -57,8 +57,6 @@ public class CombatSystem : MonoBehaviour
     [SerializeField]
     GameObject[] endObj;
 
-    CombatMapDemo MapObj;
-
     GameObject currentEnemy;
 
     [SerializeField]
@@ -182,11 +180,6 @@ public class CombatSystem : MonoBehaviour
 
     void Start()
     {
-        if (GameObject.Find("MainCamera_Map"))
-        {
-            MapObj = GameObject.Find("MainCamera_Map").GetComponent<CombatMapDemo>();
-        }
-
         envEffect.SetCurrentEffect(EEnvEffectType.None);
         PrepareBeginTurn();
     }
@@ -484,15 +477,6 @@ public class CombatSystem : MonoBehaviour
     public void GotoChangeRuneScene()
     {
         // SceneManager.LoadScene("ChangeRuneScene");
-    }
-
-    public void CloseFightScene()
-    {
-        var playerData = PlayerData.Instance;// Toolbox.Instance.GetOrAddComponent<PlayerData>();
-        playerData.inventory.AddItem("HealPotion", 10);
-        playerData.inventory.AddItem("ManaPotion", 10);
-        MapObj.BackMapScene();
-        SceneManager.UnloadSceneAsync("newCombatScene");
     }
 
     void ClickEndDialog(bool isVictory)
