@@ -16,7 +16,7 @@ public class CombatSystem : MonoBehaviour
 
     public EnvironmentEffect envEffect { private set; get; }
 
-    public UICombatTextPanel combatTxtPanel { private set; get; }
+    UICombatTextPanel combatTxtPanel;
 
     public bool isContinue = true;
 
@@ -287,7 +287,7 @@ public class CombatSystem : MonoBehaviour
         CreateOrder((int)Order.InterruptMobsAction, isBreakAciton ? 1 : 0, playerUnit, () => { // interrupt
             if (!mobUnit.HasEffect(EAbilityEffectType.BreakAction))
             {
-                combatTxtPanel.EnqueueText("成功打斷行動", ECombatTextType.Debuff, false);
+                SpawnCombatText("成功打斷行動", ECombatTextType.Debuff, false);
             }
         });
 
@@ -524,6 +524,9 @@ public class CombatSystem : MonoBehaviour
             Debug.Log(" you loss ");
         }
     }
+    
+    public void SpawnCombatText(string content, ECombatTextType type, bool isPlayer) => combatTxtPanel.EnqueueText(content, type, isPlayer);
+    public void SpawnSystemText(string content) => combatTxtPanel.DisplaySystemText(content);
 
     public async UniTaskVoid DisplayBreakCloth(GameObject animPrefab)
     {

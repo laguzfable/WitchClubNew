@@ -100,7 +100,7 @@ public class BaseCombatUnit : MonoBehaviour
             finalValue = 0f;
         }
         HP.Value -= finalValue;
-        combatSystem.combatTxtPanel.EnqueueText(finalValue.ToString("F0"), ECombatTextType.Damage, gameObject.CompareTag("Player"));
+        combatSystem.SpawnCombatText(finalValue.ToString("F0"), ECombatTextType.Damage, gameObject.CompareTag("Player"));
         return finalValue;
     }
 
@@ -108,7 +108,7 @@ public class BaseCombatUnit : MonoBehaviour
     {
         float finalValue = healingValue;
         HP.Value += finalValue;
-        combatSystem.combatTxtPanel.EnqueueText(finalValue.ToString("F0"), ECombatTextType.Heal, gameObject.CompareTag("Player"));
+        combatSystem.SpawnCombatText(finalValue.ToString("F0"), ECombatTextType.Heal, gameObject.CompareTag("Player"));
     }
 
     /// <summary>

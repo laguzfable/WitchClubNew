@@ -17,7 +17,7 @@ public class EnemyUnit : BaseCombatUnit
 
     public bool isMovable = true;
 
-    Animator animator;
+    // Animator animator;
 
     public Transform fxPos;
     
@@ -42,7 +42,7 @@ public class EnemyUnit : BaseCombatUnit
     private void Awake()
     {
         audioSource = this.GetOrAddComponent<AudioSource>();
-        animator = GetComponent<Animator>();
+        // animator = GetComponent<Animator>();
         sprRend = GetComponent<SpriteRenderer>();
 
         actionArr = defActionArr;
@@ -58,7 +58,7 @@ public class EnemyUnit : BaseCombatUnit
             actResult.attr.DEF = 0;
             combatSystem.UpdateMobActionInfo(GetActionString());
         });
-        AddEffectEvent(EAbilityEffectType.BreakAction, () => combatSystem.combatTxtPanel.EnqueueText("成功打斷行動", ECombatTextType.Debuff, false));
+        AddEffectEvent(EAbilityEffectType.BreakAction, () => combatSystem.SpawnCombatText("成功打斷行動", ECombatTextType.Debuff, false));
     }
 
     protected override void Init()
@@ -320,7 +320,7 @@ public class EnemyUnit : BaseCombatUnit
         {
             isMovable = false;
 
-            transform.DOShakePosition(0.7f, new Vector3(2f, 0f, 0f)).onComplete += OnShakeComplete;
+            transform.DOShakePosition(0.7f, new Vector3(2f, 0f, 0f)).onComplete += ()=> isMovable = true;
             
             DamagedFlash().Forget();
 
@@ -342,10 +342,5 @@ public class EnemyUnit : BaseCombatUnit
         sprRend.material.SetFloat("_FlashAmount", 0.8f);
         await UniTask.Delay(System.TimeSpan.FromSeconds(0.15f));
         sprRend.material.SetFloat("_FlashAmount", 0f);
-    }
-
-    void OnShakeComplete()
-    {
-        isMovable = true;
     }
 }

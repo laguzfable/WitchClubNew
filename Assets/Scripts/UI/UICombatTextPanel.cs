@@ -4,6 +4,7 @@ using UniRx.Async;
 using UnityEngine;
 
 //Use Respawn tag
+// 考慮改名稱叫TextSpawner
 public class UICombatTextPanel : MonoBehaviour {
 
     [SerializeField]
