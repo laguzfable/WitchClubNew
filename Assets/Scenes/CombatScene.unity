@@ -16775,6 +16775,7 @@ MonoBehaviour:
   playerPos: {fileID: 986684210}
   enemyPos: {fileID: 532556117}
   systemPos: {fileID: 1696181377}
+  popDelayTime: 0.25
 --- !u!1 &1037563111
 GameObject:
   m_ObjectHideFlags: 0
@@ -33963,10 +33964,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1959616811}
   - component: {fileID: 1959616810}
-  - component: {fileID: 1959616812}
   - component: {fileID: 1959616813}
   - component: {fileID: 1959616814}
-  - component: {fileID: 1959616815}
   - component: {fileID: 1959616816}
   m_Layer: 0
   m_Name: CombatSystem
@@ -34022,28 +34021,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1959616812
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1959616809}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e95acfd2e3695442a8407dd41b1833b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  startScript:
-    value: 
-    hasValue: 0
-    dynamicValueData:
-      PlaybackSpot:
-        scriptName: 
-        lineIndex: 0
-        inlineIndex: 0
-      ValueText: 
-      Expressions: []
 --- !u!114 &1959616813
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34178,19 +34155,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &1959616815
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1959616809}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a7d8a3fe1cfbdb4981198ccc5c2ef57, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  remainTurn: 1
 --- !u!114 &1959616816
 MonoBehaviour:
   m_ObjectHideFlags: 0

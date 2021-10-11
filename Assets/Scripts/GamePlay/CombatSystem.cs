@@ -120,7 +120,10 @@ public class CombatSystem : MonoBehaviour
 
         pc = GameObject.FindWithTag("Player").GetComponent<PlayerController>();
         combatTxtPanel = GameObject.FindWithTag("Respawn").GetComponent<UICombatTextPanel>();
-        envEffect = GetComponent<EnvironmentEffect>();
+        
+        // envEffect = GetComponent<EnvironmentEffect>();
+        envEffect = new EnvironmentEffect(this);
+
         monsterID = PlayerPrefs.GetString("enemyName");
         bossName.text = monsterID;
         

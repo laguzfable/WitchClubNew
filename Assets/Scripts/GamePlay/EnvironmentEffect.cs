@@ -10,11 +10,8 @@ public enum EEnvEffectType { None, Attack, Defense, Heal, Energy, RedSilence, Bl
 /// <summary>
 /// 日後要將他移除MonoBehaviour 因為沒用到
 /// </summary>
-[RequireComponent(typeof(CombatSystem))]
-public class EnvironmentEffect : MonoBehaviour
+public sealed class EnvironmentEffect
 {
-    CombatSystem combatSystem;
-
     public EEnvEffectType curType { private set; get; } = EEnvEffectType.None;
 
     public EEnvEffectType nextType { private set; get; } = EEnvEffectType.None;
@@ -32,10 +29,13 @@ public class EnvironmentEffect : MonoBehaviour
 
     public UnityAction envEffChangeEvent;
 
+    CombatSystem combatSystem;
 
-    void Awake()
+    public EnvironmentEffect(CombatSystem combatSystem)
     {
-        combatSystem = GetComponent<CombatSystem>();
+        this.combatSystem = combatSystem;
+
+        
         // 黃色卡還沒可以使用之前將魔力狂潮的權重設為0
         envWeight[(int)EEnvEffectType.Energy] = combatSystem.IsEnergyActive() ? 2000 : 0;
     }
