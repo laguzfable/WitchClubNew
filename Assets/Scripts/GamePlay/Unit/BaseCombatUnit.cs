@@ -223,20 +223,20 @@ public abstract class BaseCombatUnit : MonoBehaviour
                         combatSystem.envEffect.SetCurrentEffect((int)effect.value < 0 ? (EEnvEffectType)Random.Range(0, (int)EEnvEffectType.Length) : (EEnvEffectType)effect.GetValue());
                     }
                     break;
-                case EAbilityEffectType.Stun:// not implemented yet
+                case EAbilityEffectType.Stun:// !not implemented yet
                 case EAbilityEffectType.NoArmor:
                     {
                         target.AddEffect(AbilityEffectRef.Create(effect.type, effect));
                     }
                     break;
-                case EAbilityEffectType.TheWorld:// not implemented yet
+                case EAbilityEffectType.TheWorld:// !not implemented yet
                 case EAbilityEffectType.IgnoreElement:
                 case EAbilityEffectType.HealingAttack:
                 case EAbilityEffectType.Reflect:
                 case EAbilityEffectType.LifeSteal:
-                case EAbilityEffectType.SelfODExchange:// not implemented yet
-                case EAbilityEffectType.Revenge:// not implemented yet
-                case EAbilityEffectType.FocusHeal:// not implemented yet
+                case EAbilityEffectType.SelfODExchange:// !not implemented yet
+                case EAbilityEffectType.Revenge:// !not implemented yet
+                case EAbilityEffectType.FocusHeal:// !not implemented yet
                 case EAbilityEffectType.Shield:
                 case EAbilityEffectType.IgnoreEnvironmentEffect:
                     {

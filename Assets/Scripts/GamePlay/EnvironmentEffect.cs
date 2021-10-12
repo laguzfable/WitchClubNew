@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine.Events;
 using Naninovel;
 
-public enum EEnvEffectType { None, Attack, Defense, Heal, Energy, RedSilence, BlueSilence, GreenSilence, YellowSilence, LimitCards, NoCharacter, NoRune, NoHeal, NoDefense, Length };
+public enum EEnvEffectType { None, Attack, Defense, Heal, Energy, RedSilence, BlueSilence, GreenSilence, YellowSilence, LimitCards, NoCharacter, NoRune, NoHeal, NoDefense, PlayerNoArmor, MobArmor, PlayerDamage, Length };
 
 
 /// <summary>
@@ -16,11 +16,11 @@ public sealed class EnvironmentEffect
 
     public EEnvEffectType nextType { private set; get; } = EEnvEffectType.None;
 
-    static readonly string[] envEffDescription = { "無任何效果", "攻擊雙倍", "防禦雙倍", "治療雙倍", "獲得能量雙倍", "禁用血系卡牌", "禁用學院系卡牌", "禁用自然系卡牌", "禁用惡魔系卡牌", "限制最多2張卡牌", "禁用角色卡", "禁用符文", "治療無效", "防禦無效" };
+    static readonly string[] envEffDescription = { "無任何效果", "攻擊雙倍", "防禦雙倍", "治療雙倍", "獲得能量雙倍", "禁用血系卡牌", "禁用學院系卡牌", "禁用自然系卡牌", "禁用惡魔系卡牌", "限制最多2張卡牌", "禁用角色卡", "禁用符文", "治療無效", "防禦無效", "玩家防禦無效", "敵人減免傷害", "玩家每回合受到傷害" };
 
-    static readonly string[] envEffName = { "風和日麗", "絳紅之夜", "高塔之暮", "生命之雨", "魔力狂潮", "沉默：紅", "沉默：藍", "沉默：綠", "沉默：黃", "能量束縛", "寂靜破曉", "符文封印", "虛弱結界", "護盾瓦解" };
+    static readonly string[] envEffName = { "風和日麗", "絳紅之夜", "高塔之暮", "生命之雨", "魔力狂潮", "沉默：紅", "沉默：藍", "沉默：綠", "沉默：黃", "能量束縛", "寂靜破曉", "符文封印", "虛弱結界", "護盾瓦解", "護盾瓦解P", "迴避結界", "傷害結界" };
 
-    static int[] envWeight = {10000, 2000, 2000, 2000, 2000, 500, 500, 500, 500, 500, 500, 500, 500, 500};
+    static int[] envWeight = {10000, 2000, 2000, 2000, 2000, 500, 500, 500, 500, 500, 500, 500, 500, 500, 0, 0, 0};// 0的是特殊環境效果 只會被技能觸發
 
     public int remainTurn = 1;
 

@@ -225,6 +225,7 @@ public class CombatSystem : MonoBehaviour
         //     }
         // }
 
+        // TODO 這裡有很多跟技能效果有關的部分 要敵人也實作 目前看起來現有的(2021/10/12)都有實作
         orderList.Clear();
         if (!isBreakAciton)
         {
