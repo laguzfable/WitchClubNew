@@ -129,6 +129,7 @@ public class EnemyUnit : BaseCombatUnit
         AddEffectEvent(EAbilityEffectType.BreakAction, () => combatSystem.SpawnCombatText("成功打斷行動", ECombatTextType.Debuff, false));
     }
 
+    [SerializeField] string testMobName = "TestMobData";
     protected override void Init()
     {
         orgY = transform.position.y;
@@ -139,14 +140,14 @@ public class EnemyUnit : BaseCombatUnit
             sprRend.sprite = combatSystem.visualResource.GetMobByName(mobName);
 
             var data = Resources.Load<MobData>($"MobData/{mobName}");
-            mobData = data != null? data : Resources.Load<MobData>("MobData/TestMobData");
+            mobData = data != null? data : Resources.Load<MobData>($"MobData/{testMobName}");
             Debug.Log($"mobData : {mobData.name}");
             HP.SetBaseValue(mobData.HP);
             EN.SetBaseValue(mobData.EN);
         }
         else
         {   // 測試用
-            mobData = Resources.Load<MobData>("MobData/TestMobData");
+            mobData = Resources.Load<MobData>($"MobData/{testMobName}");
             HP.SetBaseValue(mobData.HP);
             EN.SetBaseValue(mobData.EN);
         }
@@ -410,7 +411,13 @@ public class EnemyUnit : BaseCombatUnit
                 }
             }
 
-            CastAbility(abilityList[RandomTool.RandomHelper.GetRandomList(abilityRndList).Index]);
+            if(abilityRndList.Count > 0)
+            {
+                var useAbility = abilityList[RandomTool.RandomHelper.GetRandomList(abilityRndList).Index];
+                EN.Value -= useAbility.requireEnergy;
+                CastAbility(useAbility);
+                Debug.LogWarning($"使用了{useAbility.name}!!");
+            }
         }
     }
     
