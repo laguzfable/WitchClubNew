@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using Kenaz;
 
-public class BaseCombatUnit : MonoBehaviour
+public abstract class BaseCombatUnit : MonoBehaviour
 {
     public UnitAttribute HP;
 
@@ -88,7 +88,7 @@ public class BaseCombatUnit : MonoBehaviour
 
     public virtual void ApplyDamage(float damageValue)
     {
-
+        throw new System.NotImplementedException();
     }
     
     protected float GetAppliedDamage(float damageValue)
@@ -111,7 +111,26 @@ public class BaseCombatUnit : MonoBehaviour
         combatSystem.SpawnCombatText(finalValue.ToString("F0"), ECombatTextType.Heal, gameObject.CompareTag("Player"));
     }
 
-    // TODO 要改成雙方都可以用
+    protected virtual void CardLevelUp()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected virtual void AddEN(float value)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected virtual void ReflashCards()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    protected virtual void OnInterrupt()
+    {
+        throw new System.NotImplementedException();
+    }
+
     /// <summary>
     /// 製造效果 給予自己或敵方 造成直接的影響或加入狀態佇列
     /// </summary>
@@ -120,7 +139,7 @@ public class BaseCombatUnit : MonoBehaviour
     /// <returns></returns>
     public virtual void MakeEffect(AbilityEffect[] newEffects, ECardElement element, bool isItem)
     {
-        var pc = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        // var pc = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         foreach (var effect in newEffects)
         {
             switch (effect.type)
@@ -144,7 +163,8 @@ public class BaseCombatUnit : MonoBehaviour
                     {
                         for (int i = 0; i < effect.value; i++)
                         {
-                            pc.CardLevelUp();
+                            // pc.CardLevelUp();
+                            CardLevelUp();
                         }
                     }
                     break;
@@ -155,7 +175,7 @@ public class BaseCombatUnit : MonoBehaviour
                     break;
                 case EAbilityEffectType.Interrupt:
                     {
-                        combatSystem.MobGetNewAction();
+                        OnInterrupt();
                     }
                     break;
                 case EAbilityEffectType.InstantHeal:
@@ -172,7 +192,8 @@ public class BaseCombatUnit : MonoBehaviour
                     break;
                 case EAbilityEffectType.InstantEnergy:
                     {
-                        pc.AddEN(effect.value);
+                        //pc.AddEN(effect.value);
+                        AddEN(effect.value);
                     }
                     break;
                 case EAbilityEffectType.Shuffle:
@@ -181,7 +202,8 @@ public class BaseCombatUnit : MonoBehaviour
                         {
                             AddEffect(AbilityEffectRef.Create(effect.type, effect));
                         }
-                        pc.ReflashCards(false);
+                        // pc.ReflashCards(false);
+                        ReflashCards();
                     }
                     break;
                 case EAbilityEffectType.HOT:
@@ -223,115 +245,6 @@ public class BaseCombatUnit : MonoBehaviour
                     break;
             }
         }
-
-
-        #region old
-        /*
-        foreach (var effect in newEffects)
-        {
-            BaseCombatUnit[] fxTargetArr = null;
-            switch (effect.target)
-            {
-                case EAbilityEffectTarget.Self:
-                    fxTargetArr = new BaseCombatUnit[1];
-                    fxTargetArr[0] = this;
-                    break;
-                case EAbilityEffectTarget.Opponent:
-                    fxTargetArr = new BaseCombatUnit[1];
-                    fxTargetArr[0] = target;
-                    break;
-                case EAbilityEffectTarget.Both:
-                    fxTargetArr = new BaseCombatUnit[2];
-                    fxTargetArr[0] = this;
-                    fxTargetArr[1] = target;
-                    break;
-            }
-            if (fxTargetArr == null)
-            {
-                Debug.LogError("fxTargetArr is null !!!!!!");
-            }
-            foreach (var fxTarget in fxTargetArr)
-            {
-                switch (effect.type)
-                {
-                    //direct
-                    case EAbilityEffectType.Damage:
-                        {
-                            fxTarget.ApplyDamage((ATK.GetTotalValue() + effect.value + (might.Value * MightPower)), element, EDamageSource.Direct);
-                        }
-                        break;
-                    case EAbilityEffectType.Heal:
-                        {
-                            fxTarget.ApplyHealing(effect.value, true, element);
-                        }
-                        break;
-                    case EAbilityEffectType.Shield:
-                        {
-                            fxTarget.shield.Value += effect.value;
-                            cbtSys.cbtTxtPanel.EnqueueText("+" + effect.value.ToString("F0") + "護盾", ECombatTextType.Buff, fxTarget.gameObject.CompareTag("Player"));
-                        }
-                        break;
-                    case EAbilityEffectType.Clean:
-                        {
-                            fxTarget.CleanState();
-                        }
-                        break;
-                    case EAbilityEffectType.ExchangeHP:
-                        {
-                            float tmpHPPercent = fxTarget.HP.GetPercent();
-                            fxTarget.HP.Value = fxTarget.HP.GetTotalValue() * fxTarget.target.HP.GetPercent();
-                            fxTarget.target.HP.Value = fxTarget.target.HP.GetTotalValue() * tmpHPPercent;
-
-                            cbtSys.cbtTxtPanel.EnqueueText("交換HP", ECombatTextType.Other, fxTarget.gameObject.CompareTag("Player"));
-                            cbtSys.cbtTxtPanel.EnqueueText("交換HP", ECombatTextType.Other, fxTarget.target.gameObject.CompareTag("Player"));
-                        }
-                        break;
-                    //effect
-                    case EAbilityEffectType.CostHP:
-                        {
-                            fxTarget.HP.Value -= effect.value;
-                            cbtSys.cbtTxtPanel.EnqueueText(effect.value.ToString("F0"), ECombatTextType.Damage, fxTarget.gameObject.CompareTag("Player"));
-                        }
-                        break;
-                    case EAbilityEffectType.Lifesteal:
-                        {
-                            float value = fxTarget.HP.GetTotalValue() + effect.value;
-                            float stolenValue = fxTarget.ApplyDamage(value, element, EDamageSource.Direct);
-                            fxTarget.target.ApplyHealing(stolenValue, true, element);
-
-                            cbtSys.cbtTxtPanel.EnqueueText(stolenValue.ToString("F0"), ECombatTextType.Heal, fxTarget.target.gameObject.CompareTag("Player"));
-                        }
-                        break;
-                    case EAbilityEffectType.Might:
-                        {
-                            fxTarget.might.Value += effect.value;
-                            cbtSys.cbtTxtPanel.EnqueueText("+" + effect.value.ToString("F0") + "力量", ECombatTextType.Buff, fxTarget.gameObject.CompareTag("Player"));
-                        }
-                        break;
-                    case EAbilityEffectType.Reflection:
-                        {
-                            fxTarget.reflection.Value += effect.value;
-                            cbtSys.cbtTxtPanel.EnqueueText("+" + effect.value.ToString("F0") + "反射", ECombatTextType.Buff, fxTarget.gameObject.CompareTag("Player"));
-                        }
-                        break;
-                    case EAbilityEffectType.Poison:
-                        {
-                            fxTarget.poison.Value += effect.value;
-                            cbtSys.cbtTxtPanel.EnqueueText("+" + effect.value.ToString("F0") + "中毒", ECombatTextType.Debuff, fxTarget.gameObject.CompareTag("Player"));
-                        }
-                        break;
-                    case EAbilityEffectType.Stun:
-                        {
-                            var stunDamage = effect.value * (cbtSys.GetEnvEffect().curType == EEnvEffectType.TripleStun ? 3f : 1f);
-                            fxTarget.stun.Value -= stunDamage;
-                            cbtSys.cbtTxtPanel.EnqueueText("昏迷傷害 " + stunDamage, ECombatTextType.Debuff, fxTarget.gameObject.CompareTag("Player"));
-                        }
-                        break;
-                }
-            }
-        }
-        */
-        #endregion
     }
 
     public void CastAbility(Ability ability)

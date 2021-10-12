@@ -79,111 +79,24 @@ public class PlayerUnit : BaseCombatUnit
         combatSystem.isContinue = false;
         combatSystem.GameOver(true);
     }
-    /*
-    public override void MakeEffect(AbilityEffect[] newEffects, ECardElement element, bool isItem)
+
+    protected override void CardLevelUp()
     {
-        foreach (var effect in newEffects)
-        {
-            switch (effect.type)
-            {
-                case EAbilityEffectType.ATK:
-                    {
-                        bonusAttr.ATK += (int)effect.value;
-                    }
-                    break;
-                case EAbilityEffectType.DEF:
-                    {
-                        bonusAttr.DEF += (int)effect.value;
-                    }
-                    break;
-                case EAbilityEffectType.Heal:
-                    {
-                        bonusAttr.HEAL += (int)effect.value;
-                    }
-                    break;
-                case EAbilityEffectType.LevelUp:
-                    {
-                        for(int i = 0; i < effect.value; i++)
-                        {
-                            pc.CardLevelUp();
-                        }
-                    }
-                    break;
-                case EAbilityEffectType.DirectDamage:
-                    {
-                        target.ApplyDamage(effect.value);
-                    }
-                    break;
-                case EAbilityEffectType.Interupt:
-                    {
-                        combatSystem.MobGetNewAction();
-                    }
-                    break;
-                case EAbilityEffectType.InstantHeal:
-                    {
-                        ApplyHealing(effect.value);
-                    }
-                    break;
-                case EAbilityEffectType.IncreaseMaximumHP:
-                    {
-                        //HP.SetBaseValue(HP.GetTotalValue() + effect.value);
-                        HP.buff = effect.value;
-                        ApplyHealing(HP.GetTotalValue());
-                    }
-                    break;
-                case EAbilityEffectType.InstantEnergy:
-                    {
-                        pc.AddEN(effect.value);
-                    }
-                    break;
-                case EAbilityEffectType.Shuffle:
-                    {
-                        if((ECardElement)effect.GetValue() != ECardElement.None)
-                        {
-                            effectList.Add(AbilityEffectRef.Create(effect.type, effect));
-                        }
-                        pc.ReflashCards(false);
-                    }
-                    break;
-                case EAbilityEffectType.HOT:
-                    {
-                        if(hot.Count > 0)
-                        {
-                            hot.Clear();
-                        }
-                        for(int i = 0; i < int.Parse(effect.param); i++)
-                        {
-                            hot.Add((int)effect.value);
-                        }
-                    }
-                    break;
-                case EAbilityEffectType.ChangeEnvironmentEffect:
-                    {
-                        combatSystem.envEffect.SetCurrentEffect((int)effect.value < 0? (EEnvEffectType)Random.Range(0, (int)EEnvEffectType.Length) : (EEnvEffectType)effect.GetValue());
-                    }
-                    break;
-                case EAbilityEffectType.Stun:// not implemented yet
-                case EAbilityEffectType.NoArmor:
-                    {
-                        target.effectList.Add(AbilityEffectRef.Create(effect.type, effect));
-                    }
-                    break;
-                case EAbilityEffectType.TheWorld:// not implemented yet
-                case EAbilityEffectType.IgnoreElement:
-                case EAbilityEffectType.HealingAttack:
-                case EAbilityEffectType.Reflect:
-                case EAbilityEffectType.LifeSteal:
-                case EAbilityEffectType.SelfODExchange:// not implemented yet
-                case EAbilityEffectType.Revenge:// not implemented yet
-                case EAbilityEffectType.FocusHeal:// not implemented yet
-                case EAbilityEffectType.Shield:
-                case EAbilityEffectType.IgnoreEnvironmentEffect:
-                    {
-                        effectList.Add(AbilityEffectRef.Create(effect.type, effect));
-                    }
-                    break;
-            }
-        }
+        pc.CardLevelUp();
     }
-    */
+
+    protected override void AddEN(float value)
+    {
+        pc.AddEN(value);
+    }
+
+    protected override void ReflashCards()
+    {
+        pc.ReflashCards(false);
+    }
+
+    protected override void OnInterrupt()
+    {
+        pc.ReflashCards(false);
+    }
 }

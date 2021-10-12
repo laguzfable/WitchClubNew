@@ -37,7 +37,8 @@ public class MobElementData
 [System.Serializable]
 public class MobAbility
 {
-    public int requireEnergy;
-    public AbilityEffect[] effect;
+    public string abilityId;
     public GameObject fx;
+
+    public int decisionWeight = 1000;
 }

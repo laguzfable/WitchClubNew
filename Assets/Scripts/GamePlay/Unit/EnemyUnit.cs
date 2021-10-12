@@ -34,8 +34,7 @@ public class EnemyUnit : BaseCombatUnit
     MobData mobData;
 
     static readonly int MaxCardCount = 5;
-
-    // TODO 之後要加上留卡沒出的等級數值加成
+    
     class MobCard
     {
         public ECardElement element;
@@ -536,5 +535,30 @@ public class EnemyUnit : BaseCombatUnit
         sprRend.material.SetFloat("_FlashAmount", 0.8f);
         await UniTask.Delay(System.TimeSpan.FromSeconds(0.15f));
         sprRend.material.SetFloat("_FlashAmount", 0f);
+    }
+    
+
+    protected override void CardLevelUp()
+    {
+        for(var i = 0; i < MaxCardCount; i++)
+        {
+            cardArr[i].LevelUp(mobData);
+        }
+    }
+
+    protected override void AddEN(float value)
+    {
+        EN.Value += value;
+    }
+
+    protected override void ReflashCards()
+    {
+        ShuffleCards(true);
+    }
+
+    protected override void OnInterrupt()
+    {
+        
+        combatSystem.MobGetNewAction();
     }
 }
