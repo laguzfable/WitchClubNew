@@ -139,9 +139,9 @@ public class EnemyUnit : BaseCombatUnit
             Debug.Log($"Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[1] : {mobName}");
             sprRend.sprite = combatSystem.visualResource.GetMobByName(mobName);
 
-            // TODO 因為還沒定義各個敵人的資料 先統一抓測試資料
-            // mobData = Resources.Load<MobData>($"MobData/{mobName}");
-            mobData = Resources.Load<MobData>("MobData/TestMobData");
+            var data = Resources.Load<MobData>($"MobData/{mobName}");
+            mobData = data != null? data : Resources.Load<MobData>("MobData/TestMobData");
+            Debug.Log($"mobData : {mobData.name}");
             HP.SetBaseValue(mobData.HP);
             EN.SetBaseValue(mobData.EN);
         }
