@@ -316,7 +316,29 @@ public class EnemyUnit : BaseCombatUnit
         //     healStr = healSB.ToString();
         // }
 
+        string TransElementToString(ECardElement element)
+        {
+            switch (element)
+            {
+                case ECardElement.Blue:
+                    return "藍";
+                case ECardElement.Red:
+                    return "紅";
+                case ECardElement.Yellow:
+                    return "黃";
+                case ECardElement.Green:
+                    return "綠";
+
+            }
+            return string.Empty;
+        }
+
         string conditionStr = "";
+        if(HasEffect(EAbilityEffectType.MagicArmor))
+        {
+            var eff = GetEffect(EAbilityEffectType.MagicArmor);
+            conditionStr = $"抗魔裝甲({TransElementToString((ECardElement)eff.value)}):{eff.duration}";
+        }
         // if (act.type == EMobActionType.Power)
         // {
         //     switch (act.breakType)
@@ -349,6 +371,7 @@ public class EnemyUnit : BaseCombatUnit
     {
         EN.Value += actResult.attr.EN;
 
+        DecideCostAbility();
         ShuffleCards(false);
         actResult.Reset();
         actResult.attr = SelectCards(MakeDecision());
@@ -356,6 +379,34 @@ public class EnemyUnit : BaseCombatUnit
         // actResult.breakValue = act.breakValue;
         // actResult.targetEnvEffect = act.targetEnvEffect;
 
+    }
+    
+    /// <summary>
+    /// 決策是否用技能
+    /// 這部分通常就是EN到就用
+    /// </summary>
+    void DecideCostAbility()
+    {
+        if(mobData.ability != null && mobData.ability.Length > 0)
+        {
+            var abilityRndList = new List<RandomTool.RandomObject>();
+            var abilityList = new List<Ability>();
+            for(var i = 0; i < mobData.ability.Length; i++)
+            {
+                var abilityData = mobData.ability[i];
+                var ability = DataService.Instance.GetAbilityById(mobData.ability[i].abilityId);
+                if(EN.Value >= ability.requireEnergy)
+                {
+                    var rndObj = new RandomTool.RandomObject();
+                    rndObj.SetIndex(i);
+                    rndObj.Weight = abilityData.decisionWeight;
+                    abilityRndList.Add(rndObj);
+                    abilityList.Add(ability);
+                }
+            }
+            
+            CastAbility(abilityList[RandomTool.RandomHelper.GetRandomList(abilityRndList).Index]);
+        }
     }
     
     /// <summary>

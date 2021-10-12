@@ -165,7 +165,7 @@ public enum EAbilityEffectType
     ElementChange,
 
     /// <summary>
-    /// !本次攻擊力增加20%
+    /// 本次攻擊力增加20%
     /// </summary>
     IncreaseATK2,
 

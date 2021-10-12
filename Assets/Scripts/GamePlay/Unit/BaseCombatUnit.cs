@@ -230,8 +230,6 @@ public abstract class BaseCombatUnit : MonoBehaviour
                     break;
                 case EAbilityEffectType.HOT:
                 case EAbilityEffectType.DOT:
-                case EAbilityEffectType.MagicArmor:
-                case EAbilityEffectType.MagicArmorEX:
                     {
                         AbilityEffectRef newEffect = null;
                         if(HasEffect(effect.type))
@@ -257,6 +255,25 @@ public abstract class BaseCombatUnit : MonoBehaviour
                             hot.Add((int)effect.value);
                         }
                         */
+                    }
+                    break;
+                    
+                case EAbilityEffectType.MagicArmor:
+                case EAbilityEffectType.MagicArmorEX:
+                    {
+                        AbilityEffectRef newEffect = null;
+                        if(HasEffect(effect.type))
+                        {
+                            newEffect = GetEffect(effect.type);
+                        }
+                        else
+                        {
+                            newEffect = AbilityEffectRef.Create(effect.type, effect);
+                            AddEffect(newEffect);
+                        }
+                        
+                        newEffect.value = Random.Range(0, 4);
+                        newEffect.duration = int.Parse(effect.param);
                     }
                     break;
                 case EAbilityEffectType.ChangeEnvironmentEffect:
