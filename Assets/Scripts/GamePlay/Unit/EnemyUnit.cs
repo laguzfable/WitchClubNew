@@ -339,6 +339,11 @@ public class EnemyUnit : BaseCombatUnit
             var eff = GetEffect(EAbilityEffectType.MagicArmor);
             conditionStr = $"抗魔裝甲({TransElementToString((ECardElement)eff.value)}):{eff.duration}";
         }
+        if(HasEffect(EAbilityEffectType.MagicArmorEX))
+        {
+            var eff = GetEffect(EAbilityEffectType.MagicArmorEX);
+            conditionStr = $"抗魔裝甲EX({TransElementToString((ECardElement)eff.value)}):{eff.duration}";
+        }
         // if (act.type == EMobActionType.Power)
         // {
         //     switch (act.breakType)
@@ -404,7 +409,7 @@ public class EnemyUnit : BaseCombatUnit
                     abilityList.Add(ability);
                 }
             }
-            
+
             CastAbility(abilityList[RandomTool.RandomHelper.GetRandomList(abilityRndList).Index]);
         }
     }
