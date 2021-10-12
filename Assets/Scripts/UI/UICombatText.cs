@@ -54,9 +54,9 @@ public class UICombatText : MonoBehaviour {
         //transform.DOMoveY(pos.y + 20f, 1f).onComplete += OnTweenCompleteEvent;
         //txt.CrossFadeAlpha(0f, 1f, false);
         transform.DOScale(1.8f, 0.3f);
-        await UniTask.Delay(System.TimeSpan.FromSeconds(1));
+        await UniTask.Delay(System.TimeSpan.FromSeconds(1), cancellationToken:this.GetCancellationTokenOnDestroy());
         txt.CrossFadeAlpha(0f, 0.3f, false);
-        await UniTask.Delay(System.TimeSpan.FromSeconds(1));
+        await UniTask.Delay(System.TimeSpan.FromSeconds(1), cancellationToken:this.GetCancellationTokenOnDestroy());
         gameObject.SetActive(false);
     }
 }
