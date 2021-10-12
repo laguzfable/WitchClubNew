@@ -13,37 +13,43 @@ MonoBehaviour:
   m_Name: TestMobData
   m_EditorClassIdentifier: 
   HP: 100
+  EN: 10
+  levelUpMaxBonusValue: 3
   elementData:
   - element: 0
     attribute:
-      ATK: 7
-      DEF: 13
+      ATK: 3
+      DEF: 7
       HEAL: 0
       EN: 0
+    randomWeight: 1000
     decisionWeight: 1000
     fx: {fileID: 0}
   - element: 1
     attribute:
-      ATK: 15
-      DEF: 5
+      ATK: 9
+      DEF: 1
       HEAL: 0
       EN: 0
+    randomWeight: 1000
     decisionWeight: 1000
     fx: {fileID: 0}
   - element: 2
     attribute:
-      ATK: 10
-      DEF: 9
+      ATK: 5
+      DEF: 4
       HEAL: 0
       EN: 1
+    randomWeight: 1000
     decisionWeight: 1000
     fx: {fileID: 0}
   - element: 3
     attribute:
       ATK: 0
-      DEF: 10
-      HEAL: 10
+      DEF: 8
+      HEAL: 3
       EN: 0
+    randomWeight: 1000
     decisionWeight: 1000
     fx: {fileID: 0}
   ability: []

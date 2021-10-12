@@ -4,6 +4,9 @@ using UnityEngine;
 public class MobData : ScriptableObject
 {
     public int HP = 100;
+    public int EN = 10;
+
+    public int levelUpMaxBonusValue = 3;
     public MobElementData[] elementData = new MobElementData[]{
         new MobElementData(){element = ECardElement.Blue},
         new MobElementData(){element = ECardElement.Red}, 

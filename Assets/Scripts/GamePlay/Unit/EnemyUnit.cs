@@ -36,17 +36,80 @@ public class EnemyUnit : BaseCombatUnit
     static readonly int MaxCardCount = 5;
 
     // TODO 之後要加上留卡沒出的等級數值加成
-    struct MobCard
+    class MobCard
     {
         public ECardElement element;
-        public bool isUse;
+        public bool isUse = false;
+        public CardAttribute levelUpBonusAttr;
+        public int level = 1;
+
+        public void Reset()
+        {
+            levelUpBonusAttr.Init();
+            level = 1;
+            isUse = false;
+        }
+
+        public CardAttribute GetAttr(CardAttribute dataValue)
+        {
+            levelUpBonusAttr.ATK += dataValue.ATK;
+            levelUpBonusAttr.DEF += dataValue.DEF;
+            levelUpBonusAttr.HEAL += dataValue.HEAL;
+            levelUpBonusAttr.EN += dataValue.EN;
+
+            return levelUpBonusAttr;
+        }
+
+        public void LevelUp(MobData mobData)
+        {
+            if(level == 5)
+            {
+                return;
+            }
+            level++;
+
+            var rndEleList = new List<int>{0, 1};
+
+            if(element == ECardElement.Green)
+            {
+                rndEleList.Add(2);
+            }
+            else if(element == ECardElement.Yellow)
+            {
+                rndEleList.Add(3);
+            }
+
+            var rndIndex = Random.Range(0, rndEleList.Count);
+            switch(rndEleList[rndIndex])
+            {
+                case 0:
+                    levelUpBonusAttr.ATK += Random.Range(1, mobData.levelUpMaxBonusValue);
+                    break;
+                case 1:
+                    levelUpBonusAttr.DEF += Random.Range(1, mobData.levelUpMaxBonusValue);
+                    break;
+                case 2:
+                    levelUpBonusAttr.HEAL += Random.Range(1, mobData.levelUpMaxBonusValue);
+                    break;
+                case 3:
+                    levelUpBonusAttr.EN += 1;
+                    break;
+            }
+        }
     }
 
     MobCard[] cardArr = new MobCard[MaxCardCount];
 
-    MobActionResult actResult = null;
+    MobActionResult actResult = new MobActionResult();
 
-    UnitAttribute abilityEnergy;
+    // ability energy
+    UnitAttribute EN = new UnitAttribute();
+
+    // AI決定元素用權重表
+    Dictionary<ECardElement, RandomTool.RandomObject> eleDecisionRndMap = new Dictionary<ECardElement, RandomTool.RandomObject>();
+
+    // 洗卡牌用權重表
+    List<RandomTool.RandomObject> cardRndList = new List<RandomTool.RandomObject>();
 
     private void Awake()
     {
@@ -80,10 +143,38 @@ public class EnemyUnit : BaseCombatUnit
             // mobData = Resources.Load<MobData>($"MobData/{mobName}");
             mobData = Resources.Load<MobData>("MobData/TestMobData");
             HP.SetBaseValue(mobData.HP);
+            EN.SetBaseValue(mobData.EN);
         }
+        else
+        {   // 測試用
+            mobData = Resources.Load<MobData>("MobData/TestMobData");
+            HP.SetBaseValue(mobData.HP);
+            EN.SetBaseValue(mobData.EN);
+        }
+
         sprRend.enabled = true;
         
         base.Init();
+
+        //卡牌部分初始化
+        for(var i = 0; i < MaxCardCount; i++)
+        {
+            cardArr[i] = new MobCard();
+        }
+        
+        for (int i = 0; i < (int)ECardElement.None; i++)
+        {
+            var rndObj = new RandomTool.RandomObject();
+            rndObj.SetIndex((int)mobData.elementData[i].element);
+            rndObj.Weight = mobData.elementData[i].randomWeight;
+            cardRndList.Add(rndObj);
+        }
+        
+        for(var i = 0; i < (int)ECardElement.None; i++)
+        {
+            eleDecisionRndMap[(ECardElement)i] = new RandomTool.RandomObject();
+            eleDecisionRndMap[(ECardElement)i].SetIndex(i);
+        }
 
         ShuffleCards(true);
     }
@@ -116,23 +207,19 @@ public class EnemyUnit : BaseCombatUnit
     /// <param name="isAll">是不是全洗</param>
     public void ShuffleCards(bool isAll)
     {
-        var rndList = new List<RandomTool.RandomObject>();
-        for (int i = 0; i < (int)ECardElement.None; i++)
-        {
-            var rndObj = new RandomTool.RandomObject();
-            rndObj.SetIndex((int)mobData.elementData[i].element);
-            rndObj.Weight = mobData.elementData[i].randomWeight;
-            rndList.Add(rndObj);
-        }
-
         for(var i = 0; i < MaxCardCount; i++)
         {
             var card = cardArr[i];
             if(isAll || card.isUse)
             {
-                var rnd = RandomTool.RandomHelper.GetRandomList(rndList);
+                var rnd = RandomTool.RandomHelper.GetRandomList(cardRndList);
                 cardArr[i].element = (ECardElement)rnd.Index;
-                cardArr[i].isUse = false;
+                // cardArr[i].isUse = false;
+                cardArr[i].Reset();
+            }
+            else
+            {
+                cardArr[i].LevelUp(mobData);
             }
         }
     }
@@ -146,6 +233,12 @@ public class EnemyUnit : BaseCombatUnit
         // public EBreakConditionType breakType;
         // public int breakValue;
         public EEnvEffectType targetEnvEffect;
+
+        public void Reset()
+        {
+            attr.Init();
+            targetEnvEffect = EEnvEffectType.None;
+        }
     }
 
     /// <summary>
@@ -255,7 +348,10 @@ public class EnemyUnit : BaseCombatUnit
 
     public void GetNewAction(bool isBreakAciton)
     {
-        actResult = new MobActionResult();
+        EN.Value += actResult.attr.EN;
+
+        ShuffleCards(false);
+        actResult.Reset();
         actResult.attr = SelectCards(MakeDecision());
         // actResult.breakType = act.breakType;
         // actResult.breakValue = act.breakValue;
@@ -270,40 +366,39 @@ public class EnemyUnit : BaseCombatUnit
     /// <returns>所選擇的元素</returns>
     public ECardElement MakeDecision()
     {
-        var rndMap = new Dictionary<ECardElement, RandomTool.RandomObject>();
+        //reset weight
+        for(var i = 0; i < (int)ECardElement.None; i++)
+        {
+            eleDecisionRndMap[(ECardElement)i].Weight = 0;
+        }
 
         foreach(var card in cardArr)
         {
             var index = (int)card.element;
-            if(!rndMap.ContainsKey(card.element))
-            {
-                rndMap[card.element] = new RandomTool.RandomObject();
-                rndMap[card.element].SetIndex(index);
-            }
-            rndMap[card.element].Weight += mobData.elementData[index].decisionWeight;
+            eleDecisionRndMap[card.element].Weight += mobData.elementData[index].decisionWeight;
         }
 
         var envType = combatSystem.envEffect.curType;
         switch(envType)
         {
             case EEnvEffectType.BlueSilence:
-                rndMap[ECardElement.Blue].Weight = 0;
+                eleDecisionRndMap[ECardElement.Blue].Weight = 0;
                 break;
             case EEnvEffectType.RedSilence:
-                rndMap[ECardElement.Red].Weight = 0;
+                eleDecisionRndMap[ECardElement.Red].Weight = 0;
                 break;
             case EEnvEffectType.YellowSilence:
-                rndMap[ECardElement.Yellow].Weight = 0;
+                eleDecisionRndMap[ECardElement.Yellow].Weight = 0;
                 break;
             case EEnvEffectType.GreenSilence:
-                rndMap[ECardElement.Green].Weight = 0;
+                eleDecisionRndMap[ECardElement.Green].Weight = 0;
                 break;
             case EEnvEffectType.Energy:
-                rndMap[ECardElement.Yellow].Weight *= 2;
+                eleDecisionRndMap[ECardElement.Yellow].Weight *= 2;
                 break;
         }
 
-        return (ECardElement)RandomTool.RandomHelper.GetRandomList(rndMap.Values.ToList()).Index;
+        return (ECardElement)RandomTool.RandomHelper.GetRandomList(eleDecisionRndMap.Values.ToList()).Index;
     }
 
     /// <summary>
@@ -313,6 +408,8 @@ public class EnemyUnit : BaseCombatUnit
     /// <returns>返回素質的總和</returns>
     public CardAttribute SelectCards(ECardElement selectElement)
     {
+        Debug.Log($"MobUnitCards this turn use element: {selectElement}");
+
         var attr = bonusAttr;
 
         var targetAttr = mobData.elementData[(int)selectElement].attribute;
@@ -330,10 +427,12 @@ public class EnemyUnit : BaseCombatUnit
                 card.isUse = true;
                 selectCardCount++;
 
-                attr.ATK += targetAttr.ATK;
-                attr.DEF += targetAttr.DEF;
-                attr.HEAL += targetAttr.HEAL;
-                attr.EN += targetAttr.EN;
+                var totalAttr = card.GetAttr(targetAttr);
+
+                attr.ATK += totalAttr.ATK;
+                attr.DEF += totalAttr.DEF;
+                attr.HEAL += totalAttr.HEAL;
+                attr.EN += totalAttr.EN;
 
                 if(isLimitedCards && selectCardCount == 2)
                 {
@@ -341,6 +440,14 @@ public class EnemyUnit : BaseCombatUnit
                 }
             }
         }
+
+        Debug.Log($"MobUnitCards selectCardCount: {selectCardCount}");
+        for(var i = 0; i < MaxCardCount; i++)
+        {
+            var card = cardArr[i];
+            Debug.Log($"MobUnitCards: ele:{card.element}, isUse? {card.isUse}");
+        }
+
 
         if (!HasEffect(EAbilityEffectType.IgnoreEnvironmentEffect))
         {
@@ -387,10 +494,7 @@ public class EnemyUnit : BaseCombatUnit
         return attr;
     }
 
-    public MobActionResult GetActionResult()
-    {
-        return actResult;
-    }
+    public MobActionResult GetActionResult() => actResult;
 
     // public void CheckIsBreak(float damageValue)
     // {
