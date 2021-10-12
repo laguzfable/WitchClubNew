@@ -305,7 +305,7 @@ public class PlayerController : MonoBehaviour
     public void ResetAttr()
     {
         cardAttr.Init();
-        playerUnit.ClearEffect();
+        // playerUnit.ClearEffect();
         for (int i = 0; i < AttributeIndex.Length; i++)
         {
             //attrArr[i] = 0;
@@ -409,7 +409,7 @@ public class PlayerController : MonoBehaviour
         int rndElementIndex = Random.Range(0, 4);
         if (effectRef != null)
         {
-            rndElementIndex = effectRef.effect.GetValue();
+            rndElementIndex = (effectRef as PlayerAbilityEffectRef).effect.GetValue();
         }
         if(HasCharacterCard(cardIDArr[rndElementIndex]))
         {
@@ -511,7 +511,7 @@ public class PlayerController : MonoBehaviour
             else  //牌堆重洗
             {
                 var effectRef = playerUnit.GetEffect(EAbilityEffectType.Shuffle);
-                if (effectRef != null && card.element == (ECardElement)effectRef.effect.GetValue())
+                if (effectRef != null && card.element == (ECardElement)(effectRef as PlayerAbilityEffectRef).effect.GetValue())
                 {
                     continue;
                 }

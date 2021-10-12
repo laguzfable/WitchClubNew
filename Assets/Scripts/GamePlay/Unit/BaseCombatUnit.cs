@@ -17,7 +17,11 @@ public abstract class BaseCombatUnit : MonoBehaviour
     public CardAttribute bonusAttr;
 
     List<AbilityEffectRef> effectList = new List<AbilityEffectRef>();
-    Dictionary<EAbilityEffectType, System.Action> effectEvent = new Dictionary<EAbilityEffectType, System.Action>();
+    Dictionary<EAbilityEffectType, System.Action> onAddEffectEvent = new Dictionary<EAbilityEffectType, System.Action>();
+
+    Dictionary<EAbilityEffectType, System.Action> onRemoveEffectEvent = new Dictionary<EAbilityEffectType, System.Action>();
+
+    Dictionary<EAbilityEffectType, System.Action<AbilityEffectRef> > onCostEffectEvent = new Dictionary<EAbilityEffectType, System.Action<AbilityEffectRef> >();
 
     protected virtual void OnDefeated()
     {
@@ -27,6 +31,8 @@ public abstract class BaseCombatUnit : MonoBehaviour
     protected virtual void Init()
     {
         HP.Restore();
+        AddCostEffectEvent(EAbilityEffectType.HOT, eff => ApplyHealing(eff.value));
+        AddCostEffectEvent(EAbilityEffectType.DOT, eff => ApplyDamage(eff.value));
     }
 
     void Start()
@@ -34,6 +40,13 @@ public abstract class BaseCombatUnit : MonoBehaviour
         HP.OnValueEmpty += OnDefeated;
         combatSystem = GameObject.FindWithTag("GameController").GetComponent<CombatSystem>();
         Init();
+    }
+
+    private void OnDestroy()
+    {
+        onAddEffectEvent.Clear();
+        onRemoveEffectEvent.Clear();
+        onCostEffectEvent.Clear();
     }
 
     public void LoadDataFromJsonString(string jsonStr)
@@ -44,27 +57,52 @@ public abstract class BaseCombatUnit : MonoBehaviour
 
     public void AddEffectEvent(EAbilityEffectType type, System.Action action)
     {
-        if (!effectEvent.ContainsKey(type))
+        if (!onAddEffectEvent.ContainsKey(type))
         {
-            effectEvent[type] = action;
+            onAddEffectEvent[type] = action;
+        }
+    }
+
+    public void AddRemoveEffectEvent(EAbilityEffectType type, System.Action action)
+    {
+        if (!onRemoveEffectEvent.ContainsKey(type))
+        {
+            onRemoveEffectEvent[type] = action;
+        }
+    }
+
+    public void AddCostEffectEvent(EAbilityEffectType type, System.Action<AbilityEffectRef> action)
+    {
+        if (!onCostEffectEvent.ContainsKey(type))
+        {
+            onCostEffectEvent[type] = action;
         }
     }
 
     public void AddEffect(AbilityEffectRef effect)
     {
         effectList.Add(effect);
-        if(effectEvent.ContainsKey(effect.type))
+        if(onAddEffectEvent.ContainsKey(effect.type))
         {
-            effectEvent[effect.type].Invoke();
+            onAddEffectEvent[effect.type].Invoke();
         }
     }
 
     public void CostEffect(AbilityEffectRef effect, int cost = 1)
     {
         effect.duration -= cost;
+        if(onCostEffectEvent.ContainsKey(effect.type))
+        {
+            onCostEffectEvent[effect.type].Invoke(effect);
+        }
+
         if(effect.duration <= 0)
         {
             RemoveEffect(effect);
+            if(onRemoveEffectEvent.ContainsKey(effect.type))
+            {
+                onRemoveEffectEvent[effect.type].Invoke();
+            }
         }
     }
 
@@ -88,18 +126,25 @@ public abstract class BaseCombatUnit : MonoBehaviour
     /// </summary>
     public virtual void BeforeAction()
     {
-        if(HasEffect(EAbilityEffectType.HOT))
+        foreach(var effect in effectList)
         {
-            var eff = GetEffect(EAbilityEffectType.HOT);
-            ApplyHealing(eff.value);
-            CostEffect(eff);
+            if(effect.duration > 0)
+            {
+                CostEffect(effect);
+            }
         }
-        if(HasEffect(EAbilityEffectType.DOT))
-        {
-            var eff = GetEffect(EAbilityEffectType.DOT);
-            ApplyDamage(eff.value);
-            CostEffect(eff);
-        }
+        // if(HasEffect(EAbilityEffectType.HOT))
+        // {
+        //     var eff = GetEffect(EAbilityEffectType.HOT);
+        //     ApplyHealing(eff.value);
+        //     CostEffect(eff);
+        // }
+        // if(HasEffect(EAbilityEffectType.DOT))
+        // {
+        //     var eff = GetEffect(EAbilityEffectType.DOT);
+        //     ApplyDamage(eff.value);
+        //     CostEffect(eff);
+        // }
     }
 
     public void ClearEffect()
@@ -222,7 +267,7 @@ public abstract class BaseCombatUnit : MonoBehaviour
                     {
                         if ((ECardElement)effect.GetValue() != ECardElement.None)
                         {
-                            AddEffect(AbilityEffectRef.Create(effect.type, effect));
+                            AddEffect(PlayerAbilityEffectRef.Create(effect));
                         }
                         // pc.ReflashCards(false);
                         ReflashCards();
@@ -238,7 +283,7 @@ public abstract class BaseCombatUnit : MonoBehaviour
                         }
                         else
                         {
-                            newEffect = AbilityEffectRef.Create(effect.type, effect);
+                            newEffect = PlayerAbilityEffectRef.Create(effect);
                             newEffect.value = effect.value;
                             AddEffect(newEffect);
                         }
@@ -268,7 +313,7 @@ public abstract class BaseCombatUnit : MonoBehaviour
                         }
                         else
                         {
-                            newEffect = AbilityEffectRef.Create(effect.type, effect);
+                            newEffect = PlayerAbilityEffectRef.Create(effect);
                             AddEffect(newEffect);
                         }
                         
@@ -278,13 +323,13 @@ public abstract class BaseCombatUnit : MonoBehaviour
                     break;
                 case EAbilityEffectType.ChangeEnvironmentEffect:
                     {
-                        combatSystem.envEffect.SetCurrentEffect((int)effect.value < 0 ? (EEnvEffectType)Random.Range(0, (int)EEnvEffectType.Length) : (EEnvEffectType)effect.GetValue());
+                        combatSystem.envEffect.SetCurrentEffect((int)effect.value < 0 ? (EEnvEffectType)Random.Range(0, (int)EEnvEffectType.Length) : (EEnvEffectType)effect.GetValue(), string.IsNullOrWhiteSpace(effect.param)? 1 : int.Parse(effect.param));
                     }
                     break;
                 case EAbilityEffectType.Stun:// !not implemented yet
                 case EAbilityEffectType.NoArmor:
                     {
-                        target.AddEffect(AbilityEffectRef.Create(effect.type, effect));
+                        target.AddEffect(PlayerAbilityEffectRef.Create(effect));
                     }
                     break;
                 case EAbilityEffectType.TheWorld:// !not implemented yet
@@ -298,7 +343,7 @@ public abstract class BaseCombatUnit : MonoBehaviour
                 case EAbilityEffectType.Shield:
                 case EAbilityEffectType.IgnoreEnvironmentEffect:
                     {
-                        AddEffect(AbilityEffectRef.Create(effect.type, effect));
+                        AddEffect(PlayerAbilityEffectRef.Create(effect));
                     }
                     break;
             }
@@ -314,15 +359,25 @@ public abstract class BaseCombatUnit : MonoBehaviour
 public class AbilityEffectRef
 {
     public EAbilityEffectType type;
-    public AbilityEffect effect;
 
     public float value;
     public int duration;
 
-    static public AbilityEffectRef Create(EAbilityEffectType newType, AbilityEffect newEffect)
+    static public AbilityEffectRef Create(EAbilityEffectType newType)
     {
-        return new AbilityEffectRef() { type = newType, effect = newEffect };
+        return new AbilityEffectRef() { type = newType};
     }
+}
+
+public class PlayerAbilityEffectRef : AbilityEffectRef
+{
+    public AbilityEffect effect;
+
+    static public PlayerAbilityEffectRef Create(AbilityEffect newEffect)
+    {
+        return new PlayerAbilityEffectRef() { type = newEffect.type, effect = newEffect };
+    }
+
 }
 
 [System.Serializable]

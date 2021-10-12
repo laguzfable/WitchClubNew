@@ -208,28 +208,15 @@ public class CombatSystem : MonoBehaviour
 
         var mobDmg = pc.ATK - mobActResult.attr.DEF;
 
-        // TODO 之後再來review
-        // if (mobActResult.curAct.type == EMobActionType.Power)
-        // {
-        //     if (mobActResult.breakType == EBreakConditionType.ATK && pc.ATK >= mobActResult.breakValue)
-        //     {
-        //         isBreakAciton = true;
-        //     }
-        //     else if (mobActResult.breakType == EBreakConditionType.HP)
-        //     {
-        //         mobActResult.breakValue -= mobDmg;
-        //         if (mobActResult.breakValue <= 0)
-        //         {
-        //             isBreakAciton = true;
-        //         }
-        //     }
-        // }
-        
         orderList.Clear();
-        if (!isBreakAciton)
-        {
+        // if (!isBreakAciton)
+        // {
             CreateOrder((int)Order.MobDealDamage, mobActResult.attr.ATK, mobUnit, () => { // Mob deal damage
 
+                if(mobUnit.HasEffect(EAbilityEffectType.BreakAction))
+                {
+                    return;
+                }
                 var dmg = mobActResult.attr.ATK - pc.DEF;
 
                 if (playerUnit.HasEffect(EAbilityEffectType.Shield)) // shield effect
@@ -254,6 +241,10 @@ public class CombatSystem : MonoBehaviour
 
             CreateOrder((int)Order.MobHealing, mobActResult.attr.HEAL, mobUnit, () => { // Mob deal healing
 
+                if(mobUnit.HasEffect(EAbilityEffectType.BreakAction))
+                {
+                    return;
+                }
                 mobUnit.ApplyHealing(mobActResult.attr.HEAL);
                 if (mobUnit.HasEffect(EAbilityEffectType.HealingAttack)) // healing attack
                 {
@@ -261,7 +252,7 @@ public class CombatSystem : MonoBehaviour
                 }
 
             });
-        }
+        // }
 
         CreateOrder((int)Order.PlayerDealDamage, pc.ATK, playerUnit, () => { // player deal damage
             visualResource.GetCardFX(pc.result.fxID);
@@ -280,9 +271,9 @@ public class CombatSystem : MonoBehaviour
                 if(envEffect.curType == EEnvEffectType.MobArmor || mobUnit.HasEffect(EAbilityEffectType.MagicArmor) || mobUnit.HasEffect(EAbilityEffectType.MagicArmorEX))
                 {
                     dealDamage = Mathf.FloorToInt((float)dealDamage * 0.7f);
-                    mobUnit.CheckCostMagicArmor(pc.result.IsCombo()? ECardElement.None : pc.result.cardList[0].element, pc.result.cardList.Count);
                 }
                 mobUnit.ApplyDamage(dealDamage);
+                mobUnit.CheckCostMagicArmor(pc.result.IsCombo()? ECardElement.None : pc.result.cardList[0].element, pc.result.cardList.Count);
             }
 
             if (playerUnit.HasEffect(EAbilityEffectType.LifeSteal) && (!playerUnit.HasEffect(EAbilityEffectType.IgnoreEnvironmentEffect) && envEffect.curType != EEnvEffectType.NoHeal) && mobDmg > 0) // life steal
@@ -291,11 +282,12 @@ public class CombatSystem : MonoBehaviour
             }
         });
 
-        CreateOrder((int)Order.InterruptMobsAction, isBreakAciton ? 1 : 0, playerUnit, () => { // interrupt
-            if (!mobUnit.HasEffect(EAbilityEffectType.BreakAction))
-            {
-                SpawnCombatText("成功打斷行動", ECombatTextType.Debuff, false);
-            }
+        CreateOrder((int)Order.InterruptMobsAction, /*isBreakAciton ? 1 : 0*/1, playerUnit, () => { // interrupt
+            // if (!mobUnit.HasEffect(EAbilityEffectType.BreakAction))
+            // {
+            //     SpawnCombatText("成功打斷行動", ECombatTextType.Debuff, false);
+            // }
+            
         });
 
         CreateOrder((int)Order.PlayerHealing, pc.HEAL, playerUnit, () => { // player deal healing
@@ -333,10 +325,10 @@ public class CombatSystem : MonoBehaviour
             }
         }
 
-        if (mobActResult.targetEnvEffect != EEnvEffectType.None && !isBreakAciton)
-        {
-            envEffect.SetNextEffect(mobActResult.targetEnvEffect, 1);
-        }
+        // if (mobActResult.targetEnvEffect != EEnvEffectType.None && !isBreakAciton)
+        // {
+        //     envEffect.SetNextEffect(mobActResult.targetEnvEffect, 1);
+        // }
 
         if (TutorialController.isTutorial)
         {
@@ -354,7 +346,6 @@ public class CombatSystem : MonoBehaviour
     }
 
     List<ResultOrder> orderList = new List<ResultOrder>();
-    bool isBreakAciton = false;
 
     //WaitForSeconds waitPlay = null;
 
@@ -414,10 +405,8 @@ public class CombatSystem : MonoBehaviour
 
     public void MobGetNewAction()
     {
-        // var act = mobUnit.GetNewAction(isBreakAciton);
-        mobUnit.GetNewAction(isBreakAciton);
+        mobUnit.GetNewAction();
         mobActTxt.text = mobUnit.GetActionString();
-        isBreakAciton = false;
     }
 
     public void UpdateMobActionInfo(string actionStr)

@@ -126,7 +126,22 @@ public class EnemyUnit : BaseCombatUnit
             actResult.attr.DEF = 0;
             combatSystem.UpdateMobActionInfo(GetActionString());
         });
-        AddEffectEvent(EAbilityEffectType.BreakAction, () => combatSystem.SpawnCombatText("成功打斷行動", ECombatTextType.Debuff, false));
+        // AddEffectEvent(EAbilityEffectType.BreakAction, () => combatSystem.SpawnCombatText("成功打斷行動", ECombatTextType.Debuff, false));
+        void RemovedMagicArmor()
+        {
+            actResult.Reset();
+
+            var eff = AbilityEffectRef.Create(EAbilityEffectType.BreakAction);
+            eff.duration = 1;
+            AddEffect(eff);
+
+            //中斷的下一回合會昏迷 所以
+            var stunEff = AbilityEffectRef.Create(EAbilityEffectType.Stun);
+            stunEff.duration = 2;
+            AddEffect(stunEff);
+        }
+        AddRemoveEffectEvent(EAbilityEffectType.MagicArmor, RemovedMagicArmor);
+        AddRemoveEffectEvent(EAbilityEffectType.MagicArmorEX, RemovedMagicArmor);
     }
 
     [SerializeField] string testMobName = "TestMobData";
@@ -230,14 +245,12 @@ public class EnemyUnit : BaseCombatUnit
     {
         public CardAttribute attr;
         // public int turnRemain;
-        // public EBreakConditionType breakType;
-        // public int breakValue;
-        public EEnvEffectType targetEnvEffect;
+        // public EEnvEffectType targetEnvEffect;
 
         public void Reset()
         {
             attr.Init();
-            targetEnvEffect = EEnvEffectType.None;
+            // targetEnvEffect = EEnvEffectType.None;
         }
     }
 
@@ -373,23 +386,23 @@ public class EnemyUnit : BaseCombatUnit
         return atkStr + defStr + healStr + conditionStr;
     }
 
-    public void GetNewAction(bool isBreakAciton)
+    public void GetNewAction()
     {
         EN.Value += actResult.attr.EN;
-
-        DecideCostAbility();
-        ShuffleCards(false);
         actResult.Reset();
-        actResult.attr = SelectCards(MakeDecision());
-        // actResult.breakType = act.breakType;
-        // actResult.breakValue = act.breakValue;
-        // actResult.targetEnvEffect = act.targetEnvEffect;
-
+        if(!HasEffect(EAbilityEffectType.Stun))
+        {
+            DecideCostAbility();
+            ShuffleCards(false);
+            actResult.attr = SelectCards(MakeDecision());
+            // actResult.targetEnvEffect = act.targetEnvEffect;
+        }
     }
     
     /// <summary>
     /// 決策是否用技能
     /// 這部分通常就是EN到就用
+    /// ! 日後可能會變更使用技能的執行順序
     /// </summary>
     void DecideCostAbility()
     {
@@ -424,7 +437,6 @@ public class EnemyUnit : BaseCombatUnit
     
     /// <summary>
     /// 透過權重選擇這一次的元素
-    /// TODO 要因為環境效果改變權重
     /// </summary>
     /// <returns>所選擇的元素</returns>
     public ECardElement MakeDecision()
@@ -568,19 +580,9 @@ public class EnemyUnit : BaseCombatUnit
 
     public MobActionResult GetActionResult() => actResult;
 
-    // public void CheckIsBreak(float damageValue)
-    // {
-    //     if(actResult.curAct.type == EMobActionType.Power && !HasEffect(EAbilityEffectType.BreakAction) && damageValue >= actResult.breakValue)
-    //     {
-    //         AddEffect(AbilityEffectRef.Create(EAbilityEffectType.BreakAction, new AbilityEffect() { type = EAbilityEffectType.BreakAction }));
-    //     }
-    // }
-
     //敵人被攻擊
     public override void ApplyDamage(float damageValue)
     {
-        // TODO 被中斷動作的部分先暫停 之後看看有沒有要加回來
-        // CheckIsBreak(damageValue);
         float dmg = GetAppliedDamage(damageValue);
         if (dmg > 0f)
         {
