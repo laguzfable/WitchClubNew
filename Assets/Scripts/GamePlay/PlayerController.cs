@@ -365,6 +365,7 @@ public class PlayerController : MonoBehaviour
                         cardAttr.HEAL = 0;
                     }
                     break;
+                case EEnvEffectType.PlayerNoArmor:
                 case EEnvEffectType.NoDefense:
                     {
                         cardAttr.DEF = 0;
@@ -375,6 +376,10 @@ public class PlayerController : MonoBehaviour
         if(playerUnit.HasEffect(EAbilityEffectType.NoArmor))
         {
             cardAttr.DEF = 0;
+        }
+        if(playerUnit.HasEffect(EAbilityEffectType.IncreaseATK2))
+        {
+            cardAttr.ATK = Mathf.FloorToInt((float)cardAttr.ATK * 1.2f);
         }
 
         textArr[0].text = cardAttr.ATK.ToString();

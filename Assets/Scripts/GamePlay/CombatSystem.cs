@@ -224,8 +224,7 @@ public class CombatSystem : MonoBehaviour
         //         }
         //     }
         // }
-
-        // TODO 這裡有很多跟技能效果有關的部分 要敵人也實作 目前看起來現有的(2021/10/12)都有實作
+        
         orderList.Clear();
         if (!isBreakAciton)
         {
@@ -277,7 +276,13 @@ public class CombatSystem : MonoBehaviour
             }
             else // normal
             {
-                mobUnit.ApplyDamage(mobDmg);
+                var dealDamage = mobDmg;
+                if(envEffect.curType == EEnvEffectType.MobArmor || mobUnit.HasEffect(EAbilityEffectType.MagicArmor) || mobUnit.HasEffect(EAbilityEffectType.MagicArmorEX))
+                {
+                    dealDamage = Mathf.FloorToInt((float)dealDamage * 0.7f);
+                    mobUnit.CheckCostMagicArmor(pc.result.IsCombo()? ECardElement.None : pc.result.cardList[0].element, pc.result.cardList.Count);
+                }
+                mobUnit.ApplyDamage(dealDamage);
             }
 
             if (playerUnit.HasEffect(EAbilityEffectType.LifeSteal) && (!playerUnit.HasEffect(EAbilityEffectType.IgnoreEnvironmentEffect) && envEffect.curType != EEnvEffectType.NoHeal) && mobDmg > 0) // life steal
@@ -402,6 +407,9 @@ public class CombatSystem : MonoBehaviour
         playerUnit.controllable = true;
         mobUnit.controllable = false;
         pc.SetControllable(true);
+
+        playerUnit.BeforeAction();
+        mobUnit.BeforeAction();
     }
 
     public void MobGetNewAction()

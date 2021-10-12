@@ -19,8 +19,6 @@ public abstract class BaseCombatUnit : MonoBehaviour
     List<AbilityEffectRef> effectList = new List<AbilityEffectRef>();
     Dictionary<EAbilityEffectType, System.Action> effectEvent = new Dictionary<EAbilityEffectType, System.Action>();
 
-    protected List<int> hot = new List<int>();
-
     protected virtual void OnDefeated()
     {
 
@@ -61,6 +59,20 @@ public abstract class BaseCombatUnit : MonoBehaviour
         }
     }
 
+    public void CostEffect(AbilityEffectRef effect, int cost = 1)
+    {
+        effect.duration -= cost;
+        if(effect.duration <= 0)
+        {
+            RemoveEffect(effect);
+        }
+    }
+
+    public void RemoveEffect(AbilityEffectRef effect)
+    {
+        effectList.Remove(effect);
+    }
+
     public bool HasEffect(EAbilityEffectType type)
     {
         return effectList.Any(item => item.type == type);
@@ -71,12 +83,22 @@ public abstract class BaseCombatUnit : MonoBehaviour
         return effectList.Find(item => item.type == type);
     }
 
+    /// <summary>
+    /// 如果有DOT HOT就在這裡作用
+    /// </summary>
     public virtual void BeforeAction()
     {
-        if(hot.Count > 0)
+        if(HasEffect(EAbilityEffectType.HOT))
         {
-            HP.Value += hot[0];
-            hot.RemoveAt(0);
+            var eff = GetEffect(EAbilityEffectType.HOT);
+            ApplyHealing(eff.value);
+            CostEffect(eff);
+        }
+        if(HasEffect(EAbilityEffectType.DOT))
+        {
+            var eff = GetEffect(EAbilityEffectType.DOT);
+            ApplyDamage(eff.value);
+            CostEffect(eff);
         }
     }
 
@@ -207,7 +229,25 @@ public abstract class BaseCombatUnit : MonoBehaviour
                     }
                     break;
                 case EAbilityEffectType.HOT:
+                case EAbilityEffectType.DOT:
+                case EAbilityEffectType.MagicArmor:
+                case EAbilityEffectType.MagicArmorEX:
                     {
+                        AbilityEffectRef newEffect = null;
+                        if(HasEffect(effect.type))
+                        {
+                            newEffect = GetEffect(effect.type);
+                        }
+                        else
+                        {
+                            newEffect = AbilityEffectRef.Create(effect.type, effect);
+                            newEffect.value = effect.value;
+                            AddEffect(newEffect);
+                        }
+                        
+                        newEffect.duration = int.Parse(effect.param);
+                        
+                        /*
                         if (hot.Count > 0)
                         {
                             hot.Clear();
@@ -216,6 +256,7 @@ public abstract class BaseCombatUnit : MonoBehaviour
                         {
                             hot.Add((int)effect.value);
                         }
+                        */
                     }
                     break;
                 case EAbilityEffectType.ChangeEnvironmentEffect:
@@ -257,6 +298,9 @@ public class AbilityEffectRef
 {
     public EAbilityEffectType type;
     public AbilityEffect effect;
+
+    public float value;
+    public int duration;
 
     static public AbilityEffectRef Create(EAbilityEffectType newType, AbilityEffect newEffect)
     {

@@ -50,6 +50,17 @@ public class PlayerUnit : BaseCombatUnit
         Debug.Log("Player Action!");
     }
     */
+
+    public override void BeforeAction()
+    {
+        base.BeforeAction();
+        if(combatSystem.envEffect.curType == EEnvEffectType.PlayerDamage)
+        {
+            // TODO 扣多少還沒決定
+            ApplyDamage(0);
+        }
+    }
+
     public override void ApplyDamage(float damageValue)
     {
         if(HasEffect(EAbilityEffectType.Shield))

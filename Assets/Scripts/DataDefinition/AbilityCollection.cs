@@ -18,152 +18,152 @@ public enum EAbilityEffectType
     /// 攻擊力增加
     /// </summary>
     IncreaseATK,
-    
+
     /// <summary>
     /// 防禦力增加
     /// </summary>
     IncreaseDEF,
-    
+
     /// <summary>
     /// 治療量增加
     /// </summary>
     IncreaseHeal,
-    
+
     /// <summary>
     /// 卡牌等級提升
     /// </summary>
     LevelUp,
-    
+
     /// <summary>
     /// 直接傷害目標 無視防禦
     /// </summary>
     DirectDamage,
-    
+
     /// <summary>
     /// 反射受到的傷害 無視防禦
     /// </summary>
     Reflect,
-    
+
     /// <summary>
     /// 立刻獲得能量(除了黃色)
     /// </summary>
     InstantEnergy,
-    
+
     /// <summary>
     /// 恢復成功造成傷害的治療量
     /// </summary>
     LifeSteal,
-    
+
     /// <summary>
     /// !攻擊力與防禦力交換
     /// </summary>
     SelfODExchange,
-    
+
     /// <summary>
     /// !過溢的防禦力轉換為傷害攻擊目標
     /// </summary>
     Revenge,
-    
+
     /// <summary>
     /// 更換目標行動(old:直接使目標的強力技能失效)
     /// </summary>
     Interrupt,
-    
+
     /// <summary>
     /// 使此次的傷害無效
     /// </summary>
     Shield,
-    
+
     /// <summary>
     /// 直接進行治療
     /// </summary>
     InstantHeal,
-    
+
     /// <summary>
     /// !所有的數值轉換為治療
     /// </summary>
     FocusHeal,
-    
+
     /// <summary>
     /// 提升HP上限並恢復所有HP
     /// </summary>
     IncreaseMaximumHP,
-    
+
     /// <summary>
     /// 忽略環境效果
     /// </summary>
     IgnoreEnvironmentEffect,
-    
+
     /// <summary>
     /// 洗掉手牌
     /// </summary>
     Shuffle,
-    
+
     /// <summary>
     /// 防禦力為0
     /// </summary>
     NoArmor,
-    
+
     /// <summary>
     /// 無視卡牌顏色
     /// </summary>
     IgnoreElement,
-    
+
     /// <summary>
     /// 持續治療
     /// </summary>
     HOT,
-    
+
     /// <summary>
     /// 更換環境效果
     /// </summary>
     ChangeEnvironmentEffect,
-    
+
     /// <summary>
     /// 治療同時給予傷害
     /// </summary>
     HealingAttack,
-    
+
     /// <summary>
-    /// !下回合無法行動
+    /// 下回合無法行動
     /// </summary>
     Stun,
-    
+
     /// <summary>
     /// !時間暫停 時間內無限回合
     /// </summary>
     TheWorld,
-    
+
     /// <summary>
     /// 怪物專屬 動作被打斷
     /// </summary>
     BreakAction,
-    
+
     /// <summary>
-    /// !抗魔裝甲
+    /// 抗魔裝甲
     /// </summary>
     MagicArmor,
-    
+
     /// <summary>
-    /// !抗魔裝甲EX
+    /// 抗魔裝甲EX
     /// </summary>
     MagicArmorEX,
-    
+
     /// <summary>
-    /// !持續傷害
+    /// 持續傷害
     /// </summary>
     DOT,
-    
+
     /// <summary>
     /// !詛咒 會無法使用部分手牌
     /// </summary>
     Curse,
-    
+
     /// <summary>
     /// !玩家卡片元素隨機更改
     /// </summary>
     ElementChange,
-    
+
     /// <summary>
     /// !本次攻擊力增加20%
     /// </summary>

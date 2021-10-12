@@ -433,7 +433,7 @@ public class EnemyUnit : BaseCombatUnit
                 attr.HEAL += totalAttr.HEAL;
                 attr.EN += totalAttr.EN;
 
-                if(isLimitedCards && selectCardCount == 2)
+                if(!isIgnoreElement && isLimitedCards && selectCardCount == 2)
                 {
                     break;
                 }
@@ -489,6 +489,15 @@ public class EnemyUnit : BaseCombatUnit
         {
             attr.DEF = 0;
         }
+        if(HasEffect(EAbilityEffectType.IncreaseATK2))
+        {
+            attr.ATK = Mathf.FloorToInt((float)attr.ATK * 1.2f);
+        }
+        if(HasEffect(EAbilityEffectType.MagicArmorEX))
+        {
+            attr.ATK = Mathf.FloorToInt((float)attr.ATK * 1.2f);
+            attr.ATK = Mathf.FloorToInt((float)attr.HEAL * 1.2f);
+        }
 
         return attr;
     }
@@ -537,6 +546,22 @@ public class EnemyUnit : BaseCombatUnit
         sprRend.material.SetFloat("_FlashAmount", 0f);
     }
     
+    public void CheckCostMagicArmor(ECardElement playerElement, int count)
+    {
+        if(!HasEffect(EAbilityEffectType.MagicArmor) && HasEffect(EAbilityEffectType.MagicArmorEX))
+        {
+            return;
+        }
+
+        AbilityEffectRef effect = HasEffect(EAbilityEffectType.MagicArmor)? GetEffect(EAbilityEffectType.MagicArmor) : GetEffect(EAbilityEffectType.MagicArmorEX);
+
+        var armorElement = (ECardElement)effect.value;
+
+        if(playerElement == ECardElement.None || armorElement == playerElement)
+        {
+            CostEffect(effect, count);
+        }
+    }
 
     protected override void CardLevelUp()
     {
