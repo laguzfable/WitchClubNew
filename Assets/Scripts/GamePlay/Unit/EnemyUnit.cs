@@ -614,7 +614,7 @@ public class EnemyUnit : BaseCombatUnit
     
     public void CheckCostMagicArmor(ECardElement playerElement, int count)
     {
-        if(!HasEffect(EAbilityEffectType.MagicArmor) && HasEffect(EAbilityEffectType.MagicArmorEX))
+        if(!HasEffect(EAbilityEffectType.MagicArmor) && !HasEffect(EAbilityEffectType.MagicArmorEX))
         {
             return;
         }
