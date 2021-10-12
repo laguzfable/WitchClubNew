@@ -17,7 +17,7 @@ public class FXSequence : MonoBehaviour
 
     public FXSequence nextFX;
 
-    static public async UniTaskVoid PlayFX(FXSequence fxSeq)
+    static public async UniTask PlayFX(FXSequence fxSeq)
     {
         var displayFX = fxSeq;
         while (displayFX != null)

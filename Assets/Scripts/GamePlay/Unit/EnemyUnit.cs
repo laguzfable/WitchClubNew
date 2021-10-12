@@ -417,6 +417,7 @@ public class EnemyUnit : BaseCombatUnit
                 EN.Value -= useAbility.requireEnergy;
                 CastAbility(useAbility);
                 Debug.LogWarning($"使用了{useAbility.name}!!");
+                combatSystem.SpawnCombatText($"敵人使用了 {useAbility.name}!", ECombatTextType.Buff, false);
             }
         }
     }

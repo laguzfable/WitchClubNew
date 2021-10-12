@@ -1438,16 +1438,7 @@ MonoBehaviour:
   fxPos: {fileID: 0}
   fxSeq: {fileID: 0}
   audioClipList: []
-  defActionArr:
-  - {fileID: 11400000, guid: 882dbfe46fb9b724b9b30596333f8bfa, type: 2}
-  - {fileID: 11400000, guid: 2195dc1dc7616a048a548727d40c1018, type: 2}
-  - {fileID: 11400000, guid: 65cd76680d3023148ab45a8d88e8c498, type: 2}
-  - {fileID: 11400000, guid: 877aa194241f8704f98baf5db026439e, type: 2}
-  - {fileID: 11400000, guid: c7738c1ee55cabe41946d793d2c89da4, type: 2}
-  - {fileID: 11400000, guid: 882dbfe46fb9b724b9b30596333f8bfa, type: 2}
-  - {fileID: 11400000, guid: 882dbfe46fb9b724b9b30596333f8bfa, type: 2}
-  - {fileID: 11400000, guid: 2195dc1dc7616a048a548727d40c1018, type: 2}
-  - {fileID: 11400000, guid: 882dbfe46fb9b724b9b30596333f8bfa, type: 2}
+  testMobName: TestMobData2
   brokenClothFx: []
   fullCloths: []
   halfCloths: []
@@ -17467,8 +17458,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98cfdb50352058a49aeed465412a49b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showCg: {fileID: 0}
-  desCgTime: 0
 --- !u!82 &1094567149
 AudioSource:
   m_ObjectHideFlags: 0
@@ -34871,15 +34860,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e5eae2bec1e5994eb61ff912db96fab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultAlpha: 0
-  itemPrefab: {fileID: 4323157831799192579, guid: 97b429beb51f9324fb7bc88efe1c608c,
-    type: 3}
-  pagePrefab: {fileID: 5186957650155680263, guid: 2de57b873176945a3b83bafb713d13c4,
-    type: 3}
-  itemList: []
-  pageSlider: {fileID: 0}
-  itemPages: []
-  mode: 0
 --- !u!82 &2067112461
 AudioSource:
   m_ObjectHideFlags: 0
@@ -35058,15 +35038,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e5eae2bec1e5994eb61ff912db96fab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultAlpha: 0
-  itemPrefab: {fileID: 4323157831799192579, guid: 97b429beb51f9324fb7bc88efe1c608c,
-    type: 3}
-  pagePrefab: {fileID: 5186957650155680263, guid: 2de57b873176945a3b83bafb713d13c4,
-    type: 3}
-  itemList: []
-  pageSlider: {fileID: 1645345138}
-  itemPages: []
-  mode: 0
 --- !u!114 &2083044908
 MonoBehaviour:
   m_ObjectHideFlags: 0
