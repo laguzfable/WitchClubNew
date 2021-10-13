@@ -510,8 +510,8 @@ public class PlayerController : MonoBehaviour
             }
             else  //牌堆重洗
             {
-                var effectRef = playerUnit.GetEffect(EAbilityEffectType.Shuffle);
-                if (effectRef != null && card.element == (ECardElement)(effectRef as PlayerAbilityEffectRef).effect.GetValue())
+                var effectRef = playerUnit.GetEffect(EAbilityEffectType.Shuffle) as PlayerAbilityEffectRef;
+                if (effectRef != null && card.element == (ECardElement)effectRef.effect.GetValue())
                 {
                     continue;
                 }

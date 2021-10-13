@@ -72,11 +72,12 @@ public class EnemyUnit : BaseCombatUnit
             if(element == ECardElement.Green)
             {
                 rndEleList.Add(2);
+                // rndEleList = new List<int>{1, 2};
             }
-            else if(element == ECardElement.Yellow)
-            {
-                rndEleList.Add(3);
-            }
+            // else if(element == ECardElement.Yellow)
+            // {
+            //     rndEleList.Add(3);
+            // }
 
             var rndIndex = Random.Range(0, rndEleList.Count);
             switch(rndEleList[rndIndex])
@@ -120,8 +121,8 @@ public class EnemyUnit : BaseCombatUnit
             target = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerUnit>();
         }
 
-        AddEffectEvent(EAbilityEffectType.Stun, () => combatSystem.UpdateMobActionInfo(GetActionString()));
-        AddEffectEvent(EAbilityEffectType.NoArmor, () =>
+        AddOnAddEffectEvent(EAbilityEffectType.Stun, () => combatSystem.UpdateMobActionInfo(GetActionString()));
+        AddOnAddEffectEvent(EAbilityEffectType.NoArmor, () =>
         {
             actResult.attr.DEF = 0;
             combatSystem.UpdateMobActionInfo(GetActionString());
@@ -132,7 +133,7 @@ public class EnemyUnit : BaseCombatUnit
             actResult.Reset();
 
             var eff = AbilityEffectRef.Create(EAbilityEffectType.BreakAction);
-            eff.duration = 1;
+            // eff.duration = 1;
             AddEffect(eff);
 
             //中斷的下一回合會昏迷 所以
@@ -140,8 +141,8 @@ public class EnemyUnit : BaseCombatUnit
             stunEff.duration = 2;
             AddEffect(stunEff);
         }
-        AddRemoveEffectEvent(EAbilityEffectType.MagicArmor, RemovedMagicArmor);
-        AddRemoveEffectEvent(EAbilityEffectType.MagicArmorEX, RemovedMagicArmor);
+        AddOnRemoveEffectEvent(EAbilityEffectType.MagicArmor, RemovedMagicArmor);
+        AddOnRemoveEffectEvent(EAbilityEffectType.MagicArmorEX, RemovedMagicArmor);
     }
 
     [SerializeField] string testMobName = "TestMobData";
@@ -623,6 +624,7 @@ public class EnemyUnit : BaseCombatUnit
 
         var armorElement = (ECardElement)effect.value;
 
+        Debug.Log($"armorElement? {armorElement}, playerElement? {playerElement}, count? {count}");
         if(playerElement == ECardElement.None || armorElement == playerElement)
         {
             CostEffect(effect, count);

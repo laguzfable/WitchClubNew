@@ -16,7 +16,8 @@ public abstract class BaseCombatUnit : MonoBehaviour
 
     public CardAttribute bonusAttr;
 
-    List<AbilityEffectRef> effectList = new List<AbilityEffectRef>();
+    Dictionary<EAbilityEffectType, AbilityEffectRef> effectMap = new Dictionary<EAbilityEffectType, AbilityEffectRef>();
+
     Dictionary<EAbilityEffectType, System.Action> onAddEffectEvent = new Dictionary<EAbilityEffectType, System.Action>();
 
     Dictionary<EAbilityEffectType, System.Action> onRemoveEffectEvent = new Dictionary<EAbilityEffectType, System.Action>();
@@ -31,8 +32,8 @@ public abstract class BaseCombatUnit : MonoBehaviour
     protected virtual void Init()
     {
         HP.Restore();
-        AddCostEffectEvent(EAbilityEffectType.HOT, eff => ApplyHealing(eff.value));
-        AddCostEffectEvent(EAbilityEffectType.DOT, eff => ApplyDamage(eff.value));
+        AddOnCostEffectEvent(EAbilityEffectType.HOT, eff => ApplyHealing(eff.value));
+        AddOnCostEffectEvent(EAbilityEffectType.DOT, eff => ApplyDamage(eff.value));
     }
 
     void Start()
@@ -55,7 +56,7 @@ public abstract class BaseCombatUnit : MonoBehaviour
         HP = attrCollection.HP;
     }
 
-    public void AddEffectEvent(EAbilityEffectType type, System.Action action)
+    public void AddOnAddEffectEvent(EAbilityEffectType type, System.Action action)
     {
         if (!onAddEffectEvent.ContainsKey(type))
         {
@@ -63,7 +64,7 @@ public abstract class BaseCombatUnit : MonoBehaviour
         }
     }
 
-    public void AddRemoveEffectEvent(EAbilityEffectType type, System.Action action)
+    public void AddOnRemoveEffectEvent(EAbilityEffectType type, System.Action action)
     {
         if (!onRemoveEffectEvent.ContainsKey(type))
         {
@@ -71,7 +72,7 @@ public abstract class BaseCombatUnit : MonoBehaviour
         }
     }
 
-    public void AddCostEffectEvent(EAbilityEffectType type, System.Action<AbilityEffectRef> action)
+    public void AddOnCostEffectEvent(EAbilityEffectType type, System.Action<AbilityEffectRef> action)
     {
         if (!onCostEffectEvent.ContainsKey(type))
         {
@@ -81,7 +82,9 @@ public abstract class BaseCombatUnit : MonoBehaviour
 
     public void AddEffect(AbilityEffectRef effect)
     {
-        effectList.Add(effect);
+        // effectList.Add(effect);
+        effectMap[effect.type] = effect;
+
         if(onAddEffectEvent.ContainsKey(effect.type))
         {
             onAddEffectEvent[effect.type].Invoke();
@@ -98,7 +101,7 @@ public abstract class BaseCombatUnit : MonoBehaviour
 
         if(effect.duration <= 0)
         {
-            RemoveEffect(effect);
+            RemoveEffect(effect.type);
             if(onRemoveEffectEvent.ContainsKey(effect.type))
             {
                 onRemoveEffectEvent[effect.type].Invoke();
@@ -106,19 +109,20 @@ public abstract class BaseCombatUnit : MonoBehaviour
         }
     }
 
-    public void RemoveEffect(AbilityEffectRef effect)
+    public void RemoveEffect(EAbilityEffectType type)
     {
-        effectList.Remove(effect);
+        effectMap.Remove(type);
+        Debug.Log($"{name} removed effect : {type}");
     }
 
     public bool HasEffect(EAbilityEffectType type)
     {
-        return effectList.Any(item => item.type == type);
+        return effectMap.ContainsKey(type);
     }
 
     public AbilityEffectRef GetEffect(EAbilityEffectType type)
     {
-        return effectList.Find(item => item.type == type);
+        return HasEffect(type) ? effectMap[type] : null;
     }
 
     /// <summary>
@@ -126,12 +130,19 @@ public abstract class BaseCombatUnit : MonoBehaviour
     /// </summary>
     public virtual void BeforeAction()
     {
-        foreach(var effect in effectList)
+        var removeList = new List<AbilityEffectRef>();
+        foreach(var effect in effectMap.Values)
         {
-            if(effect.duration > 0)
+            if(effect.duration > 0 && effect.isCostByTurn)
             {
-                CostEffect(effect);
+                removeList.Add(effect);
+                // CostEffect(effect);
             }
+        }
+
+        foreach(var effect in removeList)
+        {
+            CostEffect(effect);
         }
         // if(HasEffect(EAbilityEffectType.HOT))
         // {
@@ -150,7 +161,7 @@ public abstract class BaseCombatUnit : MonoBehaviour
     public void ClearEffect()
     {
         bonusAttr.Init();
-        effectList.Clear();
+        effectMap.Clear();
     }
 
     public virtual void ApplyDamage(float damageValue)
@@ -319,6 +330,7 @@ public abstract class BaseCombatUnit : MonoBehaviour
                         
                         newEffect.value = Random.Range(0, 4);
                         newEffect.duration = int.Parse(effect.param);
+                        newEffect.isCostByTurn = false;
                     }
                     break;
                 case EAbilityEffectType.ChangeEnvironmentEffect:
@@ -361,7 +373,8 @@ public class AbilityEffectRef
     public EAbilityEffectType type;
 
     public float value;
-    public int duration;
+    public int duration = 1;
+    public bool isCostByTurn = true;
 
     static public AbilityEffectRef Create(EAbilityEffectType newType)
     {

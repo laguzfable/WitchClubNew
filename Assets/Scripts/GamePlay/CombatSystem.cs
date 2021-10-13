@@ -283,10 +283,10 @@ public class CombatSystem : MonoBehaviour
         });
 
         CreateOrder((int)Order.InterruptMobsAction, /*isBreakAciton ? 1 : 0*/1, playerUnit, () => { // interrupt
-            // if (!mobUnit.HasEffect(EAbilityEffectType.BreakAction))
-            // {
-            //     SpawnCombatText("成功打斷行動", ECombatTextType.Debuff, false);
-            // }
+            if (mobUnit.HasEffect(EAbilityEffectType.BreakAction))
+            {
+                SpawnCombatText("成功打斷行動", ECombatTextType.Debuff, false);
+            }
             
         });
 
@@ -297,6 +297,11 @@ public class CombatSystem : MonoBehaviour
             {
                 mobUnit.ApplyDamage(pc.HEAL);
             }
+            if(!pc.result.IsCombo())
+            {
+                mobUnit.CheckCostMagicArmor(pc.result.cardList[0].element, pc.result.cardList.Count);
+            }
+            
         });
 
         if (pc.result != null && pc.result.IsCombo())
@@ -388,19 +393,20 @@ public class CombatSystem : MonoBehaviour
                 envEffect.GetNextEffect();
             }
         }
+        
+        var playerUnit = pc.GetPlayerUnit();
+        
+        playerUnit.BeforeAction();
+        mobUnit.BeforeAction();
 
         MobGetNewAction();
         isPlayerTurn = true;
         // pc.MoveBaseCards(false);
         pc.ResetAttr();
         //mobUnit.ClearEffect();
-        var playerUnit = pc.GetPlayerUnit();
         playerUnit.controllable = true;
         mobUnit.controllable = false;
         pc.SetControllable(true);
-
-        playerUnit.BeforeAction();
-        mobUnit.BeforeAction();
     }
 
     public void MobGetNewAction()
