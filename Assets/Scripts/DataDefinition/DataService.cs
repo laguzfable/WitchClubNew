@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Naninovel.Commands;
 using UnityEngine;
 
@@ -23,11 +24,12 @@ public class DataService : Singleton<DataService>
     protected override void Init()
     {
         var abilityCollection = Resources.Load<AbilityCollection>("DataCollections/AbilityCollection");
-        var abilityList = abilityCollection.abilityList;
-        foreach (var ability in abilityList)
-        {
-            abilityDict[ability.id] = ability;
-        }
+        abilityDict = abilityCollection.abilityList.ToDictionary(item => item.id);
+        // var abilityList = abilityCollection.abilityList;
+        // foreach (var ability in abilityList)
+        // {
+        //     abilityDict[ability.id] = ability;
+        // }
     }
 
     public Ability GetAbilityById(string id)
