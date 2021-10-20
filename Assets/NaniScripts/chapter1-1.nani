@@ -1,0 +1,162 @@
+@back bg01
+
+@sfx morning
+@char 涅莉 pos:50
+涅莉.happy: 早啊～{PlayerName}，怎麼臉色看起來不太好的樣子？
+
+
+@choice 妳可以看出骷髏的臉色，真是不簡單。 goto:.C01a
+@choice 我作了一個奇怪的夢……。 goto:.C01b
+@stop
+
+
+# C01a
+涅莉: 當然啦，我可是閱髏無數呢。
+@goto .C01
+
+# C01b
+涅莉: 怪夢啊，有時候是運氣要變好的預兆唷。
+@goto .C01
+
+# C01
+@stopsfx
+@sfx slam1 loop:false
+@sfx slam2 loop:false
+@sfx glassbreak loop:false
+
+涅莉.suprised: 媽呀，大清早是在拆房子嗎？我們快去看看怎麼回事。
+@hide 涅莉
+@back cg05
+
+@stopBgm
+@bgm hurry
+
+@sfx bark loop:false
+
+獵犬: 汪汪汪！汪！
+赫菲: 咿咿咿－－是女巫獵犬！
+@sfx magicattack loop:false
+赫菲: 奧術之箭！
+@sfx bark loop:false
+@sfx hitmetal loop:false
+獵犬: 汪汪汪汪汪－－汪！
+
+赫菲: 居然是抗魔裝甲，啊－－
+
+
+@back bg03
+
+@char 艾妮格玫 pos:35
+@char 薇狄亞 pos:65
+薇狄亞.sad: 赫菲！
+艾妮格玫.rage: 這狗好大的膽子！可惡，我的儀式用短刀呢……
+艾妮格玫.sad: 很久沒用血咒術了，我要從哪裡下刀比較好啊－－
+@hide 薇狄亞
+@char 涅莉 pos:65
+
+涅莉: 欸等等，妳手上那不就是武器嗎？朝那狗刺下去啊。
+艾妮格玫: 不行啊，我的血魔法獻祭只能用我自己的血……不管了，血咒術！
+@sfx stab loop:false
+@hide 涅莉
+@char 赫菲 pos:65
+赫菲.what: 艾妮妳這個威力完全不夠啊！
+赫菲.angry: 刺深一點！
+@sfx stab2 loop:false
+艾妮格玫.scared: 可能最近沒有運動，血液循環不好，我再試一次，血咒術－－！！啊啊啊－－好痛－－
+@hide 赫菲
+@char 涅莉 pos:65
+涅莉: 妳這是何苦呢？搞得血流成河了。
+@char 薇狄亞 pos:50 time:0
+@char 涅莉 pos:75
+@char 艾妮格玫 pos:25
+@sfx slip loop:false
+薇狄亞: 別怕，我來補血！呀啊啊－－地板好滑－－
+
+赫菲: 妳不是可以跟動物溝通嗎？快點呀！跟牠溝通啊！
+薇狄亞: 不行呀！牠一直對著我罵髒話！
+@sfx bark loop:false
+獵犬: 汪汪汪！
+涅莉: ……真是看不下去了，{PlayerName}，幫忙一下吧。
+
+@stopBgm
+@bgm energetic
+
+@hide 薇狄亞,涅莉,艾妮格玫
+
+@battle background:bg02 target:monster02 label:afterbattle2
+@stop
+
+# afterbattle2
+
+@back bg03 time:0
+@char 薇狄亞 pos:60 time:0
+@char 赫菲 pos:40 time:0
+@char 艾妮格玫 pos:20 time:0
+@char 涅莉 pos:80 time:0
+
+
+@stopBgm
+@bgm peace
+
+
+獵犬: 汪汪！
+赫菲: 啊！跑走了！
+艾妮格玫.thinking: 說起來那個招牌還是太張揚了，馬上就引來敵人。
+赫菲.talk: 搞不好跟那無關啊。
+艾妮格玫: 不然呢？女巫獵人不獵巫是要幹嘛……
+赫菲: 有個人應該會知道！
+
+@hide 涅莉,赫菲,艾妮格玫,薇狄亞
+
+@back bg02
+
+@char 涅莉 pos:50
+涅莉.talk: 說起來妳在同個地方繞老半天了……
+@char 赫菲 pos:35
+@char 涅莉 pos:65
+赫菲: 應該是這裡才對呀，真奇怪。
+@hide 涅莉
+@char 薇狄亞 pos:65
+薇狄亞.love: 妳們快看！快看！那個！
+赫菲.what: 喔喔喔？薇狄亞發現什麼了嗎？
+薇狄亞: 這攤的馬鈴薯超便宜耶，一大籃只要3銀！請幫我包下來！
+
+@char 艾妮格玫 pos:25
+@char 赫菲 pos:50
+@char 薇狄亞 pos:75
+@stopBgm
+@bgm strange
+艾妮格玫.talking: 現在是買馬鈴薯的時候嗎？無腦也要看一下場合吧！
+赫菲.talk: 不要這麼兇好不好，薇狄亞也是為了我們的生計才這麼辛苦地買菜耶。
+艾妮格玫: 我不是說不能買菜，我的意思是現在不適合好嗎。
+薇狄亞.sad: 對不起嘛，艾妮，我下次會注意的。
+赫菲.angry: 薇狄亞妳不用道歉！明明就是艾妮的問題。
+艾妮格玫: 我的問題？！以妳們這種散漫的態度，重建象牙塔什麼的根本就是癡人說夢吧。
+赫菲: 怎樣都比妳這種只會攻擊自己人的血系女巫好！
+薇狄亞: 不要這樣子講啦……
+@hide 薇狄亞
+@char 涅莉 pos:75
+涅莉: 喔唷？火藥味越來越濃了耶！
+
+@hide 涅莉
+@char 艾妮格玫 pos:35
+@char 赫菲 pos:65
+艾妮格玫: 很好啊，妳自以為在戳我的痛處是嗎？
+艾妮格玫.rage: 我就如妳所願，讓妳見識血巫結社那凌駕在象牙塔之上的力量。
+赫菲: 我怕妳嗎？來啊！
+艾妮格玫: 血祭－－
+@sfx explosion loop:false
+赫菲: 奧術－－
+@sfx magicattack loop:false
+@spawn ShakeBackground
+@hide 涅莉,赫菲,艾妮格玫,薇狄亞
+@char 陰陰 pos:65
+@char 鬱鬱 pos:35
+
+？？？: 要打架可以去別的地方嗎，我們這裡還要做生意的！
+@hide 陰陰,鬱鬱
+
+
+
+
+@goto chapter1-2
