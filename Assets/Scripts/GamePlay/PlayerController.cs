@@ -58,6 +58,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     Sprite[] combinationCGArr = new Sprite[16];// or amimation clip
 
+    
+
+    public CardDataCollection cardDataCollection;
+
 
     void Awake()
     {
@@ -244,6 +248,7 @@ public class PlayerController : MonoBehaviour
         {
             card.controlable = controllable;
             //card.ChangeBtnEvent(controllable);
+            card.CheckIsAvaliable(combatSystem.envEffect.curType);
         }
         foreach (var witchCard in witchCards)
         {

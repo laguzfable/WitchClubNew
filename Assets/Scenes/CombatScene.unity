@@ -17350,8 +17350,8 @@ GameObject:
   - component: {fileID: 1094567146}
   - component: {fileID: 1094567145}
   - component: {fileID: 1094567147}
-  - component: {fileID: 1094567148}
   - component: {fileID: 1094567149}
+  - component: {fileID: 1094567148}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -17444,6 +17444,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 30d814cb4e27b4b42a4c60ddce0bf35a, type: 3}
   - {fileID: 21300000, guid: 5068563acba235444bd0db0ea772ecc2, type: 3}
   - {fileID: 21300000, guid: 07c92e2851c368444acb7b2708eaaa2e, type: 3}
+  cardDataCollection: {fileID: 1094567148}
   downPos: {fileID: 2035818075}
   upPos: {fileID: 846607034}
 --- !u!114 &1094567148
@@ -17455,9 +17456,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 1094567144}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98cfdb50352058a49aeed465412a49b9, type: 3}
+  m_Script: {fileID: 11500000, guid: 6354bbb013fb9b24390b9710c1911728, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cardDataArr:
+  - {fileID: 11400000, guid: bee3e110f1be5d848994955b3c3410eb, type: 2}
+  - {fileID: 11400000, guid: 947ea3203dc029c438f9482d3c9fd829, type: 2}
+  - {fileID: 11400000, guid: a3cd2257741c4904dab9382a642bb42b, type: 2}
+  - {fileID: 11400000, guid: 8664870ac11592741be6416dc00ac436, type: 2}
+  - {fileID: 11400000, guid: 7a82bec3e90ad1b409d34d53ad8e7dcf, type: 2}
+  - {fileID: 11400000, guid: 977b8de9f9993174fbd1115b55d6fb32, type: 2}
+  - {fileID: 11400000, guid: 2a1a1118ef87e0044bd14aa031748ff7, type: 2}
+  - {fileID: 11400000, guid: ea9e6816968a15e4da92da113de10057, type: 2}
 --- !u!82 &1094567149
 AudioSource:
   m_ObjectHideFlags: 0

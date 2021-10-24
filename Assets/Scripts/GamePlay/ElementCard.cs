@@ -19,8 +19,6 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
 
     BaseCombatUnit unit;
 
-    [SerializeField]
-    GameObject info;
     AudioSource audioSource;
     public bool controlable = true;
     [SerializeField]
@@ -42,13 +40,26 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
     [SerializeField]
     Vector3 selectedPos;
 
+    // GameObject cardInst;
+
+    [SerializeField] GameObject outline;
+    [SerializeField] SpriteRenderer cardPic;
+    [SerializeField] TextMeshPro nameTxt;
+
+    CardData cardData;
+    
+
     public int ID
     {
         set
         {
             id = value;
-            ClearChildren();
-            visualResource.GetBaseCard(id, transform);
+            // ClearChildren();
+            // cardInst = visualResource.GetBaseCard(id, transform);
+            cardData = pc.cardDataCollection.cardDict[id];
+            cardPic.sprite = cardData.image;
+            nameTxt.text = cardData.displayName;
+            
             ResetLevel();
             UpdateValue();
         }
@@ -107,15 +118,17 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
 
     void UpdateValue()
     {
-        var ability = dataService.GetAbilityById(ID.ToString()).cardAttr[level-1];
+        // var ability = dataService.GetAbilityById(ID.ToString()).cardAttr[level-1];
 
-        atkTxt.text = ability.ATK.ToString();
-        defTxt.text = ability.DEF.ToString();
-        enTxt.text = ability.EN.ToString();
-        healTxt.text = ability.HEAL.ToString();
+        var cardAttr = cardData.cardAttr[level-1];
 
-        enTxt.enabled = pc.combatSystem.IsEnergyActive() && ability.EN > 0;
-        healTxt.enabled = ability.HEAL > 0;
+        atkTxt.text = cardAttr.ATK.ToString();
+        defTxt.text = cardAttr.DEF.ToString();
+        enTxt.text = cardAttr.EN.ToString();
+        healTxt.text = cardAttr.HEAL.ToString();
+
+        enTxt.enabled = pc.combatSystem.IsEnergyActive() && cardAttr.EN > 0;
+        healTxt.enabled = cardAttr.HEAL > 0;
         atkTxt.enabled = !healTxt.enabled;
     }
 
@@ -223,6 +236,37 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
         if(eventData.button == PointerEventData.InputButton.Left)
         {
             OnSelect();
+        }
+    }
+
+    public void CheckIsAvaliable(EEnvEffectType type)
+    {
+        // var cardPic = cardInst.transform.Find("CardPic").GetComponent<SpriteRenderer>();
+        // Debug.Log($"cardPic? {cardPic}");
+
+        if(type == EEnvEffectType.RedSilence && (id == 1 || id == 101))
+        {
+            cardPic.color = Color.gray;
+        }
+        else if(type == EEnvEffectType.BlueSilence && (id == 2 || id == 102))
+        {
+            cardPic.color = Color.gray;
+        }
+        else if(type == EEnvEffectType.GreenSilence && (id == 4 || id == 103))
+        {
+            cardPic.color = Color.gray;
+        }
+        else if(type == EEnvEffectType.YellowSilence && (id == 8 || id == 104))
+        {
+            cardPic.color = Color.gray;
+        }
+        else if(type == EEnvEffectType.NoCharacter && id < 10)// 角色卡最多到8
+        {
+            cardPic.color = Color.gray;
+        }
+        else
+        {
+            cardPic.color = Color.white;
         }
     }
 }

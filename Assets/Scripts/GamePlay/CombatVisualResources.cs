@@ -32,11 +32,12 @@ public class CombatVisualResources : MonoBehaviour
         indexDict.Add(104, 7);
     }
 
-    public void GetBaseCard(int index, Transform parent)
+    public GameObject GetBaseCard(int index, Transform parent)
     {
-        var card = Instantiate(baseMainCardArr[indexDict[index]], parent);
-        card.transform.localPosition = zeroPos;
-        card.transform.SetSiblingIndex(0);
+        var cardInst = Instantiate(baseMainCardArr[indexDict[index]], parent);
+        cardInst.transform.localPosition = zeroPos;
+        cardInst.transform.SetSiblingIndex(0);
+        return cardInst;
     }
 
     public void GetCardFX(int index)
