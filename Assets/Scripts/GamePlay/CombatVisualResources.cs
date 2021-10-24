@@ -5,8 +5,6 @@ using UnityEngine;
 public class CombatVisualResources : MonoBehaviour
 {
     [SerializeField]
-    GameObject[] baseMainCardArr = new GameObject[8];
-    [SerializeField]
     GameObject[] cardFXArr = new GameObject[8];
 
     //readonly int[] index = new int[] {1, 2, 4, 8, 101, 102, 103, 104 };
@@ -15,9 +13,6 @@ public class CombatVisualResources : MonoBehaviour
 
     Vector3 zeroPos = new Vector3(0, 0, 0);
     Vector3 fxPos = new Vector3(0, 1.7f, -1f);
-
-    public Sprite[] bgArr;
-    // public Sprite[] mobArr;
 
 
     private void Awake()
@@ -30,14 +25,6 @@ public class CombatVisualResources : MonoBehaviour
         indexDict.Add(102, 5);
         indexDict.Add(103, 6);
         indexDict.Add(104, 7);
-    }
-
-    public GameObject GetBaseCard(int index, Transform parent)
-    {
-        var cardInst = Instantiate(baseMainCardArr[indexDict[index]], parent);
-        cardInst.transform.localPosition = zeroPos;
-        cardInst.transform.SetSiblingIndex(0);
-        return cardInst;
     }
 
     public void GetCardFX(int index)

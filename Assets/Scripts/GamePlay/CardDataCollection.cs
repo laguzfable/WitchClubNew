@@ -8,7 +8,7 @@ public class CardDataCollection : MonoBehaviour
 
     public Dictionary<int, CardData> cardDict { private set; get; }
 
-    private void Start()
+    private void Awake()
     {
         cardDict = cardDataArr.ToDictionary(item => int.Parse(item.ID));
     }
