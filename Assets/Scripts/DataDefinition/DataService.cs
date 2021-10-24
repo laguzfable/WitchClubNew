@@ -23,13 +23,13 @@ public class DataService : Singleton<DataService>
 
     protected override void Init()
     {
+        var totalAbilityList = new List<Ability>();
 
         var abilityCollectionRelease = Resources.Load<AbilityCollection>("DataCollections/AbilityCollectionRelease"); // 正式抓這一份
-        var abilityCollectionTest = Resources.Load<AbilityCollection>("DataCollections/AbilityCollection");// 測試用資料
-
-        var totalAbilityList = new List<Ability>();
-        totalAbilityList.AddRange(abilityCollectionTest.abilityList);
         totalAbilityList.AddRange(abilityCollectionRelease.abilityList);
+
+        // var abilityCollectionTest = Resources.Load<AbilityCollection>("DataCollections/AbilityCollection");// 測試用資料
+        // totalAbilityList.AddRange(abilityCollectionTest.abilityList);
         
         abilityDict = totalAbilityList.ToDictionary(item => item.id);
         // var abilityList = abilityCollection.abilityList;

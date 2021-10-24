@@ -415,6 +415,10 @@ public class EnemyUnit : BaseCombatUnit
             {
                 var abilityData = mobData.ability[i];
                 var ability = DataService.Instance.GetAbilityById(mobData.ability[i].abilityId);
+                if(DataService.IsEmpty(ability))
+                {
+                    continue;
+                }
                 if(EN.Value >= ability.requireEnergy)
                 {
                     var rndObj = new RandomTool.RandomObject();

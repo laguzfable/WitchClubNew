@@ -252,7 +252,7 @@ public abstract class BaseCombatUnit : MonoBehaviour
                         if(!string.IsNullOrWhiteSpace(effect.param))
                         {
                             var param = effect.param.Split('_');
-                            damage = Random.Range(int.Parse(param[0]), int.Parse(param[1]));
+                            damage = Random.Range(int.Parse(param[0]), int.Parse(param[1])+1);
                         }
                         
                         target.ApplyDamage(damage);
@@ -345,7 +345,20 @@ public abstract class BaseCombatUnit : MonoBehaviour
                 case EAbilityEffectType.ChangeEnvironmentEffect:
                     {
                         //value <0:隨機出效果 >=0:指定效果
-                        combatSystem.envEffect.SetCurrentEffect((int)effect.value < 0 ? (EEnvEffectType)Random.Range(0, (int)EEnvEffectType.Length) : (EEnvEffectType)effect.GetValue(), Mathf.Min(effect.duration, 1));
+                        var newEnv = (EEnvEffectType)effect.GetValue();
+
+                        if(!string.IsNullOrWhiteSpace(effect.param))
+                        {
+                            var param = effect.param.Split('_');
+                            newEnv = (EEnvEffectType)Random.Range(int.Parse(param[0]), int.Parse(param[1])+1);
+
+                        }
+                        else
+                        {
+                            newEnv = (EEnvEffectType)Random.Range(0, (int)EEnvEffectType.Length);
+                        }
+                        
+                        combatSystem.envEffect.SetCurrentEffect(newEnv, Mathf.Min(effect.duration, 1));
                     }
                     break;
                 case EAbilityEffectType.Stun:

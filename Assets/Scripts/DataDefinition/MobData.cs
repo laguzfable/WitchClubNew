@@ -12,6 +12,11 @@ public class MobData : ScriptableObject
         new MobElementData(){element = ECardElement.Red}, 
         new MobElementData(){element = ECardElement.Yellow}, 
         new MobElementData(){element = ECardElement.Green} };
+    public MobElementData[] proModeElementData = new MobElementData[]{
+        new MobElementData(){element = ECardElement.Blue},
+        new MobElementData(){element = ECardElement.Red}, 
+        new MobElementData(){element = ECardElement.Yellow}, 
+        new MobElementData(){element = ECardElement.Green} };
 
     public MobAbility[] ability;
 
