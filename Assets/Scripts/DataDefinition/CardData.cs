@@ -21,3 +21,20 @@ public class CardData : ScriptableObjectID
     }
     
 }
+
+[System.Serializable]
+public struct CardAttribute
+{
+    public int ATK;
+    public int DEF;
+    public int HEAL;
+    public int EN;
+
+    public void Init()
+    {
+        ATK = 0;
+        DEF = 0;
+        HEAL = 0;
+        EN = 0;
+    }
+}

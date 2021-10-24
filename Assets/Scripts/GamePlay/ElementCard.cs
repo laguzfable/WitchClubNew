@@ -46,7 +46,7 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
     [SerializeField] SpriteRenderer cardPic;
     [SerializeField] TextMeshPro nameTxt;
 
-    CardData cardData;
+    public CardData cardData { private set; get; }
     
 
     public int ID
@@ -120,7 +120,7 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
     {
         // var ability = dataService.GetAbilityById(ID.ToString()).cardAttr[level-1];
 
-        var cardAttr = cardData.cardAttr[level-1];
+        var cardAttr = curAttr;
 
         atkTxt.text = cardAttr.ATK.ToString();
         defTxt.text = cardAttr.DEF.ToString();
@@ -131,6 +131,8 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
         healTxt.enabled = cardAttr.HEAL > 0;
         atkTxt.enabled = !healTxt.enabled;
     }
+
+    public CardAttribute curAttr => cardData.cardAttr[level-1];
 
     public void ChangeBtnEvent(bool isEnabled)
     {

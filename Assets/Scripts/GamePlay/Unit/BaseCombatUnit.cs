@@ -276,6 +276,8 @@ public abstract class BaseCombatUnit : MonoBehaviour
                     break;
                 case EAbilityEffectType.Shuffle:
                     {
+                        //value !=4:洗出特定元素牌 =4整組隨機洗
+
                         if ((ECardElement)effect.GetValue() != ECardElement.None)
                         {
                             AddEffect(PlayerAbilityEffectRef.Create(effect));
@@ -299,7 +301,7 @@ public abstract class BaseCombatUnit : MonoBehaviour
                             AddEffect(newEffect);
                         }
                         
-                        newEffect.duration = int.Parse(effect.param);
+                        newEffect.duration = effect.duration;
                         
                         /*
                         if (hot.Count > 0)
@@ -328,30 +330,31 @@ public abstract class BaseCombatUnit : MonoBehaviour
                             AddEffect(newEffect);
                         }
                         
-                        newEffect.value = Random.Range(0, 4);
-                        newEffect.duration = int.Parse(effect.param);
+                        newEffect.value = Random.Range(0, 4);//四個元素隨機出
+                        newEffect.duration = effect.duration;
                         newEffect.isCostByTurn = false;
                     }
                     break;
                 case EAbilityEffectType.ChangeEnvironmentEffect:
                     {
-                        combatSystem.envEffect.SetCurrentEffect((int)effect.value < 0 ? (EEnvEffectType)Random.Range(0, (int)EEnvEffectType.Length) : (EEnvEffectType)effect.GetValue(), string.IsNullOrWhiteSpace(effect.param)? 1 : int.Parse(effect.param));
+                        //value <0:隨機出效果 >=0:指定效果
+                        combatSystem.envEffect.SetCurrentEffect((int)effect.value < 0 ? (EEnvEffectType)Random.Range(0, (int)EEnvEffectType.Length) : (EEnvEffectType)effect.GetValue(), Mathf.Min(effect.duration, 1));
                     }
                     break;
-                case EAbilityEffectType.Stun:// !not implemented yet
+                case EAbilityEffectType.Stun:
                 case EAbilityEffectType.NoArmor:
                     {
                         target.AddEffect(PlayerAbilityEffectRef.Create(effect));
                     }
                     break;
-                case EAbilityEffectType.TheWorld:// !not implemented yet
+                // case EAbilityEffectType.TheWorld:// !not implemented yet
                 case EAbilityEffectType.IgnoreElement:
                 case EAbilityEffectType.HealingAttack:
                 case EAbilityEffectType.Reflect:
                 case EAbilityEffectType.LifeSteal:
-                case EAbilityEffectType.SelfODExchange:// !not implemented yet
-                case EAbilityEffectType.Revenge:// !not implemented yet
-                case EAbilityEffectType.FocusHeal:// !not implemented yet
+                // case EAbilityEffectType.SelfODExchange:// !not implemented yet
+                // case EAbilityEffectType.Revenge:// !not implemented yet
+                // case EAbilityEffectType.FocusHeal:// !not implemented yet
                 case EAbilityEffectType.Shield:
                 case EAbilityEffectType.IgnoreEnvironmentEffect:
                     {

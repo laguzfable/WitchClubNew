@@ -12,6 +12,45 @@ public class AbilityCollection : ScriptableObject
 }
 
 [System.Serializable]
+public struct Ability
+{
+    public string id;
+
+    public string name;
+
+    [TextArea]
+    public string description;
+
+    [PreviewField(80, ObjectFieldAlignment.Left)]
+    public Sprite image;
+
+    public GameObject specialFX;
+
+    public ECardElement element;
+
+    public int requireEnergy;
+    public AbilityEffect[] effect;
+}
+
+[System.Serializable]
+public struct AbilityEffect
+{
+    public EAbilityEffectType type;
+
+    public float value;
+
+    public int duration;
+
+    public string param;
+
+    public int GetValue()
+    {
+        return (int)value;
+    }
+
+}
+
+[System.Serializable]
 public enum EAbilityEffectType
 {
     /// <summary>
@@ -210,6 +249,8 @@ public enum EAbilityEffectType
     */
 }
 
+
+/*
 [System.Serializable]
 public class Buff
 {
@@ -218,30 +259,6 @@ public class Buff
     public int turn;
     protected int turnCount;
 }
-
-public enum EAbilityEffectTarget { Self, Opponent, Both }
-[System.Serializable]
-public struct AbilityEffect
-{
-    public EAbilityEffectType type;
-
-    public float value;
-
-    //public int duration;
-
-    //public bool stackable;
-
-    //public EAbilityEffectTarget target;
-
-    public string param;
-
-    public int GetValue()
-    {
-        return (int)value;
-    }
-
-}
-/*
 public class ActivatedEffect
 {
     public AbilityEffectType type;
@@ -263,60 +280,6 @@ public class ActivatedEffect
         stackValue = 1;
     }
 }
+
+public enum EAbilityEffectTarget { Self, Opponent, Both }
 */
-
-[System.Serializable]
-public struct CardAttribute
-{
-    public int ATK;
-    public int DEF;
-    public int HEAL;
-    public int EN;
-
-    public void Init()
-    {
-        ATK = 0;
-        DEF = 0;
-        HEAL = 0;
-        EN = 0;
-    }
-}
-
-[System.Serializable]
-public struct Ability
-{
-    public string id;
-
-    public string name;
-
-    [TextArea]
-    public string description;
-
-    [PreviewField(80, ObjectFieldAlignment.Left)]
-    public Sprite image;
-
-    [PreviewField(80, ObjectFieldAlignment.Left)]
-    public Sprite portrait;
-
-    public GameObject fx;
-
-    public GameObject specialFX;
-
-    public ECardElement element;
-
-    public CardAttribute[] cardAttr;
-
-    public int requireEnergy;
-
-    private bool IsAbility
-    {
-        get
-        {
-            return requireEnergy > 0;
-        }
-    }
-
-    [EnableIf("IsAbility")]
-    public AbilityEffect[] effect;
-}
-

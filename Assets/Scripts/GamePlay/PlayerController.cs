@@ -224,7 +224,7 @@ public class PlayerController : MonoBehaviour
                 }
             }
 
-            AddEN(cardAttr.EN);
+            AddEN(totalAttr.EN);
         }
 
         /*
@@ -276,7 +276,7 @@ public class PlayerController : MonoBehaviour
     {
         get
         {
-            return cardAttr.ATK;
+            return totalAttr.ATK;
         }
     }
 
@@ -284,7 +284,7 @@ public class PlayerController : MonoBehaviour
     {
         get
         {
-            return cardAttr.DEF;
+            return totalAttr.DEF;
         }
     }
 
@@ -292,7 +292,7 @@ public class PlayerController : MonoBehaviour
     {
         get
         {
-            return cardAttr.HEAL;
+            return totalAttr.HEAL;
         }
     }
 
@@ -300,16 +300,16 @@ public class PlayerController : MonoBehaviour
     {
         get
         {
-            return cardAttr.EN;
+            return totalAttr.EN;
         }
     }
 
-    CardAttribute cardAttr = new CardAttribute();
+    CardAttribute totalAttr = new CardAttribute();
     public PlayedCardResult result { private set; get; }
 
     public void ResetAttr()
     {
-        cardAttr.Init();
+        totalAttr.Init();
         // playerUnit.ClearEffect();
         for (int i = 0; i < AttributeIndex.Length; i++)
         {
@@ -323,22 +323,22 @@ public class PlayerController : MonoBehaviour
     public void CalculateAttr()
     {
         result = GetPlayedResult();
-        cardAttr = playerUnit.bonusAttr;
+        totalAttr = playerUnit.bonusAttr;
 
         foreach (var card in result.cardList)
         {
-            var ability = dataService.GetAbilityById(card.ID.ToString());
-            cardAttr.ATK += ability.cardAttr[card.level - 1].ATK;
-            cardAttr.DEF += ability.cardAttr[card.level - 1].DEF;
-            cardAttr.HEAL += ability.cardAttr[card.level - 1].HEAL;
-            cardAttr.EN += ability.cardAttr[card.level - 1].EN;
+            var cardAttr =  card.curAttr;  //dataService.GetAbilityById(card.ID.ToString());
+            totalAttr.ATK += cardAttr.ATK;
+            totalAttr.DEF += cardAttr.DEF;
+            totalAttr.HEAL += cardAttr.HEAL;
+            totalAttr.EN += cardAttr.EN;
         }
         if (result.state == EElementState.Combination)
         {
-            cardAttr.ATK *= result.cardList.Count;
-            cardAttr.DEF *= result.cardList.Count;
-            cardAttr.HEAL *= result.cardList.Count;
-            cardAttr.EN *= result.cardList.Count;
+            totalAttr.ATK *= result.cardList.Count;
+            totalAttr.DEF *= result.cardList.Count;
+            totalAttr.HEAL *= result.cardList.Count;
+            totalAttr.EN *= result.cardList.Count;
         }
         if (!playerUnit.HasEffect(EAbilityEffectType.IgnoreEnvironmentEffect))
         {
@@ -347,50 +347,50 @@ public class PlayerController : MonoBehaviour
             {
                 case EEnvEffectType.Attack:
                     {
-                        cardAttr.ATK = cardAttr.ATK * 2;
+                        totalAttr.ATK = totalAttr.ATK * 2;
                     }
                     break;
                 case EEnvEffectType.Defense:
                     {
-                        cardAttr.DEF = cardAttr.DEF * 2;
+                        totalAttr.DEF = totalAttr.DEF * 2;
                     }
                     break;
                 case EEnvEffectType.Heal:
                     {
-                        cardAttr.HEAL = cardAttr.HEAL * 2;
+                        totalAttr.HEAL = totalAttr.HEAL * 2;
                     }
                     break;
                 case EEnvEffectType.Energy:
                     {
-                        cardAttr.EN = cardAttr.EN * 2;
+                        totalAttr.EN = totalAttr.EN * 2;
                     }
                     break;
                 case EEnvEffectType.NoHeal:
                     {
-                        cardAttr.HEAL = 0;
+                        totalAttr.HEAL = 0;
                     }
                     break;
                 case EEnvEffectType.PlayerNoArmor:
                 case EEnvEffectType.NoDefense:
                     {
-                        cardAttr.DEF = 0;
+                        totalAttr.DEF = 0;
                     }
                     break;
             }
         }
         if(playerUnit.HasEffect(EAbilityEffectType.NoArmor))
         {
-            cardAttr.DEF = 0;
+            totalAttr.DEF = 0;
         }
         if(playerUnit.HasEffect(EAbilityEffectType.IncreaseATK2))
         {
-            cardAttr.ATK = Mathf.FloorToInt((float)cardAttr.ATK * 1.2f);
+            totalAttr.ATK = Mathf.FloorToInt((float)totalAttr.ATK * 1.2f);
         }
 
-        textArr[0].text = cardAttr.ATK.ToString();
-        textArr[1].text = cardAttr.DEF.ToString();
-        textArr[2].text = cardAttr.HEAL.ToString();
-        textArr[3].text = cardAttr.EN.ToString();
+        textArr[0].text = totalAttr.ATK.ToString();
+        textArr[1].text = totalAttr.DEF.ToString();
+        textArr[2].text = totalAttr.HEAL.ToString();
+        textArr[3].text = totalAttr.EN.ToString();
     }
 
     bool HasCharacterCard(int id)
