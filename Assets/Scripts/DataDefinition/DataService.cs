@@ -23,8 +23,15 @@ public class DataService : Singleton<DataService>
 
     protected override void Init()
     {
-        var abilityCollection = Resources.Load<AbilityCollection>("DataCollections/AbilityCollection");
-        abilityDict = abilityCollection.abilityList.ToDictionary(item => item.id);
+
+        var abilityCollectionRelease = Resources.Load<AbilityCollection>("DataCollections/AbilityCollectionRelease"); // 正式抓這一份
+        var abilityCollectionTest = Resources.Load<AbilityCollection>("DataCollections/AbilityCollection");// 測試用資料
+
+        var totalAbilityList = new List<Ability>();
+        totalAbilityList.AddRange(abilityCollectionTest.abilityList);
+        totalAbilityList.AddRange(abilityCollectionRelease.abilityList);
+        
+        abilityDict = totalAbilityList.ToDictionary(item => item.id);
         // var abilityList = abilityCollection.abilityList;
         // foreach (var ability in abilityList)
         // {

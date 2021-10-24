@@ -248,7 +248,14 @@ public abstract class BaseCombatUnit : MonoBehaviour
                     break;
                 case EAbilityEffectType.DirectDamage:
                     {
-                        target.ApplyDamage(effect.value);
+                        float damage = effect.value;
+                        if(!string.IsNullOrWhiteSpace(effect.param))
+                        {
+                            var param = effect.param.Split('_');
+                            damage = Random.Range(int.Parse(param[0]), int.Parse(param[1]));
+                        }
+                        
+                        target.ApplyDamage(damage);
                     }
                     break;
                 case EAbilityEffectType.Interrupt:

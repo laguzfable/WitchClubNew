@@ -1,0 +1,321 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff93a18833edcb347a771fcabcbbff01, type: 3}
+  m_Name: AbilityCollectionRelease
+  m_EditorClassIdentifier: 
+  abilityList:
+  - id: mon02
+    name: "\u6297\u9B54\u88DD\u7532"
+    description: "\u53D7\u5230\u50B7\u5BB3\u964D\u4F4E30%\n\u9078\u64C7\u96A8\u6A5F\u4E00\u500B\u5143\u7D20
+      \u82E5\u73A9\u5BB6\u4F7F\u7528\u8A72\u5143\u7D20\u5361\u724C\u7E3D\u51714\u5F35\u5247\u89E3\u9664\u4E26\u9677\u5165\u660F\u8FF7"
+    image: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 4
+    requireEnergy: 6
+    effect:
+    - type: 25
+      value: 0
+      duration: 4
+      param: 
+  - id: mon08
+    name: "\u6297\u9B54\u88DD\u7532EX"
+    description: "\u53D7\u5230\u50B7\u5BB3\u964D\u4F4E30% \u50B7\u5BB3\u53CA\u6CBB\u7642\u63D0\u534720%\n\u9078\u64C7\u96A8\u6A5F\u4E00\u500B\u5143\u7D20
+      \u82E5\u73A9\u5BB6\u4F7F\u7528\u8A72\u5143\u7D20\u5361\u724C\u7E3D\u51714\u5F35\u5247\u89E3\u9664\u4E26\u9677\u5165\u660F\u8FF7"
+    image: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 4
+    requireEnergy: 10
+    effect:
+    - type: 26
+      value: 0
+      duration: 4
+      param: 
+  - id: mon09
+    name: "\u8B77\u76FE\u74E6\u89E3P"
+    description: "\u74B0\u5883\u6548\u679C \u73A9\u5BB6\u9632\u79A6\u7121\u6548"
+    image: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 4
+    requireEnergy: 8
+    effect:
+    - type: 20
+      value: 14
+      duration: 2
+      param: 
+  - id: mon10
+    name: "\u8FF4\u907F\u7D50\u754C"
+    description: "\u74B0\u5883\u6548\u679C \u6575\u4EBA\u53D7\u5230\u50B7\u5BB3\u964D\u4F4E30%"
+    image: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 4
+    requireEnergy: 7
+    effect:
+    - type: 20
+      value: 15
+      duration: 3
+      param: 
+  - id: mon12
+    name: "\u50B7\u5BB3\u7D50\u754C"
+    description: "\u74B0\u5883\u6548\u679C \u73A9\u5BB6\u6BCF\u56DE\u5408\u53D7\u5230\u50B7\u5BB3"
+    image: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 4
+    requireEnergy: 8
+    effect:
+    - type: 20
+      value: 16
+      duration: 3
+      param: 
+  - id: blue01
+    name: "\u8389\u8389\u5A1C\uFF08\u5B78\u751F\u6642\u671F\uFF09"
+    description: "\u63D0\u5347\u9632\u79A630\u9EDE"
+    image: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 0
+    requireEnergy: 4
+    effect:
+    - type: 1
+      value: 30
+      duration: 0
+      param: 
+  - id: blue02
+    name: "\u8B1B\u5E2B"
+    description: "\u63D0\u5347\u9632\u79A650\u9EDE"
+    image: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 0
+    requireEnergy: 7
+    effect:
+    - type: 1
+      value: 50
+      duration: 0
+      param: 
+  - id: blue03
+    name: "\u827E\u59AE\u683C\u73AB\uFF08\u5B78\u751F\u6642\u671F\uFF09"
+    description: "\u5C07\u5C0D\u65B9\u9632\u79A6\u964D\u81F30"
+    image: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 0
+    requireEnergy: 6
+    effect:
+    - type: 17
+      value: 0
+      duration: 0
+      param: 
+  - id: blue04
+    name: "\u53F2\u5609\u857E\u7279"
+    description: "\u6253\u65B7\u5C0D\u65B9\u884C\u52D5"
+    image: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 0
+    requireEnergy: 5
+    effect:
+    - type: 10
+      value: 0
+      duration: 0
+      param: 
+  - id: blue05
+    name: "\u827E\u59AE\u683C\u73AB\uFF08\u53CD\u53DB\uFF09"
+    description: "\u51FA\u724C\u4E0D\u53D7\u984F\u8272\u9650\u5236"
+    image: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 0
+    requireEnergy: 10
+    effect:
+    - type: 18
+      value: 0
+      duration: 0
+      param: 
+  - id: red01
+    name: "\u9B54\u66F8"
+    description: "\u672C\u56DE\u5408\u653B\u64CA\u529B\u589E\u52A020%"
+    image: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 1
+    requireEnergy: 7
+    effect:
+    - type: 30
+      value: 0
+      duration: 0
+      param: 
+  - id: red02
+    name: "\u8B1B\u5E2B\u514B\u8389\u7D72\u6C40\u5A1C\uFF08aka\u8C61\u7259\u5854\u4E4B\u773C\uFF09"
+    description: "\u9020\u621020~50\u9EDE\u50B7\u5BB3"
+    image: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 1
+    requireEnergy: 8
+    effect:
+    - type: 4
+      value: 0
+      duration: 0
+      param: 20_50
+  - id: red03
+    name: "\u4F0A\u838E\u8C9D\u62C9"
+    description: "\u9020\u621020\u9EDE\u50B7\u5BB3\uFF08\u6301\u7E8C3\u56DE\u5408\uFF09"
+    image: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 1
+    requireEnergy: 5
+    effect:
+    - type: 27
+      value: 20
+      duration: 3
+      param: 
+  - id: red04
+    name: "\u53F2\u5609\u857E\u7279"
+    description: "\u5C07\u6240\u6709\u724C\u63DB\u6210\u9BAE\u8840\u7CFB"
+    image: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 1
+    requireEnergy: 6
+    effect:
+    - type: 16
+      value: 1
+      duration: 0
+      param: 
+  - id: red05
+    name: "\u8D6B\u83F2"
+    description: "\u53CD\u5F48\u6575\u4EBA\u7684\u4E0B\u500B\u653B\u64CA\uFF08\u7121\u8996\u9632\u79A6\uFF09"
+    image: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 1
+    requireEnergy: 7
+    effect:
+    - type: 5
+      value: 0
+      duration: 0
+      param: 
+  - id: green01
+    name: "\u70CF\u9D09"
+    description: "\u6062\u5FA920\u9EDEHP \u6301\u7E8C3\u56DE\u5408"
+    image: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 3
+    requireEnergy: 5
+    effect:
+    - type: 19
+      value: 20
+      duration: 3
+      param: 
+  - id: green02
+    name: "\u81EA\u7136\u7CFB\u5973\u5DEB"
+    description: "\u6062\u5FA960\u9EDEHP"
+    image: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 3
+    requireEnergy: 7
+    effect:
+    - type: 12
+      value: 60
+      duration: 0
+      param: 
+  - id: green03
+    name: "\u9ED1\u8089\u59CA\u59CA"
+    description: "\u6D17\u6389\u624B\u4E0A\u6240\u6709\u624B\u724C"
+    image: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 3
+    requireEnergy: 5
+    effect:
+    - type: 16
+      value: 4
+      duration: 0
+      param: 
+  - id: green04
+    name: "\u6885\u4F0A"
+    description: "\u6CBB\u7642\u540C\u6642\u7D66\u4E88\u6575\u4EBA\u50B7\u5BB3"
+    image: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 3
+    requireEnergy: 0
+    effect:
+    - type: 21
+      value: 0
+      duration: 0
+      param: 
+  - id: green05
+    name: "\u6CF0\u62C9"
+    description: "\u6539\u8B8A\u74B0\u5883\u6548\u679C\uFF08\u6CBB\u7642\u52A0\u500D\uFF09"
+    image: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 3
+    requireEnergy: 7
+    effect:
+    - type: 20
+      value: 3
+      duration: 3
+      param: 
+  - id: yellow01
+    name: "\u5996\u7CBE\u6253\u67B6"
+    description: "\u6539\u8B8A\u74B0\u5883\u6548\u679C\uFF08\u96A8\u6A5F\uFF09"
+    image: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 2
+    requireEnergy: 4
+    effect:
+    - type: 20
+      value: -1
+      duration: 0
+      param: 
+  - id: yellow02
+    name: "\u5403\u53F2\u840A\u59C6\u7CBE\u9748"
+    description: "\u9020\u621020\u9EDE\u50B7\u5BB3 \u6062\u5FA920\u9EDE\u751F\u547D"
+    image: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 2
+    requireEnergy: 6
+    effect:
+    - type: 4
+      value: 20
+      duration: 0
+      param: 
+    - type: 12
+      value: 20
+      duration: 0
+      param: 
+  - id: yellow03
+    name: "\u9ED1\u8089\u7CBE\u9748"
+    description: "\u6240\u6709\u5361\u7247\u63D0\u5347\u81F3\u6700\u9AD8\u7B49\u7D1A"
+    image: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 2
+    requireEnergy: 6
+    effect:
+    - type: 3
+      value: 5
+      duration: 0
+      param: 
+  - id: yellow04
+    name: "\u5438\u8840\u7CBE\u9748"
+    description: "\u5438\u53D6\u751F\u547D\u6CBB\u7642\u540C\u7B49\u65BC\u653B\u64CA\u529B\u7684\u50B7\u5BB3"
+    image: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 2
+    requireEnergy: 7
+    effect:
+    - type: 7
+      value: 0
+      duration: 0
+      param: 
+  - id: yellow05
+    name: "\u737B\u796D\u5973\u5DEB"
+    description: "HP\u4E0A\u9650\u6539\u70BA200\uFF08\u4E26\u56DE\u6EFF\u8840\uFF09"
+    image: {fileID: 0}
+    specialFX: {fileID: 0}
+    element: 2
+    requireEnergy: 15
+    effect:
+    - type: 14
+      value: 100
+      duration: 0
+      param: 

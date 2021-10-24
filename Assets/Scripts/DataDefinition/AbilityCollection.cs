@@ -4,7 +4,7 @@ using UnityEngine;
 using Sirenix.OdinInspector;
 using Kenaz;
 
-[CreateAssetMenu(fileName = "AbilityCollection.asset", menuName = "Witch Club/Ability/AbilityCollection")]
+[CreateAssetMenu(fileName = "AbilityCollection.asset", menuName = "Witch Club/AbilityCollection")]
 public class AbilityCollection : ScriptableObject
 {
     [ListDrawerSettings(NumberOfItemsPerPage = 5)]
