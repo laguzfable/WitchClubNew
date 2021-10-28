@@ -20,6 +20,8 @@ public class TutorialController : MonoBehaviour
 
     [SerializeField] TutorialObject[] tutorialArr;
 
+    [SerializeField] GameObject tutorBG;
+
     public bool canGoNext = false;
 
     private void Start()
@@ -66,6 +68,7 @@ public class TutorialController : MonoBehaviour
                 charImg.gameObject.SetActive(true);
                 charImg.GetComponent<RectTransform>().anchoredPosition = tutorial.unitPos;
                 charImg.GetComponent<CharacterMove>().SetOrgY();
+                charImg.GetComponent<CharacterMove>().enabled = tutorial.displayBG == null;
                 uICollection.mob.sprRend.enabled = false;
             }
             
@@ -97,6 +100,13 @@ public class TutorialController : MonoBehaviour
             {
                 playerController.combatSystem.envEffect.SetNextEffect(tutorial.changeEnv);
             }
+
+            if(tutorial.displayBG != null)
+            {
+                tutorial.displayBG.SetActive(true);
+            }
+
+
 
             foreach(var displayObj in tutorial.displayObjecArr)
             {
@@ -141,6 +151,12 @@ public class TutorialController : MonoBehaviour
 
             leftDialog.SetActive(false);
             rightDialog.SetActive(false);
+            
+
+            if(tutorial.displayBG != null)
+            {
+                tutorial.displayBG.SetActive(false);
+            }
         }
         playerController.combatSystem.GameOver(false);
     }
@@ -160,4 +176,6 @@ public class TutorialObject
     public string customActionID;
     public bool isChangeEnv;
     public EEnvEffectType changeEnv;
+
+    public GameObject displayBG;
 }

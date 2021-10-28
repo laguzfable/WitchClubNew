@@ -8,6 +8,9 @@ using UnityEngine.SceneManagement;
 
 public class ResetGame : MonoBehaviour
 {
+    public string mainScene = "MainScene";
+
+
     void Awake()
     {
         if(FindObjectsOfType<ResetGame>().Length > 1)
@@ -56,6 +59,6 @@ public class ResetGame : MonoBehaviour
         var naniCamera = Engine.GetService<ICameraManager>().Camera;
         naniCamera.enabled = false;
 
-        SceneManager.LoadSceneAsync("MainScene");
+        SceneManager.LoadSceneAsync(mainScene);
     }
 }
