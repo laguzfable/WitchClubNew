@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UniRx.Async;
 using UnityEngine;
 
-public class NaniTestShit : MonoBehaviour
+public class NaniScriptLoader : MonoBehaviour
 {
     public string defaultScript = "chapter0";
 
@@ -19,11 +19,11 @@ public class NaniTestShit : MonoBehaviour
         }
 
         // Debug.Log("WTF?!");
-        if (Engine.Initialized) DoMyCustomWork();
-        else Engine.OnInitializationFinished += DoMyCustomWork;
+        if (Engine.Initialized) LoadNaniScript();
+        else Engine.OnInitializationFinished += LoadNaniScript;
     }
 
-    private void DoMyCustomWork()
+    private void LoadNaniScript()
     {
         // Engine is initialized here, it's safe to use the APIs.
         var player = Engine.GetService<IScriptPlayer>();
