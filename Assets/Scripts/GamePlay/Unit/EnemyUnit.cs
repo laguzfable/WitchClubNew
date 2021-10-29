@@ -410,7 +410,7 @@ public class EnemyUnit : BaseCombatUnit
         if(mobData.ability != null && mobData.ability.Length > 0)
         {
             var abilityRndList = new List<RandomTool.RandomObject>();
-            var abilityList = new List<Ability>();
+            // var abilityList = new List<Ability>();
             for(var i = 0; i < mobData.ability.Length; i++)
             {
                 var abilityData = mobData.ability[i];
@@ -425,17 +425,22 @@ public class EnemyUnit : BaseCombatUnit
                     rndObj.SetIndex(i);
                     rndObj.Weight = abilityData.decisionWeight;
                     abilityRndList.Add(rndObj);
-                    abilityList.Add(ability);
                 }
+                // abilityList.Add(ability);
             }
 
             if(abilityRndList.Count > 0)
             {
-                var useAbility = abilityList[RandomTool.RandomHelper.GetRandomList(abilityRndList).Index];
+                var index = RandomTool.RandomHelper.GetRandomList(abilityRndList).Index;
+                if(index >= mobData.ability.Length)
+                {
+                    Debug.LogWarning($"編號錯誤！index:{index}, mobData.ability.Length: {mobData.ability.Length}");
+                }
+                var useAbility = DataService.Instance.GetAbilityById(mobData.ability[index].abilityId); //abilityList[RandomTool.RandomHelper.GetRandomList(abilityRndList).Index];
                 EN.Value -= useAbility.requireEnergy;
                 CastAbility(useAbility);
-                Debug.LogWarning($"使用了{useAbility.name}!!");
-                combatSystem.SpawnCombatText($"敵人使用了 {useAbility.name}!", ECombatTextType.Buff, false);
+                Debug.LogWarning($"使用了{useAbility.id}!!");
+                combatSystem.SpawnCombatText($"敵人使用了符文!", ECombatTextType.Buff, false);
             }
         }
     }

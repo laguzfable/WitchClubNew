@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 162e32e7dd45d4284a4b24d47dc3603c, type: 3}
   m_Name: monster05
   m_EditorClassIdentifier: 
-  HP: 200
+  HP: 150
   EN: 10
-  levelUpMaxBonusValue: 5
+  levelUpMaxBonusValue: 7
   elementData:
   - element: 0
     attribute:
-      ATK: 5
-      DEF: 10
+      ATK: 6
+      DEF: 9
       HEAL: 0
       EN: 0
     randomWeight: 1000
@@ -27,8 +27,8 @@ MonoBehaviour:
     fx: {fileID: 0}
   - element: 1
     attribute:
-      ATK: 12
-      DEF: 3
+      ATK: 13
+      DEF: 2
       HEAL: 0
       EN: 0
     randomWeight: 1000
@@ -36,8 +36,8 @@ MonoBehaviour:
     fx: {fileID: 0}
   - element: 2
     attribute:
-      ATK: 7
-      DEF: 7
+      ATK: 8
+      DEF: 6
       HEAL: 0
       EN: 1
     randomWeight: 1000
@@ -46,8 +46,8 @@ MonoBehaviour:
   - element: 3
     attribute:
       ATK: 0
-      DEF: 8
-      HEAL: 7
+      DEF: 5
+      HEAL: 10
       EN: 0
     randomWeight: 1000
     decisionWeight: 1000
@@ -89,7 +89,4 @@ MonoBehaviour:
     randomWeight: 1000
     decisionWeight: 1000
     fx: {fileID: 0}
-  ability:
-  - abilityId: mon04
-    fx: {fileID: 0}
-    decisionWeight: 1000
+  ability: []
