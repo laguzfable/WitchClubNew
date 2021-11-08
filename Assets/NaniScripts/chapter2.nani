@@ -37,7 +37,7 @@
 
 
 
-赫菲: 欸欸欸？！原來是Ｐ啊？嚇我一跳。
+赫菲: 欸欸欸？！原來是{PlayerName}啊？嚇我一跳。
 赫菲: 嗚～我一定是睡過頭了對不對？
 赫菲: 對不起，昨天喝太多酒了。
 赫菲: 啊啊，先等我一下，我換個衣服。
@@ -128,8 +128,8 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @stopBgm
 @bgm white
 @char 蘇菲亞.idle pos:50
-蘇菲亞: 早安，{PlayerName}，大家都出門工作了呢。
-蘇菲亞: 要不要出去探班呢？她們一定會很開心的。
+蘇菲亞.idle: 早安，{PlayerName}，大家都出門工作了呢。
+蘇菲亞.idle: 要不要出去探班呢？她們一定會很開心的。
 
 
 
@@ -170,7 +170,7 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 薇狄亞: ……他曾是我的真愛。
 
 
-@back bg022
+@back bg022b
 @stopBgm
 @bgm night
 
@@ -210,14 +210,14 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @back bg06
 @char 涅莉 pos:50
 
-涅莉: 早哇，Ｐ～
+涅莉: 早哇，{PlayerName}～
 涅莉: 啊啊，大家都出門了，我也得快點才行，不然上班要遲到了。
 
 @hide 涅莉
 @back bg08b
 @char 蘇菲亞.talking pos:50
 @sfx pouring
-蘇菲亞: 早安呀，Ｐ，今天的早餐是炒菇跟歐姆蛋唷，還有剛醃好的火腿。
+蘇菲亞: 早安呀，{PlayerName}，今天的早餐是炒菇跟歐姆蛋唷，還有剛醃好的火腿。
 蘇菲亞: 茶葉是高嶺的特有品種，最近才剛到貨的，嚐嚐看吧，搭配牛奶也很不錯呢。
 蘇菲亞: 這個早上真是安靜呀。
 蘇菲亞: 她們動作好快唷，一溜煙就不見了。
@@ -231,9 +231,9 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @bgm hurry
 
 
-赫菲: Ｐ！我接到大生意了，我們趕快去找艾妮！
+赫菲: {PlayerName}！我接到大生意了，我們趕快去找艾妮！
 蘇菲亞: 什麼生意呀？最好不要是什麼危險的事唷。
-赫菲: 沒事的沒事的，Ｐ，趕快跟我來。
+赫菲: 沒事的沒事的，{PlayerName}，趕快跟我來。
 @hide 蘇菲亞,赫菲
 
 @back cg12
@@ -474,7 +474,7 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @bgm happy
 @sfx construction
 @char 涅莉 pos:50
-涅莉: 呼～早啊Ｐ，大清早的好吵啊。
+涅莉: 呼～早啊{PlayerName}，大清早的好吵啊。
 @char 赫菲 pos:25
 赫菲: 蘇菲亞已經找人來裝潢了！
 @char 薇狄亞 pos:75
@@ -654,9 +654,9 @@ may: 嗯～要先解除封印。
 
 （DEMO結束）
 
-@gotoUnityScene sceneName:MainTestScene
+@gotoUnityScene sceneName:MainScene
 
-; @gotoUntyScene sceneName:MainTestScene
+; @gotoUntyScene sceneName:MainScene
 
-; @loadScene MainTestScene
+; @loadScene MainScene
 ; @hideall remove:true
