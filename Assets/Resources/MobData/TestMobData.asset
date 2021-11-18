@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   HP: 150
   EN: 10
-  levelUpMaxBonusValue: 2
+  levelUpMaxBonusValue: 1
   elementData:
   - element: 0
     attribute:
@@ -55,7 +55,7 @@ MonoBehaviour:
   proModeElementData:
   - element: 0
     attribute:
-      ATK: 2
+      ATK: 1
       DEF: 4
       HEAL: 0
       EN: 0
@@ -64,7 +64,7 @@ MonoBehaviour:
     fx: {fileID: 0}
   - element: 1
     attribute:
-      ATK: 4
+      ATK: 3
       DEF: 0
       HEAL: 0
       EN: 0
@@ -73,7 +73,7 @@ MonoBehaviour:
     fx: {fileID: 0}
   - element: 2
     attribute:
-      ATK: 2
+      ATK: 1
       DEF: 2
       HEAL: 0
       EN: 1
@@ -82,7 +82,7 @@ MonoBehaviour:
     fx: {fileID: 0}
   - element: 3
     attribute:
-      ATK: 3
+      ATK: 2
       DEF: 2
       HEAL: 0
       EN: 0

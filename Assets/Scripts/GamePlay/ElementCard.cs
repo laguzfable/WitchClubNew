@@ -112,18 +112,16 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
 
     public void LevelUp()
     {
+        // Debug.LogWarning("Level Up ???");
         if (level < 5)
         {
             level++;
+            if(pc.combatSystem.isProMode)
+            {
+                LevelUpValue();
+            }
         }
-        if(!pc.combatSystem.isProMode)
-        {
-            UpdateValue();
-        }
-        else
-        {
-            LevelUpValue();
-        }
+        UpdateValue();
     }
 
     void LevelUpValue()
@@ -211,6 +209,9 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
                 proAttr.EN += 1;
             }
         }
+
+        // UpdateValue();
+
     }
 
     void UpdateValue()
