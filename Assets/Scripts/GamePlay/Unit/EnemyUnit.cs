@@ -182,7 +182,7 @@ public class EnemyUnit : BaseCombatUnit
         {
             var rndObj = new RandomTool.RandomObject();
             rndObj.SetIndex((int)mobData.elementData[i].element);
-            rndObj.Weight = mobData.elementData[i].randomWeight;
+            rndObj.Weight = combatSystem.isProMode? mobData.proModeElementData[i].randomWeight : mobData.elementData[i].randomWeight;
             cardRndList.Add(rndObj);
         }
         
@@ -296,9 +296,9 @@ public class EnemyUnit : BaseCombatUnit
         //     }
         // }
 
-        string atkStr = actResult.attr.ATK > 0 && !HasEffect(EAbilityEffectType.Stun) ? $"ATK:{actResult.attr.ATK} " : "";
+        string atkStr = actResult.attr.ATK > 0 && !HasEffect(EAbilityEffectType.Stun) ? (combatSystem.isProMode ? $"ATK:{actResult.attr.ATK}~{actResult.attr.ATK*6} " : $"ATK:{actResult.attr.ATK} ") : "";
         string defStr = actResult.attr.DEF > 0 ? $"DEF:{actResult.attr.DEF} " : "";
-        string healStr = actResult.attr.HEAL > 0 && !HasEffect(EAbilityEffectType.Stun) ? $"HEAL:{actResult.attr.HEAL} " : "";
+        string healStr = actResult.attr.HEAL > 0 && !HasEffect(EAbilityEffectType.Stun) ? (combatSystem.isProMode ? $"HEAL:{actResult.attr.HEAL}~{actResult.attr.HEAL*6}" : $"HEAL:{actResult.attr.HEAL} ") : "";
 
         // if(act.displayType == EMobActionDisplayType.HideATK && actResult.attr.ATK > 0)
         // {
@@ -460,7 +460,7 @@ public class EnemyUnit : BaseCombatUnit
         foreach(var card in cardArr)
         {
             var index = (int)card.element;
-            eleDecisionRndMap[card.element].Weight += mobData.elementData[index].decisionWeight;
+            eleDecisionRndMap[card.element].Weight += combatSystem.isProMode? mobData.proModeElementData[index].decisionWeight : mobData.elementData[index].decisionWeight;
         }
 
         var envType = combatSystem.envEffect.curType;
@@ -497,7 +497,8 @@ public class EnemyUnit : BaseCombatUnit
 
         var attr = bonusAttr;
 
-        var targetAttr = mobData.elementData[(int)selectElement].attribute;
+        
+        var targetAttr = combatSystem.isProMode ? mobData.proModeElementData[(int)selectElement].attribute : mobData.elementData[(int)selectElement].attribute;
 
         var isLimitedCards = combatSystem.envEffect.curType == EEnvEffectType.LimitCards;
 

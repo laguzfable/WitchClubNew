@@ -85,6 +85,8 @@ public class CombatSystem : MonoBehaviour
 
     public TutorialController tutorController;
 
+    public bool isProMode = true;
+
 
     // public async UniTask SwitchStateToCombatModeAsync(CancellationToken cancellationToken = default)
     public void SwitchStateToCombatMode()
@@ -205,8 +207,19 @@ public class CombatSystem : MonoBehaviour
         var playerUnit = pc.GetPlayerUnit();
         var mobActResult = mobUnit.GetActionResult();
 
+        int GetDiceValue(int diceCount)
+        {
+            var total = 0;
+            for(int i = 0; i < diceCount; i++)
+            {
+                var dice = UnityEngine.Random.Range(1, 7);// 1 ~ 6
+                total += dice;
+            }
+            return total;
+        }
 
-        var mobDmg = pc.ATK - mobActResult.attr.DEF;
+
+        var mobDmg = isProMode? GetDiceValue(pc.ATK) - mobActResult.attr.DEF :  pc.ATK - mobActResult.attr.DEF;
 
         orderList.Clear();
         // if (!isBreakAciton)
@@ -217,7 +230,7 @@ public class CombatSystem : MonoBehaviour
                 {
                     return;
                 }
-                var dmg = mobActResult.attr.ATK - pc.DEF;
+                var dmg = isProMode? GetDiceValue(mobActResult.attr.ATK) - pc.DEF : mobActResult.attr.ATK - pc.DEF;
 
                 if (playerUnit.HasEffect(EAbilityEffectType.Shield)) // shield effect
                 {
@@ -245,10 +258,13 @@ public class CombatSystem : MonoBehaviour
                 {
                     return;
                 }
-                mobUnit.ApplyHealing(mobActResult.attr.HEAL);
+                
+                var heal = isProMode ? GetDiceValue(mobActResult.attr.HEAL) : mobActResult.attr.HEAL;
+
+                mobUnit.ApplyHealing(heal);
                 if (mobUnit.HasEffect(EAbilityEffectType.HealingAttack)) // healing attack
                 {
-                    playerUnit.ApplyDamage(mobActResult.attr.HEAL);
+                    playerUnit.ApplyDamage(heal);
                 }
 
             });
@@ -292,10 +308,12 @@ public class CombatSystem : MonoBehaviour
 
         CreateOrder((int)Order.PlayerHealing, pc.HEAL, playerUnit, () => { // player deal healing
 
-            playerUnit.ApplyHealing(pc.HEAL);
+            var heal = isProMode? GetDiceValue(pc.HEAL) : pc.HEAL;
+
+            playerUnit.ApplyHealing(heal);
             if (playerUnit.HasEffect(EAbilityEffectType.HealingAttack)) // healing attack
             {
-                mobUnit.ApplyDamage(pc.HEAL);
+                mobUnit.ApplyDamage(heal);
             }
             if(!pc.result.IsCombo())
             {

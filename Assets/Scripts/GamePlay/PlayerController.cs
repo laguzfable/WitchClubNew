@@ -387,9 +387,9 @@ public class PlayerController : MonoBehaviour
             totalAttr.ATK = Mathf.FloorToInt((float)totalAttr.ATK * 1.2f);
         }
 
-        textArr[0].text = totalAttr.ATK.ToString();
+        textArr[0].text = combatSystem.isProMode? $"{totalAttr.ATK}~{totalAttr.ATK*6}" : totalAttr.ATK.ToString();
         textArr[1].text = totalAttr.DEF.ToString();
-        textArr[2].text = totalAttr.HEAL.ToString();
+        textArr[2].text = combatSystem.isProMode? $"{totalAttr.HEAL}~{totalAttr.HEAL*6}" : totalAttr.HEAL.ToString();
         textArr[3].text = totalAttr.EN.ToString();
     }
 
@@ -407,7 +407,7 @@ public class PlayerController : MonoBehaviour
 
     readonly int[] cardIDArr = new int[] { 2, 1, 4, 8, 102, 101, 103, 104 };
     //readonly float[] getCharacterCardChanceArr = new float[] { 0.15f, 0.2f, 0.25f };
-    readonly float getCharacterCardChance = 0.15f;
+    readonly float getCharacterCardChance = 0.15f;// TODO 要改成權重
 
     int DrawRandomCard(AbilityEffectRef effectRef)
     {
