@@ -387,9 +387,9 @@ public class PlayerController : MonoBehaviour
             totalAttr.ATK = Mathf.FloorToInt((float)totalAttr.ATK * 1.2f);
         }
 
-        textArr[0].text = combatSystem.isProMode? $"{totalAttr.ATK}~{totalAttr.ATK*6}" : totalAttr.ATK.ToString();
+        textArr[0].text = totalAttr.ATK.ToString();
         textArr[1].text = totalAttr.DEF.ToString();
-        textArr[2].text = combatSystem.isProMode? $"{totalAttr.HEAL}~{totalAttr.HEAL*6}" : totalAttr.HEAL.ToString();
+        textArr[2].text = totalAttr.HEAL.ToString();
         textArr[3].text = totalAttr.EN.ToString();
     }
 

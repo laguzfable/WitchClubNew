@@ -15,6 +15,9 @@ MonoBehaviour:
   HP: 150
   EN: 10
   levelUpMaxBonusValue: 1
+  maxSelectCardCount: 1
+  displayName: 
+  sprite: {fileID: 21300000, guid: e7b5514341015d84fbe3aa47e2fe35a0, type: 3}
   elementData:
   - element: 0
     attribute:
@@ -50,43 +53,6 @@ MonoBehaviour:
       HEAL: 3
       EN: 0
     randomWeight: 100
-    decisionWeight: 1000
-    fx: {fileID: 0}
-  proModeElementData:
-  - element: 0
-    attribute:
-      ATK: 1
-      DEF: 4
-      HEAL: 0
-      EN: 0
-    randomWeight: 1000
-    decisionWeight: 1000
-    fx: {fileID: 0}
-  - element: 1
-    attribute:
-      ATK: 3
-      DEF: 0
-      HEAL: 0
-      EN: 0
-    randomWeight: 1000
-    decisionWeight: 1000
-    fx: {fileID: 0}
-  - element: 2
-    attribute:
-      ATK: 1
-      DEF: 2
-      HEAL: 0
-      EN: 1
-    randomWeight: 1000
-    decisionWeight: 1000
-    fx: {fileID: 0}
-  - element: 3
-    attribute:
-      ATK: 2
-      DEF: 2
-      HEAL: 0
-      EN: 0
-    randomWeight: 1000
     decisionWeight: 1000
     fx: {fileID: 0}
   ability: []

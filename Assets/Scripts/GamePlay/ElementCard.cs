@@ -46,9 +46,7 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
     [SerializeField] SpriteRenderer cardPic;
     [SerializeField] TextMeshPro nameTxt;
 
-    public CardData cardData { private set; get; }
-    
-    CardAttribute proAttr;
+    public CardData cardData { private set; get; }    
 
     public int ID
     {
@@ -60,8 +58,6 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
             cardData = pc.cardDataCollection.cardDict[id];
             cardPic.sprite = cardData.image;
             nameTxt.text = cardData.displayName;
-
-            proAttr = cardData.proModeAttr;
             
             ResetLevel();
             UpdateValue();
@@ -116,102 +112,8 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
         if (level < 5)
         {
             level++;
-            if(pc.combatSystem.isProMode)
-            {
-                LevelUpValue();
-            }
         }
         UpdateValue();
-    }
-
-    void LevelUpValue()
-    {
-        if(cardData.proModeAttrLevelUpWeight.ATK > 0)
-        {   
-            var rndList = new List<RandomTool.RandomObject>();
-
-            var rndObj = new RandomTool.RandomObject();
-            rndObj.SetIndex(0);
-            rndObj.Weight = cardData.proModeAttrLevelUpWeight.ATK;
-            rndList.Add(rndObj);
-
-            var rndObj2 = new RandomTool.RandomObject();
-            rndObj2.SetIndex(1);
-            rndObj2.Weight = 1000 - cardData.proModeAttrLevelUpWeight.ATK;
-            rndList.Add(rndObj2);
-
-            var rndValue = RandomTool.RandomHelper.GetRandomList(rndList);
-            if(rndValue.Index == 0)
-            {
-                proAttr.ATK += 1;
-            }
-        }
-
-        if(cardData.proModeAttrLevelUpWeight.DEF > 0)
-        {   
-            var rndList = new List<RandomTool.RandomObject>();
-                        
-            var rndObj = new RandomTool.RandomObject();
-            rndObj.SetIndex(0);
-            rndObj.Weight = cardData.proModeAttrLevelUpWeight.DEF;
-            rndList.Add(rndObj);
-
-            var rndObj2 = new RandomTool.RandomObject();
-            rndObj2.SetIndex(1);
-            rndObj2.Weight = 1000 - cardData.proModeAttrLevelUpWeight.DEF;
-            rndList.Add(rndObj2);
-
-            var rndValue = RandomTool.RandomHelper.GetRandomList(rndList);
-            if(rndValue.Index == 0)
-            {
-                proAttr.DEF += Random.Range(1, 4);// TODO 暫時 因為防禦不隨機
-            }
-        }
-
-        if(cardData.proModeAttrLevelUpWeight.HEAL > 0)
-        {   
-            var rndList = new List<RandomTool.RandomObject>();
-                        
-            var rndObj = new RandomTool.RandomObject();
-            rndObj.SetIndex(0);
-            rndObj.Weight = cardData.proModeAttrLevelUpWeight.HEAL;
-            rndList.Add(rndObj);
-
-            var rndObj2 = new RandomTool.RandomObject();
-            rndObj2.SetIndex(1);
-            rndObj2.Weight = 1000 - cardData.proModeAttrLevelUpWeight.HEAL;
-            rndList.Add(rndObj2);
-
-            var rndValue = RandomTool.RandomHelper.GetRandomList(rndList);
-            if(rndValue.Index == 0)
-            {
-                proAttr.HEAL += 1;
-            }
-        }
-
-        if(cardData.proModeAttrLevelUpWeight.EN > 0)
-        {   
-            var rndList = new List<RandomTool.RandomObject>();
-                        
-            var rndObj = new RandomTool.RandomObject();
-            rndObj.SetIndex(0);
-            rndObj.Weight = cardData.proModeAttrLevelUpWeight.EN;
-            rndList.Add(rndObj);
-
-            var rndObj2 = new RandomTool.RandomObject();
-            rndObj2.SetIndex(1);
-            rndObj2.Weight = 1000 - cardData.proModeAttrLevelUpWeight.EN;
-            rndList.Add(rndObj2);
-
-            var rndValue = RandomTool.RandomHelper.GetRandomList(rndList);
-            if(rndValue.Index == 0)
-            {
-                proAttr.EN += 1;
-            }
-        }
-
-        // UpdateValue();
-
     }
 
     void UpdateValue()
@@ -230,7 +132,7 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
         atkTxt.enabled = !healTxt.enabled;
     }
 
-    public CardAttribute curAttr => pc.combatSystem.isProMode? proAttr : cardData.cardAttr[level-1];
+    public CardAttribute curAttr => cardData.cardAttr[level-1];
 
     public void ChangeBtnEvent(bool isEnabled)
     {

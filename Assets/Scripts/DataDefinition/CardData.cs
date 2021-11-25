@@ -11,9 +11,6 @@ public class CardData : ScriptableObjectID
 
     public CardAttribute[] cardAttr = new CardAttribute[5];
 
-    public CardAttribute proModeAttr;
-    public CardAttribute proModeAttrLevelUpWeight;
-
 
     public bool IsCharacter()
     {
