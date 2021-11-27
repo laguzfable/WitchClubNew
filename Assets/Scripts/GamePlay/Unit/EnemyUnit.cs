@@ -458,10 +458,17 @@ public class EnemyUnit : BaseCombatUnit
             eleDecisionRndMap[(ECardElement)i].Weight = 0;
         }
 
+        var eleWeightCountArr = new int[] {0, 0, 0, 0};
+
+
         foreach(var card in cardArr)
         {
             var index = (int)card.element;
-            eleDecisionRndMap[card.element].Weight += mobData.elementData[index].decisionWeight;
+            if(eleWeightCountArr[index] < mobData.maxSelectCardCount)
+            {
+                eleDecisionRndMap[card.element].Weight += mobData.elementData[index].decisionWeight;
+                eleWeightCountArr[index] += 1;
+            }
         }
 
         var envType = combatSystem.envEffect.curType;
