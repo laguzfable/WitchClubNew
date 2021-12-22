@@ -1,0 +1,477 @@
+@back bg01
+
+@sfx morning
+@char 涅莉 pos:50
+涅莉.happy: 早啊～{PlayerName}，怎麼臉色看起來不太好的樣子？
+
+
+@choice 妳可以看出骷髏的臉色，真是不簡單。 goto:.C01a
+@choice 我作了一個奇怪的夢……。 goto:.C01b
+@stop
+
+
+# C01a
+涅莉: 當然啦，我可是閱髏無數呢。
+@goto .C01
+
+# C01b
+涅莉: 怪夢啊，有時候是運氣要變好的預兆唷。
+@goto .C01
+
+# C01
+@stopsfx
+@sfx slam1 loop:false
+@sfx slam2 loop:false
+@sfx glassbreak loop:false
+
+涅莉.suprised: 媽呀，大清早是在拆房子嗎？我們快去看看怎麼回事。
+@hide 涅莉
+@back cg05
+
+@stopBgm
+@bgm hurry
+
+@sfx bark loop:false
+
+獵犬: 汪汪汪！汪！
+赫菲: 咿咿咿－－是女巫獵犬！
+@sfx magicattack loop:false
+赫菲: 奧術之箭！
+@sfx bark loop:false
+@sfx hitmetal loop:false
+獵犬: 汪汪汪汪汪－－汪！
+
+赫菲: 居然是抗魔裝甲，啊－－
+
+
+@back bg03
+
+@char 艾妮格玫 pos:35
+@char 薇狄亞 pos:65
+薇狄亞.sad: 赫菲！
+艾妮格玫.rage: 這狗好大的膽子！可惡，我的儀式用短刀呢……
+艾妮格玫.sad: 很久沒用血咒術了，我要從哪裡下刀比較好啊－－
+@hide 薇狄亞
+@char 涅莉 pos:65
+
+涅莉: 欸等等，妳手上那不就是武器嗎？朝那狗刺下去啊。
+艾妮格玫: 不行啊，我的血魔法獻祭只能用我自己的血……不管了，血咒術！
+@sfx stab loop:false
+@hide 涅莉
+@char 赫菲 pos:65
+赫菲.what: 艾妮妳這個威力完全不夠啊！
+赫菲.angry: 刺深一點！
+@sfx stab2 loop:false
+艾妮格玫.scared: 可能最近沒有運動，血液循環不好，我再試一次，血咒術－－！！啊啊啊－－好痛－－
+@hide 赫菲
+@char 涅莉 pos:65
+涅莉: 妳這是何苦呢？搞得血流成河了。
+@char 薇狄亞 pos:50 time:0
+@char 涅莉 pos:75
+@char 艾妮格玫 pos:25
+@sfx slip loop:false
+薇狄亞: 別怕，我來補血！呀啊啊－－地板好滑－－
+
+赫菲: 妳不是可以跟動物溝通嗎？快點呀！跟牠溝通啊！
+薇狄亞: 不行呀！牠一直對著我罵髒話！
+@sfx bark loop:false
+獵犬: 汪汪汪！
+涅莉: ……真是看不下去了，{PlayerName}，幫忙一下吧。
+
+@stopBgm
+@bgm energetic
+
+@hide 薇狄亞,涅莉,艾妮格玫
+
+@battle background:bg02 target:monster02 label:afterbattle2
+@stop
+
+# afterbattle2
+
+@back bg03 time:0
+@char 薇狄亞 pos:60 time:0
+@char 赫菲 pos:40 time:0
+@char 艾妮格玫 pos:20 time:0
+@char 涅莉 pos:80 time:0
+
+
+@stopBgm
+@bgm peace
+
+
+獵犬: 汪汪！
+赫菲: 啊！跑走了！
+艾妮格玫.talking: 說起來那個招牌還是太張揚了，馬上就引來敵人。
+赫菲.talk: 搞不好跟那無關啊。
+艾妮格玫: 不然呢？女巫獵人不獵巫是要幹嘛……
+赫菲: 有個人應該會知道！
+
+@hide 涅莉,赫菲,艾妮格玫,薇狄亞
+
+@back bg02
+
+@char 涅莉 pos:50
+涅莉.talk: 說起來妳在同個地方繞老半天了……
+@char 赫菲 pos:35
+@char 涅莉 pos:65
+赫菲: 應該是這裡才對呀，真奇怪。
+@hide 涅莉
+@char 薇狄亞 pos:65
+薇狄亞.love: 妳們快看！快看！那個！
+赫菲.what: 喔喔喔？薇狄亞發現什麼了嗎？
+薇狄亞: 這攤的馬鈴薯超便宜耶，一大籃只要3銀！請幫我包下來！
+
+@char 艾妮格玫 pos:25
+@char 赫菲 pos:50
+@char 薇狄亞 pos:75
+@stopBgm
+@bgm strange
+艾妮格玫.talking: 現在是買馬鈴薯的時候嗎？無腦也要看一下場合吧！
+赫菲.talk: 不要這麼兇好不好，薇狄亞也是為了我們的生計才這麼辛苦地買菜耶。
+艾妮格玫: 我不是說不能買菜，我的意思是現在不適合好嗎。
+薇狄亞.sad: 對不起嘛，艾妮，我下次會注意的。
+赫菲.angry: 薇狄亞妳不用道歉！明明就是艾妮的問題。
+艾妮格玫: 我的問題？！以妳們這種散漫的態度，重建象牙塔什麼的根本就是癡人說夢吧。
+赫菲: 怎樣都比妳這種只會攻擊自己人的血系女巫好！
+薇狄亞: 不要這樣子講啦……
+@hide 薇狄亞
+@char 涅莉 pos:75
+涅莉: 喔唷？火藥味越來越濃了耶！
+
+@hide 涅莉
+@char 艾妮格玫 pos:35
+@char 赫菲 pos:65
+艾妮格玫: 很好啊，妳自以為在戳我的痛處是嗎？
+艾妮格玫.rage: 我就如妳所願，讓妳見識血巫結社那凌駕在象牙塔之上的力量。
+赫菲: 我怕妳嗎？來啊！
+艾妮格玫: 血祭－－
+@sfx explosion loop:false
+赫菲: 奧術－－
+@sfx magicattack loop:false
+@spawn ShakeBackground
+@hide 涅莉,赫菲,艾妮格玫,薇狄亞
+@char 陰陰 pos:65
+@char 鬱鬱 pos:35
+
+？？？: 要打架可以去別的地方嗎，我們這裡還要做生意的！
+@hide 陰陰,鬱鬱
+
+
+@stopBgm
+@bgm energetic
+
+@back black
+@battle background:bg02 target:monster01 label:afterbattle3
+@stop
+
+# afterbattle3
+@stopBgm
+@bgm lilina
+
+@back bg02
+
+@char 莉莉娜 pos:50
+莉莉娜: 什麼事情那麼吵呀？啊！赫菲！好久不見耶。
+@char 莉莉娜 pos:35
+@char 赫菲 pos:65
+赫菲.smile: 莉莉娜～
+赫菲: 各位，向妳們介紹，她是我的好朋友莉莉娜。
+莉莉娜: 哇塞，妳的朋友看起來都好屌耶，尤其是那個骷髏，讚讚讚。
+莉莉娜: 這是我可愛的助手們，陰陰跟鬱鬱。
+赫菲: 哇噢，感覺莉莉娜生意越做越大了呢，居然還請了助手。
+莉莉娜: 沒有啦，騙吃騙喝而已，別站在外面說話了，趕快進來吧。
+@back bg04 time:0
+@hide 赫菲
+
+@back bg04
+
+@char 莉莉娜 pos:50 time:0
+莉莉娜: 不好意思，還有客人在，妳們就隨便坐，當自己家呀。
+@hide 莉莉娜
+@char 薇狄亞 pos:35
+薇狄亞: 這個味道是……
+@char 艾妮格玫 pos:65
+艾妮格玫.sad: 迷霧草……啊！！
+@sfx cat
+狂暴的黑貓: 喵！！！
+@char 薇狄亞 pos:25
+@char 赫菲 pos:75
+@char 艾妮格玫 pos:50
+赫菲.sad: 艾妮！有沒有怎麼樣？
+艾妮格玫: ……我沒事。
+@hide 赫菲
+@char 涅莉 pos:75
+涅莉: 妳們今天好像被各種跟動物有關的厄運纏身耶。
+@char 薇狄亞
+薇狄亞: 都流血了……治療一下吧。
+@hide 薇狄亞,涅莉,艾妮格玫
+@char 莉莉娜 pos:50
+@char 陰陰 pos:75
+@char 鬱鬱 pos:25
+莉莉娜: 抱歉抱歉，牠有點太high了。
+(陰陰鬱鬱站兩旁 鬱鬱抱著貓)
+@char 莉莉娜 pos:40
+@char 陰陰 pos:60
+@char 鬱鬱 pos:20
+@char 艾妮格玫 pos:80
+艾妮格玫.idle: 以迷霧草來說，濃得有點嚇人。
+莉莉娜: 眼光很好喔，這是我們最新的產品－－夢魘迷霧草，超強效，用過的都說讚！
+艾妮格玫: 我不是那個意思……
+@hide 艾妮格玫
+@char 赫菲 pos:80
+赫菲.talk: 莉莉娜，最近女巫獵人好像變多了耶，妳知道為什麼嗎？
+莉莉娜: 聽說是他們的某個幹部新官上任要做業績呢。
+陰陰: 只是虛張聲勢罷了。
+鬱鬱: 教團要垮不垮的，小動作卻一堆，看了就討厭，我恨不得把她們通通幹掉！
+莉莉娜: 拿一些新產品回去呀，有病治病，沒病還可以防身呢！
+赫菲: 謝、謝謝。
+@hide 莉莉娜,陰陰,鬱鬱
+@char 赫菲 pos:50
+赫菲.smile: 我們最近開了一間俱樂部，有酒跟一些吃的，妳們有空也可以來唷。
+@char 赫菲 pos:35
+@char 涅莉 pos:65
+涅莉.yummy: 就在黯鴉農舍旁邊！
+
+@hide 涅莉,赫菲
+
+
+@back bg02
+@stopBgm
+@bgm white
+
+@char 艾妮格玫 pos:50
+艾妮格玫.talking: 那個還是丟掉吧。
+@char 艾妮格玫 pos:35
+@char 涅莉 pos:65
+涅莉.suprised: 欸？不要啦！
+@hide 涅莉
+@char 赫菲 pos:65
+赫菲.what: 開什麼玩笑，這包至少值300金耶！
+艾妮格玫.talking: 妳們看到那貓了嗎？一點也不對勁，還有妳那個朋友……
+赫菲.sad: 別這樣說，莉莉娜確實有給我們情報了嘛！
+赫菲.angry: 而且這個草妳不要的話，我們其他人可以用啊！
+艾妮格玫: 那妳慢慢搞吧，在象牙塔唸了這麼多年書，還是只能用這種邪魔歪道，真替妳的教授感到可悲。
+赫菲: 連畢業都沒有的人憑什麼講這種話！
+艾妮格玫: 妳！！！
+
+
+@char 薇狄亞 pos:50
+薇狄亞.sad: 妳們兩個都冷靜一點！
+
+@hide 艾妮格玫,薇狄亞,赫菲
+
+@char 涅莉 pos:50
+涅莉: 妳們看，蘇菲亞慌慌張張地跑過來了耶。
+@hide 涅莉
+
+@stopBgm
+@bgm hurry
+
+@char 蘇菲亞 pos:35
+@char 赫菲 pos:65
+蘇菲亞.sad: 不好了，妳們的房間燒起來了！
+赫菲.what: 怎麼會？！
+
+
+@hide 蘇菲亞,赫菲
+
+@back bg01b
+
+
+@char 艾妮格玫 pos:35
+@char 赫菲 pos:65
+艾妮格玫.sad: 我不是說水晶要用布蓋住嗎！
+赫菲.what: 想說都買那麼久了沒看過什麼鬼應該是沒差……
+艾妮格玫.rage: 問題是太陽照到會起火啊！！！
+
+@hide 艾妮格玫,赫菲
+@char 蘇菲亞 pos:65
+@char 薇狄亞 pos:35
+@back bg01c
+
+蘇菲亞.talking: 還好發現得早，沒什麼損失。
+薇狄亞.sad: 不過燒焦味好重唷……
+蘇菲亞: 反正這房間早就該整修了，妳們就先搬到樓上吧，有好幾間雜物間，整理一下還可以用的。
+@hide 薇狄亞
+@char 赫菲 pos:35
+
+赫菲.smile: 謝謝妳，蘇菲亞，妳人真好。
+蘇菲亞.angry: 不過一樓這邊的修補費用要由妳們出！
+赫菲: 欸～～～？
+@hide 蘇菲亞
+@char 艾妮格玫 pos:65
+艾妮格玫.talking: 蘇菲亞沒計較已經不錯了，就努力賺錢吧。
+
+@hide 艾妮格玫,赫菲
+
+@back bg05
+
+@char 艾妮格玫 pos:25
+@char 薇狄亞 pos:50
+@char 赫菲 pos:75
+
+艾妮格玫.sad: 啊～有股發霉的味道。
+薇狄亞.talk: 整理一下還是可以使用的嘛。
+赫菲.what: 對嘛對嘛，反正蘇菲亞說雜物都給我們處理……搞不好可以挖到寶，哇噢！艾妮妳看，這罐不就是我之前想買的邪神的嘔吐物嗎！
+艾妮格玫: 拜託妳不要把那個罐子打開……
+@sfx pop
+@hide 艾妮格玫,薇狄亞,赫菲
+@char 涅莉 pos:50
+涅莉.yummy: 矮額，有黑黑的東西出來了！
+
+
+@hide 涅莉
+@stopBgm
+@bgm battle03
+@battle background:bg05 target:monster03 label:afterbattle4
+@stop
+
+# afterbattle4
+@stopBgm
+@back bg05 time:0
+
+
+
+
+？？？: 尤芙蘿絲，我不會放過妳的！
+@char 涅莉 pos:50
+涅莉.eee: 誰啊！
+@char 涅莉 pos:35
+@char 赫菲 pos:65
+
+@stopBgm
+@bgm happy
+
+
+赫菲.bling: 原來這就是邪神吐出來的東西嗎？真是長知識了，我得趕快記錄下來。
+@char 涅莉 pos:25
+@char 赫菲 pos:50
+@char 薇狄亞 pos:75
+薇狄亞: 我覺得還是趕快整理房間比較好……
+
+
+@hide 涅莉,赫菲,薇狄亞
+
+
+@char 艾妮格玫 pos:50
+艾妮格玫.idle: 這樣就差不多了。
+艾妮格玫: 搬這麼多東西真是累人哪……嗯？這個是……？
+@char 艾妮格玫 pos:35
+@char 赫菲 pos:65
+赫菲.bling: 是異鄉人專用的義體耶，我在之前的巫術世界商品型錄上有看到！
+艾妮格玫.talking: 雖然聽起來很奇怪，不過好像是{PlayerName}可以用的東西。
+赫菲: 看起來放了一陣子了，上面都是灰，不過沒有組裝過的樣子。
+艾妮格玫: 有一張說明書……
+赫菲.smile: 研究看看吧！
+
+(一陣子後)
+赫菲.smile: 完成！
+@char 艾妮格玫 pos:25
+@char 赫菲 pos:50
+@char 薇狄亞 pos:75
+薇狄亞.love: 再穿上斗篷的話，看起來就很有樣子了呢。
+@hide 薇狄亞,艾妮格玫,赫菲
+@back cg06
+
+赫菲: 這樣{PlayerName}就能盡情體驗生活了。
+艾妮格玫: 也可以幫忙抄寫咒文了。
+
+
+@choice 原來這是妳打的主意嗎……
+@choice 有了身體當然要去風俗店玩個爽啊！
+@stop
+@back bg05
+
+
+@char 薇狄亞 pos:35
+@char 赫菲 pos:65
+薇狄亞.talk: 說起來涅莉從剛剛開始就跑哪去了呀？
+赫菲.idle: 不知道耶，要不要去餐廳找找看？
+薇狄亞: 反正晚餐時間也快到了，大家就一起下去吧。
+
+@hide 薇狄亞,赫菲
+@back bg08
+
+@char 薇狄亞 pos:50
+薇狄亞: 涅莉？妳在這裡嗎？
+@sfx rustle loop:false
+@char 薇狄亞 pos:65
+@char 艾妮格玫 pos:35
+艾妮格玫.scared: 這這這這這、這個聲音是？！啊啊啊啊啊－－
+@char 薇狄亞 pos:75
+@char 赫菲 pos:50
+@char 艾妮格玫 pos:25
+赫菲.what: 艾妮？怎麼了？！
+艾妮格玫: 老老老……老鼠……
+赫菲.bling: 喔喔～那邊嗎？桌上那個看起來超美味的四種不同起司拼盤旁邊在動的那個嗎？
+艾妮格玫: 快快快……快把牠打死！
+赫菲: 讓我來吧！等等，那是切達起司嗎？看起來好好吃呀！
+薇狄亞.angry: 啊！
+艾妮格玫: ！！
+薇狄亞.love: 還有斯蒂爾頓起司！也太棒了吧，配一點淡啤酒的話不知道有多好吃呢。
+艾妮格玫: 妳們的重點也太奇怪了吧！現在的問題是……那那那那個……
+赫菲.angry: 我早說妳的膽子太小了，這樣還能領導血巫結社嗎？
+赫菲: 有本事就把那老鼠抓出來活體獻祭呀！
+艾妮格玫.talking: 獻祭本來就是用活體好不好，根本不用特別強調，象牙塔的學生就這點程度嗎？
+赫菲: 妳亂講，獻祭也可以用農作物的好嗎，到底有沒有認真上課啊！
+艾妮格玫.rage: 上課是能幹嘛，有本事來決鬥啊！
+赫菲: 誰怕誰啊。
+涅莉: 哈哈，又要開打了，真精彩。
+
+@hide 薇狄亞,赫菲,艾妮格玫
+@back cg07
+@stopBgm
+@bgm fantasy
+
+薇狄亞: 老、老鼠？不……涅莉？
+赫菲: 咦？涅莉又變得跟之前一樣小了耶。
+薇狄亞: 為什麼呢……
+涅莉: 因為啊，妳們想想看嘛，身體變小的話，食物自然而然就變得超級多了耶。
+涅莉: 有這麼方便的技能，當然要好好利用一下囉。
+赫菲: 有道理欸！
+
+
+@back bg08
+
+
+@char 蘇菲亞 pos:50
+蘇菲亞.happy: 整理好了嗎？哇！{PlayerName}的新造型真好看呢。
+蘇菲亞.beer: 今天有上等的起司還有啤酒唷，吃飽了明天好好工作還錢吧。
+@hide 蘇菲亞
+@char 赫菲.smile pos:35
+@char 涅莉.yummy pos:65
+赫菲&涅莉: 耶耶耶～
+
+@hide 赫菲,涅莉
+
+@back star2
+@stopBgm
+@bgm stardust
+
+
+？？？: 新的身體看起來真不錯，異鄉人。
+？？？: 雖然是義體，不過也是可以有感覺的。
+？？？: 我的觸摸舒服嗎？
+？？？: 這裡、那裡，還有……
+？？？: 放鬆，儘管享受就好。
+？？？: 看起來你不排斥呢，那麼，便可以進行更深入的交流了。
+
+@stopBgm
+
+（DEMO結束）
+
+@gotoUnityScene sceneName:MainScene
+
+; @gotoUntyScene sceneName:MainScene
+
+; @loadScene MainScene
+; @hideall remove:true
+
+@stopBgm
+@goto chapter2
+@stop
+
+@trialEnd
+
+
+@stop

@@ -409,7 +409,7 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @stopBgm
 @bgm battle03
 
-@battle background:bg11 target:monsterez label:afterbattle5
+@battle background:bg11 target:monster04 label:afterbattle5
 @stop
 
 # afterbattle5
@@ -560,7 +560,7 @@ may.happy: 來吧，讓我瞧瞧那異域之力－－
 @stopBgm
 @bgm battle02
 
-@battle background:bg05 target:monstermay label:afterbattle6
+@battle background:bg05 target:monster05 label:afterbattle6
 @stop
 
 # afterbattle6
@@ -651,12 +651,5 @@ may: 嗯～要先解除封印。
 ？？？: 有些事是從一開始就註定結果的吧，就像妳們那已然降臨的……命運。
 
 @stopBgm
-
-（DEMO結束）
-
-@gotoUnityScene sceneName:MainScene
-
-; @gotoUntyScene sceneName:MainScene
-
-; @loadScene MainScene
-; @hideall remove:true
+@goto chapter3
+@stop
