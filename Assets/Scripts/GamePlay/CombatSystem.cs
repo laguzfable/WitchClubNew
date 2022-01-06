@@ -419,12 +419,12 @@ public class CombatSystem : MonoBehaviour
     public void MobGetNewAction()
     {
         mobUnit.GetNewAction();
-        mobActTxt.text = mobUnit.GetActionString();
+        UpdateMobActionInfo(mobUnit.GetActionString());
     }
 
     public void UpdateMobActionInfo(string actionStr)
     {
-        mobActTxt.text = actionStr;
+        // mobActTxt.text = actionStr;
     }
 
     async UniTaskVoid DisplayDialog(string str)

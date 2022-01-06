@@ -34,6 +34,8 @@ public class EnemyUnit : BaseCombatUnit
     MobData mobData;
 
     static readonly int MaxCardCount = 5;
+
+    [SerializeField] UIStatus status;
     
     class MobCard
     {
@@ -301,6 +303,22 @@ public class EnemyUnit : BaseCombatUnit
         string defStr = actResult.attr.DEF > 0 ? $"DEF:{actResult.attr.DEF} " : "";
         string healStr = actResult.attr.HEAL > 0 && !HasEffect(EAbilityEffectType.Stun) ? $"HEAL:{actResult.attr.HEAL} " : "";
 
+        status.Reset();
+
+        if(actResult.attr.ATK > 0 && !HasEffect(EAbilityEffectType.Stun))
+        {
+            status.SetATK(actResult.attr.ATK);
+        }
+
+        if(actResult.attr.DEF > 0)
+        {
+            status.SetDEF(actResult.attr.DEF);
+        }
+        if(actResult.attr.HEAL > 0 && !HasEffect(EAbilityEffectType.Stun))
+        {
+            status.SetHEAL(actResult.attr.HEAL);
+        }
+
         // if(act.displayType == EMobActionDisplayType.HideATK && actResult.attr.ATK > 0)
         // {
         //     var atkSB = new StringBuilder();
@@ -385,7 +403,9 @@ public class EnemyUnit : BaseCombatUnit
             conditionStr = "昏迷";
         }
 
-        return atkStr + defStr + healStr + conditionStr;
+        var finalStr = atkStr + defStr + healStr + conditionStr;
+        Debug.Log($"Update Status Info: {finalStr}");
+        return finalStr;
     }
 
     public void GetNewAction()

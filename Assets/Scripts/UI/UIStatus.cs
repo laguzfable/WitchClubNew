@@ -1,69 +1,35 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class UIStatus : MonoBehaviour 
 {
 
-    // might = 0
-    // ref = 1
-    // shield = 2
-    // poison = 3
-    // stun = 4
+    [SerializeField] BaseCombatUnit target;
 
-    [SerializeField]
-    BaseCombatUnit target;
+    [SerializeField] GameObject[] statusImgArr;
 
-    [SerializeField]
-    GameObject[] statusImgArr;
+    [SerializeField] TextMeshProUGUI[] txtArr;
 
-    [SerializeField]
-    Text[] textArr;
-
-    /*
-    void Start()
+    public void Reset()
     {
-        target.shield.OnValueChanged += OnShieldChanged;
-        target.might.OnValueChanged += OnMightChanged;
-        target.poison.OnValueChanged += OnPoisonChanged;
-        target.reflection.OnValueChanged += OnReflectionChanged;
-        target.stun.OnValueChanged += OnStunValueChanged;
-
-        foreach(var go in statusImgArr)
+        foreach (var status in statusImgArr)
         {
-            go.SetActive(false);
+            status.SetActive(false);
         }
-
-        //Debug.Log("UI Status Start target : " + target.name);
     }
 
-    void OnShieldChanged(float value)
+    public void SetATK(int value) => DisplayValue(0, value.ToString());
+
+    public void SetDEF(int value) => DisplayValue(1, value.ToString());
+
+    public void SetHEAL(int value) => DisplayValue(2, value.ToString());
+
+    public void SetSkill() => DisplayValue(3, string.Empty);
+
+    void DisplayValue(int status, string valueStr)
     {
-        textArr[2].text = target.shield.Value.ToString();
-        statusImgArr[2].SetActive(target.shield.Value > 0f);
+        statusImgArr[status].SetActive(true);
+        txtArr[status].text = valueStr;
     }
-
-    void OnMightChanged(float value)
-    {
-        textArr[0].text = target.might.Value.ToString();
-        statusImgArr[0].SetActive(target.might.Value > 0f);
-    }
-
-    void OnPoisonChanged(float value)
-    {
-        textArr[3].text = target.poison.Value.ToString();
-        statusImgArr[3].SetActive(target.poison.Value > 0f);
-    }
-
-    void OnReflectionChanged(float value)
-    {
-        textArr[1].text = target.reflection.Value.ToString();
-        statusImgArr[1].SetActive(target.reflection.Value > 0f);
-    }
-
-    void OnStunValueChanged(float value)
-    {
-        textArr[4].text = target.stun.Value.ToString();
-        statusImgArr[4].SetActive(target.stun.Value > 0f);
-    }
-    */
 }
