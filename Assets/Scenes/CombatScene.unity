@@ -17817,6 +17817,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: ce89471f2a4f25d4cbda4186f5bae699, type: 3}
   - {fileID: 21300000, guid: d0d411778b5cb9c4fa0d6bf206491f40, type: 3}
   - {fileID: 21300000, guid: 930d8576ed606ca4bb4e07c509844510, type: 3}
+  transSpeed: 0.5
 --- !u!1 &1110857860
 GameObject:
   m_ObjectHideFlags: 0
@@ -18156,7 +18157,7 @@ MonoBehaviour:
   - dialog: "\u5DEB\u8853\u4E16\u754C\u6709\u56DB\u5927\u5C6C\u6027\u7684\u6CD5\u8853\uFF0C\u5728\u8996\u89BA\u4E0A\u5206\u985E\u7684\u8A71\uFF0C\u5206\u5225\u70BA\uFF0D\uFF0D\u5B78\u9662\uFF08\u85CD\uFF09\u3001\u9BAE\u8840\uFF08\u7D05\uFF09\u3001\u81EA\u7136\uFF08\u7DA0\uFF09\uFF0C\u53CA\u60E1\u9B54\uFF08\u91D1\uFF09\u3002"
     isRight: 0
     displayImg: {fileID: 21300000, guid: 2f81ad7bcc820f64fa5a2f9c2ac67198, type: 3}
-    unitPos: {x: -103.5, y: -50}
+    unitPos: {x: 0, y: -50}
     isMobUnit: 0
     displayObjecArr: []
     isClearDisplay: 1
@@ -18167,7 +18168,7 @@ MonoBehaviour:
   - dialog: "\u6BCF\u5F35\u724C\u90FD\u6709\u6700\u591A2\u7A2E\u8CC7\u8A0A\uFF0C\u653B\u64CA\u529B\uFF0C\u4EE5\u53CA\u9632\u79A6\u529B\u3002"
     isRight: 0
     displayImg: {fileID: 21300000, guid: 2f81ad7bcc820f64fa5a2f9c2ac67198, type: 3}
-    unitPos: {x: -169, y: -50}
+    unitPos: {x: -119, y: -50}
     isMobUnit: 0
     displayObjecArr:
     - {fileID: 1981923767}
@@ -33837,7 +33838,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 594, y: 60}
+  m_AnchoredPosition: {x: 529.52, y: 60}
   m_SizeDelta: {x: 676, y: 758}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1924780184
@@ -34804,7 +34805,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 594, y: 60}
+  m_AnchoredPosition: {x: 529.52, y: 60}
   m_SizeDelta: {x: 676, y: 758}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1981923769
