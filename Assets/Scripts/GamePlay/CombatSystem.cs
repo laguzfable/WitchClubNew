@@ -34,8 +34,7 @@ public class CombatSystem : MonoBehaviour
 
     readonly float waitBattleTime = 3f;
 
-    [SerializeField]
-    float waitTurnTime = 0.5f;
+    [SerializeField] float waitTurnTime = 0.5f;
 
     string monsterID;
 
@@ -46,29 +45,23 @@ public class CombatSystem : MonoBehaviour
     bool zeroHpBlean = false;
 
     //demo用
-    [SerializeField]
-    Text bossName;
+    [SerializeField] Text bossName;
     
     int nowBossInt = 0;
 
-    [SerializeField]
-    GameObject winGetItem;
+    [SerializeField] GameObject winGetItem;
 
-    [SerializeField]
-    GameObject[] endObj;
+    [SerializeField] GameObject[] endObj;
 
     GameObject currentEnemy;
 
-    [SerializeField]
-    GameObject fadeOutObj;
+    [SerializeField] GameObject fadeOutObj;
 
     AudioSource audioSource;
 
-    [SerializeField]
-    GameObject helpInfoCanvas;
+    [SerializeField] GameObject helpInfoCanvas;
 
-    [SerializeField]
-    CGFadeHelper mainCanvas;
+    [SerializeField] CGFadeHelper mainCanvas;
 
     public bool isPlayerTurn { private set; get; }
 
@@ -76,12 +69,10 @@ public class CombatSystem : MonoBehaviour
 
     public CombatVisualResources visualResource { private set; get; }
 
-    [SerializeField]
-    SpriteRenderer BG;
+    [SerializeField] SpriteRenderer BG;
 
 
-    [SerializeField]
-    RawImage blackMask;
+    [SerializeField] RawImage blackMask;
 
     public TutorialController tutorController;
 

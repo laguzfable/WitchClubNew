@@ -12,9 +12,6 @@ public class DebugInfo : MonoBehaviour
     [SerializeField]
     Text debugTxt;
 
-    [SerializeField]
-    Text envNameTxt, envDescTxt, envNextTxt;
-
     // Start is called before the first frame update
     void Start()
     {
@@ -22,7 +19,6 @@ public class DebugInfo : MonoBehaviour
         pc = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
 
 
-        combatSystem.envEffect.envEffChangeEvent += UpdateInfo;
         debugTxt.text = "";
     }
 
@@ -34,16 +30,4 @@ public class DebugInfo : MonoBehaviour
         debugTxt.text = str;
     }
     */
-
-    public void UpdateInfo()
-    {
-        var env = combatSystem.envEffect;
-
-        envNameTxt.text = env.GetCurEffectName((int)env.curType);
-        envDescTxt.text = env.GetCurDescription((int)env.curType);
-        envNextTxt.text = "Next:" + env.GetCurEffectName((int)env.nextType);
-
-        //string str = $"當前環境效果:{env.GetCurEffectName((int)env.curType)}\n{env.GetCurDescription((int)env.curType)}\n\n下一個環境效果:{env.GetCurEffectName((int)env.nextType)}";
-        //txt.text = str;
-    }
 }

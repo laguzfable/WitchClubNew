@@ -3,13 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Events;
 using Naninovel;
+using RandomTool;
 
 public enum EEnvEffectType { None, Attack, Defense, Heal, Energy, RedSilence, BlueSilence, GreenSilence, YellowSilence, LimitCards, NoCharacter, NoRune, NoHeal, NoDefense, PlayerNoArmor, MobArmor, PlayerDamage, Length };
 
 
-/// <summary>
-/// 日後要將他移除MonoBehaviour 因為沒用到
-/// </summary>
 public sealed class EnvironmentEffect
 {
     public EEnvEffectType curType { private set; get; } = EEnvEffectType.None;
@@ -34,10 +32,10 @@ public sealed class EnvironmentEffect
     public EnvironmentEffect(CombatSystem combatSystem)
     {
         this.combatSystem = combatSystem;
-
-        
+                
         // 黃色卡還沒可以使用之前將魔力狂潮的權重設為0
         envWeight[(int)EEnvEffectType.Energy] = combatSystem.IsEnergyActive() ? 2000 : 0;
+        envWeight[(int)EEnvEffectType.NoRune] = combatSystem.IsEnergyActive() ? 500 : 0;
     }
 
     public void SetNextEffect(EEnvEffectType newEffect, int turn = 1)
@@ -64,16 +62,16 @@ public sealed class EnvironmentEffect
         }
         while (nextType == curType);*/
 
-        var rndList = new List<RandomTool.RandomObject>();
+        var rndList = new List<RandomObject>();
         for (int i = 0; i < (int)EEnvEffectType.Length; i++)
         {
-            var rndObj = new RandomTool.RandomObject();
+            var rndObj = new RandomObject();
             rndObj.SetIndex(i);
             rndObj.Weight = envWeight[i];
             rndList.Add(rndObj);
         }
 
-        var rnd = RandomTool.RandomHelper.GetRandomList(rndList);
+        var rnd = RandomHelper.GetRandomList(rndList);
         nextType = (EEnvEffectType)rnd.Index;
 
         nextEffRemainTurn = 1;//Random.Range(1, 4);
