@@ -7,6 +7,8 @@ using UnityEngine.UI;
 using DG.Tweening;
 using TMPro;
 using UniRx.Async;
+using System.Threading;
+using System;
 
 public enum ECardElement { Blue, Red, Yellow, Green, None }
 
@@ -47,6 +49,8 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
     [SerializeField] TextMeshPro nameTxt;
 
     public CardData cardData { private set; get; }    
+
+    Color orgOutlineColor;
 
     public int ID
     {
@@ -90,6 +94,7 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
         orgPos = transform.localPosition;
         orgRot = transform.localRotation.eulerAngles;
         orgScale = transform.localScale;
+        orgOutlineColor = outline.GetComponent<SpriteRenderer>().color;
     }
 
     async UniTaskVoid Start()
@@ -99,6 +104,7 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
         orgPos = transform.localPosition;
         orgRot = transform.localRotation.eulerAngles;
         orgScale = transform.localScale;
+        orgOutlineColor = outline.GetComponent<SpriteRenderer>().color;
     }
 
     void ResetLevel()
@@ -198,6 +204,7 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
 
     void OnSelect()
     {
+        StopFlashOutline();
         audioSource.clip = sfx;
         audioSource.Play();
         if (unit.controllable)
@@ -205,6 +212,7 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
             SetSelectState(!isSelected);
         }
         pc.CalculateAttr();
+        pc.CheckSelectable();
     }
 
     public bool GetSelectState()
@@ -270,5 +278,62 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
         {
             cardPic.color = Color.white;
         }
+    }
+
+    public bool IsCharacter()
+    {
+        return ID < 10;
+    }
+
+    public void CheckSelectable(ECardElement ele, bool canCombo, bool isCombo)
+    {
+        var outline = GetComponentInChildren<SelectOutline>(true);
+        var sprRend = outline.GetComponent<SpriteRenderer>();
+        StopFlashOutline();
+
+        if((element == ele && !isCombo) || pc.GetPlayerUnit().HasEffect(EAbilityEffectType.IgnoreElement))
+        {
+            cardPic.color = Color.white;
+        }
+        else if(canCombo && IsCharacter())
+        {
+            Debug.Log("發光");
+            sprRend.color = endColor;
+            nextColor = orgOutlineColor;
+            outline.gameObject.SetActive(true);
+            InvokeRepeating(nameof(FlashOutline), 0f, 1.5f);
+            // outline.GetComponent<SpriteRenderer>().color
+        }
+        else
+        {
+            cardPic.color = Color.gray;
+        }
+    }
+
+    Color endColor = new Color(0, 0, 0, 0);
+    Color nextColor;
+    Tween curTween;
+
+    void FlashOutline()
+    {
+        var sprRend = outline.GetComponent<SpriteRenderer>();
+        curTween = sprRend.DOColor(nextColor, 1f);
+        nextColor = nextColor == endColor ? orgOutlineColor : endColor;
+    }
+
+    public void StopFlashOutline()
+    {
+        CancelInvoke(nameof(FlashOutline));
+        if(curTween != null)
+        {
+            curTween.Kill();
+        }
+        var outline = GetComponentInChildren<SelectOutline>(true);
+        if(outline != null)
+        {
+            outline.gameObject.SetActive(false);
+        }
+        var sprRend = outline.GetComponent<SpriteRenderer>();
+        sprRend.color = orgOutlineColor;
     }
 }

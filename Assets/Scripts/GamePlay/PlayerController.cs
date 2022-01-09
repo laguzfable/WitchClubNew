@@ -393,6 +393,28 @@ public class PlayerController : MonoBehaviour
         textArr[3].text = totalAttr.EN.ToString();
     }
 
+    public void CheckSelectable()
+    {
+        //開trigger
+        foreach (ElementCard card in cards)
+        {
+            if(card.GetSelectState())
+            {
+                continue;
+            }
+            //card.ChangeBtnEvent(controllable);
+            if(result.cardList.Count > 0)
+            {
+                card.CheckSelectable(result.cardList[0].element, result.cardList[0].IsCharacter(), result.IsCombo());    
+            }
+            else
+            {
+                card.CheckIsAvaliable(combatSystem.envEffect.curType);
+                card.StopFlashOutline();
+            }
+        }
+    }
+
     bool HasCharacterCard(int id)
     {
         foreach(var card in cards)
