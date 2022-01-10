@@ -405,7 +405,7 @@ public class PlayerController : MonoBehaviour
             //card.ChangeBtnEvent(controllable);
             if(result.cardList.Count > 0)
             {
-                card.CheckSelectable(result.cardList[0].element, result.cardList[0].IsCharacter(), result.IsCombo());    
+                card.CheckSelectable(result.cardList[0].element, result.cardList[0].IsCharacter(), result, combatSystem.envEffect.curType);
             }
             else
             {

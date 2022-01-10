@@ -285,19 +285,23 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
         return ID < 10;
     }
 
-    public void CheckSelectable(ECardElement ele, bool canCombo, bool isCombo)
+    public void CheckSelectable(ECardElement ele, bool canCombo, PlayedCardResult result, EEnvEffectType type)
     {
         var outline = GetComponentInChildren<SelectOutline>(true);
         var sprRend = outline.GetComponent<SpriteRenderer>();
         StopFlashOutline();
-
-        if((element == ele && !isCombo) || pc.GetPlayerUnit().HasEffect(EAbilityEffectType.IgnoreElement))
+        if(type == EEnvEffectType.LimitCards && result.cardList.Count >= 2)
+        {
+            cardPic.color = Color.gray;
+        }
+        else if((element == ele && !result.IsCombo()) || pc.GetPlayerUnit().HasEffect(EAbilityEffectType.IgnoreElement))
         {
             cardPic.color = Color.white;
         }
-        else if(canCombo && IsCharacter())
+        else if(canCombo && IsCharacter() && (result.IsCombo() || result.state != EElementState.Single))
         {
-            Debug.Log("發光");
+            cardPic.color = Color.white;
+            // Debug.Log("發光");
             sprRend.color = endColor;
             nextColor = orgOutlineColor;
             outline.gameObject.SetActive(true);
