@@ -393,15 +393,19 @@ public class PlayerController : MonoBehaviour
         textArr[3].text = totalAttr.EN.ToString();
     }
 
-    public void CheckSelectable()
+    public void CheckSelectable(bool isSelect)
     {
         //開trigger
         foreach (ElementCard card in cards)
         {
-            if(card.GetSelectState())
-            {
-                continue;
-            }
+            // if(isSelect && card.GetSelectState())
+            // {
+            //     if(result.cardList.Count == 1)
+            //     {
+            //         card.CheckIsAvaliable(combatSystem.envEffect.curType);
+            //     }
+            //     continue;
+            // }
             //card.ChangeBtnEvent(controllable);
             if(result.cardList.Count > 0)
             {
@@ -611,7 +615,7 @@ public class PlayerController : MonoBehaviour
 
         if(isSelectAny)
         {
-            if (isCombination)
+            if (isCombination && result.cardList.Count > 1)
             {
                 result.state = EElementState.Combination;
             }

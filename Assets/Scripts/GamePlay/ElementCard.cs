@@ -212,7 +212,7 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
             SetSelectState(!isSelected);
         }
         pc.CalculateAttr();
-        pc.CheckSelectable();
+        pc.CheckSelectable(isSelected);
     }
 
     public bool GetSelectState()
@@ -294,13 +294,17 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
         {
             cardPic.color = Color.gray;
         }
-        else if((element == ele && !result.IsCombo()) || pc.GetPlayerUnit().HasEffect(EAbilityEffectType.IgnoreElement))
+        else if((element == ele && result.state == EElementState.Single) || pc.GetPlayerUnit().HasEffect(EAbilityEffectType.IgnoreElement))
         {
             cardPic.color = Color.white;
         }
-        else if(canCombo && IsCharacter() && (result.IsCombo() || result.state != EElementState.Single))
+        else if(canCombo && IsCharacter() && (result.state != EElementState.Multiple))
         {
             cardPic.color = Color.white;
+            if(isSelected)
+            {
+                return;
+            }
             // Debug.Log("發光");
             sprRend.color = endColor;
             nextColor = orgOutlineColor;
@@ -335,7 +339,7 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
         var outline = GetComponentInChildren<SelectOutline>(true);
         if(outline != null)
         {
-            outline.gameObject.SetActive(false);
+            outline.gameObject.SetActive(isSelected);
         }
         var sprRend = outline.GetComponent<SpriteRenderer>();
         sprRend.color = orgOutlineColor;
