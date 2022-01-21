@@ -22,18 +22,43 @@ public class ResetGame : MonoBehaviour
     }
 
     public KeyCode key;
+
+    public float pressToResetTime = 5f;
+
+    float curPressTime = 0f;
+
+    bool canReset = true;
+
     // Update is called once per frame
     void Update()
     {
+        if(!canReset)
+        {
+            return;
+        }
         if(Input.GetKeyUp(key))
         {
             SwitchStateToCombatModeAsync().Forget();
             //SceneManager.LoadSceneAsync("MainScene");
         }
+        if(Input.GetMouseButton(0) && Input.GetMouseButton(1))
+        {
+            curPressTime += Time.deltaTime;
+            if(curPressTime >= pressToResetTime)
+            {
+                curPressTime = 0f;
+                SwitchStateToCombatModeAsync().Forget();
+            }
+        }
+        if(Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1))
+        {
+            curPressTime = 0f;
+        }
     }
 
     public async UniTask SwitchStateToCombatModeAsync(CancellationToken cancellationToken = default)
     {
+        canReset = false;
         // 1. Disable Naninovel input.
         //var inputManager = Engine.GetService<IInputManager>();
         //inputManager.ProcessInput = false;
@@ -59,6 +84,7 @@ public class ResetGame : MonoBehaviour
         var naniCamera = Engine.GetService<ICameraManager>().Camera;
         naniCamera.enabled = false;
 
-        SceneManager.LoadSceneAsync(mainScene);
+        await SceneManager.LoadSceneAsync(mainScene);
+        canReset = true;
     }
 }
