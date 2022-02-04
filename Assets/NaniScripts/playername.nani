@@ -1,0 +1,25 @@
+@input PlayerName value:玩家
+@stop
+
+@if StrLeng(PlayerName)>8
+    @goto .name_toolong
+@else
+    @goto .name_normal
+@endif
+
+
+# name_toolong
+？？？: {PlayerName}？你的名字也太長了吧？
+@set PlayerName=LimitedName(PlayerName)
+？？？: 決定了，以後就稱呼你{PlayerName}！
+
+# name_normal
+？？？: {PlayerName}啊，在精靈語裡面是很機車的意思耶。
+？？？: 開玩笑的啦～哈哈～
+@goto .end_naming
+
+# end_naming
+
+
+@goto .end_naming
+@stop
