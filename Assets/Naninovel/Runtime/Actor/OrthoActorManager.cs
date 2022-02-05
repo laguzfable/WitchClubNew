@@ -1,6 +1,5 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel
@@ -35,12 +34,12 @@ namespace Naninovel
         }
 
         /// <summary>
-        /// Changes provided actor y position so that it's bottom edge is aligned with the bottom of the screen.
+        /// Changes provided actor y position so that it's bottom edge is aligned with the bottom of the scene.
         /// </summary>
         protected virtual void MoveActorToBottom (TActor actor)
         {
             var metadata = Configuration.GetMetadataOrDefault(actor.Id);
-            var bottomY = (metadata.Pivot.y * actor.Scale.y) / metadata.PixelsPerUnit - CameraConfiguration.MaxOrthoSize;
+            var bottomY = (metadata.Pivot.y * actor.Scale.y) / metadata.PixelsPerUnit - CameraConfiguration.SceneRect.height;
             actor.ChangePositionY(bottomY);
         }
 

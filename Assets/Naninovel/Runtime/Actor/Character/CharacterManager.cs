@@ -1,9 +1,8 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel
@@ -24,6 +23,7 @@ namespace Naninovel
         private readonly ILocalizationManager localizationManager;
         private readonly ITextPrinterManager textPrinterManager;
         private readonly SerializableLiteralStringMap charIdToAvatarPathMap = new SerializableLiteralStringMap();
+        
         private ResourceLoader<Texture2D> avatarTextureLoader;
 
         public CharacterManager (CharactersConfiguration config, CameraConfiguration cameraConfig, ITextManager textManager, 
@@ -184,38 +184,44 @@ namespace Naninovel
             return xPos < GlobalSceneOrigin.x ? CharacterLookDirection.Right : CharacterLookDirection.Left;
         }
 
-        public virtual async UniTask ArrangeCharactersAsync (bool lookAtOrigin = true, float duration = 0, EasingType easingType = default, CancellationToken cancellationToken = default)
+        public virtual async UniTask ArrangeCharactersAsync (bool lookAtOrigin = true, float duration = 0, EasingType easingType = default, AsyncToken asyncToken = default)
         {
-            var actors = ManagedActors?.Values.Where(c => c.Visible).OrderBy(c => c.Id).ToList();
+            var actors = ManagedActors?.Values
+                .Where(c => c.Visible && !Configuration.GetMetadataOrDefault(c.Id).RenderTexture)
+                .OrderBy(c => c.Id).ToList();
             if (actors is null || actors.Count == 0) return;
-            var stepSize = CameraConfiguration.ReferenceSize.x / actors.Count;
-            var halfRefSize = CameraConfiguration.ReferenceSize.x / 2f;
-            var evenCount = 1;
-            var unevenCount = 1;
+
+            var sceneWidth = CameraConfiguration.SceneRect.width;
+            var arrangeRange = Configuration.ArrangeRange;
+            var arrangeWidth = sceneWidth * (arrangeRange.y - arrangeRange.x);
+            var stepSize = arrangeWidth / actors.Count;
+            var xOffset = (sceneWidth * arrangeRange.x - sceneWidth * (1 - arrangeRange.y)) / 2;
 
             var tasks = new List<UniTask>();
+            var evenCount = 1;
+            var unevenCount = 1;
             for (int i = 0; i < actors.Count; i++)
             {
                 var isEven = i.IsEven();
-                float posX;
+                var posX = xOffset;
                 if (isEven)
                 {
                     var step = (evenCount * stepSize) / 2f;
-                    posX = -halfRefSize + step;
+                    posX += -(arrangeWidth / 2f) + step;
                     evenCount++;
                 }
                 else
                 {
                     var step = (unevenCount * stepSize) / 2f;
-                    posX = halfRefSize - step;
+                    posX += arrangeWidth / 2f - step;
                     unevenCount++;
                 }
-                tasks.Add(actors[i].ChangePositionXAsync(posX, duration, easingType, cancellationToken));
+                tasks.Add(actors[i].ChangePositionXAsync(posX, duration, easingType, asyncToken));
 
                 if (lookAtOrigin)
                 {
                     var lookDir = LookAtOriginDirection(posX);
-                    tasks.Add(actors[i].ChangeLookDirectionAsync(lookDir, duration, easingType, cancellationToken));
+                    tasks.Add(actors[i].ChangeLookDirectionAsync(lookDir, duration, easingType, asyncToken));
                 }
             }
             await UniTask.WhenAll(tasks);
@@ -230,7 +236,7 @@ namespace Naninovel
 
             var meta = Configuration.GetMetadataOrDefault(actorId);
             if (meta.HighlightWhenSpeaking)
-                actor.TintColor = meta.NotSpeakingTint;
+                ApplyPose(actor, meta.NotSpeakingPose);
 
             return actor;
         }
@@ -245,8 +251,8 @@ namespace Naninovel
             {
                 var actorMeta = Configuration.GetMetadataOrDefault(actor.Id);
                 if (!actorMeta.HighlightWhenSpeaking) continue;
-                var tintColor = (actorMeta.HighlightCharacterCount > visibleActors || actor.Id == args.AuthorId) ? actorMeta.SpeakingTint : actorMeta.NotSpeakingTint;
-                actor.ChangeTintColorAsync(tintColor, actorMeta.HighlightDuration, actorMeta.HighlightEasing).Forget();
+                var poseName = (actorMeta.HighlightCharacterCount > visibleActors || actor.Id == args.AuthorId) ? actorMeta.SpeakingPose : actorMeta.NotSpeakingPose;
+                ApplyPose(actor, poseName, actorMeta.HighlightDuration, actorMeta.HighlightEasing);
             }
 
             if (string.IsNullOrEmpty(args.AuthorId) || !ActorExists(args.AuthorId)) return;
@@ -263,6 +269,28 @@ namespace Naninovel
                     topmostChar.ChangePositionZAsync(authorZPos, authorMeta.HighlightDuration, authorMeta.HighlightEasing).Forget();
                 }
             }
+        }
+
+        protected virtual void ApplyPose (ICharacterActor actor, string poseName, float duration = 0, EasingType easingType = default)
+        {
+            if (string.IsNullOrEmpty(poseName)) return;
+            var pose = Configuration.GetMetadataOrDefault(actor.Id).GetPoseOrNull<CharacterState>(poseName);
+            if (pose is null) return;
+
+            if (pose.IsPropertyOverridden(nameof(CharacterState.Appearance)))
+                actor.ChangeAppearanceAsync(pose.ActorState.Appearance, duration, easingType).Forget();
+            if (pose.IsPropertyOverridden(nameof(CharacterState.Position)))
+                actor.ChangePositionAsync(pose.ActorState.Position, duration, easingType).Forget();
+            if (pose.IsPropertyOverridden(nameof(CharacterState.Rotation)))
+                actor.ChangeRotationAsync(pose.ActorState.Rotation, duration, easingType).Forget();
+            if (pose.IsPropertyOverridden(nameof(CharacterState.Scale)))
+                actor.ChangeScaleAsync(pose.ActorState.Scale, duration, easingType).Forget();
+            if (pose.IsPropertyOverridden(nameof(CharacterState.Visible)))
+                actor.ChangeVisibilityAsync(pose.ActorState.Visible, duration, easingType).Forget();
+            if (pose.IsPropertyOverridden(nameof(CharacterState.LookDirection)))
+                actor.ChangeLookDirectionAsync(pose.ActorState.LookDirection, duration, easingType).Forget();
+            if (pose.IsPropertyOverridden(nameof(CharacterState.TintColor)))
+                actor.ChangeTintColorAsync(pose.ActorState.TintColor, duration, easingType).Forget();
         }
     }
 }

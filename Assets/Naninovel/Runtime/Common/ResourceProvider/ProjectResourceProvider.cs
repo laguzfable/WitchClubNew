@@ -1,8 +1,8 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
-using UniRx.Async;
+using System.Linq;
 using UnityEngine;
 
 namespace Naninovel
@@ -38,14 +38,22 @@ namespace Naninovel
 
         public readonly string RootPath;
 
-        private readonly ProjectResources projectResources;
+        private readonly IReadOnlyDictionary<string, Type> projectResources;
         private readonly Dictionary<Type, TypeRedirector> redirectors;
 
         public ProjectResourceProvider (string rootPath = null)
         {
-            projectResources = ProjectResources.Get();
-            redirectors = new Dictionary<Type, TypeRedirector>();
             RootPath = rootPath;
+            projectResources = GetProjectResources();
+            redirectors = new Dictionary<Type, TypeRedirector>();
+            foreach (var kv in projectResources)
+                LocationsCache.Add(new CachedResourceLocation(kv.Key, kv.Value));
+
+            IReadOnlyDictionary<string, Type> GetProjectResources ()
+            {
+                var filter = string.IsNullOrEmpty(RootPath) ? null : $"{RootPath}/";
+                return ProjectResources.Get().GetAllResources(filter);
+            }
         }
 
         public override bool SupportsType<T> () => true;
@@ -67,12 +75,12 @@ namespace Naninovel
 
         protected override LocateResourcesRunner<T> CreateLocateResourcesRunner<T> (string path)
         {
-            return new ProjectResourceLocator<T>(this, RootPath, path, projectResources);
+            return new ProjectResourceLocator<T>(this, path, projectResources);
         }
 
         protected override LocateFoldersRunner CreateLocateFoldersRunner (string path)
         {
-            return new ProjectFolderLocator(this, RootPath, path, projectResources);
+            return new ProjectFolderLocator(this, path, projectResources);
         }
 
         protected override void DisposeResource (Resource resource)
@@ -90,6 +98,12 @@ namespace Naninovel
             if (resource.Object is GameObject || resource.Object is Component) return;
 
             Resources.UnloadAsset(resource.Object);
+        }
+
+        protected override bool AreTypesCompatible (Type sourceType, Type targetType)
+        {
+            return base.AreTypesCompatible(sourceType, targetType) ||
+                   redirectors.Values.Any(r => r.SourceType == sourceType && r.RedirectType == targetType);
         }
     }
 }

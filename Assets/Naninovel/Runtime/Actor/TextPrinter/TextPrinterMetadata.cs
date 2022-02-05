@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using UnityEngine;
 
@@ -25,10 +25,14 @@ namespace Naninovel
         public bool AddToBacklog = true;
         [Tooltip("Whether to always split added backlog messages, even when the printer is not reset.")]
         public bool SplitBacklogMessages = false;
+        [Tooltip("Whether to stop any playing voices on each `@print` command.")]
+        public bool StopVoice = false;
         [Tooltip("Default visibility change animation duration; used when corresponding parameter is not specified in script command.")]
         public float ChangeVisibilityDuration = .3f;
         [Tooltip("Number of frames to wait before completing @print command. A value greater than zero is required to make the printed text visible while in skip mode.")]
         public int PrintFrameDelay = 1;
+        [Tooltip("Template to apply for printed messages with an associated author. %TEXT% will be replaced with the message text and %AUTHOR% with the author name (character display name).")]
+        public string AuthoredTemplate = default;
 
         public TextPrinterMetadata ()
         {
@@ -37,6 +41,6 @@ namespace Naninovel
             Pivot = new Vector2(.5f, .5f);
         }
 
-        public override TState GetPoseOrNull<TState> (string poseName) => null;
+        public override ActorPose<TState> GetPoseOrNull<TState> (string poseName) => null;
     }
 }

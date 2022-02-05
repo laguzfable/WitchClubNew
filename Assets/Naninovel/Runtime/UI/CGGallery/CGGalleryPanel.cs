@@ -1,70 +1,76 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
+using System.Collections.Generic;
+using System.Linq;
+using Naninovel.Runtime.UI;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Naninovel.UI
 {
     [RequireComponent(typeof(CanvasGroup))]
     public class CGGalleryPanel : CustomUI, ICGGalleryUI
     {
-        public int CGCount => grid.SlotCount;
+        public const string CGPrefix = "CG";
 
-        protected string UnlockableIdPrefix => unlockableIdPrefix;
-        protected ResourceLoaderConfiguration[] CGSources => cgSources;
-        protected ScriptableButton ViewerPanel => viewerPanel;
-        protected RawImage ViewerImage => viewerImage;
-        protected CGGalleryGrid Grid => grid;
+        public virtual int CGCount { get; private set; }
 
-        [Header("CG Setup")]
-        [Tooltip("All the unlockable item IDs with the specified prefix will be considered CG items.")]
-        [SerializeField] private string unlockableIdPrefix = "CG";
+        protected virtual ResourceLoaderConfiguration[] CGSources => cgSources;
+        protected virtual CGViewerPanel ViewerPanel => viewerPanel;
+        protected virtual CGGalleryGrid Grid => grid;
+
         [Tooltip("The specified resource loaders will be used to retrieve the available CG slots and associated textures.")]
         [SerializeField] private ResourceLoaderConfiguration[] cgSources = {
-            new ResourceLoaderConfiguration { PathPrefix = $"{UnlockablesConfiguration.DefaultPathPrefix}/CG" },
-            new ResourceLoaderConfiguration { PathPrefix = $"{BackgroundsConfiguration.DefaultPathPrefix}/{BackgroundsConfiguration.MainActorId}/CG" }
+            new ResourceLoaderConfiguration { PathPrefix = $"{UnlockablesConfiguration.DefaultPathPrefix}/{CGPrefix}" },
+            new ResourceLoaderConfiguration { PathPrefix = $"{BackgroundsConfiguration.DefaultPathPrefix}/{BackgroundsConfiguration.MainActorId}/{CGPrefix}" }
         };
-        [Tooltip("Whether to load only the resources required for the currently selected page and unload others. When disabled will preload all the CG resources on initialization and won't ever unload them.")]
-        [SerializeField] private bool dynamicLoad = true;
-
-        [Header("UI Setup")]
-        [SerializeField] private ScriptableButton viewerPanel = default;
-        [SerializeField] private RawImage viewerImage = default;
+        [Tooltip("Used to view selected CG slots.")]
+        [SerializeField] private CGViewerPanel viewerPanel = default;
+        [Tooltip("Used to host and navigate selectable CG preview thumbnails.")]
         [SerializeField] private CGGalleryGrid grid = default;
 
-        private IUnlockableManager unlockableManager;
         private IResourceProviderManager providerManager;
         private ILocalizationManager localizationManager;
         private IInputManager inputManager;
 
         public override async UniTask InitializeAsync ()
         {
-            foreach (var loaderConfig in cgSources)
+            var slotData = new List<CGSlotData>();
+            await UniTask.WhenAll(CGSources.Select(InitializeLoaderAsync));
+            CGCount = slotData.Count;
+            Grid.Initialize(viewerPanel, slotData);
+
+            async UniTask InitializeLoaderAsync (ResourceLoaderConfiguration loaderConfig)
             {
-                // 1. Locate all the available textures under the source path.
                 var loader = loaderConfig.CreateLocalizableFor<Texture2D>(providerManager, localizationManager);
                 var resourcePaths = await loader.LocateAsync(string.Empty);
-                // 2. Iterate the textures, adding them to the grid as CG slots.
-                foreach (var resourcePath in resourcePaths)
-                {
-                    var unlockableId = $"{unlockableIdPrefix}/{resourcePath}";
-                    if (grid.SlotExists(unlockableId)) continue;
-                    var slot = new CGGalleryGridSlot.Constructor(grid.SlotPrototype, unlockableId, resourcePath, dynamicLoad, loader, HandleSlotClicked).ConstructedSlot;
-                    grid.AddSlot(slot);
-                }
+                var pathsBySlots = resourcePaths.OrderBy(p => p).GroupBy(CGPathToSlotId);
+                foreach (var pathsBySlot in pathsBySlots)
+                    AddSlotData(pathsBySlot, loader);
             }
 
-            if (!dynamicLoad) 
-                await UniTask.WhenAll(grid.GetAllSlots().Select(s => s.LoadCGTextureAsync()));
+            string CGPathToSlotId (string cgPath)
+            {
+                if (cgPath.Contains(CGPrefix + "/"))
+                    cgPath = cgPath.GetAfterFirst(CGPrefix + "/");
+                if (!cgPath.Contains("_")) return cgPath;
+                if (!ParseUtils.TryInvariantInt(cgPath.GetAfter("_"), out _)) return cgPath;
+                return cgPath.GetBeforeLast("_");
+            }
+
+            void AddSlotData (IGrouping<string, string> pathsBySlot, IResourceLoader<Texture2D> loader)
+            {
+                var id = pathsBySlot.Key;
+                if (slotData.Any(s => s.Id == id)) return;
+                var data = new CGSlotData(id, pathsBySlot.OrderBy(p => p), loader);
+                slotData.Add(data);
+            }
         }
 
         protected override void Awake ()
         {
             base.Awake();
-            this.AssertRequiredObjects(grid, viewerPanel, viewerImage);
+            this.AssertRequiredObjects(Grid, ViewerPanel);
 
-            unlockableManager = Engine.GetService<IUnlockableManager>();
             providerManager = Engine.GetService<IResourceProviderManager>();
             localizationManager = Engine.GetService<ILocalizationManager>();
             inputManager = Engine.GetService<IInputManager>();
@@ -74,31 +80,16 @@ namespace Naninovel.UI
         {
             base.OnEnable();
 
-            viewerPanel.OnButtonClicked += viewerPanel.Hide;
-
             if (inputManager?.GetCancel() != null)
-                inputManager.GetCancel().OnStart += viewerPanel.Hide;
+                inputManager.GetCancel().OnStart += ViewerPanel.Hide;
         }
 
         protected override void OnDisable ()
         {
             base.OnDisable();
 
-            viewerPanel.OnButtonClicked -= viewerPanel.Hide;
-
             if (inputManager?.GetCancel() != null)
-                inputManager.GetCancel().OnStart -= viewerPanel.Hide;
-        }
-        
-        protected virtual async void HandleSlotClicked (string id)
-        {
-            var slot = grid.GetSlot(id);
-            if (!unlockableManager.ItemUnlocked(slot.UnlockableId)) return;
-
-            var cgTexture = await slot.LoadCGTextureAsync();
-            viewerImage.texture = cgTexture;
-            viewerImage.SetMaterialDirty(); // Otherwise it won't show after closing CG panel and returning back (Unity regression).
-            viewerPanel.Show();
+                inputManager.GetCancel().OnStart -= ViewerPanel.Hide;
         }
     }
 }

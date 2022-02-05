@@ -1,8 +1,7 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using System;
 using System.Collections.Generic;
-using UniRx.Async;
+using UnityEngine;
 
 namespace Naninovel
 {
@@ -11,15 +10,6 @@ namespace Naninovel
     /// </summary>
     public interface IResourceLoader
     {
-        /// <summary>
-        /// Event invoked when a resources with the path has finished loading.
-        /// </summary>
-        event Action<string> OnResourceLoaded;
-        /// <summary>
-        /// Event invoked when a resources with the path is unloaded.
-        /// </summary>
-        event Action<string> OnResourceUnloaded;
-
         /// <summary>
         /// Given provided resource is loaded by this loader,
         /// returns local (to the loader) path of the resource, null otherwise.
@@ -90,7 +80,7 @@ namespace Naninovel
     /// Implementation is able to load and unload <see cref="Resource{TResource}"/> objects, agnostic to the provision source.
     /// </summary>
     public interface IResourceLoader<TResource> : IResourceLoader
-        where TResource : UnityEngine.Object
+        where TResource : Object
     {
         /// <inheritdoc cref="IResourceLoader.GetLoadedOrNull"/>
         new Resource<TResource> GetLoadedOrNull (string path);

@@ -1,6 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
+using System.Collections.Generic;
 
 namespace Naninovel.Commands
 {
@@ -13,15 +13,18 @@ namespace Naninovel.Commands
     /// if the component implements `IAwaitable` interface, command execution will wait for
     /// the async completion task returned by the implementation before destroying the object.
     /// </remarks>
-    /// <example>
-    /// ; Given a "@spawn Rainbow" command was executed before
-    /// @despawn Rainbow
-    /// </example>
     [CommandAlias("despawn")]
     public class DestroySpawned : Command
     {
-        public interface IParameterized { void SetDestroyParameters (string[] parameters); }
-        public interface IAwaitable { UniTask AwaitDestroyAsync (CancellationToken cancellationToken = default); }
+        public interface IParameterized
+        {
+            void SetDestroyParameters (IReadOnlyList<string> parameters);
+        }
+
+        public interface IAwaitable
+        {
+            UniTask AwaitDestroyAsync (AsyncToken asyncToken = default);
+        }
 
         /// <summary>
         /// Name (path) of the prefab resource to destroy.
@@ -37,15 +40,18 @@ namespace Naninovel.Commands
 
         protected virtual ISpawnManager SpawnManager => Engine.GetService<ISpawnManager>();
 
-        public override async UniTask ExecuteAsync (CancellationToken cancellationToken = default)
+        public override async UniTask ExecuteAsync (AsyncToken asyncToken = default)
         {
-            if (!SpawnManager.IsObjectSpawned(Path))
+            if (!SpawnManager.IsSpawned(Path))
             {
                 LogWarningWithPosition($"Failed to destroy spawned object '{Path}': the object is not found.");
                 return;
             }
 
-            await SpawnManager.DestroySpawnedAsync(Path, cancellationToken, Params);
+            var spawned = SpawnManager.GetSpawned(Path);
+            spawned.SetDestroyParameters(Params?.ToReadOnlyList());
+            await spawned.AwaitDestroyAsync(asyncToken);
+            SpawnManager.DestroySpawned(Path);
         }
     }
 }

@@ -1,28 +1,34 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
+using System.Linq;
 
 namespace Naninovel.Commands
 {
     /// <summary>
     /// Hides (removes) all the visible characters on scene.
     /// </summary>
-    /// <example>
-    /// @hideChars
-    /// </example>
     [CommandAlias("hideChars")]
     public class HideAllCharacters : Command
     {
         /// <summary>
-        /// Duration (in seconds) of the fade animation. Default value: 0.35 seconds.
+        /// Duration (in seconds) of the fade animation.
         /// </summary>
-        [ParameterAlias("time")]
-        public DecimalParameter Duration = .35f;
+        [ParameterAlias("time"), ParameterDefaultValue("0.35")]
+        public DecimalParameter Duration;
+        /// <summary>
+        /// Whether to remove (destroy) the characters after they are hidden.
+        /// Use to unload resources associated with the characters and prevent memory leaks.
+        /// </summary>
+        [ParameterDefaultValue("false")]
+        public BooleanParameter Remove = false;
 
-        public override async UniTask ExecuteAsync (CancellationToken cancellationToken = default)
+        public override async UniTask ExecuteAsync (AsyncToken asyncToken = default)
         {
             var manager = Engine.GetService<ICharacterManager>();
-            await UniTask.WhenAll(manager.GetAllActors().Select(a => a.ChangeVisibilityAsync(false, Duration, cancellationToken: cancellationToken)));
+            var duration = Assigned(Duration) ? Duration.Value : manager.ActorManagerConfiguration.DefaultDuration;
+            var easing = manager.ActorManagerConfiguration.DefaultEasing;
+            await UniTask.WhenAll(manager.GetAllActors().Select(a => a.ChangeVisibilityAsync(false, duration, easing, asyncToken)));
+            if (Remove) manager.RemoveAllActors();
         }
     }
 }

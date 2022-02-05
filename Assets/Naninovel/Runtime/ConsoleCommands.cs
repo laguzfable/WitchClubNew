@@ -1,5 +1,10 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using Naninovel.Parsing;
+using Naninovel.UI;
 using UnityEngine;
 
 namespace Naninovel
@@ -18,19 +23,27 @@ namespace Naninovel
         }
 
         [ConsoleCommand("debug")]
-        public static void ToggleDebugInfoGUI () => UI.DebugInfoGUI.Toggle();
+        public static void ToggleDebugInfoGUI () => DebugInfoGUI.Toggle();
 
         [ConsoleCommand("var")]
-        public static void ToggleCustomVariableGUI () => UI.CustomVariableGUI.Toggle();
+        public static void ToggleCustomVariableGUI () => CustomVariableGUI.Toggle();
 
         #if UNITY_GOOGLE_DRIVE_AVAILABLE
         [ConsoleCommand("purge")]
         public static void PurgeCache ()
         {
             var manager = Engine.GetService<IResourceProviderManager>();
-            if (manager is null) { Debug.LogError("Failed to retrieve provider manager."); return; }
+            if (manager is null)
+            {
+                Debug.LogError("Failed to retrieve provider manager.");
+                return;
+            }
             var googleDriveProvider = manager.GetProvider(ResourceProviderConfiguration.GoogleDriveTypeName) as GoogleDriveResourceProvider;
-            if (googleDriveProvider is null) { Debug.LogError("Failed to retrieve google drive provider."); return; }
+            if (googleDriveProvider is null)
+            {
+                Debug.LogError("Failed to retrieve google drive provider.");
+                return;
+            }
             googleDriveProvider.PurgeCache();
         }
         #endif
@@ -66,25 +79,34 @@ namespace Naninovel
                 if (!Engine.Configuration.EnableDevelopmentConsole) return;
 
                 ConsoleGUI.ToggleKey = Engine.Configuration.ToggleConsoleKey;
-                ConsoleGUI.Initialize();
+                ConsoleGUI.Initialize(FindCommands());
 
-                // Process input starting with `@` as naninovel commands.
-                InputPreprocessor.AddPreprocessor(ProcessActionInput);
+                InputPreprocessor.AddPreprocessor(ProcessCommandInput);
+            }
+
+            Dictionary<string, MethodInfo> FindCommands ()
+            {
+                var commands = new Dictionary<string, MethodInfo>(StringComparer.OrdinalIgnoreCase);
+                foreach (var type in Engine.Types)
+                {
+                    var methods = type.GetMethods(BindingFlags.Static | BindingFlags.Public);
+                    for (int i = 0; i < methods.Length; i++)
+                    {
+                        var method = methods[i];
+                        var attr = method.GetCustomAttribute<ConsoleCommandAttribute>();
+                        if (attr is null) continue;
+                        commands[attr.Alias ?? method.Name] = method;
+                    }
+                }
+                return commands;
             }
         }
 
-        private static string ProcessActionInput (string input)
+        private static string ProcessCommandInput (string input)
         {
-            if (input is null || !input.StartsWithFast(CommandScriptLine.IdentifierLiteral)) return input;
-
-            var commandText = input.GetAfterFirst(CommandScriptLine.IdentifierLiteral);
-            var command = Commands.Command.FromScriptText("Console", 0, 0, commandText, out var errors);
-            if (!string.IsNullOrEmpty(errors))
-                Debug.LogWarning($"Failed to parse `{input}` command from development console.");
-            if (command is null) return null;
-
-            if (command.ShouldExecute)
-                command.ExecuteAsync();
+            if (input is null || !input.StartsWithFast(Identifiers.CommandLine)) return input;
+            var script = Script.FromScriptText("Console", input);
+            new ScriptPlaylist(script).ExecuteAsync().Forget();
             return null;
         }
     }

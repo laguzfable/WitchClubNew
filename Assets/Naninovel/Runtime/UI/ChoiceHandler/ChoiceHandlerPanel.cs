@@ -1,9 +1,8 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UniRx.Async;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -28,9 +27,9 @@ namespace Naninovel.UI
         /// </summary>
         public event Action<ChoiceState> OnChoice;
 
-        protected RectTransform ButtonsContainer => buttonsContainer;
-        protected ChoiceHandlerButton DefaultButtonPrefab => defaultButtonPrefab;
-        protected bool FocusChoiceButtons => focusChoiceButtons;
+        protected virtual RectTransform ButtonsContainer => buttonsContainer;
+        protected virtual ChoiceHandlerButton DefaultButtonPrefab => defaultButtonPrefab;
+        protected virtual bool FocusChoiceButtons => focusChoiceButtons;
 
         [Tooltip("Container that will hold spawned choice buttons.")]
         [SerializeField] private RectTransform buttonsContainer = null;
@@ -40,10 +39,11 @@ namespace Naninovel.UI
         [SerializeField] private bool focusChoiceButtons = true;
 
         private readonly List<ChoiceHandlerButton> choiceButtons = new List<ChoiceHandlerButton>();
+        private IResourceLoader<GameObject> customButtonLoader;
         private IBacklogUI backlogUI;
         private bool removeAllButtonsPending;
 
-        UniTask IManagedUI.ChangeVisibilityAsync (bool visible, float? duration, CancellationToken cancellationToken)
+        UniTask IManagedUI.ChangeVisibilityAsync (bool visible, float? duration, AsyncToken asyncToken)
         {
             Debug.LogError("@showUI and @hideUI commands can't be used with choice handlers; use @show/hide commands instead");
             return UniTask.CompletedTask;
@@ -59,10 +59,12 @@ namespace Naninovel.UI
 
             if (choiceButtons.Any(b => b.ChoiceState.Id == choice.Id)) return; // Could happen on rollback.
 
-            var choicePrefab = string.IsNullOrWhiteSpace(choice.ButtonPath) ? defaultButtonPrefab : Resources.Load<ChoiceHandlerButton>(choice.ButtonPath);
-            if (!choicePrefab) throw new Exception($"Failed to add `{choice.ButtonPath}` choice button. Make sure the button prefab is stored in a `Resources` folder of the project.");
+            var choicePrefab = string.IsNullOrWhiteSpace(choice.ButtonPath)
+                ? defaultButtonPrefab
+                : LoadCustomButtonPrefab(choice.ButtonPath);
             var choiceButton = Instantiate(choicePrefab, buttonsContainer, false);
             choiceButton.Initialize(choice);
+            choiceButton.Show();
             choiceButton.OnButtonClicked += () => OnChoice?.Invoke(choice);
 
             if (backlogUI != null)
@@ -76,7 +78,7 @@ namespace Naninovel.UI
 
             choiceButtons.Add(choiceButton);
 
-            if (focusChoiceButtons)
+            if (FocusChoiceButtons)
             {
                 switch (FocusModeType)
                 {
@@ -108,7 +110,13 @@ namespace Naninovel.UI
         /// </summary>
         public virtual void RemoveAllChoiceButtonsDelayed ()
         {
+            choiceButtons?.ForEach(HideIfValid);
             removeAllButtonsPending = true;
+
+            void HideIfValid (ChoiceHandlerButton button)
+            {
+                if (button) button.Hide();
+            }
         }
 
         public virtual void RemoveAllChoiceButtons ()
@@ -124,6 +132,17 @@ namespace Naninovel.UI
             this.AssertRequiredObjects(defaultButtonPrefab, buttonsContainer);
 
             backlogUI = Engine.GetService<IUIManager>().GetUI<IBacklogUI>();
+            customButtonLoader = Engine.GetService<IChoiceHandlerManager>().ChoiceButtonLoader;
+        }
+
+        protected virtual ChoiceHandlerButton LoadCustomButtonPrefab (string path)
+        {
+            var resource = customButtonLoader.GetLoadedOrNull(path) ?? Resource<GameObject>.Invalid;
+            if (resource.Valid && resource.Object.TryGetComponent<ChoiceHandlerButton>(out var b2)) return b2;
+            if (Resources.Load<ChoiceHandlerButton>(path) is ChoiceHandlerButton b1 && b1) return b1;
+            throw new Exception($"Failed to add custom `{path}` choice button. Make sure the button prefab is stored in a `Resources` folder " +
+                                "or custom loader in choices configuration is set up correctly. " +
+                                "Be aware, that when using custom loader, dynamic path values (with expressions) are not supported.");
         }
 
         protected override void SerializeState (GameStateMap stateMap)

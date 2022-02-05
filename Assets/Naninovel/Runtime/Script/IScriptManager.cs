@@ -1,8 +1,7 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
-using UniRx.Async;
 
 namespace Naninovel
 {
@@ -35,9 +34,13 @@ namespace Naninovel
         int TotalCommandsCount { get; }
 
         /// <summary>
-        /// Loads all the script assets stored under <see cref="ScriptsConfiguration.ExternalLoader"/> (community modding feature).
+        /// Locates all the available script assets.
         /// </summary>
-        UniTask<IReadOnlyCollection<Script>> LoadExternalScriptsAsync ();
+        UniTask<IReadOnlyCollection<string>> LocateScriptsAsync ();
+        /// <summary>
+        /// Locates all the script assets stored under <see cref="ScriptsConfiguration.ExternalLoader"/> (community modding feature).
+        /// </summary>
+        UniTask<IReadOnlyCollection<string>> LocateExternalScriptsAsync ();
         /// <summary>
         /// Loads script asset with the provided name and related localization script (when available).
         /// </summary>

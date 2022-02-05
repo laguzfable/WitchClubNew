@@ -30,10 +30,26 @@
                     "interactions": ""
                 },
                 {
+                    "name": "Pause",
+                    "type": "Button",
+                    "id": "143d6fb0-1d0f-479d-8645-cb04a93ad28d",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
                     "name": "Skip",
-                    "type": "Value",
+                    "type": "Button",
                     "id": "09ffc7b1-876b-4bd2-a08d-cd0d2084d572",
-                    "expectedControlType": "",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "ToggleSkip",
+                    "type": "Button",
+                    "id": "50b9187c-1ed8-428e-853b-e4cb02af8518",
+                    "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
                 },
@@ -320,6 +336,17 @@
                 },
                 {
                     "name": "",
+                    "id": "305a87ee-20bb-4da2-a779-5fc5addc577b",
+                    "path": "<Gyroscope>/angularVelocity/y",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "CameraLookX",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "e04fe78f-2ab1-4866-98ef-61726264362d",
                     "path": "<Mouse>/delta/y",
                     "interactions": "",
@@ -337,6 +364,61 @@
                     "processors": "",
                     "groups": "",
                     "action": "CameraLookY",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5464e525-e842-4d2e-b7f7-1363b0592950",
+                    "path": "<Gyroscope>/angularVelocity/x",
+                    "interactions": "",
+                    "processors": "Invert",
+                    "groups": "",
+                    "action": "CameraLookY",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6b794c7c-d98a-49b3-aae2-575eebfce604",
+                    "path": "<Gamepad>/start",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1f293dc8-e0d7-4bc4-9491-c5a196b882df",
+                    "path": "<Keyboard>/backspace",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "081d8479-19d0-4528-b154-657815e3f0b6",
+                    "path": "<Gamepad>/rightStickPress",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ToggleSkip",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b3552f3d-691a-4248-b1c0-ca6639aa0b1c",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ToggleSkip",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

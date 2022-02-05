@@ -1,31 +1,13 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System.Collections.Generic;
-using UniRx.Async;
+using UnityEngine;
 
 namespace Naninovel.Commands
 {
     /// <summary>
     /// Modifies a [character actor](/guide/characters.md).
     /// </summary>
-    /// <example>
-    /// ; Shows character with ID `Sora` with a default appearance.
-    /// @char Sora
-    /// 
-    /// ; Same as above, but sets appearance to `Happy`.
-    /// @char Sora.Happy
-    /// 
-    /// ; Same as above, but also positions the character 45% away from the left border 
-    /// ; of the screen and 10% away from the bottom border; also makes him look to the left.
-    /// @char Sora.Happy look:left pos:45,10
-    /// 
-    /// ; Make Sora appear at the bottom-center and in front of Felix
-    /// @char Sora pos:50,0,-1
-    /// @char Felix pos:,,0
-    /// 
-    /// ; Tint all visible characters on scene.
-    /// @char * tint:#ffdc22
-    /// </example>
     [CommandAlias("char")]
     public class ModifyCharacter : ModifyOrthoActor<ICharacterActor, CharacterState, CharacterMetadata, CharactersConfiguration, ICharacterManager>
     {
@@ -33,12 +15,12 @@ namespace Naninovel.Commands
         /// ID of the character to modify (specify `*` to affect all visible characters) and an appearance (or [pose](/guide/characters.md#poses)) to set.
         /// When appearance is not provided, will use either a `Default` (is exists) or a random one.
         /// </summary>
-        [ParameterAlias(NamelessParameterAlias), RequiredParameter, IDEActor(CharactersConfiguration.DefaultPathPrefix, 0), IDEAppearance(1)]
+        [ParameterAlias(NamelessParameterAlias), RequiredParameter, ActorContext(CharactersConfiguration.DefaultPathPrefix, 0), AppearanceContext(1)]
         public NamedStringParameter IdAndAppearance;
         /// <summary>
         /// Look direction of the actor; supported values: left, right, center.
         /// </summary>
-        [ParameterAlias("look")]
+        [ParameterAlias("look"), ConstantContext(typeof(CharacterLookDirection))]
         public StringParameter LookDirection;
         /// <summary>
         /// Name (path) of the [avatar texture](/guide/characters.md#avatar-textures) to assign for the character.
@@ -48,17 +30,15 @@ namespace Naninovel.Commands
         public StringParameter AvatarTexturePath;
 
         protected override bool AllowPreload => !IdAndAppearance.DynamicValue;
-        // Allows specifying ID via the nameless parameter.
-        protected override string AssignedId => IdAndAppearance?.Name;
-        // Allows specifying appearance via the nameless parameter.
-        protected override string AssignedAppearance => Assigned(Appearance) ? Appearance.Value : Pose?.Appearance ?? IdAndAppearance?.NamedValue;
-        protected override CharacterState Pose => ActorManager.Configuration.GetMetadataOrDefault(IdAndAppearance?.Name).GetPoseOrNull<CharacterState>(IdAndAppearance?.NamedValue);
-        protected virtual CharacterLookDirection? AssignedLookDirection => Assigned(LookDirection) ? ParseLookDirection(LookDirection) : Pose?.LookDirection;
+        protected override string AssignedId => base.AssignedId ?? IdAndAppearance?.Name;
+        protected override string AlternativeAppearance => IdAndAppearance?.NamedValue;
+        protected virtual CharacterLookDirection? AssignedLookDirection => Assigned(LookDirection) ? ParseLookDirection(LookDirection) : PosedLookDirection;
 
-        public override async UniTask ExecuteAsync (CancellationToken cancellationToken = default)
+        protected CharacterLookDirection? PosedLookDirection => GetPosed(nameof(CharacterState.LookDirection))?.LookDirection;
+
+        public override async UniTask ExecuteAsync (AsyncToken asyncToken = default)
         {
-            await base.ExecuteAsync(cancellationToken);
-            if (cancellationToken.CancelASAP) return;
+            await base.ExecuteAsync(asyncToken);
 
             if (!Assigned(AvatarTexturePath)) // Check if we can map current appearance to an avatar texture path.
             {
@@ -80,25 +60,27 @@ namespace Naninovel.Commands
             }
         }
 
-        protected override async UniTask ApplyModificationsAsync (ICharacterActor actor, EasingType easingType, CancellationToken cancellationToken)
+        protected override async UniTask ApplyModificationsAsync (ICharacterActor actor, EasingType easingType, AsyncToken asyncToken)
         {
-            // Execute auto-arrange if adding to scene, no position specified and auto-arrange on add is enabled.
-            var autoArrange = Pose is null && !Assigned(ScenePosition) && AssignedPosition is null && !actor.Visible && AssignedVisibility.HasValue && AssignedVisibility.Value && ActorManager.Configuration.AutoArrangeOnAdd;
+            var addingActor = !actor.Visible && AssignedVisibility.HasValue && AssignedVisibility.Value;
+            var autoArrange = ActorManager.Configuration.AutoArrangeOnAdd && addingActor && AssignedPosition is null;
 
             var tasks = new List<UniTask>();
-            tasks.Add(base.ApplyModificationsAsync(actor, easingType, cancellationToken));
-            tasks.Add(ApplyLookDirectionModificationAsync(actor, easingType, cancellationToken));
+            var duration = actor.Visible ? AssignedDuration : 0;
+            tasks.Add(base.ApplyModificationsAsync(actor, easingType, asyncToken));
+            tasks.Add(ApplyLookDirectionModificationAsync(actor, duration, easingType, asyncToken));
 
-            if (autoArrange) 
-                tasks.Add(ActorManager.ArrangeCharactersAsync(!Assigned(LookDirection), Duration, easingType, cancellationToken));
+            if (autoArrange)
+                tasks.Add(ActorManager.ArrangeCharactersAsync(!AssignedLookDirection.HasValue, AssignedDuration, easingType, asyncToken));
 
             await UniTask.WhenAll(tasks);
         }
 
-        protected virtual async UniTask ApplyLookDirectionModificationAsync (ICharacterActor actor, EasingType easingType, CancellationToken cancellationToken)
+        protected virtual async UniTask ApplyLookDirectionModificationAsync (ICharacterActor actor, float duration, EasingType easingType, AsyncToken asyncToken)
         {
             if (!AssignedLookDirection.HasValue) return;
-            await actor.ChangeLookDirectionAsync(AssignedLookDirection.Value, Duration, easingType, cancellationToken);
+            if (Mathf.Approximately(duration, 0)) actor.LookDirection = AssignedLookDirection.Value;
+            else await actor.ChangeLookDirectionAsync(AssignedLookDirection.Value, AssignedDuration, easingType, asyncToken);
         }
 
         protected virtual CharacterLookDirection? ParseLookDirection (string value)
@@ -107,7 +89,11 @@ namespace Naninovel.Commands
             if (value.EqualsFastIgnoreCase("right")) return CharacterLookDirection.Right;
             else if (value.EqualsFastIgnoreCase("left")) return CharacterLookDirection.Left;
             else if (value.EqualsFastIgnoreCase("center")) return CharacterLookDirection.Center;
-            else { LogErrorWithPosition($"`{value}` is not a valid value for a character look direction; see API guide for `@char` command for the list of supported values."); return null; }
+            else
+            {
+                LogErrorWithPosition($"`{value}` is not a valid value for a character look direction; see API guide for `@char` command for the list of supported values.");
+                return null;
+            }
         }
-    } 
+    }
 }

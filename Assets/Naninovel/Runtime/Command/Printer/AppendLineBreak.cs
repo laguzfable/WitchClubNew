@@ -1,6 +1,5 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
 
 namespace Naninovel.Commands
 {
@@ -8,49 +7,39 @@ namespace Naninovel.Commands
     /// Adds a line break to a text printer.
     /// </summary>
     /// <remarks>
-    /// Consider using &lt;br&gt; tag instead with [TMPro printers](/guide/text-printers.md#textmesh-pro).
+    /// Consider using `&lt;br&gt;` tag instead with [TMPro printers](/guide/text-printers.md#textmesh-pro).
     /// </remarks>
-    /// <example>
-    /// ; Second sentence will be printed on a new line
-    /// Lorem ipsum dolor sit amet.[br]Consectetur adipiscing elit.
-    /// 
-    /// ; Second sentence will be printer two lines under the first one
-    /// Lorem ipsum dolor sit amet.[br 2]Consectetur adipiscing elit.
-    /// </example>
     [CommandAlias("br")]
     public class AppendLineBreak : PrinterCommand
     {
         /// <summary>
         /// Number of line breaks to add.
         /// </summary>
-        [ParameterAlias(NamelessParameterAlias)]
+        [ParameterAlias(NamelessParameterAlias), ParameterDefaultValue("1")]
         public IntegerParameter Count = 1;
         /// <summary>
         /// ID of the printer actor to use. Will use a default one when not provided.
         /// </summary>
-        [ParameterAlias("printer"), IDEActor(TextPrintersConfiguration.DefaultPathPrefix)]
+        [ParameterAlias("printer"), ActorContext(TextPrintersConfiguration.DefaultPathPrefix)]
         public StringParameter PrinterId;
         /// <summary>
         /// ID of the actor, which should be associated with the appended line break.
         /// </summary>
-        [ParameterAlias("author"), IDEActor(CharactersConfiguration.DefaultPathPrefix)]
+        [ParameterAlias("author"), ActorContext(CharactersConfiguration.DefaultPathPrefix)]
         public StringParameter AuthorId;
 
         protected override string AssignedPrinterId => PrinterId;
         protected override string AssignedAuthorId => AuthorId;
         protected IUIManager UIManager => Engine.GetService<IUIManager>();
 
-        public override async UniTask ExecuteAsync (CancellationToken cancellationToken = default)
+        public override async UniTask ExecuteAsync (AsyncToken asyncToken = default)
         {
-            var printer = await GetOrAddPrinterAsync();
-            if (cancellationToken.CancelASAP) return;
-            var backlogUI = UIManager.GetUI<UI.IBacklogUI>();
-
+            var breaks = string.Empty;
             for (int i = 0; i < Count; i++)
-            {
-                printer.Text += "\n";
-                backlogUI?.AppendMessage("\n");
-            }
+                breaks += "\n";
+            var printer = await GetOrAddPrinterAsync(asyncToken);
+            printer.Text += breaks;
+            UIManager.GetUI<UI.IBacklogUI>()?.AppendMessage(breaks);
         }
     }
 }

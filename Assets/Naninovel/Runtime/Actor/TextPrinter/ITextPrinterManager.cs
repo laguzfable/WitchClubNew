@@ -1,7 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
-using UniRx.Async;
 
 namespace Naninovel
 {
@@ -39,7 +38,7 @@ namespace Naninovel
         /// <param name="text">Text of the message to print.</param>
         /// <param name="authorId">ID of a character actor to which the printed text belongs (if any).</param>
         /// <param name="speed">Text reveal speed (<see cref="BaseRevealSpeed"/> modifier).</param>
-        /// <param name="cancellationToken">Token for task cancellation. The text will be revealed instantly when cancelled.</param>
-        UniTask PrintTextAsync (string printerId, string text, string authorId = default, float speed = 1, CancellationToken cancellationToken = default);
+        /// <param name="asyncToken">Token for task cancellation. The text will be revealed instantly when cancelled.</param>
+        UniTask PrintTextAsync (string printerId, string text, string authorId = default, float speed = 1, AsyncToken asyncToken = default);
     }
 }

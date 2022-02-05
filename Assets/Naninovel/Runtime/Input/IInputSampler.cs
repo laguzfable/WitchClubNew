@@ -1,7 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel
@@ -45,6 +44,11 @@ namespace Naninovel
         /// </summary>
         bool EndedDuringFrame { get; }
 
+        /// <summary>
+        /// Activates the input.
+        /// </summary>
+        /// <param name="value">Value (force) of the activation, in 0.0 to 1.0 range.</param>
+        void Activate (float value);
         /// <summary>
         /// When any of the provided game objects are clicked or touched, input event will trigger.
         /// </summary>

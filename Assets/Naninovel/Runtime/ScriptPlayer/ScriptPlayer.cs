@@ -1,11 +1,9 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using Naninovel.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel
@@ -17,7 +15,7 @@ namespace Naninovel
         [Serializable]
         public class Settings
         {
-            public PlayerSkipMode SkipMode = PlayerSkipMode.ReadOnly;
+            public PlayerSkipMode SkipMode;
         }
 
         [Serializable]
@@ -42,10 +40,10 @@ namespace Naninovel
         public event Action<bool> OnSkip;
         public event Action<bool> OnAutoPlay;
         public event Action<bool> OnWaitingForInput;
+        public event Action<float> OnPreloadProgress;
 
         public virtual ScriptPlayerConfiguration Configuration { get; }
         public virtual bool Playing => playRoutineCTS != null;
-        public virtual bool SkipAllowed => GetSkipAllowed();
         public virtual bool SkipActive { get; private set; }
         public virtual bool AutoPlayActive { get; private set; }
         public virtual bool WaitingForInput { get; private set; }
@@ -63,8 +61,8 @@ namespace Naninovel
         private readonly List<Func<Command, UniTask>> postExecutionTasks = new List<Func<Command, UniTask>>();
         private readonly Queue<Func<UniTask>> onSynchronizeTasks = new Queue<Func<UniTask>>();
         private readonly IInputManager inputManager;
-        private IScriptManager scriptManager;
-        private IStateManager stateManager;
+        private readonly IScriptManager scriptManager;
+        private readonly IStateManager stateManager;
         private int executedCommandsCount = 0;
         private bool executedPlayedCommand;
         private PlayedScriptRegister playedScriptRegister;
@@ -73,13 +71,16 @@ namespace Naninovel
         private CancellationTokenSource synchronizationCTS;
         private UniTaskCompletionSource waitForWaitForInputDisabledTCS;
         private UniTaskCompletionSource synchronizeTCS;
-        private IInputSampler continueInput, skipInput, autoPlayInput;
+        private IInputSampler continueInput, skipInput, toggleSkipInput, autoPlayInput;
 
-        public ScriptPlayer (ScriptPlayerConfiguration config, ResourceProviderConfiguration providerConfig, IInputManager inputManager)
+        public ScriptPlayer (ScriptPlayerConfiguration config, ResourceProviderConfiguration providerConfig, 
+            IInputManager inputManager, IScriptManager scriptManager, IStateManager stateManager)
         {
             Configuration = config;
             this.providerConfig = providerConfig;
             this.inputManager = inputManager;
+            this.scriptManager = scriptManager;
+            this.stateManager = stateManager;
 
             GosubReturnSpots = new Stack<PlaybackSpot>();
             playedScriptRegister = new PlayedScriptRegister();
@@ -89,11 +90,9 @@ namespace Naninovel
 
         public virtual UniTask InitializeServiceAsync ()
         {
-            scriptManager = Engine.GetService<IScriptManager>();
-            stateManager = Engine.GetService<IStateManager>();
-            
             continueInput = inputManager.GetContinue();
             skipInput = inputManager.GetSkip();
+            toggleSkipInput = inputManager.GetToggleSkip();
             autoPlayInput = inputManager.GetAutoPlay();
 
             if (continueInput != null)
@@ -106,6 +105,8 @@ namespace Naninovel
                 skipInput.OnStart += EnableSkip;
                 skipInput.OnEnd += DisableSkip;
             }
+            if (toggleSkipInput != null)
+                toggleSkipInput.OnStart += ToggleSkip;
             if (autoPlayInput != null)
                 autoPlayInput.OnStart += ToggleAutoPlay;
 
@@ -147,6 +148,8 @@ namespace Naninovel
                 skipInput.OnStart -= EnableSkip;
                 skipInput.OnEnd -= DisableSkip;
             }
+            if (toggleSkipInput != null)
+                toggleSkipInput.OnStart -= ToggleSkip;
             if (autoPlayInput != null)
                 autoPlayInput.OnStart -= ToggleAutoPlay;
         }
@@ -161,7 +164,9 @@ namespace Naninovel
 
         public virtual UniTask LoadServiceStateAsync (SettingsStateMap stateMap)
         {
-            var settings = stateMap.GetState<Settings>() ?? new Settings();
+            var settings = stateMap.GetState<Settings>() ?? new Settings {
+                SkipMode = Configuration.DefaultSkipMode 
+            };
             SkipMode = settings.SkipMode;
             return UniTask.CompletedTask;
         }
@@ -223,11 +228,11 @@ namespace Naninovel
                 {
                     PlayedScript = await scriptManager.LoadScriptAsync(stateMap.PlaybackSpot.ScriptName);
                     Playlist = new ScriptPlaylist(PlayedScript, scriptManager);
-                    PlayedIndex = Playlist.IndexOf(stateMap.PlaybackSpot);
+                    PlayedIndex = FindPlayableIndex(stateMap.PlaybackSpot);
                     Debug.Assert(PlayedIndex >= 0, $"Failed to load script player state: `{stateMap.PlaybackSpot}` doesn't exist in the current playlist.");
                     var endIndex = providerConfig.ResourcePolicy == ResourcePolicy.Static ? Playlist.Count - 1 :
                         Mathf.Min(PlayedIndex + providerConfig.DynamicPolicySteps, Playlist.Count - 1);
-                    await Playlist.PreloadResourcesAsync(PlayedIndex, endIndex);
+                    await Playlist.PreloadResourcesAsync(PlayedIndex, endIndex, OnPreloadProgress.SafeInvoke);
                 }
                 else PlayedIndex = Playlist.IndexOf(stateMap.PlaybackSpot);
             }
@@ -269,7 +274,7 @@ namespace Naninovel
 
         public virtual void Play ()
         {
-            if (PlayedScript is null || Playlist is null)
+            if (!PlayedScript || Playlist is null)
                 throw new Exception("Failed to start script playback: the script is not assigned.");
 
             if (Playing) Stop();
@@ -277,8 +282,10 @@ namespace Naninovel
             if (Playlist.IsIndexValid(PlayedIndex) || SelectNextCommand())
             {
                 playRoutineCTS = new CancellationTokenSource();
-                PlayRoutineAsync(playRoutineCTS.Token).Forget();
-                OnPlay?.Invoke(PlayedScript);
+                var playRoutineCancellationToken = playRoutineCTS.Token;
+                PlayRoutineAsync(playRoutineCancellationToken).Forget();
+                if (!playRoutineCancellationToken.IsCancellationRequested)
+                    OnPlay?.Invoke(PlayedScript);
             }
         }
 
@@ -313,11 +320,8 @@ namespace Naninovel
             Play();
         }
 
-        public virtual async UniTask PreloadAndPlayAsync (string scriptName, int startLineIndex = 0, int startInlineIndex = 0, string label = null)
+        public virtual async UniTask PreloadAndPlayAsync (Script script, int startLineIndex = 0, int startInlineIndex = 0, string label = null)
         {
-            var script = await scriptManager.LoadScriptAsync(scriptName);
-            if (script is null) throw new Exception($"Script player failed to start: script with name `{scriptName}` wasn't able to load.");
-
             if (!string.IsNullOrEmpty(label))
             {
                 if (!script.LabelExists(label)) throw new Exception($"Failed navigating script playback to `{label}` label: label not found in `{script.Name}` script.");
@@ -331,37 +335,20 @@ namespace Naninovel
             var startIndex = startAction != null ? Playlist.IndexOf(startAction) : 0;
             var endIndex = providerConfig.ResourcePolicy == ResourcePolicy.Static ? Playlist.Count - 1 :
                 Mathf.Min(startIndex + providerConfig.DynamicPolicySteps, Playlist.Count - 1);
-            await Playlist.PreloadResourcesAsync(startIndex, endIndex);
+            await Playlist.PreloadResourcesAsync(startIndex, endIndex, OnPreloadProgress.SafeInvoke);
             prevPlaylist?.ReleaseResources();
             await Resources.UnloadUnusedAssets();
 
             Play(script, startLineIndex, startInlineIndex);
         }
-        
-        public async UniTask PlayTransientAsync (ScriptPlaylist playlist, CancellationToken cancellationToken = default)
-        {
-            foreach (var command in playlist)
-            {
-                if (cancellationToken.CancelASAP) return;
-                if (!command.ShouldExecute) continue;
-                if (command.ForceWait || PlayedCommand.Wait) 
-                    await command.ExecuteAsync(cancellationToken);
-                else command.ExecuteAsync(cancellationToken).Forget();
-            }
-        }
 
         public virtual void Stop ()
         {
-            if (Playing)
-            {
-                playRoutineCTS.Cancel();
-                playRoutineCTS.Dispose();
-                playRoutineCTS = null;
+            playRoutineCTS?.Cancel();
+            playRoutineCTS?.Dispose();
+            playRoutineCTS = null;
 
-                OnStop?.Invoke(PlayedScript);
-            }
-
-            DisableWaitingForInput();
+            OnStop?.Invoke(PlayedScript);
         }
 
         public virtual async UniTask<bool> RewindAsync (int lineIndex)
@@ -374,9 +361,9 @@ namespace Naninovel
             var targetPlaylistIndex = Playlist.IndexOf(targetCommand);
             if (targetPlaylistIndex == PlayedIndex) return true;
 
-            if (Playing) Stop();
-
             var wasWaitingInput = WaitingForInput;
+            
+            if (Playing) Stop();
             DisableAutoPlay();
             DisableSkip();
             DisableWaitingForInput();
@@ -393,7 +380,7 @@ namespace Naninovel
             }
             else
             {
-                var targetSpot = new PlaybackSpot(PlayedScript.Name, lineIndex, 0);
+                var targetSpot = targetCommand.PlaybackSpot;
                 result = await stateManager.RollbackAsync(s => s.PlaybackSpot == targetSpot);
             }
 
@@ -403,13 +390,18 @@ namespace Naninovel
         public virtual void SetSkipEnabled (bool enable)
         {
             if (SkipActive == enable) return;
-            if (enable && !SkipAllowed) return;
+            if (enable && !GetSkipAllowed()) return;
 
             SkipActive = enable;
             Time.timeScale = enable ? Configuration.SkipTimeScale : 1f;
             OnSkip?.Invoke(enable);
 
-            if (enable && WaitingForInput) SetWaitingForInputEnabled(false);
+            if (enable && WaitingForInput)
+            {
+                stateManager.PeekRollbackStack()?.AllowPlayerRollback();
+                SetWaitingForInputEnabled(false);
+            }
+            if (enable && AutoPlayActive) SetAutoPlayEnabled(false);
         }
 
         public virtual void SetAutoPlayEnabled (bool enable)
@@ -471,21 +463,45 @@ namespace Naninovel
                 clickThroughUI.Hide();
         }
 
-        /// <summary>
-        /// In case synchronization is performed, will wait until it's completed;
-        /// returns true in case provided token has requested ASAP cancellation.
-        /// </summary>
-        /// <remarks>This should be awaited after any async operation in the playback routine.</remarks>
-        protected async UniTask<bool> WaitSynchronizeAsync (CancellationToken cancellationToken)
+        public bool HasPlayed (string scriptName, int playlistIndex)
         {
-            if (cancellationToken.CancelASAP) return true;
-            if (synchronizeTCS != null)
-                await synchronizeTCS.Task;
-            return cancellationToken.CancelASAP;
+            return playedScriptRegister.IsIndexPlayed(scriptName, playlistIndex);
         }
         
+        public bool HasPlayed (string scriptName)
+        {
+            return playedScriptRegister.IsScriptPlayed(scriptName);
+        }
+
+        /// <summary>
+        /// In case synchronization is performed, will wait until it's completed;
+        /// returns true in case provided token has requested cancellation.
+        /// </summary>
+        /// <remarks>This should be awaited after any async operation in the playback routine.</remarks>
+        protected virtual async UniTask<bool> WaitSynchronizeAsync (AsyncToken asyncToken)
+        {
+            if (asyncToken.Canceled) return true;
+            if (synchronizeTCS != null)
+                await synchronizeTCS.Task;
+            return asyncToken.Canceled;
+        }
+
+        protected virtual int FindPlayableIndex (PlaybackSpot spot)
+        {
+            var index = Playlist.IndexOf(spot);
+            if (index >= 0 || spot.InlineIndex <= 0) return index;
+            Debug.LogWarning($"Failed to play `{spot}`. Will attempt to find nearest playable index; expect undefined behaviour.");
+            while (index < 0 && spot.InlineIndex > 0)
+            {
+                spot = new PlaybackSpot(spot.ScriptName, spot.LineIndex, spot.InlineIndex - 1);
+                index = Playlist.IndexOf(spot);
+            }
+            return index;
+        }
+
         private void EnableSkip () => SetSkipEnabled(true);
         private void DisableSkip () => SetSkipEnabled(false);
+        private void ToggleSkip () => SetSkipEnabled(!SkipActive);
         private void EnableAutoPlay () => SetAutoPlayEnabled(true);
         private void DisableAutoPlay () => SetAutoPlayEnabled(false);
         private void ToggleAutoPlay () => SetAutoPlayEnabled(!AutoPlayActive);
@@ -496,7 +512,7 @@ namespace Naninovel
         {
             if (SkipMode == PlayerSkipMode.Everything) return true;
             if (PlayedScript is null) return false;
-            return playedScriptRegister.IsIndexPlayed(PlayedScript.Name, PlayedIndex);
+            return HasPlayed(PlayedScript.Name, PlayedIndex);
         }
 
         private async UniTask WaitForWaitForInputDisabledAsync ()
@@ -512,7 +528,7 @@ namespace Naninovel
             if (!AutoPlayActive) await WaitForWaitForInputDisabledAsync(); // In case auto play was disabled while waiting for delay.
         }
 
-        private async UniTask ExecutePlayedCommandAsync (CancellationToken cancellationToken)
+        private async UniTask ExecutePlayedCommandAsync (AsyncToken asyncToken)
         {
             if (PlayedCommand is null || !PlayedCommand.ShouldExecute) return;
 
@@ -523,49 +539,39 @@ namespace Naninovel
             for (int i = preExecutionTasks.Count - 1; i >= 0; i--)
             {
                 await preExecutionTasks[i](PlayedCommand);
-                if (await WaitSynchronizeAsync(cancellationToken)) return;
+                if (await WaitSynchronizeAsync(asyncToken)) return;
             }
-            
-            if (await WaitSynchronizeAsync(cancellationToken)) return;
+
+            if (await WaitSynchronizeAsync(asyncToken)) return;
 
             var synchronizationToken = synchronizationCTS.Token;
             executedPlayedCommand = true;
             executedCommandsCount++;
-            
-            if (Configuration.CompleteOnContinue && continueInput != null && PlayedCommand.Wait && !PlayedCommand.ForceWait)
+
+            var shouldWait = Configuration.ShouldWait(PlayedCommand);
+            if (Configuration.CompleteOnContinue && continueInput != null && shouldWait && !PlayedCommand.ForceWait)
             {
-                var syncAndInputCTS = CancellationTokenSource.CreateLinkedTokenSource(synchronizationToken, continueInput.GetInputStartCancellationToken());
-                var executionToken = new CancellationToken(commandExecutionCTS.Token, syncAndInputCTS.Token);
-                await PlayedCommand.ExecuteAsync(executionToken);
-                syncAndInputCTS.Dispose();
-                executedCommandsCount--;
-            }
-            else if (PlayedCommand.Wait || PlayedCommand.ForceWait)
-            {
-                var executionToken = new CancellationToken(commandExecutionCTS.Token, synchronizationToken);
-                await PlayedCommand.ExecuteAsync(executionToken);
-                executedCommandsCount--;
+                var syncAndContinueCTS = LinkSynchronizationWithContinueInputTokens(synchronizationToken);
+                var executionToken = new AsyncToken(commandExecutionCTS.Token, syncAndContinueCTS.Token);
+                await ExecuteIgnoringCancellationAsync(PlayedCommand, executionToken);
+                syncAndContinueCTS.Dispose();
             }
             else
             {
-                var executionToken = new CancellationToken(commandExecutionCTS.Token, synchronizationToken);
-                ExecuteCommandConcurrently().Forget();
-                async UniTaskVoid ExecuteCommandConcurrently ()
-                {
-                    await PlayedCommand.ExecuteAsync(executionToken);
-                    executedCommandsCount--;
-                }
+                var executionToken = new AsyncToken(commandExecutionCTS.Token, synchronizationToken);
+                if (shouldWait) await ExecuteIgnoringCancellationAsync(PlayedCommand, executionToken);
+                else ExecuteIgnoringCancellationAsync(PlayedCommand, executionToken).Forget();
             }
-            if (await WaitSynchronizeAsync(cancellationToken)) return;
+            if (await WaitSynchronizeAsync(asyncToken)) return;
 
             for (int i = postExecutionTasks.Count - 1; i >= 0; i--)
             {
                 await postExecutionTasks[i](PlayedCommand);
-                if (await WaitSynchronizeAsync(cancellationToken)) return;
+                if (await WaitSynchronizeAsync(asyncToken)) return;
             }
 
-            if (await WaitSynchronizeAsync(cancellationToken)) return;
-            
+            if (await WaitSynchronizeAsync(asyncToken)) return;
+
             if (providerConfig.ResourcePolicy == ResourcePolicy.Dynamic)
             {
                 if (PlayedCommand is Command.IPreloadable playedPreloadableCmd)
@@ -577,7 +583,22 @@ namespace Naninovel
             OnCommandExecutionFinish?.Invoke(PlayedCommand);
         }
 
-        private async UniTask PlayRoutineAsync (CancellationToken cancellationToken)
+        private CancellationTokenSource LinkSynchronizationWithContinueInputTokens (CancellationToken synchronizationToken)
+        {
+            var continueInputCT = continueInput.GetInputStartCancellationToken();
+            var skipInputCT = skipInput?.GetInputStartCancellationToken() ?? default;
+            var toggleSkipInputCT = toggleSkipInput?.GetInputStartCancellationToken() ?? default;
+            return CancellationTokenSource.CreateLinkedTokenSource(synchronizationToken, continueInputCT, skipInputCT, toggleSkipInputCT);
+        }
+
+        private async UniTask ExecuteIgnoringCancellationAsync (Command command, AsyncToken asyncToken)
+        {
+            try { await PlayedCommand.ExecuteAsync(asyncToken); }
+            catch (AsyncOperationCanceledException) { }
+            executedCommandsCount--;
+        }
+
+        private async UniTask PlayRoutineAsync (AsyncToken asyncToken)
         {
             while (Engine.Initialized && Playing)
             {
@@ -586,34 +607,34 @@ namespace Naninovel
                     if (AutoPlayActive) 
                     { 
                         await UniTask.WhenAny(WaitForAutoPlayDelayAsync(), WaitForWaitForInputDisabledAsync()); 
-                        if (await WaitSynchronizeAsync(cancellationToken)) return;
+                        if (await WaitSynchronizeAsync(asyncToken)) return;
                         DisableWaitingForInput(); 
                     }
                     else
                     {
                         await WaitForWaitForInputDisabledAsync();
-                        if (await WaitSynchronizeAsync(cancellationToken)) return;
+                        if (await WaitSynchronizeAsync(asyncToken)) return;
                     }
                 }
 
-                await ExecutePlayedCommandAsync(cancellationToken);
-                if (await WaitSynchronizeAsync(cancellationToken)) return;
+                await ExecutePlayedCommandAsync(asyncToken);
+                if (await WaitSynchronizeAsync(asyncToken)) return;
 
                 var nextActionAvailable = SelectNextCommand();
                 if (!nextActionAvailable) break;
 
-                if (SkipActive && !SkipAllowed) SetSkipEnabled(false);
+                if (SkipActive && !GetSkipAllowed()) SetSkipEnabled(false);
             }
         }
 
-        private async UniTask<bool> FastForwardRoutineAsync (CancellationToken cancellationToken, int targetPlaylistIndex, bool executePlayedCommand)
+        private async UniTask<bool> FastForwardRoutineAsync (AsyncToken asyncToken, int targetPlaylistIndex, bool executePlayedCommand)
         {
             SetSkipEnabled(true);
 
             if (executePlayedCommand)
             {
-                await ExecutePlayedCommandAsync(cancellationToken);
-                if (await WaitSynchronizeAsync(cancellationToken)) return false;
+                await ExecutePlayedCommandAsync(asyncToken);
+                if (await WaitSynchronizeAsync(asyncToken)) return false;
             }
 
             var reachedLine = true;
@@ -624,11 +645,11 @@ namespace Naninovel
 
                 if (PlayedIndex >= targetPlaylistIndex) { reachedLine = true; break; }
 
-                await ExecutePlayedCommandAsync(cancellationToken);
-                if (await WaitSynchronizeAsync(cancellationToken)) return false;
+                await ExecutePlayedCommandAsync(asyncToken);
+                if (await WaitSynchronizeAsync(asyncToken)) return false;
                 SetSkipEnabled(true); // Force skip mode to be always active while fast-forwarding.
 
-                if (cancellationToken.CancelASAP) { reachedLine = false; break; }
+                if (asyncToken.Canceled) { reachedLine = false; break; }
             }
 
             SetSkipEnabled(false);

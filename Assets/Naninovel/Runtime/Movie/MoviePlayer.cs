@@ -1,8 +1,7 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
-using System.Threading;
-using UniRx.Async;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Video;
 
@@ -14,24 +13,19 @@ namespace Naninovel
     {
         public event Action OnMoviePlay;
         public event Action OnMovieStop;
-        public event Action<Texture> OnMovieTextureReady;
 
         public virtual MoviesConfiguration Configuration { get; }
-        public virtual bool Playing => playCTS != null && !playCTS.IsCancellationRequested;
-        public virtual Texture2D FadeTexture { get; }
+        public virtual bool Playing { get; private set; }
 
         protected virtual VideoPlayer Player { get; private set; }
-
-        private const string defaultFadeTextureResourcesPath = "Naninovel/Textures/Black";
+        protected virtual bool UrlStreaming => Application.platform == RuntimePlatform.WebGLPlayer && !Application.isEditor;
 
         private readonly IInputManager inputManager;
         private readonly IResourceProviderManager providerManager;
         private readonly ILocalizationManager localeManager;
         private LocalizableResourceLoader<VideoClip> videoLoader;
-        private CancellationTokenSource playCTS;
         private string playedMovieName;
         private IInputSampler cancelInput;
-        // ReSharper disable once NotAccessedField.Local (Used in WebGL pragma)
         private string streamExtension;
 
         public MoviePlayer (MoviesConfiguration config, IResourceProviderManager providerManager, ILocalizationManager localeManager, IInputManager inputManager)
@@ -40,8 +34,6 @@ namespace Naninovel
             this.providerManager = providerManager;
             this.localeManager = localeManager;
             this.inputManager = inputManager;
-
-            FadeTexture = ObjectUtils.IsValid(config.CustomFadeTexture) ? config.CustomFadeTexture : Resources.Load<Texture2D>(defaultFadeTextureResourcesPath);
         }
 
         public virtual UniTask InitializeServiceAsync ()
@@ -50,18 +42,8 @@ namespace Naninovel
             streamExtension = Engine.GetConfiguration<ResourceProviderConfiguration>().VideoStreamExtension;
             cancelInput = inputManager.GetCancel();
 
-            Player = Engine.CreateObject<VideoPlayer>(nameof(MoviePlayer));
-            Player.playOnAwake = false;
-            Player.skipOnDrop = Configuration.SkipFrames;
-            #if UNITY_WEBGL && !UNITY_EDITOR
-            Player.source = VideoSource.Url;
-            #else
-            Player.source = VideoSource.VideoClip;
-            #endif
-            Player.renderMode = VideoRenderMode.APIOnly;
-            Player.isLooping = false;
-            Player.audioOutputMode = VideoAudioOutputMode.Direct;
-            Player.loopPointReached += HandleLoopPointReached;
+            Player = CreatePlayer();
+            SetupAudioSource(Player);
 
             if (Configuration.SkipOnInput && cancelInput != null)
                 cancelInput.OnStart += Stop;
@@ -78,71 +60,95 @@ namespace Naninovel
         public virtual void DestroyService ()
         {
             if (Playing) Stop();
-            if (Player != null) Player.loopPointReached -= HandleLoopPointReached;
+            if (Player) ObjectUtils.DestroyOrImmediate(Player.gameObject);
             if (cancelInput != null) cancelInput.OnStart -= Stop;
             videoLoader?.ReleaseAll(this);
         }
 
-        public virtual async UniTask PlayAsync (string movieName, CancellationToken cancellationToken = default)
+        public virtual async UniTask<Texture> PlayAsync (string movieName, AsyncToken asyncToken = default)
         {
             if (Playing) Stop();
-
             playedMovieName = movieName;
-            playCTS = cancellationToken.CreateLinkedTokenSource();
-
-            OnMoviePlay?.Invoke();
-            await UniTask.Delay(TimeSpan.FromSeconds(Configuration.FadeDuration));
-            if (cancellationToken.CancelASAP) return;
-
-            #if UNITY_WEBGL && !UNITY_EDITOR
-            Player.url = PathUtils.Combine(Application.streamingAssetsPath, $"{Configuration.Loader.PathPrefix}/{movieName}") + streamExtension;
-            #else
-            var videoClipResource = await videoLoader.LoadAndHoldAsync(movieName, this);
-            if (cancellationToken.CancelASAP) return;
-            if (!videoClipResource.Valid) throw new Exception($"Failed to load `{movieName}` movie.");
-            Player.clip = videoClipResource;
-            #endif
-
-            Player.Prepare();
-            while (!Player.isPrepared) await AsyncUtils.WaitEndOfFrame;
-            if (cancellationToken.CancelASAP) return;
-            OnMovieTextureReady?.Invoke(Player.texture);
-
+            SetIsPlaying(true);
+            if (UrlStreaming) Player.url = BuildStreamUrl(movieName);
+            else Player.clip = await LoadMovieClipAsync(movieName, asyncToken);
+            await PreparePlayerAsync(asyncToken);
             Player.Play();
-            while (Playing) await AsyncUtils.WaitEndOfFrame;
+            return Player.texture;
         }
 
         public virtual void Stop ()
         {
-            if (Player) Player.Stop();
-            playCTS?.Cancel();
-            playCTS?.Dispose();
-            playCTS = null;
+            if (!Playing) return;
 
+            if (Player) Player.Stop();
             videoLoader?.Release(playedMovieName, this);
             playedMovieName = null;
-
-            OnMovieStop?.Invoke();
+            SetIsPlaying(false);
         }
 
-        #if UNITY_WEBGL && !UNITY_EDITOR
-        public virtual UniTask HoldResourcesAsync (string movieName, object holder) => UniTask.CompletedTask;
-        #else
         public virtual async UniTask HoldResourcesAsync (string movieName, object holder)
         {
+            if (UrlStreaming) return;
             await videoLoader.LoadAndHoldAsync(movieName, holder);
         }
-        #endif
 
         public virtual void ReleaseResources (string movieName, object holder)
         {
-            #if UNITY_WEBGL && !UNITY_EDITOR
-            return;
-            #else
+            if (UrlStreaming) return;
             videoLoader?.Release(movieName, holder);
-            #endif
         }
 
-        private void HandleLoopPointReached (VideoPlayer source) => Stop();
+        protected virtual VideoPlayer CreatePlayer ()
+        {
+            var player = Engine.CreateObject<VideoPlayer>(nameof(MoviePlayer));
+            player.playOnAwake = false;
+            player.skipOnDrop = Configuration.SkipFrames;
+            player.source = UrlStreaming ? VideoSource.Url : VideoSource.VideoClip;
+            player.renderMode = VideoRenderMode.APIOnly;
+            player.isLooping = false;
+            player.loopPointReached += _ => Stop();
+            return player;
+        }
+
+        protected virtual void SetupAudioSource (VideoPlayer player)
+        {
+            var audioManager = Engine.GetService<IAudioManager>();
+            var audioSource = player.gameObject.AddComponent<AudioSource>();
+            audioSource.playOnAwake = false;
+            audioSource.bypassReverbZones = true;
+            audioSource.bypassEffects = true;
+            audioSource.outputAudioMixerGroup = audioManager.AudioMixer.FindMatchingGroups("Master")[0];
+            player.audioOutputMode = VideoAudioOutputMode.AudioSource;
+            player.SetTargetAudioSource(0, audioSource);
+        }
+
+        protected virtual string BuildStreamUrl (string movieName)
+        {
+            var clipPath = $"{Configuration.Loader.PathPrefix}/{movieName}{streamExtension}";
+            return PathUtils.Combine(Application.streamingAssetsPath, clipPath);
+        }
+
+        protected virtual async Task<VideoClip> LoadMovieClipAsync (string movieName, AsyncToken asyncToken)
+        {
+            var videoResource = await videoLoader.LoadAndHoldAsync(movieName, this);
+            asyncToken.ThrowIfCanceled();
+            if (!videoResource.Valid) throw new Exception($"Failed to load `{movieName}` movie.");
+            return videoResource.Object;
+        }
+
+        protected virtual async UniTask PreparePlayerAsync (AsyncToken asyncToken)
+        {
+            Player.Prepare();
+            while (!Player.isPrepared)
+                await AsyncUtils.WaitEndOfFrameAsync(asyncToken);
+        }
+
+        private void SetIsPlaying (bool playing)
+        {
+            Playing = playing;
+            if (playing) OnMoviePlay?.Invoke();
+            else OnMovieStop?.Invoke();
+        }
     }
 }

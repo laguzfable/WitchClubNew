@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 #if SPRITE_DICING_AVAILABLE
 
@@ -12,9 +12,22 @@ namespace Naninovel
     [ActorResources(typeof(DicedSpriteAtlas), false)]
     public class DicedSpriteBackground : DicedSpriteActor<BackgroundMetadata>, IBackgroundActor
     {
+        private BackgroundMatcher matcher;
+        
         public DicedSpriteBackground (string id, BackgroundMetadata metadata) 
             : base(id, metadata) { }
+        
+        public override async UniTask InitializeAsync ()
+        {
+            await base.InitializeAsync();
+            matcher = BackgroundMatcher.CreateFor(ActorMetadata, TransitionalRenderer);
+        }
 
+        public override void Dispose ()
+        {
+            base.Dispose();
+            matcher?.Stop();
+        }
     } 
 }
 

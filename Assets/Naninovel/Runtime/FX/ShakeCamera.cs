@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using UnityEngine;
 
@@ -12,8 +12,8 @@ namespace Naninovel.FX
         protected override Transform GetShakenTransform ()
         {
             var cameraManager = Engine.GetService<ICameraManager>().Camera;
-            if (cameraManager == null) return null;
-            return cameraManager.transform;
+            if (cameraManager == null || !cameraManager.transform.parent) return null;
+            return cameraManager.transform.parent;
         }
     }
 }

@@ -432,7 +432,7 @@ Canvas:
   m_GameObject: {fileID: 6306036015961478139}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_Camera: {fileID: 0}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
@@ -475,10 +475,23 @@ MonoBehaviour:
   allowedSamplers: []
   modalUI: 1
   fontChangeConfiguration: []
-  messageText: {fileID: 5078263606959904337}
-  confirmButton: {fileID: 1084794563696203716}
-  cancelButton: {fileID: 2673349915401508994}
-  closeButton: {fileID: 7295692470770244885}
+  confirmButton: {fileID: 5582502469759141957}
+  cancelButton: {fileID: 737224920332038356}
+  closeButton: {fileID: 1478846080621157415}
+  onMessageChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5078263606959904337}
+        m_MethodName: set_text
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!225 &6306036015961478118
 CanvasGroup:
   m_ObjectHideFlags: 0

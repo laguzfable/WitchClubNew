@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using UnityEngine;
@@ -10,7 +10,7 @@ namespace Naninovel.UI
     [RequireComponent(typeof(Button))]
     public class ChoiceHandlerButton : ScriptableButton
     {
-        [System.Serializable]
+        [Serializable]
         private class SummaryTextChangedEvent : UnityEvent<string> { }
 
         /// <summary>
@@ -30,5 +30,5 @@ namespace Naninovel.UI
             OnSummaryTextChanged?.Invoke(choiceState.Summary);
             onSummaryTextChanged?.Invoke(choiceState.Summary);
         }
-    } 
+    }
 }

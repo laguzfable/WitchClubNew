@@ -1,8 +1,8 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel
@@ -16,6 +16,7 @@ namespace Naninovel
         private readonly IResourceProviderManager providersManager;
         private readonly ILocalizationManager localizationManager;
         private readonly HashSet<ManagedTextRecord> records = new HashSet<ManagedTextRecord>();
+        private readonly ILookup<string, Type> typesByName = Engine.Types.ToLookup(t => t.FullName);
         private LocalizableResourceLoader<TextAsset> documentLoader;
 
         public TextManager (ManagedTextConfiguration config, IResourceProviderManager providersManager, ILocalizationManager localizationManager)
@@ -37,7 +38,7 @@ namespace Naninovel
         public virtual void DestroyService ()
         {
             localizationManager?.RemoveChangeLocaleTask(ApplyManagedTextAsync);
-            documentLoader?.UnloadAll();
+            documentLoader?.ReleaseAll(this);
         }
 
         public virtual string GetRecordValue (string key, string category = ManagedTextRecord.DefaultCategoryName)
@@ -63,21 +64,30 @@ namespace Naninovel
         public virtual async UniTask ApplyManagedTextAsync ()
         {
             records.Clear();
-            var documentResources = await documentLoader.LoadAllAsync();
-            foreach (var documentResource in documentResources)
-            {
-                if (!documentResource.Valid)
-                {
-                    Debug.LogWarning($"Failed to load `{documentResource.Path}` managed text document.");
-                    continue;
-                }
-                var managedTextSet = ManagedTextUtils.ParseDocument(documentResource.Object.text, documentLoader.GetLocalPath(documentResource));
+            var documentResources = await documentLoader.LoadAndHoldAllAsync(this);
+            foreach (var resource in documentResources)
+                if (resource.Valid) records.UnionWith(ParseManagedText(resource));
+                else Debug.LogWarning($"Failed to load `{resource.Path}` managed text document.");
+            foreach (var record in records)
+                ApplyRecord(record);
+        }
 
-                foreach (var text in managedTextSet)
-                    records.Add(new ManagedTextRecord(text.Key, text.Value, text.Category));
+        protected virtual HashSet<ManagedTextRecord> ParseManagedText (Resource<TextAsset> resource)
+        {
+            var category = documentLoader.GetLocalPath(resource);
+            var text = resource.Object.text;
+            return ManagedTextUtils.ParseDocument(text, category);
+        }
 
-                ManagedTextUtils.ApplyRecords(managedTextSet);
-            }
+        protected virtual void ApplyRecord (ManagedTextRecord record)
+        {
+            var typeName = record.Key.GetBeforeLast(".") ?? record.Key;
+            var type = typesByName[typeName].FirstOrDefault();
+            if (type is null) return;
+            var fieldName = record.Key.GetAfter(".") ?? record.Key;
+            var fieldInfo = type.GetField(fieldName, ManagedTextUtils.ManagedFieldBindings);
+            if (fieldInfo is null) Debug.LogWarning($"Failed to apply managed text record value to '{type.FullName}.{fieldName}' field.");
+            else fieldInfo.SetValue(null, record.Value);
         }
     }
 }

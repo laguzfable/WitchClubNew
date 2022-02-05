@@ -1,7 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System.Linq;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel.FX
@@ -21,19 +20,19 @@ namespace Naninovel.FX
             return ObjectUtils.IsValid(go) ? go.transform : null;
         }
 
-        protected override async UniTask ShakeSequenceAsync (CancellationToken cancellationToken)
+        protected override async UniTask ShakeSequenceAsync (AsyncToken asyncToken)
         {
             if (!preventPositiveYOffset)
             {
-                await base.ShakeSequenceAsync(cancellationToken);
+                await base.ShakeSequenceAsync(asyncToken);
                 return;
             }
 
             var amplitude = DeltaPos + DeltaPos * Random.Range(-AmplitudeVariation, AmplitudeVariation);
             var duration = ShakeDuration + ShakeDuration * Random.Range(-DurationVariation, DurationVariation);
 
-            await MoveAsync(InitialPos - amplitude * .5f, duration * .5f, cancellationToken);
-            await MoveAsync(InitialPos, duration * .5f, cancellationToken);
+            await MoveAsync(InitialPos - amplitude * .5f, duration * .5f, asyncToken);
+            await MoveAsync(InitialPos, duration * .5f, asyncToken);
         }
     }
 }

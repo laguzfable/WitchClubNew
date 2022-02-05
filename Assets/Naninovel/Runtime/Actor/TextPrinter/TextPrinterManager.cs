@@ -1,7 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel
@@ -62,7 +61,15 @@ namespace Naninovel
 
         public virtual UniTask LoadServiceStateAsync (SettingsStateMap stateMap)
         {
-            var settings = stateMap.GetState<Settings>() ?? new Settings();
+            var settings = stateMap.GetState<Settings>();
+            
+            if (settings is null) // Apply default settings.
+            {
+                BaseRevealSpeed = Configuration.DefaultBaseRevealSpeed;
+                BaseAutoDelay = Configuration.DefaultBaseAutoDelay;
+                return UniTask.CompletedTask;
+            }
+            
             BaseRevealSpeed = settings.BaseRevealSpeed;
             BaseAutoDelay = settings.BaseAutoDelay;
             return UniTask.CompletedTask;
@@ -86,10 +93,10 @@ namespace Naninovel
             DefaultPrinterId = state.DefaultPrinterId ?? Configuration.DefaultPrinterId;
         }
 
-        public virtual async UniTask PrintTextAsync (string printerId, string text, string authorId = default, float speed = 1, CancellationToken cancellationToken = default)
+        public virtual async UniTask PrintTextAsync (string printerId, string text, string authorId = default, float speed = 1, AsyncToken asyncToken = default)
         {
             var printer = await GetOrAddActorAsync(printerId);
-            if (cancellationToken.CancelASAP) return;
+            asyncToken.ThrowIfCanceled();
 
             OnPrintTextStarted?.Invoke(new PrintTextArgs(printer, text, authorId, speed));
 
@@ -97,8 +104,7 @@ namespace Naninovel
             printer.Text += text;
 
             var revealDelay = scriptPlayer.SkipActive ? 0 : Mathf.Lerp(Configuration.MaxRevealDelay, 0, BaseRevealSpeed * speed);
-            await printer.RevealTextAsync(revealDelay, cancellationToken);
-            if (cancellationToken.CancelASAP) return;
+            await printer.RevealTextAsync(revealDelay, asyncToken);
 
             OnPrintTextFinished?.Invoke(new PrintTextArgs(printer, text, authorId, speed));
         }

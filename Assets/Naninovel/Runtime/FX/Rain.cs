@@ -1,8 +1,8 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
+using System.Collections.Generic;
 using Naninovel.Commands;
 using System.Linq;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel.FX
@@ -29,7 +29,7 @@ namespace Naninovel.FX
         private Material particlesMaterial;
         private Color tintColor;
 
-        public virtual void SetSpawnParameters (string[] parameters)
+        public virtual void SetSpawnParameters (IReadOnlyList<string> parameters)
         {
             Intensity = parameters?.ElementAtOrDefault(0)?.AsInvariantFloat() ?? defaultIntensity;
             FadeInTime = Mathf.Abs(parameters?.ElementAtOrDefault(1)?.AsInvariantFloat() ?? defaultFadeInTime);
@@ -37,29 +37,29 @@ namespace Naninovel.FX
             velocityModule.yMultiplier *= parameters?.ElementAtOrDefault(3)?.AsInvariantFloat() ?? defaultVelocityY;
         }
 
-        public async UniTask AwaitSpawnAsync (CancellationToken cancellationToken = default)
+        public async UniTask AwaitSpawnAsync (AsyncToken asyncToken = default)
         {
             if (intensityTweener.Running)
                 intensityTweener.CompleteInstantly();
 
-            var time = cancellationToken.CancelLazy ? 0 : FadeInTime;
-            var tween = new FloatTween(emissionModule.rateOverTimeMultiplier, Intensity, time, SetIntensity, target: particles);
-            await intensityTweener.RunAsync(tween, cancellationToken);
+            var time = asyncToken.Completed ? 0 : FadeInTime;
+            var tween = new FloatTween(emissionModule.rateOverTimeMultiplier, Intensity, time, SetIntensity);
+            await intensityTweener.RunAsync(tween, asyncToken, particles);
         }
 
-        public void SetDestroyParameters (string[] parameters)
+        public void SetDestroyParameters (IReadOnlyList<string> parameters)
         {
             FadeOutTime = Mathf.Abs(parameters?.ElementAtOrDefault(0)?.AsInvariantFloat() ?? defaultFadeOutTime);
         }
 
-        public async UniTask AwaitDestroyAsync (CancellationToken cancellationToken = default)
+        public async UniTask AwaitDestroyAsync (AsyncToken asyncToken = default)
         {
             if (intensityTweener.Running)
                 intensityTweener.CompleteInstantly();
 
-            var time = cancellationToken.CancelLazy ? 0 : FadeOutTime;
-            var tween = new FloatTween(Intensity, 0, time, SetTintOpacity, target: particles);
-            await intensityTweener.RunAsync(tween, cancellationToken);
+            var time = asyncToken.Completed ? 0 : FadeOutTime;
+            var tween = new FloatTween(Intensity, 0, time, SetTintOpacity);
+            await intensityTweener.RunAsync(tween, asyncToken, particles);
         }
 
         private void Awake ()
@@ -70,13 +70,10 @@ namespace Naninovel.FX
             particlesMaterial = GetComponent<ParticleSystemRenderer>().material;
             tintColor = particlesMaterial.GetColor(tintColorId);
 
-            SetIntensity(0);
-        }
-
-        private void Start ()
-        {
             // Position before the first background.
             transform.position = new Vector3(0, 0, Engine.GetConfiguration<BackgroundsConfiguration>().ZOffset - 1);
+            
+            SetIntensity(0);
         }
 
         private void SetIntensity (float value)

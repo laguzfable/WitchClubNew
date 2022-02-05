@@ -1,6 +1,5 @@
 ﻿using Naninovel;
 using Naninovel.Commands;
-using UniRx.Async;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -12,7 +11,7 @@ public class GotoCombatScene : Command, Command.IForceWait
     public StringParameter ScriptName;
     public StringParameter Label;
 
-    public async override UniTask ExecuteAsync(CancellationToken cancellationToken = default)
+    public async override UniTask ExecuteAsync(AsyncToken asyncToken = default)
     {
         // Engine.GetService<IUIManager>().SetUIVisibleWithToggle(false, false);
         

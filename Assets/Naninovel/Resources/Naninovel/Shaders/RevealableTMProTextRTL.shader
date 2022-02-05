@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 
 Shader "Naninovel/RevealableTMProText RTL" {
@@ -46,6 +46,7 @@ Properties {
 	_StencilWriteMask	("Stencil Write Mask", Float) = 255
 	_StencilReadMask	("Stencil Read Mask", Float) = 255
 	
+	_CullMode			("Cull Mode", Float) = 0
 	_ColorMask			("Color Mask", Float) = 15
 
     // -------------- Naninovel font. --------------

@@ -1,6 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
-
-using UniRx.Async;
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 namespace Naninovel
 {

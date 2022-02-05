@@ -1,13 +1,13 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System.IO;
 
 namespace Naninovel
 {
-    public sealed class IOGameStateSlotManager : IOSaveSlotManager<GameStateMap>
+    public class IOGameStateSlotManager : IOSaveSlotManager<GameStateMap>
     {
         protected override string SaveDataPath => $"{GameDataPath}/{savesFolderPath}";
-        protected override string Extension => Binary ? "nson" : "json";
+        protected sealed override string Extension => Binary ? "nson" : "json";
         protected override bool Binary => config.BinarySaveFiles;
 
         private readonly string savePattern, quickSavePattern;

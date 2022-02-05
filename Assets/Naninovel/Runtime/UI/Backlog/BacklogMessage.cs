@@ -1,71 +1,59 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
+using System;
 using System.Collections.Generic;
+using Naninovel.UI;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace Naninovel
 {
     public class BacklogMessage : ScriptableUIBehaviour
     {
-        [System.Serializable]
-        public struct State
-        {
-            public string MessageText;
-            public string ActorNameText;
-            public List<string> VoiceClipNames;
-            public PlaybackSpot RollbackSpot;
-        }
+        [Serializable]
+        private class OnMessageChangedEvent : UnityEvent<string> { }
+        [Serializable]
+        private class OnAuthorChangedEvent : UnityEvent<string> { }
 
-        public virtual string Message => messageText.text;
-        public virtual string ActorName => actorNameText.text;
+        public virtual string Message { get; private set; }
+        public virtual string Author { get; private set; }
 
-        protected virtual Text MessageText => messageText;
-        protected virtual Text ActorNameText => actorNameText;
+        protected virtual GameObject AuthorPanel => authorPanel;
         protected virtual Button PlayVoiceButton => playVoiceButton;
         protected virtual Button RollbackButton => rollbackButton;
 
-        [SerializeField] private Text messageText = default;
-        [SerializeField] private Text actorNameText = default;
+        [Tooltip("Panel hosting author name text (optional). When assigned will be de-activated based on whether author is assigned.")]
+        [SerializeField] private GameObject authorPanel = default;
+        [Tooltip("Button to replay voice associated with the message (optional).")]
         [SerializeField] private Button playVoiceButton = default;
+        [Tooltip("Button to perform rollback to the moment the messages was added (optional).")]
         [SerializeField] private Button rollbackButton = default;
+        [SerializeField] private OnMessageChangedEvent onMessageChanged = default;
+        [SerializeField] private OnAuthorChangedEvent onAuthorChanged = default;
 
         private readonly List<string> voiceClipNames = new List<string>();
         private PlaybackSpot rollbackSpot = PlaybackSpot.Invalid;
-        
+
         // Can't assign them in .Awake(), as message objects are instantiated inside a disabled parent.
         private IAudioManager audioManager => audioManagerCache ?? (audioManagerCache = Engine.GetService<IAudioManager>());
         private IStateManager stateManager => stateManagerCache ?? (stateManagerCache = Engine.GetService<IStateManager>());
         private IAudioManager audioManagerCache;
         private IStateManager stateManagerCache;
 
-        public virtual State GetState () => new State { 
-            MessageText = MessageText.text, 
-            ActorNameText = ActorNameText.text, 
-            VoiceClipNames = voiceClipNames,
-            RollbackSpot = rollbackSpot
-        };
+        public virtual BacklogMessageState GetState () => new BacklogMessageState(Message, Author, voiceClipNames, rollbackSpot);
 
         /// <summary>
         /// Initializes the backlog message.
         /// </summary>
         /// <param name="message">Text of the message.</param>
-        /// <param name="authorName">Name of the message author.</param>
+        /// <param name="author">Actor ID of the message author.</param>
         /// <param name="voiceClipNames">Voice replay clip names associated with the message. Provide null to disable voice replay.</param>
         /// <param name="rollbackSpot">Rollback spot associated with the message. Provide <see cref="PlaybackSpot.Invalid"/> to disable rollback.</param>
-        public virtual void Initialize (string message, string authorName, List<string> voiceClipNames, PlaybackSpot rollbackSpot)
+        public virtual void Initialize (string message, string author, IReadOnlyCollection<string> voiceClipNames, PlaybackSpot rollbackSpot)
         {
-            MessageText.text = message;
-            if (string.IsNullOrWhiteSpace(authorName))
-            {
-                ActorNameText.text = null;
-                ActorNameText.transform.parent.gameObject.SetActive(false);
-            }
-            else
-            {
-                ActorNameText.text = authorName;
-                ActorNameText.transform.parent.gameObject.SetActive(true);
-            }
+            SetMessage(message);
+            SetAuthor(author);
 
             this.voiceClipNames.Clear();
             if (voiceClipNames?.Count > 0)
@@ -88,7 +76,7 @@ namespace Naninovel
 
         public virtual void Append (string text, string voiceClipName = null)
         {
-            MessageText.text += text;
+            SetMessage(Message + text);
 
             if (!string.IsNullOrEmpty(voiceClipName))
             {
@@ -120,10 +108,25 @@ namespace Naninovel
                 RollbackButton.onClick.RemoveListener(HandleRollbackButtonClicked);
         }
 
+        protected virtual void SetMessage (string value)
+        {
+            Message = value;
+            onMessageChanged?.Invoke(value);
+        }
+
+        protected virtual void SetAuthor (string value)
+        {
+            Author = value;
+            if (AuthorPanel)
+                AuthorPanel.SetActive(!string.IsNullOrWhiteSpace(value));
+            onAuthorChanged?.Invoke(value);
+        }
+
         protected virtual async void HandlePlayVoiceButtonClicked ()
         {
             PlayVoiceButton.interactable = false;
-            await audioManager.PlayVoiceSequenceAsync(voiceClipNames);
+            var voicePaths = voiceClipNames.ToArray();
+            await audioManager.PlayVoiceSequenceAsync(voicePaths);
             PlayVoiceButton.interactable = true;
         }
 
@@ -133,7 +136,7 @@ namespace Naninovel
             await stateManager.RollbackAsync(s => s.PlaybackSpot == rollbackSpot);
             RollbackButton.interactable = true;
 
-            GetComponentInParent<UI.IBacklogUI>()?.Hide();
+            GetComponentInParent<IBacklogUI>()?.Hide();
         }
     }
 }

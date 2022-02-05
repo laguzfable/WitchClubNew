@@ -1,8 +1,9 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
 namespace Naninovel
@@ -49,4 +50,21 @@ namespace Naninovel
             action?.Invoke(arg0, arg1, arg2);
         }
     }
+
+    [Serializable]
+    public class StringUnityEvent : UnityEvent<string> { }
+    [Serializable]
+    public class FloatUnityEvent : UnityEvent<float> { }
+    [Serializable]
+    public class IntUnityEvent : UnityEvent<int> { }
+    [Serializable]
+    public class BoolUnityEvent : UnityEvent<bool> { }
+    [Serializable]
+    public class Vector3UnityEvent : UnityEvent<Vector3> { }
+    [Serializable]
+    public class Vector2UnityEvent : UnityEvent<Vector2> { }
+    [Serializable]
+    public class QuaternionUnityEvent : UnityEvent<Quaternion> { }
+    [Serializable]
+    public class ColorUnityEvent : UnityEvent<Color> { }
 }

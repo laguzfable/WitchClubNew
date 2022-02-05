@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
@@ -33,7 +33,7 @@ namespace Naninovel
             this.name = name;
             this.value = value;
         }
-
+        
         public override bool Equals (object obj)
         {
             return obj is CustomVariable variable && Equals(variable);
@@ -41,7 +41,7 @@ namespace Naninovel
 
         public bool Equals (CustomVariable other)
         {
-            return name == other.name;
+            return Name == other.Name;
         }
 
         public override int GetHashCode ()

@@ -1,6 +1,5 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
 
 namespace Naninovel.Commands
 {
@@ -10,11 +9,6 @@ namespace Naninovel.Commands
     /// The character should be able to receive the lip sync events (currently generic, layered and Live2D implementations only).
     /// See [characters guide](/guide/characters.md#lip-sync) for more information on lip sync feature.
     /// </summary>
-    /// <example>
-    /// ; Given auto voicing is disabled and lip sync is driven by text messages,
-    /// ; exclude punctuation from the mouth animation.
-    /// Kohaku: Lorem ipsum dolor sit amet[lipSync Kohaku.false]... [lipSync Kohaku.true]Consectetur adipiscing elit.
-    /// </example>
     public class LipSync : Command
     {
         /// <summary>
@@ -31,10 +25,10 @@ namespace Naninovel.Commands
         /// <summary>
         /// Character ID followed by a boolean (true or false) on whether to halt or allow the lip sync animation.
         /// </summary>
-        [ParameterAlias(NamelessParameterAlias), RequiredParameter, IDEActor(CharactersConfiguration.DefaultPathPrefix, 0)]
+        [ParameterAlias(NamelessParameterAlias), RequiredParameter, ActorContext(CharactersConfiguration.DefaultPathPrefix, 0)]
         public NamedBooleanParameter CharIdAndAllow;
 
-        public override UniTask ExecuteAsync (CancellationToken cancellationToken = default)
+        public override UniTask ExecuteAsync (AsyncToken asyncToken = default)
         {
             var characterManager = Engine.GetService<ICharacterManager>();
             if (!characterManager.ActorExists(CharIdAndAllow.Name))

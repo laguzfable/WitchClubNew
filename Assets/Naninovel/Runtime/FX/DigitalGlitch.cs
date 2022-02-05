@@ -1,8 +1,8 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
+using System.Collections.Generic;
 using Naninovel.Commands;
 using System.Linq;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel.FX
@@ -35,7 +35,7 @@ namespace Naninovel.FX
         
         private CameraComponent cameraComponent;
 
-        public virtual void SetSpawnParameters (string[] parameters)
+        public virtual void SetSpawnParameters (IReadOnlyList<string> parameters)
         {
             this.AssertRequiredObjects(glitchShader, glitchTexture);
 
@@ -45,7 +45,7 @@ namespace Naninovel.FX
             Intensity = Mathf.Abs(parameters?.ElementAtOrDefault(1)?.AsInvariantFloat() ?? defaultIntensity);
         }
 
-        public async UniTask AwaitSpawnAsync (CancellationToken cancellationToken = default) 
+        public async UniTask AwaitSpawnAsync (AsyncToken asyncToken = default) 
         {
             if (cameraComponent is null)
             {
@@ -57,10 +57,10 @@ namespace Naninovel.FX
             cameraComponent.Intensity = Intensity;
 
             await UniTask.Delay(System.TimeSpan.FromSeconds(Duration));
-            if (cancellationToken.CancelASAP) return;
+            asyncToken.ThrowIfCanceled();
 
-            if (SpawnManager.IsObjectSpawned(SpawnedPath))
-                SpawnManager.DestroySpawnedObject(SpawnedPath);
+            if (SpawnManager.IsSpawned(SpawnedPath))
+                SpawnManager.DestroySpawned(SpawnedPath);
         }
 
         private void OnDestroy ()

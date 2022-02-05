@@ -1,29 +1,41 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System.Linq;
-using UniRx.Async;
 
 namespace Naninovel.Commands
 {
     /// <summary>
-    /// Hides (removes) all the actors (eg characters, backgrounds, text printers, choice handlers, etc) on scene.
+    /// Hides (removes) all the actors (characters, backgrounds, text printers, choice handlers) on scene.
     /// </summary>
-    /// <example>
-    /// @hideAll
-    /// </example>
     [CommandAlias("hideAll")]
     public class HideAllActors : Command
     {
         /// <summary>
-        /// Duration (in seconds) of the fade animation. Default value: 0.35 seconds.
+        /// Duration (in seconds) of the fade animation.
         /// </summary>
-        [ParameterAlias("time")]
-        public DecimalParameter Duration = .35f;
+        [ParameterAlias("time"), ParameterDefaultValue("0.35")]
+        public DecimalParameter Duration;
+        /// <summary>
+        /// Whether to remove (destroy) the actors after they are hidden.
+        /// Use to unload resources associated with the actors and prevent memory leaks.
+        /// </summary>
+        [ParameterDefaultValue("false")]
+        public BooleanParameter Remove = false;
 
-        public override async UniTask ExecuteAsync (CancellationToken cancellationToken = default)
+        public override async UniTask ExecuteAsync (AsyncToken asyncToken = default)
         {
-            var managers = Engine.GetAllServices<IActorManager>();
-            await UniTask.WhenAll(managers.SelectMany(m => m.GetAllActors()).Select(a => a.ChangeVisibilityAsync(false, Duration, cancellationToken: cancellationToken)));
+            var managers = Engine.FindAllServices<IActorManager>();
+            await UniTask.WhenAll(managers.Select(m => HideManagedActorsAsync(m, asyncToken)));
+            if (Remove)
+                foreach (var manager in managers)
+                    manager.RemoveAllActors();
         }
-    } 
+
+        private UniTask HideManagedActorsAsync (IActorManager manager, AsyncToken asyncToken)
+        {
+            var duration = Assigned(Duration) ? Duration.Value : manager.ActorManagerConfiguration.DefaultDuration;
+            var easing = manager.ActorManagerConfiguration.DefaultEasing;
+            return UniTask.WhenAll(manager.GetAllActors().Select(a => a.ChangeVisibilityAsync(false, duration, easing, asyncToken)));
+        }
+    }
 }

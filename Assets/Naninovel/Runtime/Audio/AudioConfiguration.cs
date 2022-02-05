@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,13 +11,14 @@ namespace Naninovel
     {
         public const string DefaultAudioPathPrefix = "Audio";
         public const string DefaultVoicePathPrefix = "Voice";
-        public const string DefaultMixerResourcesPath = "Naninovel/DefaultMixer";
         public const string AutoVoiceClipNameTemplate = "{0}/{1}.{2}";
 
         [Tooltip("Configuration of the resource loader used with audio (BGM and SFX) resources.")]
         public ResourceLoaderConfiguration AudioLoader = new ResourceLoaderConfiguration { PathPrefix = DefaultAudioPathPrefix };
         [Tooltip("Configuration of the resource loader used with voice resources.")]
         public ResourceLoaderConfiguration VoiceLoader = new ResourceLoaderConfiguration { PathPrefix = DefaultVoicePathPrefix };
+        [Tooltip(nameof(IAudioPlayer) + " implementation responsible for playing audio clips.")]
+        public string AudioPlayer = typeof(AudioPlayer).AssemblyQualifiedName;
         [Range(0f, 1f), Tooltip("Master volume to set when the game is first started.")]
         public float DefaultMasterVolume = 1f;
         [Range(0f, 1f), Tooltip("BGM volume to set when the game is first started.")]
@@ -39,6 +40,8 @@ namespace Naninovel
         public VoiceOverlapPolicy VoiceOverlapPolicy = VoiceOverlapPolicy.PreventOverlap;
         [Tooltip("Assign localization tags to allow selecting voice language in the game settings independently of the main localization. Doesn't work with `Content Hash` auto voice mode.")]
         public List<string> VoiceLocales = default;
+        [Tooltip("Default duration of the volume fade in/out when starting or stopping playing audio.")]
+        public float DefaultFadeDuration = .35f;
 
         [Header("Audio Mixer")]
         [Tooltip("Audio mixer to control audio groups. When not provided, will use a default one.")]
@@ -71,7 +74,7 @@ namespace Naninovel
         /// </summary>
         public static string GetAutoVoiceClipPath (Commands.PrintText printCommand)
         {
-            if (!printCommand?.Text?.HasValue ?? true) return string.Empty;
+            if (printCommand is null || !Command.Assigned(printCommand.Text)) return string.Empty;
             var text = printCommand.Text.DynamicValue ? printCommand.Text.DynamicValueText : printCommand.Text.Value;
             var content = $"{printCommand.AutoVoiceId}{printCommand.AuthorId}{text}";
             return CryptoUtils.PersistentHexCode(content);

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Naninovel;
 using Naninovel.Commands;
 using UnityEngine;
 

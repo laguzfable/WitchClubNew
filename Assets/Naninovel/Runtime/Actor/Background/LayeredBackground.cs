@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 
 namespace Naninovel
@@ -9,8 +9,21 @@ namespace Naninovel
     [ActorResources(typeof(LayeredBackgroundBehaviour), false)]
     public class LayeredBackground : LayeredActor<LayeredBackgroundBehaviour, BackgroundMetadata>, IBackgroundActor
     {
-        public LayeredBackground (string id, BackgroundMetadata metadata) 
+        private BackgroundMatcher matcher;
+
+        public LayeredBackground (string id, BackgroundMetadata metadata)
             : base(id, metadata) { }
 
-    } 
+        public override async UniTask InitializeAsync ()
+        {
+            await base.InitializeAsync();
+            matcher = BackgroundMatcher.CreateFor(ActorMetadata, TransitionalRenderer);
+        }
+
+        public override void Dispose ()
+        {
+            base.Dispose();
+            matcher?.Stop();
+        }
+    }
 }

@@ -1,6 +1,5 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
 
 namespace Naninovel.Commands
 {
@@ -8,16 +7,6 @@ namespace Naninovel.Commands
     /// Allows halting and resuming user input processing (eg, reacting to pressing keyboard keys).
     /// The effect of the action is persistent and saved with the game.
     /// </summary>
-    /// <example>
-    /// ; Halt input processing of all the samplers
-    /// @processInput false
-    /// 
-    /// ; Resume input processing of all the samplers
-    /// @processInput true
-    /// 
-    /// ; Mute `Rollback` and `Pause` inputs and un-mute `Continue` input
-    /// @processInput set:Rollback.false,Pause.false,Continue.true
-    /// </example>
     public class ProcessInput : Command
     {
         /// <summary>
@@ -31,7 +20,7 @@ namespace Naninovel.Commands
         [ParameterAlias("set")]
         public NamedBooleanListParameter SetEnabled;
 
-        public override UniTask ExecuteAsync (CancellationToken cancellationToken = default)
+        public override UniTask ExecuteAsync (AsyncToken asyncToken = default)
         {
             if (!Assigned(InputEnabled) && !Assigned(SetEnabled))
             {

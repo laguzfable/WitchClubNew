@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 
 namespace Naninovel.UI
@@ -11,16 +11,16 @@ namespace Naninovel.UI
         public bool InProgress { get; private set; }
         public int CharactersToReveal { get; private set; }
         public float RevealDuration { get; private set; }
-        public CancellationToken CancellationToken { get; private set; }
+        public AsyncToken AsyncToken { get; private set; }
         public int CharactersRevealed { get; set; }
 
-        public virtual void Start (int count, float duration, CancellationToken cancellationToken)
+        public virtual void Start (int count, float duration, AsyncToken asyncToken)
         {
             InProgress = true;
             CharactersRevealed = 0;
             CharactersToReveal = count;
             RevealDuration = duration;
-            CancellationToken = cancellationToken;
+            AsyncToken = asyncToken;
         }
 
         public virtual void Reset ()
@@ -28,7 +28,7 @@ namespace Naninovel.UI
             InProgress = false;
             CharactersToReveal = CharactersRevealed = 0;
             RevealDuration = 0f;
-            CancellationToken = default;
+            AsyncToken = default;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using UnityEngine;
 
@@ -43,8 +43,8 @@ namespace Naninovel
 
         [Header("Resources Management")]
         [Tooltip("Dictates when the resources are loaded and unloaded during script execution:" +
-            "\n • Static — All the resources required for the script execution are pre-loaded when starting the playback (masked with a loading screen) and unloaded only when the script has finished playing. This policy is default and recommended for most cases." +
-            "\n • Dynamic — Only the resources required for the next `Dynamic Policy Steps` commands are pre-loaded during the script execution and all the unused resources are unloaded immediately. Use this mode when targeting platforms with strict memory limitations and it's impossible to properly organize naninovel scripts. Expect hiccups when the resources are loaded in background while the game is progressing.")]
+            "\n • Static — All the resources required for the script execution are preloaded when starting the playback (masked with a loading screen) and unloaded only when the script has finished playing. This policy is default and recommended for most cases." +
+            "\n • Dynamic — Only the resources required for the next `Dynamic Policy Steps` commands are preloaded during the script execution and all the unused resources are unloaded immediately. Use this mode when targeting platforms with strict memory limitations and it's impossible to properly organize naninovel scripts. Expect hiccups when the resources are loaded in background while the game is progressing.")]
         public ResourcePolicy ResourcePolicy = ResourcePolicy.Static;
         [Tooltip("When dynamic resource policy is enabled, defines the number of script commands to pre-load.")]
         public int DynamicPolicySteps = 25;
@@ -64,6 +64,8 @@ namespace Naninovel
         [Header("Addressable Provider")]
         [Tooltip("Whether to use addressable provider in editor. Enable if you're manually exposing resources via addressable address instead of assigning them with Naninovel's resource managers. Be aware, that enabling this could cause issues when resources are assigned both in resources manager and registered with an addressable address and then renamed or duplicated.")]
         public bool AllowAddressableInEditor = false;
+        [Tooltip("Whether to create an addressable group per Naninovel resource category: scripts, characters, audio, etc. When disabled, will use a single `Naninovel` group for all the resources.")]
+        public bool GroupByCategory = false;
         [Tooltip("Addressable provider will only work with assets, that have the assigned labels in addition to `Naninovel` label. Can be used to filter assets used by the engine based on custom criteria (eg, HD vs SD textures).")]
         public string[] ExtraLabels = default;
 

@@ -2,7 +2,6 @@
 using Naninovel.UI;
 using System.Collections;
 using System.Collections.Generic;
-using UniRx.Async;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -56,7 +55,7 @@ public class ResetGame : MonoBehaviour
         }
     }
 
-    public async UniTask SwitchStateToCombatModeAsync(CancellationToken cancellationToken = default)
+    public async UniTask SwitchStateToCombatModeAsync(AsyncToken asyncToken = default)
     {
         canReset = false;
         // 1. Disable Naninovel input.

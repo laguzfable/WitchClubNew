@@ -4,8 +4,8 @@ using UnityEngine;
 using DG.Tweening;
 using System.Text;
 using System.Linq;
-using UniRx.Async;
 using Kenaz;
+using Naninovel;
 
 public class EnemyUnit : BaseCombatUnit
 {

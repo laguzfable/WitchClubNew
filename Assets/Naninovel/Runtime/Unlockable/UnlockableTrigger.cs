@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using UnityEngine;
@@ -30,6 +30,10 @@ namespace Naninovel
         [SerializeField] private string unlockableItemId = default;
         [Tooltip("Invoked when unlocked state of the listened unlockable item is changed; also invoked when the component is started.")]
         [SerializeField] private UnlockedStateChangedEvent onUnlockedStateChanged = default;
+        [Tooltip("Invoked when the item is unlocked.")]
+        [SerializeField] private UnityEvent onUnlocked = default;
+        [Tooltip("Invoked when the item is locked.")]
+        [SerializeField] private UnityEvent onLocked = default;
 
         protected virtual void OnEnable ()
         {
@@ -48,18 +52,23 @@ namespace Naninovel
         {
             UnlockableManager.OnItemUpdated -= HandleItemUpdated;
             UnlockableManager.OnItemUpdated += HandleItemUpdated;
-            
+
             var unlocked = UnlockableManager.ItemUnlocked(UnlockableItemId);
-            OnUnlockedStateChanged?.Invoke(unlocked);
-            onUnlockedStateChanged?.Invoke(unlocked);
+            InvokeEvents(unlocked);
         }
 
         protected virtual void HandleItemUpdated (UnlockableItemUpdatedArgs args)
         {
-            if (!args.Id.EqualsFastIgnoreCase(UnlockableItemId)) return;
+            if (args.Id.EqualsFastIgnoreCase(UnlockableItemId))
+                InvokeEvents(args.Unlocked);
+        }
 
-            OnUnlockedStateChanged?.Invoke(args.Unlocked);
-            onUnlockedStateChanged?.Invoke(args.Unlocked);
+        private void InvokeEvents (bool unlocked)
+        {
+            OnUnlockedStateChanged?.Invoke(unlocked);
+            onUnlockedStateChanged?.Invoke(unlocked);
+            if (unlocked) onUnlocked?.Invoke();
+            else onLocked.Invoke();
         }
     }
 }

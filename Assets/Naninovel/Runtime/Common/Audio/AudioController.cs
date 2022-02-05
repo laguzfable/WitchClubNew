@@ -1,8 +1,7 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System.Collections.Generic;
 using System.Linq;
-using UniRx.Async;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -42,8 +41,8 @@ namespace Naninovel
             if (listenerVolumeTweener.Running)
                 listenerVolumeTweener.CompleteInstantly();
 
-            var tween = new FloatTween(Volume, volume, time, value => Volume = value, ignoreTimeScale: true, target: this);
-            listenerVolumeTweener.Run(tween);
+            var tween = new FloatTween(Volume, volume, time, value => Volume = value, ignoreTimeScale: true);
+            listenerVolumeTweener.Run(tween, target: this);
         }
 
         public bool ClipPlaying (AudioClip clip)
@@ -70,7 +69,7 @@ namespace Naninovel
         }
 
         public async UniTask PlayClipAsync (AudioClip clip, float fadeInTime, AudioSource audioSource = null, float volume = 1f,
-            bool loop = false, AudioMixerGroup mixerGroup = null, AudioClip introClip = null, bool additive = false, CancellationToken cancellationToken = default)
+            bool loop = false, AudioMixerGroup mixerGroup = null, AudioClip introClip = null, bool additive = false, AsyncToken asyncToken = default)
         {
             if (!clip) return;
 
@@ -83,7 +82,7 @@ namespace Naninovel
 
             var track = new AudioTrack(clip, audioSource, volume, loop, mixerGroup, introClip);
             audioTracks.Add(track);
-            await track.PlayAsync(fadeInTime, cancellationToken);
+            await track.PlayAsync(fadeInTime, asyncToken);
         }
 
         public void StopClip (AudioClip clip)
@@ -99,20 +98,20 @@ namespace Naninovel
                 track.Stop();
         }
 
-        public async UniTask StopClipAsync (AudioClip clip, float fadeOutTime, CancellationToken cancellationToken = default)
+        public async UniTask StopClipAsync (AudioClip clip, float fadeOutTime, AsyncToken asyncToken = default)
         {
             if (!clip || !ClipPlaying(clip)) return;
             var tasks = new List<UniTask>();
             foreach (var track in GetTracks(clip))
-                tasks.Add(track.StopAsync(fadeOutTime, cancellationToken));
+                tasks.Add(track.StopAsync(fadeOutTime, asyncToken));
             await UniTask.WhenAll(tasks);
         }
 
-        public async UniTask StopAllClipsAsync (float fadeOutTime, CancellationToken cancellationToken = default)
+        public async UniTask StopAllClipsAsync (float fadeOutTime, AsyncToken asyncToken = default)
         {
             var tasks = new List<UniTask>();
             foreach (var track in GetAllTracks())
-                tasks.Add(track.StopAsync(fadeOutTime, cancellationToken));
+                tasks.Add(track.StopAsync(fadeOutTime, asyncToken));
             await UniTask.WhenAll(tasks);
         }
 
@@ -136,7 +135,7 @@ namespace Naninovel
 
         private bool IsOwnedByController (AudioSource audioSource)
         {
-            return audioSource.gameObject == gameObject;
+            return audioSource && audioSource.gameObject == gameObject;
         }
 
         private AudioSource GetPooledSource ()

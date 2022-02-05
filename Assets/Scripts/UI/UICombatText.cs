@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
-using UniRx.Async;
+using Naninovel;
+using System.Threading;
 
 public enum ECombatTextType { Damage, Heal, Buff, Debuff, Other , System };
 public class UICombatText : MonoBehaviour {
@@ -18,7 +19,7 @@ public class UICombatText : MonoBehaviour {
 
     }
 
-    public async UniTaskVoid Display(string content, ECombatTextType type, Vector3 pos)
+    public async UniTaskVoid Display(string content, ECombatTextType type, Vector3 pos, CancellationToken cancellationToken)
     {
         //type to color
         txt.text = content;
@@ -54,9 +55,9 @@ public class UICombatText : MonoBehaviour {
         //transform.DOMoveY(pos.y + 20f, 1f).onComplete += OnTweenCompleteEvent;
         //txt.CrossFadeAlpha(0f, 1f, false);
         transform.DOScale(1.8f, 0.3f);
-        await UniTask.Delay(System.TimeSpan.FromSeconds(1), cancellationToken:this.GetCancellationTokenOnDestroy());
+        await UniTask.Delay(System.TimeSpan.FromSeconds(1), cancellationToken: cancellationToken);
         txt.CrossFadeAlpha(0f, 0.3f, false);
-        await UniTask.Delay(System.TimeSpan.FromSeconds(1), cancellationToken:this.GetCancellationTokenOnDestroy());
+        await UniTask.Delay(System.TimeSpan.FromSeconds(1), cancellationToken: cancellationToken);
         gameObject.SetActive(false);
     }
 }

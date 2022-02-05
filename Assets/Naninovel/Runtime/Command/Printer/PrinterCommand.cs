@@ -1,6 +1,5 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
 
 namespace Naninovel.Commands
 {
@@ -26,7 +25,7 @@ namespace Naninovel.Commands
             heldPrinterActor?.ReleaseResources(null, this);
         }
 
-        protected virtual async UniTask<ITextPrinterActor> GetOrAddPrinterAsync ()
+        protected virtual async UniTask<ITextPrinterActor> GetOrAddPrinterAsync (AsyncToken asyncToken = default)
         {
             var printerId = default(string);
 
@@ -36,7 +35,9 @@ namespace Naninovel.Commands
             if (string.IsNullOrEmpty(printerId))
                 printerId = AssignedPrinterId;
 
-            return await PrinterManager.GetOrAddActorAsync(printerId ?? PrinterManager.DefaultPrinterId);
+            var printer = await PrinterManager.GetOrAddActorAsync(printerId ?? PrinterManager.DefaultPrinterId);
+            asyncToken.ThrowIfCanceled();
+            return printer;
         }
     }
 }

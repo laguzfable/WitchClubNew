@@ -1,42 +1,47 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
+using System;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace Naninovel.UI
 {
     public class ConfirmationPanel : CustomUI, IConfirmationUI
     {
-        protected Text MessageText => messageText;
-        protected ScriptableLabeledButton ConfirmButton => confirmButton;
-        protected ScriptableLabeledButton CancelButton => cancelButton;
-        protected ScriptableLabeledButton CloseButton => closeButton;
+        [Serializable]
+        private class OnMessageChangedEvent : UnityEvent<string> { }
 
-        [SerializeField] private Text messageText = default;
-        [SerializeField] private ScriptableLabeledButton confirmButton = default;
-        [SerializeField] private ScriptableLabeledButton cancelButton = default;
-        [SerializeField] private ScriptableLabeledButton closeButton = default;
+        protected virtual Button ConfirmButton => confirmButton;
+        protected virtual Button CancelButton => cancelButton;
+        protected virtual Button CloseButton => closeButton;
+        protected virtual bool? Confirmed { get; private set; }
 
-        private bool? userConfirmed;
+        [Tooltip("Used to agree on confirmation dialogue.")]
+        [SerializeField] private Button confirmButton = default;
+        [Tooltip("Used to cancel on confirmation dialogue.")]
+        [SerializeField] private Button cancelButton = default;
+        [Tooltip("Used to close notification dialogue.")]
+        [SerializeField] private Button closeButton = default;
+        [SerializeField] private OnMessageChangedEvent onMessageChanged = default;
 
         public virtual async UniTask<bool> ConfirmAsync (string message)
         {
             if (Visible) return false;
 
-            closeButton.gameObject.SetActive(false);
-            confirmButton.gameObject.SetActive(true);
-            cancelButton.gameObject.SetActive(true);
+            ConfirmButton.gameObject.SetActive(true);
+            CancelButton.gameObject.SetActive(true);
+            CloseButton.gameObject.SetActive(false);
 
-            messageText.text = message;
+            SetMessage(message);
 
             Show();
 
-            while (!userConfirmed.HasValue)
-                await AsyncUtils.WaitEndOfFrame;
+            while (!Confirmed.HasValue)
+                await AsyncUtils.WaitEndOfFrameAsync();
 
-            var result = userConfirmed.Value;
-            userConfirmed = null;
+            var result = Confirmed.Value;
+            Confirmed = null;
 
             Hide();
 
@@ -47,18 +52,18 @@ namespace Naninovel.UI
         {
             if (Visible) return;
 
-            closeButton.gameObject.SetActive(true);
-            confirmButton.gameObject.SetActive(false);
-            cancelButton.gameObject.SetActive(false);
+            ConfirmButton.gameObject.SetActive(false);
+            CancelButton.gameObject.SetActive(false);
+            CloseButton.gameObject.SetActive(true);
 
-            messageText.text = message;
+            SetMessage(message);
 
             Show();
 
-            while (!userConfirmed.HasValue)
-                await AsyncUtils.WaitEndOfFrame;
+            while (!Confirmed.HasValue)
+                await AsyncUtils.WaitEndOfFrameAsync();
 
-            userConfirmed = null;
+            Confirmed = null;
 
             Hide();
         }
@@ -66,37 +71,42 @@ namespace Naninovel.UI
         protected override void Awake ()
         {
             base.Awake();
-            this.AssertRequiredObjects(messageText, confirmButton, cancelButton, closeButton);
+            this.AssertRequiredObjects(ConfirmButton, CancelButton, CloseButton);
         }
 
         protected override void OnEnable ()
         {
             base.OnEnable();
 
-            confirmButton.OnButtonClicked += Confirm;
-            cancelButton.OnButtonClicked += Cancel;
-            closeButton.OnButtonClicked += Confirm;
+            ConfirmButton.onClick.AddListener(Confirm);
+            CancelButton.onClick.AddListener(Cancel);
+            CloseButton.onClick.AddListener(Cancel);
         }
 
         protected override void OnDisable ()
         {
             base.OnDisable();
 
-            confirmButton.OnButtonClicked -= Confirm;
-            cancelButton.OnButtonClicked -= Cancel;
-            closeButton.OnButtonClicked -= Confirm;
+            ConfirmButton.onClick.RemoveListener(Confirm);
+            CancelButton.onClick.RemoveListener(Cancel);
+            CloseButton.onClick.RemoveListener(Cancel);
         }
 
-        private void Confirm ()
+        protected virtual void Confirm ()
         {
             if (!Visible) return;
-            userConfirmed = true;
+            Confirmed = true;
         }
 
-        private void Cancel ()
+        protected virtual void Cancel ()
         {
             if (!Visible) return;
-            userConfirmed = false;
+            Confirmed = false;
+        }
+
+        protected virtual void SetMessage (string value)
+        {
+            onMessageChanged?.Invoke(value);
         }
     }
 }

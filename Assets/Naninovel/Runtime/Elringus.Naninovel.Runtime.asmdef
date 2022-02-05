@@ -14,6 +14,7 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
+        "Naninovel.Parsing.dll",
         "Naninovel.NCalc.dll",
         "NLayer.dll"
     ],
@@ -39,11 +40,6 @@
             "name": "com.unity.inputsystem",
             "expression": "",
             "define": "INPUT_SYSTEM_AVAILABLE"
-        },
-        {
-            "name": "com.cysharp.unitask",
-            "expression": "",
-            "define": "UNITASK2_AVAILABLE"
         }
     ],
     "noEngineReferences": false

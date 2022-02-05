@@ -1,10 +1,9 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using UniRx.Async;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,10 +11,10 @@ namespace Naninovel.UI
 {
     public class BacklogPanel : CustomUI, IBacklogUI
     {
-        [System.Serializable]
+        [Serializable]
         public new class GameState
         {
-            public List<BacklogMessage.State> Messages;
+            public List<BacklogMessageState> Messages;
         }
 
         protected virtual BacklogMessage LastMessage => messages.Last?.Value;
@@ -63,7 +62,7 @@ namespace Naninovel.UI
         /// <summary>
         /// Capture formatting content enclosed in angle brackets.
         /// </summary>
-        private static readonly Regex formattingRegex = new Regex(@"<.*?>");
+        private static readonly Regex formattingRegex = new Regex(@"<.*?>", RegexOptions.Compiled);
 
         private readonly LinkedList<BacklogMessage> messages = new LinkedList<BacklogMessage>();
         private readonly Stack<BacklogMessage> messagesPool = new Stack<BacklogMessage>();
@@ -101,7 +100,7 @@ namespace Naninovel.UI
 
             if ((LastMessage.Message.Length + message.Length) > messageLengthLimit)
             {
-                SpawnMessage(message, LastMessage.ActorName,
+                SpawnMessage(message, LastMessage.Author,
                     (AllowReplayVoice && !string.IsNullOrEmpty(voiceClipName)) ? new List<string> { voiceClipName } : null,
                     (AllowRollback && rollbackSpot.HasValue) ? rollbackSpot.Value : PlaybackSpot.Invalid);
                 return;
@@ -127,10 +126,10 @@ namespace Naninovel.UI
             base.SetVisibility(visible);
         }
 
-        public override UniTask ChangeVisibilityAsync (bool visible, float? duration = null, CancellationToken cancellationToken = default)
+        public override UniTask ChangeVisibilityAsync (bool visible, float? duration = null, AsyncToken asyncToken = default)
         {
             if (visible) ScrollToBottom();
-            return base.ChangeVisibilityAsync(visible, duration, cancellationToken);
+            return base.ChangeVisibilityAsync(visible, duration, asyncToken);
         }
 
         protected override void Awake ()
@@ -182,8 +181,8 @@ namespace Naninovel.UI
                 localizationManager.OnLocaleChanged -= SetClearPending;
         }
 
-        protected virtual void SpawnMessage (string messageText, string actorNameText, 
-            List<string> voiceClipNames, PlaybackSpot rollbackSpot)
+        protected virtual void SpawnMessage (string messageText, string actorNameText,
+            IReadOnlyCollection<string> voiceClipNames, PlaybackSpot rollbackSpot)
         {
             var message = default(BacklogMessage);
 
@@ -241,13 +240,18 @@ namespace Naninovel.UI
                     SpawnMessage(messageState.MessageText, messageState.ActorNameText, messageState.VoiceClipNames, messageState.RollbackSpot);
         }
 
-        protected virtual string StripFormatting (string content) => formattingRegex.Replace(content, string.Empty);
+        protected virtual string StripFormatting (string content)
+        {
+            if (string.IsNullOrWhiteSpace(content))
+                return content;
+            return formattingRegex.Replace(content, string.Empty);
+        }
 
         private async void ScrollToBottom ()
         {
             // Wait a frame and force rebuild layout before setting scroll position,
             // otherwise it's ignoring recently added messages.
-            await AsyncUtils.WaitEndOfFrame;
+            await AsyncUtils.WaitEndOfFrameAsync();
             LayoutRebuilder.ForceRebuildLayoutImmediate(ScrollRect.content);
             ScrollRect.verticalNormalizedPosition = 0;
         }

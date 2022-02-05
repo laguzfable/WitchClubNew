@@ -1,8 +1,7 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Linq;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel
@@ -28,10 +27,29 @@ namespace Naninovel
         protected abstract bool PrettifyJson { get; }
         protected abstract bool Binary { get; }
 
-        protected void InvokeOnBeforeSave () { Saving = true; OnBeforeSave?.Invoke(); }
-        protected void InvokeOnSaved () { Saving = false; OnSaved?.Invoke(); }
-        protected void InvokeOnBeforeLoad () { Loading = true; OnBeforeLoad?.Invoke(); }
-        protected void InvokeOnLoaded () { Loading = false; OnLoaded?.Invoke(); }
+        protected void InvokeOnBeforeSave ()
+        {
+            Saving = true;
+            OnBeforeSave?.Invoke();
+        }
+
+        protected void InvokeOnSaved ()
+        {
+            Saving = false;
+            OnSaved?.Invoke();
+        }
+
+        protected void InvokeOnBeforeLoad ()
+        {
+            Loading = true;
+            OnBeforeLoad?.Invoke();
+        }
+
+        protected void InvokeOnLoaded ()
+        {
+            Loading = false;
+            OnLoaded?.Invoke();
+        }
     }
 
     /// <summary>
@@ -50,7 +68,7 @@ namespace Naninovel
         public async UniTask SaveAsync (string slotId, TData data)
         {
             while (saveInProgress && Application.isPlaying)
-                await AsyncUtils.WaitEndOfFrame;
+                await AsyncUtils.WaitEndOfFrameAsync();
 
             saveInProgress = true;
 
@@ -59,6 +77,15 @@ namespace Naninovel
             await SerializeDataAsync(slotId, data);
             InvokeOnSaved();
 
+            saveInProgress = false;
+        }
+
+        public void Save (string slotId, TData data)
+        {
+            saveInProgress = true;
+            InvokeOnBeforeSave();
+            SerializeData(slotId, data);
+            InvokeOnSaved();
             saveInProgress = false;
         }
 
@@ -93,6 +120,7 @@ namespace Naninovel
             var slotKey = SlotIdToKey(slotId);
             PlayerPrefs.DeleteKey(slotKey);
             RemoveKeyIndex(slotKey);
+            PlayerPrefs.Save();
         }
 
         public override void RenameSaveSlot (string sourceSlotId, string destSlotId)
@@ -106,6 +134,7 @@ namespace Naninovel
             DeleteSaveSlot(sourceSlotId);
             PlayerPrefs.SetString(destKey, sourceValue);
             AddKeyIndexIfNotExist(destKey);
+            PlayerPrefs.Save();
         }
 
         protected virtual string SlotIdToKey (string slotId) => KeyPrefix + slotId;
@@ -123,6 +152,23 @@ namespace Naninovel
 
             PlayerPrefs.SetString(slotKey, jsonData);
             AddKeyIndexIfNotExist(slotKey);
+            PlayerPrefs.Save();
+        }
+
+        protected virtual void SerializeData (string slotId, TData data)
+        {
+            var jsonData = JsonUtility.ToJson(data, PrettifyJson);
+            var slotKey = SlotIdToKey(slotId);
+
+            if (Binary)
+            {
+                var bytes = StringUtils.ZipString(jsonData);
+                jsonData = Convert.ToBase64String(bytes);
+            }
+
+            PlayerPrefs.SetString(slotKey, jsonData);
+            AddKeyIndexIfNotExist(slotKey);
+            PlayerPrefs.Save();
         }
 
         protected virtual async UniTask<TData> DeserializeDataAsync (string slotId)

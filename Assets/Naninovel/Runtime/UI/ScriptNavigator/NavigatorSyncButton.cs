@@ -1,6 +1,5 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,18 +10,20 @@ namespace Naninovel.UI
         private Image syncImage;
         private IScriptManager scriptManager;
         private bool loadingScripts;
+        private ScriptNavigatorPanel panel;
 
         protected override void Awake ()
         {
             base.Awake();
 
             syncImage = GetComponentInChildren<Image>();
-            this.AssertRequiredObjects(syncImage);
+            panel = GetComponentInParent<ScriptNavigatorPanel>();
+            this.AssertRequiredObjects(syncImage, panel);
 
             scriptManager = Engine.GetService<IScriptManager>();
             UIComponent.interactable = false;
         }
-
+        
         protected override void OnEnable ()
         {
             base.OnEnable();
@@ -50,7 +51,7 @@ namespace Naninovel.UI
 
         protected override void OnButtonClick ()
         {
-            scriptManager.ReloadAllScriptsAsync().Forget();
+            panel.LocateScriptsAsync().Forget();
         }
 
         private void HandleScriptLoadStarted ()
@@ -64,5 +65,5 @@ namespace Naninovel.UI
             loadingScripts = false;
             UIComponent.interactable = true;
         }
-    } 
+    }
 }

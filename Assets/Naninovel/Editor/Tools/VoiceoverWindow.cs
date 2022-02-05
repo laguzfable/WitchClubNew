@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using Naninovel.Commands;
 using System;
@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using UniRx.Async;
 using UnityEditor;
 using UnityEngine;
 
@@ -153,7 +152,7 @@ namespace Naninovel
                 }
 
                 var fileExtension = UseMarkdownFormat ? "md" : "txt";
-                File.WriteAllText($"{OutputPath}/{script.Name}.{fileExtension}", scriptText, Encoding.UTF8);
+                File.WriteAllText($"{OutputPath}/{script.Name}.{fileExtension}", scriptText);
             }
         }
     }

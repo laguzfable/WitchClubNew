@@ -1,7 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel
@@ -53,6 +52,6 @@ namespace Naninovel
         /// <param name="lookAtOrigin">Whether to also make the characters look at the scene origin.</param>
         /// <param name="duration">Duration of the arrangement animation, in seconds.</param>
         /// <param name="easingType">Easing type to use for the arrangement animation.</param>
-        UniTask ArrangeCharactersAsync (bool lookAtOrigin = true, float duration = 0, EasingType easingType = default, CancellationToken cancellationToken = default);
+        UniTask ArrangeCharactersAsync (bool lookAtOrigin = true, float duration = 0, EasingType easingType = default, AsyncToken asyncToken = default);
     }
 }

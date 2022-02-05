@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
@@ -54,7 +54,7 @@ namespace Naninovel.UI
             uiManager.FontSize = index == defaultSizeIndex ? -1 : index;
         }
 
-        private void InitializeOptions ()
+        protected virtual void InitializeOptions ()
         {
             var options = new List<string> { Small, Default, Large, ExtraLarge };
             UIComponent.ClearOptions();

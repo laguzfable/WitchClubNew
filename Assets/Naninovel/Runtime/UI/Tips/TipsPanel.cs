@@ -1,8 +1,7 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
-using UniRx.Async;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,23 +10,17 @@ namespace Naninovel.UI
     [RequireComponent(typeof(CanvasGroup))]
     public class TipsPanel : CustomUI, ITipsUI
     {
-        [System.Serializable]
-        public class TipsSelectedState : SerializableMap<string, bool> { }
-
         public const string DefaultManagedTextCategory = "Tips";
 
         public virtual int TipsCount { get; private set; }
 
-        protected string UnlockableIdPrefix => unlockableIdPrefix;
-        protected string ManagedTextCategory => managedTextCategory;
-        protected RectTransform ItemsContainer => itemsContainer;
-        protected TipsListItem ItemPrefab => itemPrefab;
-        protected Text TitleText => titleText;
-        protected Text NumberText => numberText;
-        protected Text CategoryText => categoryText;
-        protected Text DescriptionText => descriptionText;
+        protected virtual string UnlockableIdPrefix => unlockableIdPrefix;
+        protected virtual string ManagedTextCategory => managedTextCategory;
+        protected virtual RectTransform ItemsContainer => itemsContainer;
+        protected virtual TipsListItem ItemPrefab => itemPrefab;
 
         private const string separatorLiteral = "|";
+        private const string selectedPrefix = "TIP_SELECTED_";
 
         [Header("Tips Setup")]
         [Tooltip("All the unlockable item IDs with the specified prefix will be considered Tips items.")]
@@ -39,29 +32,25 @@ namespace Naninovel.UI
         [SerializeField] private ScrollRect itemsScrollRect = default;
         [SerializeField] private RectTransform itemsContainer = default;
         [SerializeField] private TipsListItem itemPrefab = default;
-        [SerializeField] private Text titleText = default;
-        [SerializeField] private Text numberText = default;
-        [SerializeField] private Text categoryText = default;
-        [SerializeField] private Text descriptionText = default;
+        [SerializeField] private StringUnityEvent onTitleChanged = default;
+        [SerializeField] private StringUnityEvent onNumberChanged = default;
+        [SerializeField] private StringUnityEvent onCategoryChanged = default;
+        [SerializeField] private StringUnityEvent onDescriptionChanged = default;
 
         private IUnlockableManager unlockableManager;
         private ITextManager textManager;
-        private IStateManager stateManager;
-        private TipsSelectedState tipsSelectedState = new TipsSelectedState();
         private List<TipsListItem> listItems = new List<TipsListItem>();
 
         public override UniTask InitializeAsync ()
         {
-            tipsSelectedState = stateManager.GlobalState.GetState<TipsSelectedState>() ?? new TipsSelectedState();
-
-            var records = textManager.GetAllRecords(managedTextCategory);
+            var records = textManager.GetAllRecords(ManagedTextCategory);
             foreach (var record in records)
             {
-                var unlockableId = $"{unlockableIdPrefix}/{record.Key}";
+                var unlockableId = $"{UnlockableIdPrefix}/{record.Key}";
                 var title = record.Value.GetBefore(separatorLiteral) ?? record.Value;
-                var selectedOnce = tipsSelectedState.TryGetValue(unlockableId, out var selected) && selected;
-                var item = TipsListItem.Instantiate(itemPrefab, unlockableId, title, selectedOnce, HandleItemClicked);
-                item.transform.SetParent(itemsContainer, false);
+                var selectedOnce = WasItemSelectedOnce(unlockableId);
+                var item = TipsListItem.Instantiate(ItemPrefab, unlockableId, title, selectedOnce, HandleItemClicked);
+                item.transform.SetParent(ItemsContainer, false);
                 listItems.Add(item);
             }
 
@@ -75,7 +64,7 @@ namespace Naninovel.UI
 
         public virtual void SelectTipRecord (string tipId)
         {
-            var unlockableId = $"{unlockableIdPrefix}/{tipId}";
+            var unlockableId = $"{UnlockableIdPrefix}/{tipId}";
             var item = listItems.Find(i => i.UnlockableId == unlockableId);
             if (item is null) throw new Exception($"Failed to select `{tipId}` tip record: item with the ID is not found.");
             itemsScrollRect.ScrollTo(item.GetComponent<RectTransform>());
@@ -85,16 +74,15 @@ namespace Naninovel.UI
         protected override void Awake ()
         {
             base.Awake();
-            this.AssertRequiredObjects(itemsScrollRect, itemsContainer, itemPrefab, titleText, numberText, categoryText, descriptionText);
+            this.AssertRequiredObjects(itemsScrollRect, ItemsContainer, ItemPrefab);
 
             unlockableManager = Engine.GetService<IUnlockableManager>();
             textManager = Engine.GetService<ITextManager>();
-            stateManager = Engine.GetService<IStateManager>();
 
-            titleText.text = string.Empty;
-            numberText.text = string.Empty;
-            categoryText.text = string.Empty;
-            descriptionText.text = string.Empty;
+            SetTitle(string.Empty);
+            SetNumber(string.Empty);
+            SetCategory(string.Empty);
+            SetDescription(string.Empty);
         }
 
         protected override void OnEnable ()
@@ -116,33 +104,47 @@ namespace Naninovel.UI
         {
             if (!unlockableManager.ItemUnlocked(clickedItem.UnlockableId)) return;
 
-            tipsSelectedState[clickedItem.UnlockableId] = true;
+            SetItemSelectedOnce(clickedItem.UnlockableId);
             foreach (var item in listItems)
                 item.SetSelected(item.UnlockableId.EqualsFast(clickedItem.UnlockableId));
-            var recordValue = textManager.GetRecordValue(clickedItem.UnlockableId.GetAfterFirst($"{unlockableIdPrefix}/"), managedTextCategory);
-            titleText.text = recordValue.GetBefore(separatorLiteral)?.Trim() ?? recordValue;
-            numberText.text = clickedItem.Number.ToString();
-            categoryText.text = recordValue.GetBetween(separatorLiteral)?.Trim() ?? string.Empty;
-            descriptionText.text = recordValue.GetAfter(separatorLiteral)?.Replace("\\n", "\n").Trim() ?? string.Empty;
-        }
-
-        protected override void HandleVisibilityChanged (bool visible)
-        {
-            base.HandleVisibilityChanged(visible);
-
-            if (visible) return;
-
-            stateManager?.GlobalState.SetState(tipsSelectedState);
-            stateManager?.SaveGlobalStateAsync().Forget();
+            var recordValue = textManager.GetRecordValue(clickedItem.UnlockableId.GetAfterFirst($"{UnlockableIdPrefix}/"), ManagedTextCategory);
+            SetTitle(recordValue.GetBefore(separatorLiteral)?.Trim() ?? recordValue);
+            SetNumber(clickedItem.Number.ToString());
+            SetCategory(recordValue.GetBetween(separatorLiteral)?.Trim() ?? string.Empty);
+            SetDescription(recordValue.GetAfter(separatorLiteral)?.Replace("\\n", "\n").Trim() ?? string.Empty);
         }
 
         protected virtual void HandleUnlockableItemUpdated (UnlockableItemUpdatedArgs args)
         {
-            if (!args.Id.StartsWithFast(unlockableIdPrefix)) return;
+            if (!args.Id.StartsWithFast(UnlockableIdPrefix)) return;
 
             var unlockedItem = listItems.Find(i => i.UnlockableId.EqualsFast(args.Id));
             if (unlockedItem)
                 unlockedItem.SetUnlocked(args.Unlocked);
         }
+
+        protected virtual void SetTitle (string value)
+        {
+            onTitleChanged?.Invoke(value);
+        }
+
+        protected virtual void SetNumber (string value)
+        {
+            onNumberChanged?.Invoke(value);
+        }
+
+        protected virtual void SetCategory (string value)
+        {
+            onCategoryChanged?.Invoke(value);
+        }
+
+        protected virtual void SetDescription (string value)
+        {
+            onDescriptionChanged?.Invoke(value);
+        }
+
+        private bool WasItemSelectedOnce (string unlockableId) => unlockableManager.ItemUnlocked(selectedPrefix + unlockableId);
+
+        private void SetItemSelectedOnce (string unlockableId) => unlockableManager.SetItemUnlocked(selectedPrefix + unlockableId, true);
     }
 }

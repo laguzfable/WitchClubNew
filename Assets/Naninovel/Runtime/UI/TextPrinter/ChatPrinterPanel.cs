@@ -1,8 +1,7 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System.Collections.Generic;
 using System.Linq;
-using UniRx.Async;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,37 +15,35 @@ namespace Naninovel.UI
         [System.Serializable]
         public new class GameState
         {
-            public List<ChatMessage.State> Messages;
+            public List<ChatMessageState> Messages;
             public string LastMessageText;
         }
 
         public override string PrintedText { get => printedText; set => SetPrintedText(value); }
         public override string AuthorNameText { get; set; }
-        public override float RevealProgress 
-        { 
-            get => revealProgress; 
-            set 
-            { 
-                if (value == 0) DestroyAllMessages(); 
-                else if (messageStack?.Count > 0 && messageStack.Peek() is ChatMessage message && message) 
+        public override float RevealProgress
+        {
+            get => revealProgress;
+            set
+            {
+                if (value == 0) DestroyAllMessages();
+                else if (messageStack?.Count > 0 && messageStack.Peek() is ChatMessage message && message)
                     message.MessageText = lastMessageText;
-            } 
+            }
         }
         public override string Appearance { get; set; }
 
-        protected ScrollRect ScrollRect => scrollRect;
-        protected RectTransform MessagesContainer => messagesContainer;
-        protected ChatMessage MessagePrototype => messagePrototype;
-        protected ScriptableUIBehaviour InputIndicator => inputIndicator;
-        protected float RevealDelayModifier => revealDelayModifier;
-        protected float PrintDotDelay => printDotDelay;
+        protected virtual ScrollRect ScrollRect => scrollRect;
+        protected virtual RectTransform MessagesContainer => messagesContainer;
+        protected virtual ChatMessage MessagePrototype => messagePrototype;
+        protected virtual ScriptableUIBehaviour InputIndicator => inputIndicator;
+        protected virtual float RevealDelayModifier => revealDelayModifier;
 
         [SerializeField] private ScrollRect scrollRect = default;
         [SerializeField] private RectTransform messagesContainer = default;
         [SerializeField] private ChatMessage messagePrototype = default;
         [SerializeField] private ScriptableUIBehaviour inputIndicator = default;
         [SerializeField] private float revealDelayModifier = 3f;
-        [SerializeField] private float printDotDelay = .5f;
 
         private Stack<ChatMessage> messageStack = new Stack<ChatMessage>();
         private ICharacterManager characterManager;
@@ -55,50 +52,35 @@ namespace Naninovel.UI
         private string lastMessageText;
         private float revealProgress = .1f;
 
-        public override async UniTask RevealPrintedTextOverTimeAsync (float revealDelay, CancellationToken cancellationToken)
+        public override async UniTask RevealPrintedTextOverTimeAsync (float revealDelay, AsyncToken asyncToken)
         {
-            var message = AddMessage(string.Empty, lastAuthorId);
-
+            var message = AddMessage(lastMessageText, lastAuthorId);
+            message.SetIsTyping(true);
             revealProgress = .1f;
 
             if (revealDelay > 0 && lastMessageText != null)
             {
-                await AsyncUtils.WaitEndOfFrame;
-                if (cancellationToken.CancelASAP) return;
+                await AsyncUtils.WaitEndOfFrameAsync(asyncToken);
                 ScrollToBottom(); // Wait before scrolling, otherwise it's not scrolled.
-
                 var revealDuration = lastMessageText.Count(char.IsLetterOrDigit) * revealDelay * revealDelayModifier;
                 var revealStartTime = Time.time;
                 var revealFinishTime = revealStartTime + revealDuration;
-                var lastPrintDotTime = 0f;
                 while (revealFinishTime > Time.time && messageStack.Count > 0 && messageStack.Peek() == message)
                 {
-                    // Print dots while waiting.
-                    if (Time.time >= lastPrintDotTime + printDotDelay)
-                    {
-                        lastPrintDotTime = Time.time;
-                        message.MessageText = message.MessageText.Length >= 9 ? string.Empty : message.MessageText + " . ";
-                    }
-
                     revealProgress = (Time.time - revealStartTime) / revealDuration;
-
-                    await AsyncUtils.WaitEndOfFrame;
-                    if (cancellationToken.CancelASAP) return;
-                    else if (cancellationToken.CancelLazy) break;
+                    await AsyncUtils.WaitEndOfFrameAsync(asyncToken);
+                    if (asyncToken.Completed) break;
                 }
             }
 
-            if (messageStack.Contains(message))
-                message.MessageText = lastMessageText;
-
             ScrollToBottom();
-
             revealProgress = 1f;
+            message.SetIsTyping(false);
         }
 
-        public override void SetWaitForInputIndicatorVisible (bool isVisible)
+        public override void SetWaitForInputIndicatorVisible (bool visible)
         {
-            if (isVisible) inputIndicator.Show();
+            if (visible) inputIndicator.Show();
             else inputIndicator.Hide();
         }
 
@@ -136,7 +118,7 @@ namespace Naninovel.UI
 
             if (!string.IsNullOrEmpty(authorId))
             {
-                message.ActorNameText = characterManager.GetDisplayName(authorId);
+                message.ActorNameText = characterManager.GetDisplayName(authorId) ?? authorId;
                 message.AvatarTexture = CharacterManager.GetAvatarTextureFor(authorId);
 
                 var meta = characterManager.Configuration.GetMetadataOrDefault(authorId);
@@ -202,9 +184,9 @@ namespace Naninovel.UI
         {
             // Wait a frame and force rebuild layout before setting scroll position,
             // otherwise it's ignoring recently added messages.
-            await AsyncUtils.WaitEndOfFrame;
+            await AsyncUtils.WaitEndOfFrameAsync();
             LayoutRebuilder.ForceRebuildLayoutImmediate(scrollRect.content);
             scrollRect.verticalNormalizedPosition = 0;
         }
-    } 
+    }
 }

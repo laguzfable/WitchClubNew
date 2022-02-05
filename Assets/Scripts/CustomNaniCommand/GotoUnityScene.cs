@@ -1,7 +1,6 @@
 using Naninovel;
 using Naninovel.Commands;
 using Naninovel.UI;
-using UniRx.Async;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -10,7 +9,7 @@ public class GotoUnityScene : Command, Command.IForceWait
 {
     public StringParameter SceneName;
 
-    public async override UniTask ExecuteAsync(CancellationToken cancellationToken = default)
+    public async override UniTask ExecuteAsync(AsyncToken asyncToken = default)
     {
         GameObject.FindObjectOfType<ContinueInputUI>().Visible = false;
 

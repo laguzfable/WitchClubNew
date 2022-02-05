@@ -1,7 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
-using UnityEngine;
+using System.Collections.Generic;
 
 namespace Naninovel
 {
@@ -11,31 +10,25 @@ namespace Naninovel
     public interface ISpawnManager : IEngineService<SpawnConfiguration>
     {
         /// <summary>
-        /// Attempts to spawn a <see cref="GameObject"/> based on the prefab stored at the provided path.
+        /// Spawns an object with the provided path.
         /// </summary>
-        UniTask SpawnAsync (string path, CancellationToken cancellationToken = default, params string[] parameters);
-        /// <summary>
-        /// Attempts to update parameters of a spawned <see cref="GameObject"/>; can only be used over <see cref="Commands.Spawn.IParameterized"/> objects.
-        /// </summary>
-        UniTask UpdateSpawnedAsync (string path, CancellationToken cancellationToken = default, params string[] parameters);
-        /// <summary>
-        /// Attempts to destroy a previously spawned <see cref="GameObject"/> with the provided path while applying provided parameters.
-        /// </summary>
-        /// <returns>Whether the object was found and destroyed.</returns>
-        UniTask<bool> DestroySpawnedAsync (string path, CancellationToken cancellationToken = default, params string[] parameters);
-        /// <summary>
-        /// Attempts to destroy a previously spawned <see cref="GameObject"/> with the provided path.
-        /// </summary>
-        /// <returns>Whether the object was found and destroyed.</returns>
-        bool DestroySpawnedObject (string path);
-        /// <summary>
-        /// Destroys all the previously spawned objects.
-        /// </summary>
-        void DestroyAllSpawnedObjects ();
+        UniTask<SpawnedObject> SpawnAsync (string path, AsyncToken asyncToken = default);
         /// <summary>
         /// Checks whether an object with the provided path is currently spawned.
         /// </summary>
-        bool IsObjectSpawned (string path);
+        bool IsSpawned (string path);
+        /// <summary>
+        /// Returns a spawned object with the provided path.
+        /// </summary>
+        SpawnedObject GetSpawned (string path);
+        /// <summary>
+        /// Returns all the currently spawned objects.
+        /// </summary>
+        IReadOnlyCollection<SpawnedObject> GetAllSpawned ();
+        /// <summary>
+        /// Destroys a spawned object with the provided path.
+        /// </summary>
+        void DestroySpawned (string path);
 
         /// <summary>
         /// Preloads and holds resources required to spawn an object with the provided path.

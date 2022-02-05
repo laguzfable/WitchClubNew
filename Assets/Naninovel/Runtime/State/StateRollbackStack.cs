@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections;
@@ -34,10 +34,12 @@ namespace Naninovel
         public int Count => rollbackList.Count;
 
         private readonly LinkedList<GameStateMap> rollbackList = new LinkedList<GameStateMap>();
+        private readonly Action<GameStateMap> onDrop;
 
-        public StateRollbackStack (int capacity)
+        public StateRollbackStack (int capacity, Action<GameStateMap> onDrop = default)
         {
             Capacity = capacity;
+            this.onDrop = onDrop;
         }
 
         public IEnumerator<GameStateMap> GetEnumerator () => rollbackList.GetEnumerator();
@@ -49,7 +51,11 @@ namespace Naninovel
             rollbackList.AddFirst(item);
 
             if (rollbackList.Count > Capacity)
+            {
+                var dropped = rollbackList.Last.Value;
                 rollbackList.RemoveLast();
+                onDrop?.Invoke(dropped);
+            }
         }
 
         public GameStateMap Peek () => rollbackList?.Count > 0 ? rollbackList.First?.Value : null;

@@ -1,15 +1,15 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
 using Naninovel.Commands;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel
 {
     /// <inheritdoc cref="ICustomVariableManager"/>
-    [InitializeAtRuntime, Goto.DontReset]
+    /// <remarks>Initialization order lowered, as other services implicitly use custom variables (eg, via <see cref="ExpressionEvaluator"/>).</remarks>
+    [InitializeAtRuntime(int.MinValue + 1), Goto.DontReset]
     public class CustomVariableManager : IStatefulService<GameStateMap>, IStatefulService<GlobalStateMap>, ICustomVariableManager
     {
         [Serializable]

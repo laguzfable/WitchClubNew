@@ -1,6 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,7 +8,7 @@ namespace Naninovel.UI
 {
     public class VariableInputPanel : CustomUI, IVariableInputUI
     {
-        [System.Serializable]
+        [Serializable]
         public new class GameState
         {
             public string VariableName;
@@ -17,19 +17,22 @@ namespace Naninovel.UI
             public bool PlayOnSubmit;
         }
 
-        protected InputField InputField => inputField;
-        protected Text SummaryText => summaryText;
-        protected Button SubmitButton => submitButton;
-        protected bool ActivateOnShow => activateOnShow;
-        protected bool SubmitOnInput => submitOnInput;
+        protected virtual string Summary { get; private set; }
+        protected virtual InputField InputField => inputField;
+        protected virtual Button SubmitButton => submitButton;
+        protected virtual bool ActivateOnShow => activateOnShow;
+        protected virtual bool SubmitOnInput => submitOnInput;
+        protected virtual GameObject SummaryContainer => summaryContainer;
 
         [SerializeField] private InputField inputField = default;
-        [SerializeField] private Text summaryText = default;
         [SerializeField] private Button submitButton = default;
         [Tooltip("Whether to automatically select and activate input field when the UI is shown.")]
         [SerializeField] private bool activateOnShow = true;
         [Tooltip("Whether to attempt submit input field value when a `Submit` input is activated.")]
         [SerializeField] private bool submitOnInput = true;
+        [Tooltip("When assigned, the game object will be de-/activated based on whether summary is assigned.")]
+        [SerializeField] private GameObject summaryContainer = default;
+        [SerializeField] private StringUnityEvent onSummaryChanged = default;
 
         private IScriptPlayer scriptPlayer;
         private ICustomVariableManager variableManager;
@@ -42,40 +45,39 @@ namespace Naninovel.UI
         {
             this.variableName = variableName;
             this.playOnSubmit = playOnSubmit;
-            summaryText.text = summary ?? string.Empty;
-            summaryText.gameObject.SetActive(!string.IsNullOrWhiteSpace(summary));
-            inputField.text = predefinedValue ?? string.Empty;
+            SetSummary(summary);
+            InputField.text = predefinedValue ?? string.Empty;
 
             Show();
 
-            if (activateOnShow)
+            if (ActivateOnShow)
             {
-                inputField.Select();
-                inputField.ActivateInputField();
+                InputField.Select();
+                InputField.ActivateInputField();
             }
         }
 
         protected override void Awake ()
         {
             base.Awake();
-            this.AssertRequiredObjects(inputField, summaryText, submitButton);
+            this.AssertRequiredObjects(InputField, SubmitButton);
 
             scriptPlayer = Engine.GetService<IScriptPlayer>();
             variableManager = Engine.GetService<ICustomVariableManager>();
             stateManager = Engine.GetService<IStateManager>();
             submitInput = Engine.GetService<IInputManager>().GetSubmit();
 
-            submitButton.interactable = false;
+            SubmitButton.interactable = false;
         }
 
         protected override void OnEnable ()
         {
             base.OnEnable();
 
-            submitButton.onClick.AddListener(HandleSubmit);
-            inputField.onValueChanged.AddListener(HandleInputChanged);
+            SubmitButton.onClick.AddListener(HandleSubmit);
+            InputField.onValueChanged.AddListener(HandleInputChanged);
 
-            if (submitInput != null && submitOnInput)
+            if (submitInput != null && SubmitOnInput)
                 submitInput.OnStart += HandleSubmit;
         }
 
@@ -83,10 +85,10 @@ namespace Naninovel.UI
         {
             base.OnDisable();
 
-            submitButton.onClick.RemoveListener(HandleSubmit);
-            inputField.onValueChanged.RemoveListener(HandleInputChanged);
+            SubmitButton.onClick.RemoveListener(HandleSubmit);
+            InputField.onValueChanged.RemoveListener(HandleInputChanged);
 
-            if (submitInput != null && submitOnInput)
+            if (submitInput != null && SubmitOnInput)
                 submitInput.OnStart -= HandleSubmit;
         }
 
@@ -96,8 +98,8 @@ namespace Naninovel.UI
 
             var state = new GameState {
                 VariableName = variableName,
-                SummaryText = summaryText.text,
-                InputFieldText = inputField.text,
+                SummaryText = Summary,
+                InputFieldText = InputField.text,
                 PlayOnSubmit = playOnSubmit
             };
             stateMap.SetState(state);
@@ -111,24 +113,31 @@ namespace Naninovel.UI
             if (state is null) return;
 
             variableName = state.VariableName;
-            summaryText.text = state.SummaryText;
-            summaryText.gameObject.SetActive(!string.IsNullOrWhiteSpace(state.SummaryText));
-            inputField.text = state.InputFieldText;
+            SetSummary(state.SummaryText);
+            InputField.text = state.InputFieldText;
             playOnSubmit = state.PlayOnSubmit;
+        }
+
+        protected virtual void SetSummary (string value)
+        {
+            Summary = value;
+            onSummaryChanged?.Invoke(value);
+            if (SummaryContainer)
+                SummaryContainer.SetActive(!string.IsNullOrWhiteSpace(value));
         }
 
         protected virtual void HandleInputChanged (string text)
         {
-            submitButton.interactable = !string.IsNullOrWhiteSpace(text);
+            SubmitButton.interactable = !string.IsNullOrWhiteSpace(text);
         }
 
         protected virtual void HandleSubmit ()
         {
-            if (!Visible || string.IsNullOrWhiteSpace(inputField.text)) return;
+            if (!Visible || string.IsNullOrWhiteSpace(InputField.text)) return;
 
             stateManager.PeekRollbackStack()?.AllowPlayerRollback();
 
-            variableManager.SetVariableValue(variableName, inputField.text);
+            variableManager.SetVariableValue(variableName, InputField.text);
 
             ClearFocus();
             Hide();

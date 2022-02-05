@@ -1,6 +1,5 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel.Commands
@@ -10,23 +9,18 @@ namespace Naninovel.Commands
     /// (eg, by moving a mouse or using gamepad analog stick).
     /// Check [this video](https://youtu.be/rC6C9mA7Szw) for a quick demonstration of the command.
     /// </summary>
-    /// <example>
-    /// ; Activate camera look mode with default parameters
-    /// @look
-    /// 
-    /// ; Activate camera look mode with custom parameters
-    /// @look zone:6.5,4 speed:3,2.5 gravity:true
-    /// 
-    /// ; Disable camera look mode and reset camera offset
-    /// @look enable:false
-    /// @camera offset:0,0
-    /// </example>
+    /// <remarks>
+    /// It's also possible to control the look by rotating a mobile device (in case it has a gyroscope).
+    /// This requires using Unity's new input system and manually [enabling gyroscope](https://docs.unity3d.com/Packages/com.unity.inputsystem@1.0/manual/Sensors.html) device.
+    /// Check out [input example project](https://github.com/Naninovel/Input) for a reference on how to setup camera look with gyroscope.
+    /// </remarks>
     [CommandAlias("look")]
     public class CameraLook : Command
     {
         /// <summary>
         /// Whether to enable or disable the camera look mode. Default: true.
         /// </summary>
+        [ParameterAlias(NamelessParameterAlias), ParameterDefaultValue("true")]
         public BooleanParameter Enable = true;
         /// <summary>
         /// A bound box with X,Y sizes in units from the initial camera position, 
@@ -43,13 +37,18 @@ namespace Naninovel.Commands
         /// Whether to automatically move camera to the initial position when the look input is not active 
         /// (eg, mouse is not moving or analog stick is in default position). Default: false.
         /// </summary>
+        [ParameterDefaultValue("false")]
         public BooleanParameter Gravity = false;
 
-        public override UniTask ExecuteAsync (CancellationToken cancellationToken = default)
-        {
-            var cameraManager = Engine.GetService<ICameraManager>();
+        private static readonly Vector2 defaultZone = new Vector2(5, 3);
+        private static readonly Vector2 defaultSpeed = new Vector2(1.5f, 1);
 
-            cameraManager.SetLookMode(Enable, ArrayUtils.ToVector2(LookZone, new Vector2(5, 3)), ArrayUtils.ToVector2(LookSpeed, new Vector2(1.5f, 1f)), Gravity);
+        public override UniTask ExecuteAsync (AsyncToken asyncToken = default)
+        {
+            var zone = ArrayUtils.ToVector2(LookZone, defaultZone);
+            var speed = ArrayUtils.ToVector2(LookSpeed, defaultSpeed);
+            var cameraManager = Engine.GetService<ICameraManager>();
+            cameraManager.SetLookMode(Enable, zone, speed, Gravity);
 
             return UniTask.CompletedTask;
         }

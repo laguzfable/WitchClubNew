@@ -1,7 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System.Collections.Generic;
-using UniRx.Async;
 
 namespace Naninovel
 {
@@ -33,7 +32,7 @@ namespace Naninovel
         /// Reveals the assigned text message over time.
         /// </summary>
         /// <param name="revealDelay">Delay (in seconds) to wait after revealing each text character.</param>
-        /// <param name="cancellationToken">Token for task cancellation.</param>
-        UniTask RevealTextAsync (float revealDelay, CancellationToken cancellationToken = default);
+        /// <param name="asyncToken">Token for task cancellation.</param>
+        UniTask RevealTextAsync (float revealDelay, AsyncToken asyncToken = default);
     } 
 }

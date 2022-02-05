@@ -1,8 +1,7 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System.Collections.Generic;
 using System.Linq;
-using UniRx.Async;
 
 namespace Naninovel.Commands
 {
@@ -10,38 +9,39 @@ namespace Naninovel.Commands
     /// Shows (makes visible) actors (character, background, text printer, choice handler, etc) with the specified IDs.
     /// In case multiple actors with the same ID found (eg, a character and a printer), will affect only the first found one.
     /// </summary>
-    /// <example>
-    /// ; Given an actor with ID `SomeActor` is hidden, reveal (fade-in) it over 3 seconds.
-    /// @show SomeActor time:3
-    /// 
-    /// ; Show `Kohaku` and `Yuko` actors.
-    /// @show Kohaku,Yuko
-    /// </example>
     [CommandAlias("show")]
     public class ShowActors : Command
     {
         /// <summary>
         /// IDs of the actors to show.
         /// </summary>
-        [ParameterAlias(NamelessParameterAlias), RequiredParameter, IDEActor]
+        [ParameterAlias(NamelessParameterAlias), RequiredParameter, ActorContext]
         public StringListParameter ActorIds;
         /// <summary>
-        /// Duration (in seconds) of the fade animation. Default value: 0.35 seconds.
+        /// Duration (in seconds) of the fade animation.
         /// </summary>
-        [ParameterAlias("time")]
-        public DecimalParameter Duration = .35f;
+        [ParameterAlias("time"), ParameterDefaultValue("0.35")]
+        public DecimalParameter Duration;
 
-        public override async UniTask ExecuteAsync (CancellationToken cancellationToken = default)
+        public override async UniTask ExecuteAsync (AsyncToken asyncToken = default)
         {
-            var managers = Engine.GetAllServices<IActorManager>(c => ActorIds.Any(id => c.ActorExists(id)));
-
+            var managers = Engine.FindAllServices<IActorManager>(c => ActorIds.Any(id => c.ActorExists(id)));
             var tasks = new List<UniTask>();
             foreach (var actorId in ActorIds)
                 if (managers.FirstOrDefault(m => m.ActorExists(actorId)) is IActorManager manager)
-                    tasks.Add(manager.GetActor(actorId).ChangeVisibilityAsync(true, Duration, cancellationToken: cancellationToken));
+                    tasks.Add(manager.GetActor(actorId).ChangeVisibilityAsync(true, GetDuration(manager), GetEasing(manager), asyncToken));
                 else LogErrorWithPosition($"Failed to show `{actorId}` actor: can't find any managers with `{actorId}` actor.");
-
             await UniTask.WhenAll(tasks);
         }
-    } 
+
+        private float GetDuration (IActorManager manager)
+        {
+            return Assigned(Duration) ? Duration.Value : manager.ActorManagerConfiguration.DefaultDuration;
+        }
+
+        private EasingType GetEasing (IActorManager manager)
+        {
+            return manager.ActorManagerConfiguration.DefaultEasing;
+        }
+    }
 }

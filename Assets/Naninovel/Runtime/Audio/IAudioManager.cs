@@ -1,7 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System.Collections.Generic;
-using UniRx.Async;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -12,10 +11,6 @@ namespace Naninovel
     /// </summary>
     public interface IAudioManager : IEngineService<AudioConfiguration>
     {
-        /// <summary>
-        /// Audio listener component currently used by the service.
-        /// </summary>
-        AudioListener AudioListener { get; }
         /// <summary>
         /// Audio mixer asset currently used by the service.
         /// Custom mixers can be assigned in the audio configuration.
@@ -69,7 +64,7 @@ namespace Naninovel
         /// <param name="volume">Volume to set for the modified audio.</param>
         /// <param name="loop">Whether the audio should loop.</param>
         /// <param name="time">Animation (fade) time of the modification.</param>
-        UniTask ModifyBgmAsync (string path, float volume, bool loop, float time, CancellationToken cancellationToken = default);
+        UniTask ModifyBgmAsync (string path, float volume, bool loop, float time, AsyncToken asyncToken = default);
         /// <summary>
         /// Modifies properties of an SFX track with the provided resource path.
         /// </summary>
@@ -77,7 +72,7 @@ namespace Naninovel
         /// <param name="volume">Volume to set for the modified audio.</param>
         /// <param name="loop">Whether the audio should loop.</param>
         /// <param name="time">Animation (fade) time of the modification.</param>
-        UniTask ModifySfxAsync (string path, float volume, bool loop, float time, CancellationToken cancellationToken = default);
+        UniTask ModifySfxAsync (string path, float volume, bool loop, float time, AsyncToken asyncToken = default);
         /// <summary>
         /// Plays an SFX track with the provided resource path in case it's loaded; won't save the playback state.
         /// </summary>
@@ -85,7 +80,7 @@ namespace Naninovel
         /// <param name="volume">Volume of the audio playback.</param>
         /// <param name="group">Path of an <see cref="AudioMixerGroup"/> of the current <see cref="AudioMixer"/> to use when playing the audio.</param>
         /// <param name="restart">Whether to start playing the audio from start in case it's already playing.</param>
-        /// <param name="additive">Whether to allow playing multiple instances of the same clip; has no effect when <paramref name="restart"/> is enabled.</param>
+        /// <param name="additive">Whether to allow playing multiple instances of the same clip; has no effect when restart is enabled.</param>
         void PlaySfxFast (string path, float volume = 1f, string group = default, bool restart = true, bool additive = true);
         /// <summary>
         /// Starts playing a BGM track with the provided path.
@@ -96,18 +91,18 @@ namespace Naninovel
         /// <param name="loop">Whether to loop the playback.</param>
         /// <param name="introPath">Name (local path) to an audio resource to play before the main audio; can be used as an intro before looping the main audio clip.</param>
         /// <param name="group">Path of an <see cref="AudioMixerGroup"/> of the current <see cref="AudioMixer"/> to use when playing the audio.</param>
-        UniTask PlayBgmAsync (string path, float volume = 1f, float fadeTime = 0f, bool loop = true, string introPath = null, string group = default, CancellationToken cancellationToken = default);
+        UniTask PlayBgmAsync (string path, float volume = 1f, float fadeTime = 0f, bool loop = true, string introPath = null, string group = default, AsyncToken asyncToken = default);
         /// <summary>
         /// Stops playing a BGM track with the provided path.
         /// </summary>
         /// <param name="path">Name (local path) of the audio resource.</param>
         /// <param name="fadeTime">Animation (fade-out) time to reach zero volume before stopping the playback.</param>
-        UniTask StopBgmAsync (string path, float fadeTime = 0f, CancellationToken cancellationToken = default);
+        UniTask StopBgmAsync (string path, float fadeTime = 0f, AsyncToken asyncToken = default);
         /// <summary>
         /// Stops playback of all the BGM tracks.
         /// </summary>
         /// <param name="fadeTime">Animation (fade-out) time to reach zero volume before stopping the playback.</param>
-        UniTask StopAllBgmAsync (float fadeTime = 0f, CancellationToken cancellationToken = default);
+        UniTask StopAllBgmAsync (float fadeTime = 0f, AsyncToken asyncToken = default);
         /// <summary>
         /// Starts playing an SFX track with the provided path.
         /// </summary>
@@ -116,32 +111,33 @@ namespace Naninovel
         /// <param name="fadeTime">Animation (fade-in) time to reach the target volume.</param>
         /// <param name="loop">Whether to loop the playback.</param>
         /// <param name="group">Path of an <see cref="AudioMixerGroup"/> of the current <see cref="AudioMixer"/> to use when playing the audio.</param>
-        UniTask PlaySfxAsync (string path, float volume = 1f, float fadeTime = 0f, bool loop = false, string group = default, CancellationToken cancellationToken = default);
+        UniTask PlaySfxAsync (string path, float volume = 1f, float fadeTime = 0f, bool loop = false, string group = default, AsyncToken asyncToken = default);
         /// <summary>
         /// Stops playing an SFX track with the provided path.
         /// </summary>
         /// <param name="path">Name (local path) of the audio resource.</param>
         /// <param name="fadeTime">Animation (fade-out) time to reach zero volume before stopping the playback.</param>
-        UniTask StopSfxAsync (string path, float fadeTime = 0f, CancellationToken cancellationToken = default);
+        UniTask StopSfxAsync (string path, float fadeTime = 0f, AsyncToken asyncToken = default);
         /// <summary>
         /// Stops playback of all the SFX tracks.
         /// </summary>
         /// <param name="fadeTime">Animation (fade-out) time to reach zero volume before stopping the playback.</param>
-        UniTask StopAllSfxAsync (float fadeTime = 0f, CancellationToken cancellationToken = default);
+        UniTask StopAllSfxAsync (float fadeTime = 0f, AsyncToken asyncToken = default);
         /// <summary>
         /// Starts playing an SFX track with the provided path.
         /// </summary>
         /// <param name="path">Name (local path) of the voice resource.</param>
         /// <param name="volume">Volume of the voice playback.</param>
         /// <param name="group">Path of an <see cref="AudioMixerGroup"/> of the current <see cref="AudioMixer"/> to use when playing the voice.</param>
-        UniTask PlayVoiceAsync (string path, float volume = 1f, string group = default, CancellationToken cancellationToken = default);
+        /// <param name="authorId">ID of the author (character actor) of the played voice.</param>
+        UniTask PlayVoiceAsync (string path, float volume = 1f, string group = default, string authorId = default, AsyncToken asyncToken = default);
         /// <summary>
         /// Plays voice clips with the provided resource paths in sequence.
         /// </summary>
         /// <param name="pathList">Names (local paths) of the voice resources.</param>
         /// <param name="volume">Volume of the voice playback.</param>
         /// <param name="group">Path of an <see cref="AudioMixerGroup"/> of the current <see cref="AudioMixer"/> to use when playing the voice.</param>
-        UniTask PlayVoiceSequenceAsync (List<string> pathList, float volume = 1f, string group = default, CancellationToken cancellationToken = default);
+        UniTask PlayVoiceSequenceAsync (IReadOnlyCollection<string> pathList, float volume = 1f, string group = default, AsyncToken asyncToken = default);
         /// <summary>
         /// Stops playing a voice track with the provided path.
         /// </summary>

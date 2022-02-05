@@ -1,6 +1,5 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,7 +16,7 @@ namespace Naninovel.UI
         private TransitionalMaterial material;
         private RenderTexture sceneTexture;
 
-        public virtual void CaptureScene ()
+        public virtual async UniTask CaptureSceneAsync ()
         {
             if (sceneTexture)
                 RenderTexture.ReleaseTemporary(sceneTexture);
@@ -25,7 +24,7 @@ namespace Naninovel.UI
             sceneTexture = RenderTexture.GetTemporary(cameraManager.Camera.scaledPixelWidth, cameraManager.Camera.scaledPixelHeight);
             var initialRenderTexture = cameraManager.Camera.targetTexture;
             cameraManager.Camera.targetTexture = sceneTexture;
-            cameraManager.Camera.Render();
+            await UniTask.DelayFrame(1); // Camera.Render() not working in builds.
             cameraManager.Camera.targetTexture = initialRenderTexture;
 
             material.TransitionProgress = 0;
@@ -34,7 +33,7 @@ namespace Naninovel.UI
             SetVisibility(true);
         }
 
-        public virtual async UniTask TransitionAsync (Transition transition, float duration, EasingType easingType = EasingType.Linear, CancellationToken cancellationToken = default)
+        public virtual async UniTask TransitionAsync (Transition transition, float duration, EasingType easingType = EasingType.Linear, AsyncToken asyncToken = default)
         {
             if (transitionTweener.Running)
                 transitionTweener.CompleteInstantly();
@@ -43,7 +42,7 @@ namespace Naninovel.UI
             material.TransitionProgress = 0;
             material.TransitionName = transition.Name;
             material.TransitionParams = transition.Parameters;
-            if (ObjectUtils.IsValid(transition.DissolveTexture))
+            if (transition.DissolveTexture)
                 material.DissolveTexture = transition.DissolveTexture;
 
             var transitionTexture = RenderTexture.GetTemporary(cameraManager.Camera.scaledPixelWidth, cameraManager.Camera.scaledPixelHeight);
@@ -51,15 +50,15 @@ namespace Naninovel.UI
             cameraManager.Camera.targetTexture = transitionTexture;
             material.TransitionTexture = transitionTexture;
 
-            var tween = new FloatTween(material.TransitionProgress, 1, duration, value => material.TransitionProgress = value, false, easingType, material);
-            await transitionTweener.RunAsync(tween, cancellationToken);
-            if (cancellationToken.CancelASAP)
+            var tween = new FloatTween(material.TransitionProgress, 1, duration, value => material.TransitionProgress = value, false, easingType);
+            try { await transitionTweener.RunAsync(tween, asyncToken, material); }
+            catch (AsyncOperationCanceledException)
             {
                 // Try restore camera target texture before cancellation, otherwise it'll mess when rolling back.
                 if (cameraManager != null && cameraManager.Camera)
                     cameraManager.Camera.targetTexture = initialRenderTexture;
                 RenderTexture.ReleaseTemporary(transitionTexture);
-                return;
+                throw new AsyncOperationCanceledException(asyncToken);
             }
 
             cameraManager.Camera.targetTexture = initialRenderTexture;
@@ -77,7 +76,7 @@ namespace Naninovel.UI
             this.AssertRequiredObjects(image);
 
             cameraManager = Engine.GetService<ICameraManager>();
-            material = new TransitionalMaterial(TransitionalMaterial.Variant.Default);
+            material = new TransitionalMaterial(true);
             image.material = material;
         }
 
@@ -85,6 +84,7 @@ namespace Naninovel.UI
         {
             if (sceneTexture)
                 RenderTexture.ReleaseTemporary(sceneTexture);
+            ObjectUtils.DestroyOrImmediate(material);
 
             base.OnDestroy();
         }

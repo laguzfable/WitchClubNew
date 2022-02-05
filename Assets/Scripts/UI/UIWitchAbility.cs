@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using Kenaz;
-using UniRx.Async;
+using Naninovel;
 
 public class UIWitchAbility : MonoBehaviour
 {

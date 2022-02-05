@@ -1,9 +1,8 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel
@@ -16,7 +15,8 @@ namespace Naninovel
 
         public virtual ResourceProviderConfiguration Configuration { get; }
 
-        private readonly Dictionary<string, IResourceProvider> providers = new Dictionary<string, IResourceProvider>();
+        private readonly Dictionary<string, IResourceProvider> providersMap = new Dictionary<string, IResourceProvider>();
+        private readonly Dictionary<UnityEngine.Object, HashSet<object>> holdersMap = new Dictionary<UnityEngine.Object, HashSet<object>>();
 
         public ResourceProviderManager (ResourceProviderConfiguration config)
         {
@@ -40,18 +40,18 @@ namespace Naninovel
         public virtual void DestroyService ()
         {
             Application.lowMemory -= HandleLowMemoryAsync;
-            foreach (var provider in providers.Values)
+            foreach (var provider in providersMap.Values)
                 provider?.UnloadResources();
             Configuration.MasterProvider?.UnloadResources();
         }
 
-        public virtual bool ProviderInitialized (string providerType) => providers.ContainsKey(providerType);
+        public virtual bool IsProviderInitialized (string providerType) => providersMap.ContainsKey(providerType);
 
         public virtual IResourceProvider GetProvider (string providerType)
         {
-            if (!providers.ContainsKey(providerType))
-                providers[providerType] = InitializeProvider(providerType);
-            return providers[providerType];
+            if (!providersMap.ContainsKey(providerType))
+                providersMap[providerType] = InitializeProvider(providerType);
+            return providersMap[providerType];
         }
 
         public virtual List<IResourceProvider> GetProviders (List<string> providerTypes)
@@ -72,13 +72,32 @@ namespace Naninovel
             return result;
         }
 
-        private IResourceProvider InitializeProjectProvider ()
+        public virtual int Hold (UnityEngine.Object obj, object holder)
+        {
+            var holders = GetHolders(obj);
+            holders.Add(holder);
+            return holders.Count;
+        }
+
+        public virtual int Release (UnityEngine.Object obj, object holder)
+        {
+            var holders = GetHolders(obj);
+            holders.Remove(holder);
+            return holders.Count;
+        }
+
+        public virtual int CountHolders (UnityEngine.Object obj)
+        {
+            return GetHolders(obj).Count;
+        }
+
+        protected virtual IResourceProvider InitializeProjectProvider ()
         {
             var projectProvider = new ProjectResourceProvider(Configuration.ProjectRootPath);
             return projectProvider;
         }
 
-        private IResourceProvider InitializeGoogleDriveProvider ()
+        protected virtual IResourceProvider InitializeGoogleDriveProvider ()
         {
             #if UNITY_GOOGLE_DRIVE_AVAILABLE
             var gDriveProvider = new GoogleDriveResourceProvider(Configuration.GoogleDriveRootPath, Configuration.GoogleDriveCachingPolicy, Configuration.GoogleDriveRequestLimit);
@@ -91,7 +110,7 @@ namespace Naninovel
             #endif
         }
 
-        private IResourceProvider InitializeLocalProvider ()
+        protected virtual IResourceProvider InitializeLocalProvider ()
         {
             var localProvider = new LocalResourceProvider(Configuration.LocalRootPath);
             localProvider.AddConverter(new JpgOrPngToTextureConverter());
@@ -101,7 +120,7 @@ namespace Naninovel
             return localProvider;
         }
 
-        private IResourceProvider InitializeAddressableProvider ()
+        protected virtual IResourceProvider InitializeAddressableProvider ()
         {
             #if ADDRESSABLES_AVAILABLE
             if (Application.isEditor && !Configuration.AllowAddressableInEditor) return null; // Otherwise could be issues with addressables added on previous build, but renamed after.
@@ -112,7 +131,7 @@ namespace Naninovel
             #endif
         }
 
-        private IResourceProvider InitializeProvider (string providerType)
+        protected virtual IResourceProvider InitializeProvider (string providerType)
         {
             IResourceProvider provider;
 
@@ -154,5 +173,13 @@ namespace Naninovel
             Debug.LogWarning("Forcing resource unloading due to out of memory.");
             await Resources.UnloadUnusedAssets();
         }
-    } 
+
+        private HashSet<object> GetHolders (UnityEngine.Object obj)
+        {
+            if (holdersMap.TryGetValue(obj, out var holders)) return holders;
+            holders = new HashSet<object>();
+            holdersMap[obj] = holders;
+            return holders;
+        }
+    }
 }

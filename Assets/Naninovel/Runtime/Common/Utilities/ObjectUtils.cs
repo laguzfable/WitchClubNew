@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
@@ -69,17 +69,12 @@ namespace Naninovel
         /// </summary>
         /// <param name="requiredObjects">Objects to check for validity.</param>
         /// <returns>Whether all the required objects are valid.</returns>
-        public static bool AssertRequiredObjects (this Object unityObject, params Object[] requiredObjects)
+        public static void AssertRequiredObjects (this Component component, params Object[] requiredObjects)
         {
-            for (int i = 0; i < requiredObjects.Length; ++i)
-            {
+            for (int i = 0; i < requiredObjects.Length; i++)
                 if (!requiredObjects[i])
-                {
-                    Debug.LogError($"Object `{unityObject.name}` is missing a required reference. Make sure all the required fields are assigned in the inspector.");
-                    return false;
-                }
-            }
-            return true;
+                    throw new UnityException($"Unity object `{component}` is missing a required dependency. " +
+                                             "Make sure all the required fields are assigned in the inspector and are pointing to valid objects.");
         }
 
         /// <summary>
@@ -110,7 +105,11 @@ namespace Naninovel
         {
             if (!IsValid(obj)) return false;
             #if UNITY_EDITOR
+            #if UNITY_2021_2_OR_NEWER
+            return UnityEditor.SceneManagement.PrefabStageUtility.GetPrefabStage(obj) != null;
+            #else
             return UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage(obj) != null;
+            #endif
             #else
             return false;
             #endif

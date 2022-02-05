@@ -1,6 +1,5 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
 
 namespace Naninovel.Commands
 {
@@ -19,7 +18,7 @@ namespace Naninovel.Commands
         [ParameterAlias("reset")]
         public StringListParameter ResetState;
 
-        public override async UniTask ExecuteAsync (CancellationToken cancellationToken = default)
+        public override async UniTask ExecuteAsync (AsyncToken asyncToken = default)
         {
             var player = Engine.GetService<IScriptPlayer>();
 

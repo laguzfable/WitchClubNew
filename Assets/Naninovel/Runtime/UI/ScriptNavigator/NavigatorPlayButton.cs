@@ -1,48 +1,40 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
+using System;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
+using UnityEngine.Events;
 
 namespace Naninovel.UI
 {
-    public class NavigatorPlayButton : ScriptableButton, IPointerEnterHandler, IPointerExitHandler
+    public class NavigatorPlayButton : ScriptableButton
     {
-        private Text labelText;
+        [Serializable]
+        private class OnLabelChangedEvent : UnityEvent<string> { }
+
+        [SerializeField] private OnLabelChangedEvent onLabelChanged = default;
+
         private ScriptNavigatorPanel navigator;
-        private Script script;
+        private string scriptName;
         private IScriptPlayer player;
         private IStateManager stateManager;
         private bool isInitialized;
 
-        public virtual void Initialize (ScriptNavigatorPanel navigator, Script script, IScriptPlayer player)
+        public virtual void Initialize (ScriptNavigatorPanel navigator, string scriptName, IScriptPlayer player)
         {
             this.navigator = navigator;
-            this.script = script;
+            this.scriptName = scriptName;
             this.player = player;
-            name = "PlayScript: " + script.Name;
-            if (labelText) labelText.text = script.Name;
+            name = "PlayScript: " + scriptName;
+            SetLabel(scriptName);
             isInitialized = true;
             UIComponent.interactable = true;
-        }
-
-        public virtual void OnPointerEnter (PointerEventData eventData)
-        {
-            if (UIComponent.interactable)
-                labelText.fontStyle = FontStyle.Bold;
-        }
-
-        public virtual void OnPointerExit (PointerEventData eventData)
-        {
-            labelText.fontStyle = FontStyle.Normal;
         }
 
         protected override void Awake ()
         {
             base.Awake();
 
-            labelText = GetComponentInChildren<Text>();
-            labelText.text = "Loading...";
+            SetLabel(null);
             UIComponent.interactable = false;
 
             stateManager = Engine.GetService<IStateManager>();
@@ -52,20 +44,20 @@ namespace Naninovel.UI
         {
             base.OnEnable();
 
-            stateManager.GameStateSlotManager.OnBeforeLoad += ControlInteractability;
-            stateManager.GameStateSlotManager.OnLoaded += ControlInteractability;
-            stateManager.GameStateSlotManager.OnBeforeSave += ControlInteractability;
-            stateManager.GameStateSlotManager.OnSaved += ControlInteractability;
+            stateManager.GameSlotManager.OnBeforeLoad += ControlInteractability;
+            stateManager.GameSlotManager.OnLoaded += ControlInteractability;
+            stateManager.GameSlotManager.OnBeforeSave += ControlInteractability;
+            stateManager.GameSlotManager.OnSaved += ControlInteractability;
         }
 
         protected override void OnDisable ()
         {
             base.OnDisable();
 
-            stateManager.GameStateSlotManager.OnBeforeLoad -= ControlInteractability;
-            stateManager.GameStateSlotManager.OnLoaded -= ControlInteractability;
-            stateManager.GameStateSlotManager.OnBeforeSave -= ControlInteractability;
-            stateManager.GameStateSlotManager.OnSaved -= ControlInteractability;
+            stateManager.GameSlotManager.OnBeforeLoad -= ControlInteractability;
+            stateManager.GameSlotManager.OnLoaded -= ControlInteractability;
+            stateManager.GameSlotManager.OnBeforeSave -= ControlInteractability;
+            stateManager.GameSlotManager.OnSaved -= ControlInteractability;
         }
 
         protected override void OnButtonClick ()
@@ -76,14 +68,19 @@ namespace Naninovel.UI
             PlayScriptAsync();
         }
 
+        protected virtual void SetLabel (string value)
+        {
+            onLabelChanged?.Invoke(value);
+        }
+
         private async void PlayScriptAsync ()
         {
-            await stateManager.ResetStateAsync(() => player.PreloadAndPlayAsync(script.Name));
+            await stateManager.ResetStateAsync(() => player.PreloadAndPlayAsync(scriptName));
         }
 
         private void ControlInteractability ()
         {
-            UIComponent.interactable = !stateManager.GameStateSlotManager.Loading && !stateManager.GameStateSlotManager.Saving;
+            UIComponent.interactable = !stateManager.GameSlotManager.Loading && !stateManager.GameSlotManager.Saving;
         }
-    } 
+    }
 }

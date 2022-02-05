@@ -1,7 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System.Collections.Generic;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel.UI
@@ -34,6 +33,10 @@ namespace Naninovel.UI
         /// </summary>
         public abstract string Appearance { get; set; }
         /// <summary>
+        /// Current tint color of the printer.
+        /// </summary>
+        public virtual Color TintColor { get => tintColor; set { tintColor = value; onTintChanged?.Invoke(value); } }
+        /// <summary>
         /// Objects that should trigger continue input when interacted with.
         /// </summary>
         public virtual IReadOnlyCollection<GameObject> ContinueInputTriggers => continueInputTriggers;
@@ -44,9 +47,12 @@ namespace Naninovel.UI
         [SerializeField] private RectTransform content = default;
         [Tooltip("Objects that should trigger continue input when interacted with. Make sure the objects are a raycast target and not blocked by other raycast targets.")]
         [SerializeField] private List<GameObject> continueInputTriggers = default;
+        [Tooltip("Event invoked when tint color of the printer actor is changed.")]
+        [SerializeField] private ColorUnityEvent onTintChanged = default;
 
         private IInputSampler continueInput;
         private IScriptPlayer scriptPlayer;
+        private Color tintColor = Color.white;
 
         public override async UniTask InitializeAsync ()
         {
@@ -58,7 +64,7 @@ namespace Naninovel.UI
             scriptPlayer.OnWaitingForInput += SetWaitForInputIndicatorVisible;
         }
 
-        UniTask IManagedUI.ChangeVisibilityAsync (bool visible, float? duration, CancellationToken cancellationToken)
+        UniTask IManagedUI.ChangeVisibilityAsync (bool visible, float? duration, AsyncToken asyncToken)
         {
             Debug.LogError("@showUI and @hideUI commands can't be used with text printers; use @show/hide or @show/hidePrinter commands instead");
             return UniTask.CompletedTask;
@@ -68,12 +74,12 @@ namespace Naninovel.UI
         /// Reveals the <see cref="PrintedText"/> char by char over time.
         /// </summary>
         /// <param name="revealDelay">Delay (in seconds) between revealing consequent characters.</param>
-        /// <param name="cancellationToken">The reveal should be canceled when requested by the provided token.</param>
-        public abstract UniTask RevealPrintedTextOverTimeAsync (float revealDelay, CancellationToken cancellationToken);
+        /// <param name="asyncToken">The reveal should be canceled when requested by the provided token.</param>
+        public abstract UniTask RevealPrintedTextOverTimeAsync (float revealDelay, AsyncToken asyncToken);
         /// <summary>
         /// Controls visibility of the wait for input indicator.
         /// </summary>
-        public abstract void SetWaitForInputIndicatorVisible (bool isVisible);
+        public abstract void SetWaitForInputIndicatorVisible (bool visible);
         /// <summary>
         /// Invoked by <see cref="UITextPrinter"/> when author meta of the printed text changes.
         /// </summary>

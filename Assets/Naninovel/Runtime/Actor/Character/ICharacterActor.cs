@@ -1,6 +1,5 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
 
 namespace Naninovel
 {
@@ -10,13 +9,13 @@ namespace Naninovel
     public interface ICharacterActor : IActor
     {
         /// <summary>
-        /// Look direction of the actor.
+        /// Look direction of the character.
         /// </summary>
         CharacterLookDirection LookDirection { get; set; }
 
         /// <summary>
         /// Changes character look direction over specified time using provided animation easing.
         /// </summary>
-        UniTask ChangeLookDirectionAsync (CharacterLookDirection lookDirection, float duration, EasingType easingType = default, CancellationToken cancellationToken = default);
+        UniTask ChangeLookDirectionAsync (CharacterLookDirection lookDirection, float duration, EasingType easingType = default, AsyncToken asyncToken = default);
     } 
 }

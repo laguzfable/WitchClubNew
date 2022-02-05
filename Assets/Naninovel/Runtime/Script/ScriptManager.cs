@@ -1,9 +1,8 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel
@@ -21,7 +20,7 @@ namespace Naninovel
         public virtual UI.ScriptNavigatorPanel ScriptNavigator { get; private set; }
         public virtual int TotalCommandsCount { get; private set; }
 
-        private const string navigatorPrefabResourcesPath = "Naninovel/ScriptNavigator";
+        private const string navigatorPrefabName = "ScriptNavigator";
 
         private readonly IResourceProviderManager providerManager;
         private readonly ILocalizationManager localizationManager;
@@ -45,8 +44,8 @@ namespace Naninovel
 
             if (Application.isPlaying && Configuration.EnableNavigator)
             {
-                var navigatorPrefab = Resources.Load<UI.ScriptNavigatorPanel>(navigatorPrefabResourcesPath);
-                ScriptNavigator = Engine.Instantiate(navigatorPrefab, "ScriptNavigator");
+                var navigatorPrefab = Engine.LoadInternalResource<UI.ScriptNavigatorPanel>(navigatorPrefabName);
+                ScriptNavigator = Engine.Instantiate(navigatorPrefab, navigatorPrefabName);
                 ScriptNavigator.SortingOrder = Configuration.NavigatorSortOrder;
                 ScriptNavigator.SetVisibility(false);
             }
@@ -74,15 +73,21 @@ namespace Naninovel
             }
         }
 
-        public virtual async UniTask<IReadOnlyCollection<Script>> LoadExternalScriptsAsync ()
+        public virtual async UniTask<IReadOnlyCollection<string>> LocateScriptsAsync ()
         {
-            if (!CommunityModdingEnabled)
-                return new List<Script>();
-
             OnScriptLoadStarted?.Invoke();
-            var scriptResources = await externalScriptLoader.LoadAllAsync();
+            var result = await scriptLoader.LocateAsync();
             OnScriptLoadCompleted?.Invoke();
-            return scriptResources.Select(r => r.Object).ToArray();
+            return result;
+        }
+
+        public virtual async UniTask<IReadOnlyCollection<string>> LocateExternalScriptsAsync ()
+        {
+            if (!CommunityModdingEnabled) return new List<string>();
+            OnScriptLoadStarted?.Invoke();
+            var result = await externalScriptLoader.LocateAsync();
+            OnScriptLoadCompleted?.Invoke();
+            return result;
         }
 
         public virtual async UniTask<Script> LoadScriptAsync (string name)
@@ -112,9 +117,6 @@ namespace Naninovel
 
             await UniTask.WhenAll(scripts.Select(TryAddLocalizationScriptAsync));
 
-            if (ScriptNavigator)
-                ScriptNavigator.GenerateScriptButtons(scripts);
-
             OnScriptLoadCompleted?.Invoke();
             return scripts;
         }
@@ -139,11 +141,9 @@ namespace Naninovel
 
             #if UNITY_GOOGLE_DRIVE_AVAILABLE
             // Delete cached scripts when using Google Drive resource provider.
-            if (providerManager.ProviderInitialized(ResourceProviderConfiguration.GoogleDriveTypeName))
+            if (providerManager.IsProviderInitialized(ResourceProviderConfiguration.GoogleDriveTypeName))
                 (providerManager.GetProvider(ResourceProviderConfiguration.GoogleDriveTypeName) as GoogleDriveResourceProvider)?.PurgeCachedResources(Configuration.Loader.PathPrefix);
             #endif
-
-            if (ScriptNavigator) ScriptNavigator.DestroyScriptButtons();
         }
 
         public virtual Script GetLocalizationScriptFor (Script script)
@@ -155,7 +155,7 @@ namespace Naninovel
         private async UniTask TryAddLocalizationScriptAsync (Script script)
         {
             if (script is null) return;
-            
+
             if (await localeScriptLoader.ExistsAsync(script.Name))
             {
                 var localizationScript = await localeScriptLoader.LoadAsync(script.Name);
@@ -169,10 +169,7 @@ namespace Naninovel
 
             var scripts = await LoadAllScriptsAsync();
             foreach (var script in scripts)
-            {
-                var playlist = new ScriptPlaylist(script.Name, script.ExtractCommands());
-                result += playlist.Count;
-            }
+                result += script.ExtractCommands().Count;
 
             return result;
         }

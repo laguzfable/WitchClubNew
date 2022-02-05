@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using UnityEngine;
@@ -21,7 +21,7 @@ namespace Naninovel.UI
         {
             if (!providerManager.Configuration.LogResourceLoading) return;
 
-            await AsyncUtils.WaitEndOfFrame; // Otherwise could get here inside a rebuild loop and Unity will become sad :(
+            await AsyncUtils.WaitEndOfFrameAsync(); // Otherwise could get here inside a rebuild loop and Unity will become sad :(
             if (!Application.isPlaying) return;
 
             loggerText.text += message;

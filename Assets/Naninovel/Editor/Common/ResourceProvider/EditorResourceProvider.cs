@@ -1,5 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,11 +16,13 @@ namespace Naninovel
         public void AddResourceGuid (string path, string guid)
         {
             pathToGuidMap[path] = guid;
+            LocationsCache.Add(new CachedResourceLocation(path, typeof(UnityEngine.Object)));
         }
 
         public void RemoveResourceGuid (string path)
         {
             pathToGuidMap.Remove(path);
+            LocationsCache.RemoveAll(r => r.Path.EqualsFast(path));
         }
 
         public override bool SupportsType<T> () => true;
@@ -52,5 +55,7 @@ namespace Naninovel
             else ObjectUtils.DestroyOrImmediate(resource.Object);
             #endif
         }
+
+        protected override bool AreTypesCompatible (Type sourceType, Type targetType) => true;
     }
 }

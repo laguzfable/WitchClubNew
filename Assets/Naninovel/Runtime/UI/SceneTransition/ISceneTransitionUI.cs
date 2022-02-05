@@ -1,6 +1,5 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
 
 namespace Naninovel.UI
 {
@@ -12,10 +11,10 @@ namespace Naninovel.UI
         /// <summary>
         /// Saves the current main camera content to a temporary render texture to use during the transition.
         /// </summary>
-        void CaptureScene ();
+        UniTask CaptureSceneAsync ();
         /// <summary>
         /// Performs transition between the previously captured scene texture and current main camera content.
         /// </summary>
-        UniTask TransitionAsync (Transition transition, float duration, EasingType easingType = default, CancellationToken cancellationToken = default);
+        UniTask TransitionAsync (Transition transition, float duration, EasingType easingType = default, AsyncToken asyncToken = default);
     }
 }

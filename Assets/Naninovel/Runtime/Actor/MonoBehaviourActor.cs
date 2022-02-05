@@ -1,7 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel
@@ -58,44 +57,44 @@ namespace Naninovel
         public virtual UniTask InitializeAsync () => UniTask.CompletedTask; 
 
         public abstract UniTask ChangeAppearanceAsync (string appearance, float duration, EasingType easingType = default,
-            Transition? transition = default, CancellationToken cancellationToken = default);
+            Transition? transition = default, AsyncToken asyncToken = default);
 
-        public abstract UniTask ChangeVisibilityAsync (bool isVisible, float duration, EasingType easingType = default, CancellationToken cancellationToken = default);
+        public abstract UniTask ChangeVisibilityAsync (bool isVisible, float duration, EasingType easingType = default, AsyncToken asyncToken = default);
 
-        public virtual async UniTask ChangePositionAsync (Vector3 position, float duration, EasingType easingType = default, CancellationToken cancellationToken = default)
+        public virtual async UniTask ChangePositionAsync (Vector3 position, float duration, EasingType easingType = default, AsyncToken asyncToken = default)
         {
             CompletePositionTween();
             this.position = position;
 
-            var tween = new VectorTween(GetBehaviourPosition(), position, duration, SetBehaviourPosition, false, easingType, GameObject);
-            await positionTweener.RunAsync(tween, cancellationToken);
+            var tween = new VectorTween(GetBehaviourPosition(), position, duration, SetBehaviourPosition, false, easingType);
+            await positionTweener.RunAsync(tween, asyncToken, GameObject);
         }
 
-        public virtual async UniTask ChangeRotationAsync (Quaternion rotation, float duration, EasingType easingType = default, CancellationToken cancellationToken = default)
+        public virtual async UniTask ChangeRotationAsync (Quaternion rotation, float duration, EasingType easingType = default, AsyncToken asyncToken = default)
         {
             CompleteRotationTween();
             this.rotation = rotation;
 
-            var tween = new VectorTween(GetBehaviourRotation().ClampedEulerAngles(), rotation.ClampedEulerAngles(), duration, SetBehaviourRotation, false, easingType, GameObject);
-            await rotationTweener.RunAsync(tween, cancellationToken);
+            var tween = new VectorTween(GetBehaviourRotation().ClampedEulerAngles(), rotation.ClampedEulerAngles(), duration, SetBehaviourRotation, false, easingType);
+            await rotationTweener.RunAsync(tween, asyncToken, GameObject);
         }
 
-        public virtual async UniTask ChangeScaleAsync (Vector3 scale, float duration, EasingType easingType = default, CancellationToken cancellationToken = default)
+        public virtual async UniTask ChangeScaleAsync (Vector3 scale, float duration, EasingType easingType = default, AsyncToken asyncToken = default)
         {
             CompleteScaleTween();
             this.scale = scale;
 
-            var tween = new VectorTween(GetBehaviourScale(), scale, duration, SetBehaviourScale, false, easingType, GameObject);
-            await scaleTweener.RunAsync(tween, cancellationToken);
+            var tween = new VectorTween(GetBehaviourScale(), scale, duration, SetBehaviourScale, false, easingType);
+            await scaleTweener.RunAsync(tween, asyncToken, GameObject);
         }
 
-        public virtual async UniTask ChangeTintColorAsync (Color tintColor, float duration, EasingType easingType = default, CancellationToken cancellationToken = default)
+        public virtual async UniTask ChangeTintColorAsync (Color tintColor, float duration, EasingType easingType = default, AsyncToken asyncToken = default)
         {
             CompleteTintColorTween();
             this.tintColor = tintColor;
 
-            var tween = new ColorTween(GetBehaviourTintColor(), tintColor, ColorTweenMode.All, duration, SetBehaviourTintColor, false, easingType, GameObject);
-            await tintColorTweener.RunAsync(tween, cancellationToken);
+            var tween = new ColorTween(GetBehaviourTintColor(), tintColor, ColorTweenMode.All, duration, SetBehaviourTintColor, false, easingType);
+            await tintColorTweener.RunAsync(tween, asyncToken, GameObject);
         }
 
         public virtual UniTask HoldResourcesAsync (string appearance, object holder) => UniTask.CompletedTask;

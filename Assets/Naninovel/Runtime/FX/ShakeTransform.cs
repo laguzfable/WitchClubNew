@@ -1,9 +1,9 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
+using System.Collections.Generic;
 using Naninovel.Commands;
 using System.Linq;
 using System.Threading;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel.FX
@@ -40,7 +40,7 @@ namespace Naninovel.FX
         private readonly Tweener<VectorTween> positionTweener = new Tweener<VectorTween>();
         private CancellationTokenSource loopCTS;
 
-        public virtual void SetSpawnParameters (string[] parameters)
+        public virtual void SetSpawnParameters (IReadOnlyList<string> parameters)
         {
             if (positionTweener.Running)
                 positionTweener.CompleteInstantly();
@@ -59,12 +59,12 @@ namespace Naninovel.FX
             Loop = ShakesCount <= 0;
         }
 
-        public virtual async UniTask AwaitSpawnAsync (CancellationToken cancellationToken = default)
+        public virtual async UniTask AwaitSpawnAsync (AsyncToken asyncToken = default)
         {
             ShakenTransform = GetShakenTransform();
             if (ShakenTransform == null)
             {
-                SpawnManager.DestroySpawnedObject(SpawnedPath);
+                SpawnManager.DestroySpawned(SpawnedPath);
                 Debug.LogWarning($"Failed to apply `{GetType().Name}` FX to `{ObjectName}`: game object not found.");
                 return;
             }
@@ -72,64 +72,59 @@ namespace Naninovel.FX
             InitialPos = ShakenTransform.position;
             DeltaPos = new Vector3(ShakeHorizontally ? ShakeAmplitude : 0, ShakeVertically ? ShakeAmplitude : 0, 0);
 
-            if (Loop) LoopRoutine(cancellationToken).Forget();
+            if (Loop) LoopRoutine(asyncToken).Forget();
             else
             {
                 for (int i = 0; i < ShakesCount; i++)
-                {
-                    await ShakeSequenceAsync(cancellationToken);
-                    if (cancellationToken.CancelASAP) return;
-                }
-
-                if (SpawnManager.IsObjectSpawned(SpawnedPath))
-                    SpawnManager.DestroySpawnedObject(SpawnedPath);
+                    await ShakeSequenceAsync(asyncToken);
+                if (SpawnManager.IsSpawned(SpawnedPath))
+                    SpawnManager.DestroySpawned(SpawnedPath);
             }
 
-            await AsyncUtils.WaitEndOfFrame; // Otherwise a consequent shake won't work.
+            await AsyncUtils.WaitEndOfFrameAsync(asyncToken); // Otherwise a consequent shake won't work.
         }
 
         protected abstract Transform GetShakenTransform ();
 
-        protected virtual async UniTask ShakeSequenceAsync (CancellationToken cancellationToken)
+        protected virtual async UniTask ShakeSequenceAsync (AsyncToken asyncToken)
         {
             var amplitude = DeltaPos + DeltaPos * Random.Range(-AmplitudeVariation, AmplitudeVariation);
             var duration = ShakeDuration + ShakeDuration * Random.Range(-DurationVariation, DurationVariation);
-
-            await MoveAsync(InitialPos - amplitude * .5f, duration * .25f, cancellationToken);
-            if (cancellationToken.CancelASAP) return;
-            await MoveAsync(InitialPos + amplitude, duration * .5f, cancellationToken);
-            if (cancellationToken.CancelASAP) return;
-            await MoveAsync(InitialPos, duration * .25f, cancellationToken);
+            await MoveAsync(InitialPos - amplitude * .5f, duration * .25f, asyncToken);
+            await MoveAsync(InitialPos + amplitude, duration * .5f, asyncToken);
+            await MoveAsync(InitialPos, duration * .25f, asyncToken);
         }
 
-        protected virtual async UniTask MoveAsync (Vector3 position, float duration, CancellationToken cancellationToken)
+        protected virtual async UniTask MoveAsync (Vector3 position, float duration, AsyncToken asyncToken)
         {
-            var tween = new VectorTween(ShakenTransform.position, position, duration, pos => ShakenTransform.position = pos, false, EasingType.SmoothStep, ShakenTransform);
-            await positionTweener.RunAsync(tween, cancellationToken);
+            var tween = new VectorTween(ShakenTransform.position, position, duration, pos => ShakenTransform.position = pos, false, EasingType.SmoothStep);
+            await positionTweener.RunAsync(tween, asyncToken, ShakenTransform);
         }
 
         protected virtual void OnDestroy ()
         {
             Loop = false;
+            loopCTS?.Cancel();
+            loopCTS?.Dispose();
 
             if (ShakenTransform != null)
                 ShakenTransform.position = InitialPos;
 
-            if (Engine.Initialized && SpawnManager.IsObjectSpawned(SpawnedPath))
-                SpawnManager.DestroySpawnedObject(SpawnedPath);
+            if (Engine.Initialized && SpawnManager.IsSpawned(SpawnedPath))
+                SpawnManager.DestroySpawned(SpawnedPath);
         }
 
-        private async UniTaskVoid LoopRoutine (CancellationToken cancellationToken)
+        private async UniTaskVoid LoopRoutine (AsyncToken asyncToken)
         {
             loopCTS?.Cancel();
             loopCTS?.Dispose();
             loopCTS = new CancellationTokenSource();
-            var combinedCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken.ASAPToken, loopCTS.Token);
+            var combinedCTS = CancellationTokenSource.CreateLinkedTokenSource(asyncToken.CancellationToken, loopCTS.Token);
             var combinedCTSToken = combinedCTS.Token;
-            
+
             while (Loop && Application.isPlaying && !combinedCTSToken.IsCancellationRequested)
                 await ShakeSequenceAsync(combinedCTSToken);
-            
+
             combinedCTS.Dispose();
         }
     }

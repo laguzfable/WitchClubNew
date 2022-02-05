@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
@@ -12,11 +12,11 @@ namespace Naninovel
 {
     public class ManagedTextWindow : EditorWindow
     {
-        protected string OutputPath 
-        { 
-            get => PlayerPrefs.GetString(outputPathKey, $"{Application.dataPath}/Resources/Naninovel/{ProjectConfigurationProvider.LoadOrDefault<ManagedTextConfiguration>().Loader.PathPrefix}"); 
-            set { PlayerPrefs.SetString(outputPathKey, value); ValidateOutputPath(); } 
-        } 
+        protected string OutputPath
+        {
+            get => PlayerPrefs.GetString(outputPathKey, $"{Application.dataPath}/Resources/Naninovel/{ProjectConfigurationProvider.LoadOrDefault<ManagedTextConfiguration>().Loader.PathPrefix}");
+            set { PlayerPrefs.SetString(outputPathKey, value); ValidateOutputPath(); }
+        }
 
         private static readonly GUIContent outputPathContent = new GUIContent("Output Path", "Path to the folder under which to sore generated managed text documents; should be `Resources/Naninovel/Text` by default.");
         private static readonly GUIContent deleteUnusedContent = new GUIContent("Delete Unused", "Whether to delete documents that doesn't correspond to any static fields with `ManagedTextAttribute`.");
@@ -33,7 +33,6 @@ namespace Naninovel
             var position = new Rect(100, 100, 500, 135);
             GetWindowWithRect<ManagedTextWindow>(position, true, "Managed Text", true);
         }
-
 
         private void OnEnable ()
         {
@@ -72,7 +71,7 @@ namespace Naninovel
             if (!outputPathValid)
                 EditorGUILayout.HelpBox($"Output path is not valid. Make sure it points to a `{pathPrefix}` folder stored under a `Resources` folder.", MessageType.Error);
             else if (GUILayout.Button("Generate Managed Text Documents", GUIStyles.NavigationButton))
-                    GenerateDocuments();
+                GenerateDocuments();
             EditorGUILayout.Space();
         }
 
@@ -117,9 +116,11 @@ namespace Naninovel
                 File.Delete(fullPath);
             }
 
-            var resultString = string.Empty;
+            var lines = new List<string>();
             foreach (var record in records)
-                resultString += $"{record.ToDocumentTextLine()}{Environment.NewLine}";
+                lines.Add(record.ToDocumentTextLine());
+            lines = lines.OrderBy(l => l).ToList();
+            var resultString = string.Join(Environment.NewLine, lines);
 
             File.WriteAllText(fullPath, resultString);
         }
@@ -150,13 +151,6 @@ namespace Naninovel
             // Add managed text providers from the managed UIs, text printers and choice handlers.
             var providers = new List<ManagedTextProvider>();
             var editorResources = EditorResources.LoadOrDefault();
-            void ProcessPrefab (GameObject prefab) 
-            {
-                if (!ObjectUtils.IsValid(prefab)) return;
-                prefab.GetComponentsInChildren(true, providers);
-                providers.ForEach(p => records.Add(p.CreateRecord())); 
-                providers.Clear(); 
-            }
             var uiConfig = ProjectConfigurationProvider.LoadOrDefault<UIConfiguration>();
             foreach (var kv in editorResources.GetAllRecords(uiConfig.Loader.PathPrefix))
             {
@@ -165,17 +159,7 @@ namespace Naninovel
                 var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
                 ProcessPrefab(prefab);
             }
-            void ProcessActor<TActor>(string id, ActorMetadata meta) where TActor : IActor
-            {
-                if (!typeof(TActor).IsAssignableFrom(Type.GetType(meta.Implementation))) return;
-                var resourcePath = $"{meta.Loader.PathPrefix}/{id}";
-                var guid = editorResources.GetGuidByPath(resourcePath);
-                if (guid is null) return; // Actor without an assigned resource.
-                var assetPath = AssetDatabase.GUIDToAssetPath(guid);
-                if (assetPath is null) return; // Actor with a non-valid resource.
-                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
-                ProcessPrefab(prefab);
-            }
+
             foreach (var kv in ProjectConfigurationProvider.LoadOrDefault<TextPrintersConfiguration>().Metadata.ToDictionary())
                 ProcessActor<ITextPrinterActor>(kv.Key, kv.Value);
             foreach (var kv in ProjectConfigurationProvider.LoadOrDefault<ChoiceHandlersConfiguration>().Metadata.ToDictionary())
@@ -192,6 +176,26 @@ namespace Naninovel
                 var fieldValue = fieldInfo.GetValue(null) as string;
                 var category = attribute.Category;
                 return new ManagedTextRecord(fieldId, fieldValue, category);
+            }
+
+            void ProcessPrefab (GameObject prefab)
+            {
+                if (!ObjectUtils.IsValid(prefab)) return;
+                prefab.GetComponentsInChildren(true, providers);
+                providers.ForEach(p => records.Add(new ManagedTextRecord(p.Key, p.DefaultValue, p.Category)));
+                providers.Clear();
+            }
+
+            void ProcessActor<TActor> (string id, ActorMetadata meta) where TActor : IActor
+            {
+                if (!typeof(TActor).IsAssignableFrom(Type.GetType(meta.Implementation))) return;
+                var resourcePath = $"{meta.Loader.PathPrefix}/{id}";
+                var guid = editorResources.GetGuidByPath(resourcePath);
+                if (guid is null) return; // Actor without an assigned resource.
+                var assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                if (assetPath is null) return; // Actor with a non-valid resource.
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+                ProcessPrefab(prefab);
             }
         }
     }

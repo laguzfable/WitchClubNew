@@ -1,14 +1,14 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UniRx.Async;
+using System.Threading;
 using UnityEngine;
+using UnityEngine.Scripting;
 
 // Make sure none of the assembly types are stripped when building with IL2CPP.
-[assembly: UnityEngine.Scripting.AlwaysLinkAssembly]
-[assembly: UnityEngine.Scripting.Preserve]
+[assembly: AlwaysLinkAssembly, Preserve]
 
 namespace Naninovel
 {
@@ -25,6 +25,14 @@ namespace Naninovel
         /// Invoked when the engine initialization is finished.
         /// </summary>
         public static event Action OnInitializationFinished;
+        /// <summary>
+        /// Invoked when the engine initialization progress is changed (in 0.0 to 1.0 range).
+        /// </summary>
+        public static event Action<float> OnInitializationProgress;
+        /// <summary>
+        /// Invoked when the engine is destroyed.
+        /// </summary>
+        public static event Action OnDestroyed;
 
         /// <summary>
         /// Types (both built-in and user-created) available for the engine
@@ -47,11 +55,15 @@ namespace Naninovel
         /// <summary>
         /// Whether the engine is initialized and ready.
         /// </summary>
-        public static bool Initialized => initializeTCS != null && initializeTCS.Task.IsCompleted();
+        public static bool Initialized => initializeTCS != null && initializeTCS.Task.IsCompleted;
         /// <summary>
         /// Whether the engine is currently being initialized.
         /// </summary>
-        public static bool Initializing => initializeTCS != null && !initializeTCS.Task.IsCompleted();
+        public static bool Initializing => initializeTCS != null && !initializeTCS.Task.IsCompleted;
+        /// <summary>
+        /// Token which is canceled when the engine is destroyed.
+        /// </summary>
+        public static CancellationToken DestroyToken => destroyCTS?.Token ?? new CancellationToken(true);
 
         private static readonly List<UnityEngine.Object> objects = new List<UnityEngine.Object>();
         private static readonly List<IEngineService> services = new List<IEngineService>();
@@ -60,6 +72,7 @@ namespace Naninovel
         private static readonly List<Func<UniTask>> postInitializationTasks = new List<Func<UniTask>>();
         private static IConfigurationProvider configurationProvider;
         private static UniTaskCompletionSource initializeTCS;
+        private static CancellationTokenSource destroyCTS;
         private static IReadOnlyCollection<Type> typesCache;
 
         /// <summary>
@@ -85,7 +98,7 @@ namespace Naninovel
         public static void RemovePostInitializationTask (Func<UniTask> task) => postInitializationTasks.Remove(task);
 
         /// <summary>
-        /// Initializes engine behaviour and services.
+        /// Initializes the engine behaviour and services.
         /// Services will be initialized in the order in which they were added to the list.
         /// </summary>
         /// <param name="configurationProvider">Configuration provider to use when resolving configuration objects.</param>
@@ -94,13 +107,19 @@ namespace Naninovel
         public static async UniTask InitializeAsync (IConfigurationProvider configurationProvider, IEngineBehaviour behaviour, IList<IEngineService> services)
         {
             if (Initialized) return;
-            if (Initializing) { await initializeTCS.Task; return; }
+            if (Initializing)
+            {
+                await initializeTCS.Task;
+                return;
+            }
 
+            destroyCTS = new CancellationTokenSource();
             initializeTCS = new UniTaskCompletionSource();
             OnInitializationStarted?.Invoke();
 
             for (int i = preInitializationTasks.Count - 1; i >= 0; i--)
             {
+                OnInitializationProgress?.Invoke(.25f * (1 - i / (float)preInitializationTasks.Count));
                 await preInitializationTasks[i]();
                 if (!Initializing) return; // In case initialization process was terminated (eg, exited playmode).
             }
@@ -117,12 +136,14 @@ namespace Naninovel
 
             for (var i = 0; i < Engine.services.Count; i++)
             {
+                OnInitializationProgress?.Invoke(.25f + .5f * (i / (float)Engine.services.Count));
                 await Engine.services[i].InitializeServiceAsync();
                 if (!Initializing) return;
             }
 
             for (int i = postInitializationTasks.Count - 1; i >= 0; i--)
             {
+                OnInitializationProgress?.Invoke(.75f + .25f * (1 - i / (float)postInitializationTasks.Count));
                 await postInitializationTasks[i]();
                 if (!Initializing) return;
             }
@@ -177,6 +198,12 @@ namespace Naninovel
 
             Configuration = null;
             configurationProvider = null;
+            
+            OnDestroyed?.Invoke();
+            
+            destroyCTS?.Cancel();
+            destroyCTS?.Dispose();
+            destroyCTS = null;
         }
 
         /// <summary>
@@ -200,62 +227,70 @@ namespace Naninovel
         }
 
         /// <summary>
-        /// Attempts to resolve first matching <see cref="IEngineService"/> object from the services list using provided <paramref name="predicate"/>.
+        /// Attempts to resolve an <see cref="IEngineService"/> of the specified type.
         /// </summary>
         /// <remarks>
-        /// Results per requested types are cached, so it's fine to use this method frequently without a <paramref name="predicate"/>.
+        /// Results per requested types are cached, so it's fine to use this method frequently.
         /// </remarks>
         /// <typeparam name="TService">Type of the requested service.</typeparam>
-        /// <param name="predicate">Additional filter to apply when looking for a match.</param>
         /// <returns>First matching service or null, when no matches found.</returns>
-        public static TService GetService<TService> (Predicate<TService> predicate = null)
+        public static TService GetService<TService> ()
             where TService : class, IEngineService
         {
-            var requestedType = typeof(TService);
-
-            if (predicate is null && cachedGetServiceResults.TryGetValue(requestedType, out var cachedResult))
-                return cachedResult as TService;
-
-            foreach (var service in services)
-            {
-                if (!requestedType.IsInstanceOfType(service)) continue;
-                if (predicate != null && !predicate(service as TService)) continue;
-
-                var result = service as TService;
-                if (predicate is null)
-                    cachedGetServiceResults[requestedType] = result;
-                return result;
-            }
-
-            return null;
+            return GetService(typeof(TService)) as TService;
         }
-        
-        /// <inheritdoc cref="GetService{TService}(System.Predicate{TService})"/>
-        /// <param name="result">First matching service or null, when no matches found.</param>
-        /// <returns>whether a match was found.</returns>
-        public static bool TryGetService<TService> (out TService result, Predicate<TService> predicate = null)
+
+        /// <inheritdoc cref="GetService{TService}()"/>
+        /// <returns>Whether the service was found.</returns>
+        public static bool TryGetService<TService> (out TService result)
             where TService : class, IEngineService
         {
-            result = GetService<TService>(predicate);
+            result = GetService<TService>();
             return result != null;
         }
 
+        /// <inheritdoc cref="GetService{TService}()"/>
+        /// <param name="serviceType">Type of the service to resolve.</param>
+        public static IEngineService GetService (Type serviceType)
+        {
+            if (cachedGetServiceResults.TryGetValue(serviceType, out var cachedResult))
+                return cachedResult;
+            var result = services.FirstOrDefault(serviceType.IsInstanceOfType);
+            if (result is null) return null;
+            cachedGetServiceResults[serviceType] = result;
+            return result;
+        }
+
         /// <summary>
-        /// Resolves all the matching <see cref="IEngineService"/> objects from the services list; returns empty list when no matches found.
+        /// Attempts to resolve first matching <see cref="IEngineService"/> object from
+        /// the services list using provided <paramref name="predicate"/>.
+        /// </summary>
+        /// <typeparam name="TService">Type of the requested service.</typeparam>
+        /// <param name="predicate">Additional filter to apply when looking for a match.</param>
+        /// <returns>First matching service or null, when no matches found.</returns>
+        public static TService FindService<TService> (Predicate<TService> predicate)
+            where TService : class, IEngineService
+        {
+            foreach (var service in services)
+                if (service is TService engineService && predicate(engineService))
+                    return engineService;
+            return null;
+        }
+
+        /// <summary>
+        /// Resolves all the matching <see cref="IEngineService"/> objects from the services list;
+        /// returns empty list when no matches found.
         /// </summary>
         /// <typeparam name="TService">Type of the requested services.</typeparam>
         /// <param name="predicate">Additional filter to apply when looking for a match.</param>
-        public static List<TService> GetAllServices<TService> (Predicate<TService> predicate = null) 
+        public static IReadOnlyCollection<TService> FindAllServices<TService> (Predicate<TService> predicate = null)
             where TService : class, IEngineService
         {
-            var result = new List<TService>();
-            var resolvingType = typeof(TService);
-
-            var servicesOfType = services.FindAll(s => resolvingType.IsInstanceOfType(s));
+            var requestedType = typeof(TService);
+            var servicesOfType = services.FindAll(requestedType.IsInstanceOfType);
             if (servicesOfType.Count > 0)
-                result = servicesOfType.FindAll(s => predicate is null || predicate(s as TService)).Cast<TService>().ToList();
-
-            return result;
+                return servicesOfType.FindAll(s => predicate is null || predicate(s as TService)).Cast<TService>().ToArray();
+            return Array.Empty<TService>();
         }
 
         /// <summary>
@@ -264,15 +299,16 @@ namespace Naninovel
         /// <param name="prototype">Prototype of the object to instantiate.</param>
         /// <param name="name">Name to assign for the instantiated object. Will use name of the prototype when not provided.</param>
         /// <param name="layer">Layer to assign for the instantiated object. When not provided and override layer is enabled in the engine configuration, will assign the layer specified in the configuration.</param>
-        public static T Instantiate<T> (T prototype, string name = default, int? layer = default) where T : UnityEngine.Object
+        /// <param name="parent">When provided, will make the instantiated object child of the transform.</param>
+        public static T Instantiate<T> (T prototype, string name = default, int? layer = default, Transform parent = default) where T : UnityEngine.Object
         {
             if (Behaviour is null)
                 throw new Exception($"Failed to instantiate `{name ?? prototype.name}`: engine is not ready. " +
                                     $"Make sure you're not attempting to instantiate and object inside an engine service constructor (use `{nameof(IEngineService.InitializeServiceAsync)}` method instead).");
 
-            var newObj = UnityEngine.Object.Instantiate(prototype);
+            var newObj = parent ? UnityEngine.Object.Instantiate(prototype, parent) : UnityEngine.Object.Instantiate(prototype);
             var gameObj = newObj is GameObject newGObj ? newGObj : (newObj as Component)?.gameObject;
-            Behaviour.AddChildObject(gameObj);
+            if (!parent) Behaviour.AddChildObject(gameObj);
 
             if (!string.IsNullOrEmpty(name)) newObj.name = name;
 
@@ -289,8 +325,9 @@ namespace Naninovel
         /// </summary>
         /// <param name="name">Name to assign for the instantiated object. Will use a default name when not provided.</param>
         /// <param name="layer">Layer to assign for the instantiated object. When not provided and override layer is enabled in the engine configuration, will assign the layer specified in the configuration.</param>
+        /// <param name="parent">When provided, will make the created object child of the transform.</param>
         /// <param name="components">Components to add on the created object.</param>
-        public static GameObject CreateObject (string name = default, int? layer = default, params Type[] components)
+        public static GameObject CreateObject (string name = default, int? layer = default, Transform parent = default, params Type[] components)
         {
             if (Behaviour is null)
                 throw new Exception($"Failed to create `{name ?? string.Empty}` object: engine is not ready. " +
@@ -300,7 +337,9 @@ namespace Naninovel
             GameObject newObj;
             if (components != null) newObj = new GameObject(objName, components);
             else newObj = new GameObject(objName);
-            Behaviour.AddChildObject(newObj);
+
+            if (parent) newObj.transform.SetParent(parent);
+            else Behaviour.AddChildObject(newObj);
 
             if (layer.HasValue) newObj.ForEachDescendant(obj => obj.layer = layer.Value);
             else if (Configuration.OverrideObjectsLayer) newObj.ForEachDescendant(obj => obj.layer = Configuration.ObjectsLayer);
@@ -315,14 +354,17 @@ namespace Naninovel
         /// </summary>
         /// <param name="name">Name to assign for the instantiated object. Will use a default name when not provided.</param>
         /// <param name="layer">Layer to assign for the instantiated object. When not provided and override layer is enabled in the engine configuration, will assign the layer specified in the configuration.</param>
-        public static T CreateObject<T> (string name = default, int? layer = default) where T : Component
+        /// <param name="parent">When provided, will make the instantiated object child of the transform.</param>
+        public static T CreateObject<T> (string name = default, int? layer = default, Transform parent = default) where T : Component
         {
             if (Behaviour is null)
                 throw new Exception($"Failed to create `{name ?? string.Empty}` object of type `{typeof(T).Name}`: engine is not ready. " +
                                     $"Make sure you're not attempting to create and object inside an engine service constructor (use `{nameof(IEngineService.InitializeServiceAsync)}` method instead).");
 
             var newObj = new GameObject(name ?? typeof(T).Name);
-            Behaviour.AddChildObject(newObj);
+
+            if (parent) newObj.transform.SetParent(parent);
+            else Behaviour.AddChildObject(newObj);
 
             if (layer.HasValue) newObj.ForEachDescendant(obj => obj.layer = layer.Value);
             else if (Configuration.OverrideObjectsLayer) newObj.ForEachDescendant(obj => obj.layer = Configuration.ObjectsLayer);
@@ -330,6 +372,20 @@ namespace Naninovel
             objects.Add(newObj);
 
             return newObj.AddComponent<T>();
+        }
+
+        /// <summary>
+        /// Attempts to <see cref="Resources.Load{T}"/> using the specified path, prefixed with "Naninovel".
+        /// In case the resource is not found, will raise an exception mentioning the package was probably modified or is corrupted.
+        /// </summary>
+        /// <param name="relativePath">Relative (to "Naninovel") path to the resource.</param>
+        /// <typeparam name="T">Type of the resource to load.</typeparam>
+        public static T LoadInternalResource<T> (string relativePath) where T : UnityEngine.Object
+        {
+            var fullPath = $"Naninovel/{relativePath}";
+            var asset = Resources.Load<T>(fullPath);
+            if (asset == null) throw new Exception($"Failed to load an internal Naninovel asset stored at `Naninovel/Resources/{fullPath}`. The Naninovel package was probably modified or is corrupted. Try removing `Naninovel` folder from the project and re-importing the package from the Asset Store. Remember, that you shouldn't modify contents of the `Naninovel` folder: be it adding, removing, editing or moving anything inside the folder.");
+            return asset;
         }
 
         private static IReadOnlyCollection<Type> GetEngineTypes ()
@@ -344,6 +400,29 @@ namespace Naninovel
                 engineTypes.AddRange(assembly.GetExportedTypes());
             }
             return engineTypes;
+        }
+
+        [RuntimeInitializeOnLoadMethod]
+        private static void CheckUnityVersion ()
+        {
+            if (!Application.isEditor) return;
+
+            var version = Application.unityVersion;
+            if (!ParseUtils.TryInvariantInt(version.GetBefore("."), out var major) ||
+                !ParseUtils.TryInvariantInt(version.GetBetween("."), out var minor) ||
+                !ParseUtils.TryInvariantInt(new string(version.GetAfter(".").TakeWhile(char.IsDigit).ToArray()), out var patch))
+                throw new Exception($"Failed to parse `{version}` Unity version.");
+
+            if (major < 2019) Debug.LogError("Minimum supported Unity version is 2019.4.22.");
+            // https://issuetracker.unity3d.com/product/unity/issues/guid/1301378
+            if (major == 2019) CheckMinorAndPatch(4, 22);
+            if (major == 2020) CheckMinorAndPatch(2, 7);
+
+            void CheckMinorAndPatch (int minMinor, int minPatch)
+            {
+                if (minor < minMinor || minor == minMinor && patch < minPatch)
+                    Debug.LogError($"Minimum supported Unity release in {major} stream is {major}.{minMinor}.{minPatch}.");
+            }
         }
     }
 }

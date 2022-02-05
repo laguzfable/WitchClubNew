@@ -1,10 +1,8 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using Naninovel.Commands;
 using UnityEngine;
 
 namespace Naninovel
@@ -20,60 +18,51 @@ namespace Naninovel
         /// </summary>
         public string Name => name;
         /// <summary>
-        /// The lines this script asset contains.
+        /// The list of lines this script asset contains.
         /// </summary>
-        public ReadOnlyCollection<ScriptLine> Lines => lines.AsReadOnly();
+        public IReadOnlyList<ScriptLine> Lines => lines;
+
+        private static IScriptParser cachedParser;
 
         [SerializeReference] private List<ScriptLine> lines = default;
 
         /// <summary>
-        /// Creates new instance by parsing the provided serialized script text.
+        /// Creates a new instance from the provided script lines.
         /// </summary>
-        /// <param name="scriptName">Name of the script asset.</param>
-        /// <param name="scriptText">The serialized script text to parse.</param>
-        /// <param name="errors">When provided and an error occurs while parsing a line, will add the error to the list.</param>
-        public static Script FromScriptText (string scriptName, string scriptText, List<ScriptParseError> errors = null)
+        public static Script FromLines (string scriptName, IEnumerable<ScriptLine> scriptLines)
         {
             var asset = CreateInstance<Script>();
             asset.name = scriptName;
-            asset.lines = new List<ScriptLine>();
-
-            var scriptLinesText = SplitScriptText(scriptText);
-            for (int i = 0; i < scriptLinesText.Length; i++)
-            {
-                var lineText = scriptLinesText[i].TrimFull();
-                var lineType = ResolveLineType(lineText);
-                var line = Activator.CreateInstance(lineType, asset.Name, i, lineText, errors) as ScriptLine;
-                asset.lines.Add(line);
-            }
-
+            asset.lines = scriptLines.ToList();
             return asset;
         }
 
         /// <summary>
-        /// Evaluates type of the line that could be parsed of the provided script line text string,
-        /// based on the identifier literal placed at the start of the string.
+        /// Creates a new instance by parsing the provided script text.
         /// </summary>
-        public static Type ResolveLineType (string lineText)
+        /// <param name="scriptName">Name of the script asset.</param>
+        /// <param name="scriptText">The script text to parse.</param>
+        /// <param name="errors">When an error occurs while parsing, will add it to the collection.</param>
+        public static Script FromScriptText (string scriptName, string scriptText, ICollection<ScriptParseError> errors)
         {
-            if (string.IsNullOrWhiteSpace(lineText))
-                return typeof(CommentScriptLine);
-            else if (lineText.StartsWithFast(CommandScriptLine.IdentifierLiteral))
-                return typeof(CommandScriptLine);
-            else if (lineText.StartsWithFast(CommentScriptLine.IdentifierLiteral))
-                return typeof(CommentScriptLine);
-            else if (lineText.StartsWithFast(LabelScriptLine.IdentifierLiteral))
-                return typeof(LabelScriptLine);
-            else return typeof(GenericTextScriptLine);
+            return GetCachedParser().ParseText(scriptName, scriptText, errors);
+
+            IScriptParser GetCachedParser ()
+            {
+                var typeName = Configuration.GetOrDefault<ScriptsConfiguration>().ScriptParser;
+                if (cachedParser != null && cachedParser.GetType().AssemblyQualifiedName == typeName) return cachedParser;
+                cachedParser = Activator.CreateInstance(Type.GetType(typeName)) as IScriptParser;
+                return cachedParser;
+            }
         }
 
-        /// <summary>
-        /// Splits provided script text string into individual script lines.
-        /// </summary>
-        public static string[] SplitScriptText (string scriptText)
+        /// <inheritdoc cref="FromScriptText(string,string,ICollection{ScriptParseError})"/>
+        public static Script FromScriptText (string scriptName, string scriptText)
         {
-            // uFEFF - BOM, u200B - zero-width space.
-            return scriptText?.Trim('\uFEFF', '\u200B').SplitByNewLine() ?? new[] { string.Empty };
+            var logger = ScriptParseErrorLogger.GetFor(scriptName);
+            var script = FromScriptText(scriptName, scriptText, logger);
+            ScriptParseErrorLogger.Return(logger);
+            return script;
         }
 
         /// <summary>
@@ -108,17 +97,18 @@ namespace Naninovel
         {
             var commands = new List<Command>();
             var usedLocalizedLineIndexes = new HashSet<int>();
-            var rollbackEnabled = Engine.Initialized ? Engine.GetConfiguration<StateConfiguration>().EnableStateRollback : 
-                ProjectConfigurationProvider.LoadOrDefault<StateConfiguration>().EnableStateRollback;
+            var rollbackEnabled = Engine.Initialized ? Engine.GetConfiguration<StateConfiguration>().EnableStateRollback : ProjectConfigurationProvider.LoadOrDefault<StateConfiguration>().EnableStateRollback;
 
             for (int i = 0; i < lines.Count; i++)
             {
                 var sourceLine = lines[i];
-                if (sourceLine is CommentScriptLine || sourceLine is LabelScriptLine) continue;
+                if (sourceLine is CommentScriptLine || sourceLine is LabelScriptLine || sourceLine is EmptyScriptLine) continue;
 
-                var li = localizationScript != null ? (localizationScript.FindLine<LabelScriptLine>(l =>
-                    // Exclude used localized lines to prevent overriding lines with equal content hashes.
-                    !usedLocalizedLineIndexes.Contains(l.LineIndex) && l.LabelText == sourceLine.LineHash)?.LineIndex ?? -1) : -1;
+                var li = localizationScript != null
+                    ? (localizationScript.FindLine<LabelScriptLine>(l =>
+                        // Exclude used localized lines to prevent overriding lines with equal content hashes.
+                        !usedLocalizedLineIndexes.Contains(l.LineIndex) && l.LabelText == sourceLine.LineHash)?.LineIndex ?? -1)
+                    : -1;
                 if (localizationScript != null && li > -1) // Localized lines available.
                 {
                     usedLocalizedLineIndexes.Add(li);
@@ -128,16 +118,16 @@ namespace Naninovel
                     {
                         li++;
                         var localizedLine = localizationScript.lines[li];
-                        if (localizedLine is CommentScriptLine) continue;
+                        if (localizedLine is CommentScriptLine || localizedLine is EmptyScriptLine) continue;
                         if (localizedLine is LabelScriptLine) break;
-                        if (!rollbackEnabled && replacedAnything) 
+                        if (!rollbackEnabled && replacedAnything)
                         {
                             Debug.LogWarning($"Multiple localized lines mapped to a single source line detected in localization script `{localizationScript.Name}` at line #{localizedLine.LineNumber}. " +
                                              "That is not supported when state rollback is disabled. The extra lines won't be included to the localized version of the script.");
                             break;
                         }
                         if (!rollbackEnabled && localizedLine is GenericTextScriptLine localizedGenericLine
-                                             && (!(sourceLine is GenericTextScriptLine sourceGenericLine) || sourceGenericLine.InlinedCommands.Count != localizedGenericLine.InlinedCommands.Count)) 
+                                             && (!(sourceLine is GenericTextScriptLine sourceGenericLine) || sourceGenericLine.InlinedCommands.Count != localizedGenericLine.InlinedCommands.Count))
                             Debug.LogWarning($"Inlined commands count in the localized content not equals to the source in `{localizationScript.Name}` script at line #{localizedLine.LineNumber}. " +
                                              "That could break the playback when changing the locale while state rollback is disabled. Either enable state rollback or fix the localized content.");
                         OverrideCommandIndexInLine(localizedLine, i, ref inlineIndex);

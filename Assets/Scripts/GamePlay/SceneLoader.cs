@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using Naninovel;
 using Naninovel.UI;
-using UniRx.Async;
 
 public class SceneLoader : MonoBehaviour
 {

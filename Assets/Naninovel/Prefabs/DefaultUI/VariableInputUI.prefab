@@ -466,7 +466,7 @@ Canvas:
   m_GameObject: {fileID: 6306036015961478139}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_Camera: {fileID: 0}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
@@ -507,15 +507,28 @@ MonoBehaviour:
   saveVisibilityState: 1
   blockInputWhenVisible: 1
   allowedSamplers:
-  - Submit
   - Rollback
   modalUI: 1
   fontChangeConfiguration: []
   inputField: {fileID: 4204331642765858567}
-  summaryText: {fileID: 4907214032101069361}
   submitButton: {fileID: 8344271011024427722}
   activateOnShow: 1
   submitOnInput: 1
+  summaryContainer: {fileID: 5117707394641935651}
+  onSummaryChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4907214032101069361}
+        m_MethodName: set_text
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!225 &6306036015961478118
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -569,7 +582,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 55
+    m_Bits: 4294967295
 --- !u!1 &6306036017273270223
 GameObject:
   m_ObjectHideFlags: 0

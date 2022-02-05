@@ -1,7 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel
@@ -19,24 +18,17 @@ namespace Naninovel
         /// Event invoked when playback is stopped.
         /// </summary>
         event Action OnMovieStop;
-        /// <summary>
-        /// Event invoked when a movie is ready to be played.
-        /// </summary>
-        event Action<Texture> OnMovieTextureReady;
 
         /// <summary>
-        /// Whether currently playing a movie.
+        /// Whether currently playing or preparing to play a movie.
         /// </summary>
         bool Playing { get; }
-        /// <summary>
-        /// A fade texture used when starting and stopping the playback.
-        /// </summary>
-        Texture2D FadeTexture { get; }
 
         /// <summary>
-        /// Plays a movie with the provided name; returns when the playback finishes.
+        /// Starts playing a movie with the provided name.
+        /// Returns texture to which the movie is rendered.
         /// </summary>
-        UniTask PlayAsync (string movieName, CancellationToken cancellationToken = default);
+        UniTask<Texture> PlayAsync (string movieName, AsyncToken asyncToken = default);
         /// <summary>
         /// Stops the playback.
         /// </summary>

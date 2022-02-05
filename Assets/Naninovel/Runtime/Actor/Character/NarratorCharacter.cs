@@ -1,6 +1,5 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel
@@ -29,25 +28,25 @@ namespace Naninovel
         public UniTask InitializeAsync () => UniTask.CompletedTask;
 
         public UniTask ChangeAppearanceAsync (string appearance, float duration, EasingType easingType = default, 
-            Transition? transition = default, CancellationToken cancellationToken = default) => UniTask.CompletedTask;
+            Transition? transition = default, AsyncToken asyncToken = default) => UniTask.CompletedTask;
 
         public UniTask ChangeVisibilityAsync (bool visible, float duration, EasingType easingType = default, 
-            CancellationToken cancellationToken = default) => UniTask.CompletedTask;
+            AsyncToken asyncToken = default) => UniTask.CompletedTask;
 
         public UniTask ChangePositionAsync (Vector3 position, float duration, EasingType easingType = default, 
-            CancellationToken cancellationToken = default) => UniTask.CompletedTask;
+            AsyncToken asyncToken = default) => UniTask.CompletedTask;
 
         public UniTask ChangeRotationAsync (Quaternion rotation, float duration, EasingType easingType = default, 
-            CancellationToken cancellationToken = default) => UniTask.CompletedTask;
+            AsyncToken asyncToken = default) => UniTask.CompletedTask;
 
         public UniTask ChangeScaleAsync (Vector3 scale, float duration, EasingType easingType = default, 
-            CancellationToken cancellationToken = default) => UniTask.CompletedTask;
+            AsyncToken asyncToken = default) => UniTask.CompletedTask;
 
         public UniTask ChangeTintColorAsync (Color tintColor, float duration, EasingType easingType = default, 
-            CancellationToken cancellationToken = default) => UniTask.CompletedTask;
+            AsyncToken asyncToken = default) => UniTask.CompletedTask;
         
         public UniTask ChangeLookDirectionAsync (CharacterLookDirection lookDirection, float duration, EasingType easingType = default, 
-            CancellationToken cancellationToken = default) => UniTask.CompletedTask;
+            AsyncToken asyncToken = default) => UniTask.CompletedTask;
 
         public UniTask HoldResourcesAsync (string appearance, object holder) => UniTask.CompletedTask;
 

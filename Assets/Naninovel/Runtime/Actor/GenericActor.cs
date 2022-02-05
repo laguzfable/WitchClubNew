@@ -1,6 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
+using System;
 using UnityEngine;
 
 namespace Naninovel
@@ -16,10 +16,12 @@ namespace Naninovel
         where TBehaviour : GenericActorBehaviour
         where TMeta : ActorMetadata
     {
+        /// <summary>
+        /// Behaviour component of the instantiated generic prefab associated with the actor.
+        /// </summary>
+        public virtual TBehaviour Behaviour { get; private set; }
         public override string Appearance { get => appearance; set => SetAppearance(value); }
         public override bool Visible { get => visible; set => SetVisibility(value); }
-
-        protected TBehaviour Behaviour { get; private set; }
 
         private LocalizableResourceLoader<GameObject> prefabLoader;
         private string appearance;
@@ -36,7 +38,9 @@ namespace Naninovel
             var providerManager = Engine.GetService<IResourceProviderManager>();
             var localizationManager = Engine.GetService<ILocalizationManager>();
             prefabLoader = ActorMetadata.Loader.CreateLocalizableFor<GameObject>(providerManager, localizationManager);
-            var prefabResource = await prefabLoader.LoadAsync(Id);
+            var prefabResource = await prefabLoader.LoadAndHoldAsync(Id, this);
+            if (!prefabResource.Valid) 
+                throw new Exception($"Failed to load `{Id}` generic actor prefab. Make sure a valid prefab is assigned in the resources editor menu.");
 
             Behaviour = Engine.Instantiate(prefabResource.Object).GetComponent<TBehaviour>();
             Behaviour.transform.SetParent(Transform);
@@ -45,13 +49,13 @@ namespace Naninovel
         }
 
         public override UniTask ChangeAppearanceAsync (string appearance, float duration, EasingType easingType = default,
-            Transition? transition = default, CancellationToken cancellationToken = default)
+            Transition? transition = default, AsyncToken asyncToken = default)
         {
             SetAppearance(appearance);
             return UniTask.CompletedTask;
         }
 
-        public override UniTask ChangeVisibilityAsync (bool visible, float duration, EasingType easingType = default, CancellationToken cancellationToken = default)
+        public override UniTask ChangeVisibilityAsync (bool visible, float duration, EasingType easingType = default, AsyncToken asyncToken = default)
         {
             SetVisibility(visible);
             return UniTask.CompletedTask;
@@ -85,9 +89,9 @@ namespace Naninovel
 
         public override void Dispose ()
         {
+            prefabLoader?.ReleaseAll(this);
+            
             base.Dispose();
-
-            prefabLoader?.UnloadAll();
         }
     }
 }

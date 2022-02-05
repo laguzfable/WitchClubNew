@@ -1,7 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System.Text;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel.Commands
@@ -12,49 +11,6 @@ namespace Naninovel.Commands
     /// <remarks>
     /// When `goto`, `gosub` and `do` parameters are not specified, will continue script execution from the next script line.
     /// </remarks>
-    /// <example>
-    /// ; Print the text, then immediately show choices and stop script execution.
-    /// Continue executing this script or ...?[skipInput]
-    /// @choice "Continue"
-    /// @choice "Load another script from start" goto:AnotherScript
-    /// @choice "Load another script from \"MyLabel\" label" goto:AnotherScript.MyLabel
-    /// @choice "Goto to \"MySub\" subroutine in another script" gosub:AnotherScript.MySub
-    /// @stop
-    /// 
-    /// ; You can also set custom variables based on choices.
-    /// @choice "I'm humble, one is enough..." set:score++
-    /// @choice "Two, please." set:score=score+2
-    /// @choice "I'll take the entire stock!" set:karma--;score=999
-    /// 
-    /// ; Play a sound effect and arrange characters when choice is picked
-    /// @choice "Arrange" do:"@sfx Click, @arrange k.10\,y.55"
-    /// 
-    /// ; Print a text line corresponding to the picked choice
-    /// @choice "Ask about color" do:"What's your favorite color?"
-    /// @choice "Ask about age" do:"How old are you?"
-    /// @choice "Keep silent" do:"..."
-    /// @stop
-    /// 
-    /// ; Following example shows how to make an interactive map via `@choice` commands.
-    /// ; For this example, we assume, that inside a `Resources/MapButtons` folder you've 
-    /// ; stored prefabs with `ChoiceHandlerButton` component attached to their root objects.
-    /// # Map
-    /// @back Map
-    /// @hidePrinter
-    /// @choice handler:ButtonArea button:MapButtons/Home pos:-300,-300 goto:.HomeScene
-    /// @choice handler:ButtonArea button:MapButtons/Shop pos:300,200 goto:.ShopScene
-    /// @stop
-    /// 
-    /// # HomeScene
-    /// @back Home
-    /// Home, sweet home!
-    /// @goto .Map
-    /// 
-    /// # ShopScene
-    /// @back Shop
-    /// Don't forget about cucumbers!
-    /// @goto .Map
-    /// </example>
     [CommandAlias("choice")]
     public class AddChoice : Command, Command.ILocalizable, Command.IPreloadable
     {
@@ -63,7 +19,7 @@ namespace Naninovel.Commands
         /// When the text contain spaces, wrap it in double quotes (`"`). 
         /// In case you wish to include the double quotes in the text itself, escape them.
         /// </summary>
-        [ParameterAlias(NamelessParameterAlias)]
+        [ParameterAlias(NamelessParameterAlias), LocalizableParameter]
         public StringParameter ChoiceSummary;
         /// <summary>
         /// Path (relative to a `Resources` folder) to a [button prefab](/guide/choices.md#choice-button) representing the choice. 
@@ -80,29 +36,29 @@ namespace Naninovel.Commands
         /// <summary>
         /// ID of the choice handler to add choice for. Will use a default handler if not provided.
         /// </summary>
-        [ParameterAlias("handler"), IDEActor(ChoiceHandlersConfiguration.DefaultPathPrefix)]
+        [ParameterAlias("handler"), ActorContext(ChoiceHandlersConfiguration.DefaultPathPrefix)]
         public StringParameter HandlerId;
         /// <summary>
         /// Path to go when the choice is selected by user;
         /// see [@goto] command for the path format.
         /// </summary>
-        [ParameterAlias("goto"), IDEResource(ScriptsConfiguration.DefaultScriptsPathPrefix, 0)]
+        [ParameterAlias("goto"), ResourceContext(ScriptsConfiguration.DefaultPathPrefix, 0)]
         public NamedStringParameter GotoPath;
         /// <summary>
         /// Path to a subroutine to go when the choice is selected by user;
         /// see [@gosub] command for the path format. When `goto` is assigned this parameter will be ignored.
         /// </summary>
-        [ParameterAlias("gosub"), IDEResource(ScriptsConfiguration.DefaultScriptsPathPrefix, 0)]
+        [ParameterAlias("gosub"), ResourceContext(ScriptsConfiguration.DefaultPathPrefix, 0)]
         public NamedStringParameter GosubPath;
         /// <summary>
         /// Set expression to execute when the choice is selected by user; 
         /// see [@set] command for syntax reference.
         /// </summary>
-        [ParameterAlias("set"), IDEConstant(IDEConstantAttribute.Expression)]
+        [ParameterAlias("set"), ExpressionContext]
         public StringParameter SetExpression;
         /// <summary>
-        /// Script commands to execute when the choice is selected by user; 
-        /// don't forget to escape commas inside list values to prevent them being treated as delimiters.
+        /// Script commands to execute when the choice is selected by user.
+        /// Escape commas inside list values to prevent them being treated as delimiters.
         /// The commands will be invoked in order after `set`, `goto` and `gosub` are handled (if assigned).
         /// </summary>
         [ParameterAlias("do")]
@@ -112,61 +68,72 @@ namespace Naninovel.Commands
         /// when neither `goto` nor `gosub` parameters are specified. 
         /// Has no effect in case the script is already playing when the choice is processed.
         /// </summary>
-        [ParameterAlias("play")]
+        [ParameterAlias("play"), ParameterDefaultValue("true")]
         public BooleanParameter AutoPlay = true;
         /// <summary>
         /// Whether to also show choice handler the choice is added for;
         /// enabled by default.
         /// </summary>
-        [ParameterAlias("show")]
+        [ParameterAlias("show"), ParameterDefaultValue("true")]
         public BooleanParameter ShowHandler = true;
         /// <summary>
-        /// Duration (in seconds) of the fade-in (reveal) animation. Default value: 0.35 seconds.
+        /// Duration (in seconds) of the fade-in (reveal) animation.
         /// </summary>
-        [ParameterAlias("time")]
-        public DecimalParameter Duration = .35f;
+        [ParameterAlias("time"), ParameterDefaultValue("0.35")]
+        public DecimalParameter Duration;
 
         protected IChoiceHandlerManager HandlerManager => Engine.GetService<IChoiceHandlerManager>();
 
         public async UniTask PreloadResourcesAsync ()
         {
-            if (!Assigned(HandlerId) || HandlerId.DynamicValue) return;
+            if (Assigned(HandlerId) && !HandlerId.DynamicValue)
+            {
+                var handlerId = Assigned(HandlerId) ? HandlerId.Value : HandlerManager.Configuration.DefaultHandlerId;
+                var handler = await HandlerManager.GetOrAddActorAsync(handlerId);
+                await handler.HoldResourcesAsync(null, this);
+            }
 
-            var handlerId = Assigned(HandlerId) ? HandlerId.Value : HandlerManager.Configuration.DefaultHandlerId;
-            var handler = await HandlerManager.GetOrAddActorAsync(handlerId);
-            await handler.HoldResourcesAsync(null, this);
+            if (Assigned(ButtonPath) && !ButtonPath.DynamicValue)
+                await HandlerManager.ChoiceButtonLoader.LoadAndHoldAsync(ButtonPath, this);
         }
 
         public void ReleasePreloadedResources ()
         {
-            if (!Assigned(HandlerId) || HandlerId.DynamicValue) return;
+            if (Assigned(HandlerId) && !HandlerId.DynamicValue)
+            {
+                var handlerId = Assigned(HandlerId) ? HandlerId.Value : HandlerManager.Configuration.DefaultHandlerId;
+                if (HandlerManager.ActorExists(handlerId)) HandlerManager.GetActor(handlerId).ReleaseResources(null, this);
+            }
 
-            var handlerId = Assigned(HandlerId) ? HandlerId.Value : HandlerManager.Configuration.DefaultHandlerId;
-            if (HandlerManager.ActorExists(handlerId)) HandlerManager.GetActor(handlerId).ReleaseResources(null, this);
+            if (Assigned(ButtonPath) && !ButtonPath.DynamicValue)
+                HandlerManager.ChoiceButtonLoader.Release(ButtonPath, this);
         }
 
-        public override async UniTask ExecuteAsync (CancellationToken cancellationToken = default)
+        public override async UniTask ExecuteAsync (AsyncToken asyncToken = default)
         {
             var handlerId = Assigned(HandlerId) ? HandlerId.Value : HandlerManager.Configuration.DefaultHandlerId;
             var choiceHandler = await HandlerManager.GetOrAddActorAsync(handlerId);
-            if (cancellationToken.CancelASAP) return;
+            asyncToken.ThrowIfCanceled();
 
             if (!choiceHandler.Visible && ShowHandler)
-                choiceHandler.ChangeVisibilityAsync(true, Duration, cancellationToken: cancellationToken).Forget();
+            {
+                var duration = Assigned(Duration) ? Duration.Value : HandlerManager.Configuration.DefaultDuration;
+                choiceHandler.ChangeVisibilityAsync(true, duration, asyncToken: asyncToken).Forget();
+            }
 
             var builder = new StringBuilder();
 
             if (Assigned(SetExpression))
-                builder.AppendLine($"{CommandScriptLine.IdentifierLiteral}{nameof(SetCustomVariable)} {SetExpression}");
+                builder.AppendLine($"{Parsing.Identifiers.CommandLine}{nameof(SetCustomVariable)} {SetExpression}");
 
             if (Assigned(GotoPath))
-                builder.AppendLine($"{CommandScriptLine.IdentifierLiteral}{nameof(Goto)} {GotoPath.Name ?? string.Empty}{(GotoPath.NamedValue.HasValue ? $".{GotoPath.NamedValue.Value}" : string.Empty)}");
+                builder.AppendLine($"{Parsing.Identifiers.CommandLine}{nameof(Goto)} {GotoPath.Name ?? string.Empty}{(GotoPath.NamedValue.HasValue ? $".{GotoPath.NamedValue.Value}" : string.Empty)}");
             else if (Assigned(GosubPath))
-                builder.AppendLine($"{CommandScriptLine.IdentifierLiteral}{nameof(Gosub)} {GosubPath.Name ?? string.Empty}{(GosubPath.NamedValue.HasValue ? $".{GosubPath.NamedValue.Value}" : string.Empty)}");
+                builder.AppendLine($"{Parsing.Identifiers.CommandLine}{nameof(Gosub)} {GosubPath.Name ?? string.Empty}{(GosubPath.NamedValue.HasValue ? $".{GosubPath.NamedValue.Value}" : string.Empty)}");
 
             if (Assigned(OnSelected))
                 foreach (var line in OnSelected)
-                    builder.AppendLine(line);
+                    builder.Append(line?.Value?.Trim() ?? string.Empty).Append('\n');
 
             var onSelectScript = builder.ToString().TrimFull();
             var buttonPos = Assigned(ButtonPosition) ? (Vector2?)ArrayUtils.ToVector2(ButtonPosition) : null;

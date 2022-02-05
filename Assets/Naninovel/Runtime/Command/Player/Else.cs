@@ -1,6 +1,5 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
 
 namespace Naninovel.Commands
 {
@@ -11,7 +10,7 @@ namespace Naninovel.Commands
     /// </summary>
     public class Else : Command
     {
-        public override UniTask ExecuteAsync (CancellationToken cancellationToken = default)
+        public override UniTask ExecuteAsync (AsyncToken asyncToken = default)
         {
             // We might get here either on exiting from an @if or @elseif branch (which condition is met), or via direct @goto playback jump. 
             // In any case, we just need to get out of the current conditional block.

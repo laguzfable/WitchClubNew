@@ -1,55 +1,50 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
+using System;
 using UnityEngine;
 
 namespace Naninovel
 {
-    public delegate float EasingFunction (float start, float end, float value);
-
     public static class EasingFunctions
     {
-        /// <summary>
-        /// Returns an <see cref="EasingFunction"/> corresponding to the type of easing.
-        /// Be aware that this method allocates memory; consider caching the returned delegate.
-        /// </summary>
-        public static EasingFunction GetEasingFunction (this EasingType easingType)
+        public static float Tween (this EasingType easingType, float start, float end, float value)
         {
             switch (easingType)
             {
-                case EasingType.Linear: return Linear;
-                case EasingType.SmoothStep: return SmoothStep;
-                case EasingType.Spring: return Spring;
-                case EasingType.EaseInQuad: return EaseInQuad;
-                case EasingType.EaseOutQuad: return EaseOutQuad;
-                case EasingType.EaseInOutQuad: return EaseInOutQuad;
-                case EasingType.EaseInCubic: return EaseInCubic;
-                case EasingType.EaseOutCubic: return EaseOutCubic;
-                case EasingType.EaseInOutCubic: return EaseInOutCubic;
-                case EasingType.EaseInQuart: return EaseInQuart;
-                case EasingType.EaseOutQuart: return EaseOutQuart;
-                case EasingType.EaseInOutQuart: return EaseInOutQuart;
-                case EasingType.EaseInQuint: return EaseInQuint;
-                case EasingType.EaseOutQuint: return EaseOutQuint;
-                case EasingType.EaseInOutQuint: return EaseInOutQuint;
-                case EasingType.EaseInSine: return EaseInSine;
-                case EasingType.EaseOutSine: return EaseOutSine;
-                case EasingType.EaseInOutSine: return EaseInOutSine;
-                case EasingType.EaseInExpo: return EaseInExpo;
-                case EasingType.EaseOutExpo: return EaseOutExpo;
-                case EasingType.EaseInOutExpo: return EaseInOutExpo;
-                case EasingType.EaseInCirc: return EaseInCirc;
-                case EasingType.EaseOutCirc: return EaseOutCirc;
-                case EasingType.EaseInOutCirc: return EaseInOutCirc;
-                case EasingType.EaseInBounce: return EaseInBounce;
-                case EasingType.EaseOutBounce: return EaseOutBounce;
-                case EasingType.EaseInOutBounce: return EaseInOutBounce;
-                case EasingType.EaseInBack: return EaseInBack;
-                case EasingType.EaseOutBack: return EaseOutBack;
-                case EasingType.EaseInOutBack: return EaseInOutBack;
-                case EasingType.EaseInElastic: return EaseInElastic;
-                case EasingType.EaseOutElastic: return EaseOutElastic;
-                case EasingType.EaseInOutElastic: return EaseInOutElastic;
-                default: return null;
+                case EasingType.Linear: return Linear(start, end, value);
+                case EasingType.SmoothStep: return SmoothStep(start, end, value);
+                case EasingType.Spring: return Spring(start, end, value);
+                case EasingType.EaseInQuad: return EaseInQuad(start, end, value);
+                case EasingType.EaseOutQuad: return EaseOutQuad(start, end, value);
+                case EasingType.EaseInOutQuad: return EaseInOutQuad(start, end, value);
+                case EasingType.EaseInCubic: return EaseInCubic(start, end, value);
+                case EasingType.EaseOutCubic: return EaseOutCubic(start, end, value);
+                case EasingType.EaseInOutCubic: return EaseInOutCubic(start, end, value);
+                case EasingType.EaseInQuart: return EaseInQuart(start, end, value);
+                case EasingType.EaseOutQuart: return EaseOutQuart(start, end, value);
+                case EasingType.EaseInOutQuart: return EaseInOutQuart(start, end, value);
+                case EasingType.EaseInQuint: return EaseInQuint(start, end, value);
+                case EasingType.EaseOutQuint: return EaseOutQuint(start, end, value);
+                case EasingType.EaseInOutQuint: return EaseInOutQuint(start, end, value);
+                case EasingType.EaseInSine: return EaseInSine(start, end, value);
+                case EasingType.EaseOutSine: return EaseOutSine(start, end, value);
+                case EasingType.EaseInOutSine: return EaseInOutSine(start, end, value);
+                case EasingType.EaseInExpo: return EaseInExpo(start, end, value);
+                case EasingType.EaseOutExpo: return EaseOutExpo(start, end, value);
+                case EasingType.EaseInOutExpo: return EaseInOutExpo(start, end, value);
+                case EasingType.EaseInCirc: return EaseInCirc(start, end, value);
+                case EasingType.EaseOutCirc: return EaseOutCirc(start, end, value);
+                case EasingType.EaseInOutCirc: return EaseInOutCirc(start, end, value);
+                case EasingType.EaseInBounce: return EaseInBounce(start, end, value);
+                case EasingType.EaseOutBounce: return EaseOutBounce(start, end, value);
+                case EasingType.EaseInOutBounce: return EaseInOutBounce(start, end, value);
+                case EasingType.EaseInBack: return EaseInBack(start, end, value);
+                case EasingType.EaseOutBack: return EaseOutBack(start, end, value);
+                case EasingType.EaseInOutBack: return EaseInOutBack(start, end, value);
+                case EasingType.EaseInElastic: return EaseInElastic(start, end, value);
+                case EasingType.EaseOutElastic: return EaseOutElastic(start, end, value);
+                case EasingType.EaseInOutElastic: return EaseInOutElastic(start, end, value);
+                default: throw new NotSupportedException($"Unsupported easing type: {easingType}");
             }
         }
 
@@ -66,7 +61,7 @@ namespace Naninovel
         public static float Spring (float start, float end, float value)
         {
             value = Mathf.Clamp01(value);
-            value = (Mathf.Sin(value * Mathf.PI * (.2f + 2.5f * value * value * value)) * Mathf.Pow(1f - value, 2.2f) + value) * (1f + (1.2f * (1f - value)));
+            value = (Mathf.Sin(value * Mathf.PI * (.2f + 2.5f * value * value * value)) * Mathf.Pow(1f - value, 2.2f) + value) * (1f + 1.2f * (1f - value));
             return start + (end - start) * value;
         }
 
@@ -229,24 +224,24 @@ namespace Naninovel
         {
             value /= 1f;
             end -= start;
-            if (value < (1 / 2.75f))
+            if (value < 1 / 2.75f)
             {
                 return end * (7.5625f * value * value) + start;
             }
-            else if (value < (2 / 2.75f))
+            else if (value < 2 / 2.75f)
             {
-                value -= (1.5f / 2.75f);
-                return end * (7.5625f * (value) * value + .75f) + start;
+                value -= 1.5f / 2.75f;
+                return end * (7.5625f * value * value + .75f) + start;
             }
-            else if (value < (2.5 / 2.75))
+            else if (value < 2.5 / 2.75)
             {
-                value -= (2.25f / 2.75f);
-                return end * (7.5625f * (value) * value + .9375f) + start;
+                value -= 2.25f / 2.75f;
+                return end * (7.5625f * value * value + .9375f) + start;
             }
             else
             {
-                value -= (2.625f / 2.75f);
-                return end * (7.5625f * (value) * value + .984375f) + start;
+                value -= 2.625f / 2.75f;
+                return end * (7.5625f * value * value + .984375f) + start;
             }
         }
 
@@ -279,14 +274,14 @@ namespace Naninovel
             float s = 1.70158f;
             end -= start;
             value /= .5f;
-            if ((value) < 1)
+            if (value < 1)
             {
-                s *= (1.525f);
+                s *= 1.525f;
                 return end * .5f * (value * value * ((s + 1) * value - s)) + start;
             }
             value -= 2;
-            s *= (1.525f);
-            return end * .5f * ((value) * value * ((s + 1) * value + s) + 2) + start;
+            s *= 1.525f;
+            return end * .5f * (value * value * ((s + 1) * value + s) + 2) + start;
         }
 
         public static float EaseInElastic (float start, float end, float value)

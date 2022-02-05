@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using TMPro;
-using UniRx.Async;
+using Naninovel;
 
 public class PlayerController : MonoBehaviour
 {

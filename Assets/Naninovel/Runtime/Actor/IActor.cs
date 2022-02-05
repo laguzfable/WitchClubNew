@@ -1,6 +1,5 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel
@@ -49,27 +48,27 @@ namespace Naninovel
         /// Changes <see cref="Appearance"/> over specified time using provided animation easing and transition effect.
         /// </summary>
         UniTask ChangeAppearanceAsync (string appearance, float duration, EasingType easingType = default, 
-            Transition? transition = default, CancellationToken cancellationToken = default);
+            Transition? transition = default, AsyncToken asyncToken = default);
         /// <summary>
         /// Changes <see cref="Visible"/> over specified time using provided animation easing.
         /// </summary>
-        UniTask ChangeVisibilityAsync (bool visible, float duration, EasingType easingType = default, CancellationToken cancellationToken = default);
+        UniTask ChangeVisibilityAsync (bool visible, float duration, EasingType easingType = default, AsyncToken asyncToken = default);
         /// <summary>
         /// Changes <see cref="Position"/> over specified time using provided animation easing.
         /// </summary>
-        UniTask ChangePositionAsync (Vector3 position, float duration, EasingType easingType = default, CancellationToken cancellationToken = default);
+        UniTask ChangePositionAsync (Vector3 position, float duration, EasingType easingType = default, AsyncToken asyncToken = default);
         /// <summary>
         /// Changes <see cref="Rotation"/> over specified time using provided animation easing.
         /// </summary>
-        UniTask ChangeRotationAsync (Quaternion rotation, float duration, EasingType easingType = default, CancellationToken cancellationToken = default);
+        UniTask ChangeRotationAsync (Quaternion rotation, float duration, EasingType easingType = default, AsyncToken asyncToken = default);
         /// <summary>
         /// Changes <see cref="Scale"/> factor over specified time using provided animation easing.
         /// </summary>
-        UniTask ChangeScaleAsync (Vector3 scale, float duration, EasingType easingType = default, CancellationToken cancellationToken = default);
+        UniTask ChangeScaleAsync (Vector3 scale, float duration, EasingType easingType = default, AsyncToken asyncToken = default);
         /// <summary>
         /// Changes <see cref="TintColor"/> over specified time using provided animation easing.
         /// </summary>
-        UniTask ChangeTintColorAsync (Color tintColor, float duration, EasingType easingType = default, CancellationToken cancellationToken = default);
+        UniTask ChangeTintColorAsync (Color tintColor, float duration, EasingType easingType = default, AsyncToken asyncToken = default);
 
         /// <summary>
         /// Registers provided object as a holder of the resources associated with the specified actor appearance.

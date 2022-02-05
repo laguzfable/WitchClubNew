@@ -16,7 +16,11 @@
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
-    "precompiledReferences": [],
+    "precompiledReferences": [
+        "Naninovel.Parsing.dll",
+        "Naninovel.Bridging.dll",
+        "Naninovel.WebSocketSharp.dll"
+    ],
     "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [

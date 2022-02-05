@@ -1,10 +1,9 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 #if ADDRESSABLES_AVAILABLE
 
 using System.Collections.Generic;
 using System.Linq;
-using UniRx.Async;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.ResourceLocations;
 
@@ -20,7 +19,7 @@ namespace Naninovel
         /// <summary>
         /// When specified, the provider will only work with assets that have the set of labels.
         /// </summary>
-        public readonly string[] ExtraLabels;
+        public readonly IReadOnlyCollection<string> ExtraLabels;
 
         private List<IResourceLocation> locations;
 
@@ -80,11 +79,23 @@ namespace Naninovel
         private async UniTask<List<IResourceLocation>> LoadAllLocations ()
         {
             // ReSharper disable once CoVariantArrayConversion
-            var task = ExtraLabels != null ? Addressables.LoadResourceLocationsAsync(ExtraLabels, Addressables.MergeMode.Intersection) : Addressables.LoadResourceLocationsAsync(MainLabel);
+            var task = ExtraLabels != null
+                ? Addressables.LoadResourceLocationsAsync(ExtraLabels, Addressables.MergeMode.Intersection)
+                : Addressables.LoadResourceLocationsAsync(MainLabel);
             while (!task.IsDone) // When awaiting the method directly it fails on WebGL (they're using multithreaded Task fot GetAwaiter)
-                await AsyncUtils.WaitEndOfFrame;
-            var locations = task.Result;
-            return locations?.ToList() ?? new List<IResourceLocation>();
+                await AsyncUtils.WaitEndOfFrameAsync();
+            var locations = task.Result?.ToList() ?? new List<IResourceLocation>();
+            CacheLocations(locations);
+            return locations;
+        }
+
+        private void CacheLocations (IEnumerable<IResourceLocation> locations)
+        {
+            foreach (var location in locations)
+            {
+                var path = location.PrimaryKey.GetAfterFirst("/"); // Remove the addressables prefix.
+                LocationsCache.Add(new CachedResourceLocation(path, location.ResourceType));
+            }
         }
     }
 }

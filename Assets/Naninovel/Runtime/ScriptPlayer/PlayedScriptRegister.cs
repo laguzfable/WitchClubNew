@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -56,6 +56,14 @@ namespace Naninovel
         {
             var data = GetOrCreateDataForScript(scriptName);
             return data.ContainsIndex(playlistIndex);
+        }
+        
+        public bool IsScriptPlayed (string scriptName)
+        {
+            foreach (var script in playedScripts)
+                if (script.ScriptName == scriptName)
+                    return true;
+            return false;
         }
 
         public int CountPlayed ()

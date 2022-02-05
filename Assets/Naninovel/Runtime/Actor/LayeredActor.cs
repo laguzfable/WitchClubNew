@@ -1,7 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using System.Collections.Generic;
-using UniRx.Async;
+using Naninovel.FX;
 using UnityEngine;
 
 namespace Naninovel
@@ -9,21 +8,22 @@ namespace Naninovel
     /// <summary>
     /// A <see cref="IActor"/> implementation using <see cref="LayeredActorBehaviour"/> to represent the actor.
     /// </summary>
-    public abstract class LayeredActor<TBehaviour, TMeta> : MonoBehaviourActor<TMeta> 
+    public abstract class LayeredActor<TBehaviour, TMeta> : MonoBehaviourActor<TMeta>, Blur.IBlurable
         where TBehaviour : LayeredActorBehaviour
         where TMeta : OrthoActorMetadata
     {
-        public override string Appearance { get => appearance; set => SetAppearance(value); }
+        /// <summary>
+        /// Behaviour component of the instantiated layered prefab associated with the actor.
+        /// </summary>
+        public virtual TBehaviour Behaviour { get; private set; }
+        public override string Appearance { get => Behaviour.Composition; set => SetAppearance(value); }
         public override bool Visible { get => visible; set => SetVisibility(value); }
 
-        protected TransitionalRenderer TransitionalRenderer { get; private set; }
-        protected TBehaviour Behaviour { get; private set; }
+        protected virtual TransitionalRenderer TransitionalRenderer { get; private set; }
 
-        private readonly Dictionary<object, HashSet<string>> heldAppearances = new Dictionary<object, HashSet<string>>();
         private LocalizableResourceLoader<GameObject> prefabLoader;
         private RenderTexture appearanceTexture;
         private string defaultAppearance;
-        private string appearance;
         private bool visible;
 
         protected LayeredActor (string id, TMeta metadata)
@@ -32,26 +32,8 @@ namespace Naninovel
         public override async UniTask InitializeAsync ()
         {
             await base.InitializeAsync();
-            
-            if (ActorMetadata.RenderTexture)
-            {
-                ActorMetadata.RenderTexture.Clear();
-                var textureRenderer = GameObject.AddComponent<TransitionalTextureRenderer>();
-                textureRenderer.Initialize(ActorMetadata.CustomShader);
-                textureRenderer.RenderTexture = ActorMetadata.RenderTexture;
-                textureRenderer.CorrectAspect = ActorMetadata.CorrectRenderAspect;
-                textureRenderer.DepthPassEnabled = ActorMetadata.EnableDepthPass;
-                textureRenderer.DepthAlphaCutoff = ActorMetadata.DepthAlphaCutoff;
-                TransitionalRenderer = textureRenderer;
-            }
-            else
-            {
-                var spriteRenderer = GameObject.AddComponent<TransitionalSpriteRenderer>();
-                spriteRenderer.Initialize(ActorMetadata.Pivot, ActorMetadata.PixelsPerUnit, ActorMetadata.CustomShader);
-                spriteRenderer.DepthPassEnabled = ActorMetadata.EnableDepthPass;
-                spriteRenderer.DepthAlphaCutoff = ActorMetadata.DepthAlphaCutoff;
-                TransitionalRenderer = spriteRenderer;
-            }
+
+            TransitionalRenderer = TransitionalRenderer.CreateFor(ActorMetadata, GameObject, true);
 
             SetVisibility(false);
 
@@ -59,66 +41,43 @@ namespace Naninovel
             var localizationManager = Engine.GetService<ILocalizationManager>();
             prefabLoader = ActorMetadata.Loader.CreateLocalizableFor<GameObject>(providerManager, localizationManager);
 
-            var prefabResource = await prefabLoader.LoadAsync(Id);
-            Behaviour = Engine.Instantiate(prefabResource.Object).GetComponent<TBehaviour>();
-            Behaviour.gameObject.name = prefabResource.Object.name;
-            Behaviour.transform.SetParent(Transform);
+            var prefabResource = await prefabLoader.LoadAndHoldAsync(Id, this);
+            // Don't parent prefab to the actor object, as drawer is not handling parent scale.
+            var prefabInstance = Engine.Instantiate(prefabResource.Object, $"{Id}LayeredPrefab");
+            Behaviour = prefabInstance.GetComponent<TBehaviour>();
             defaultAppearance = Behaviour.Composition;
+
+            // Force render once, otherwise the render texture is initially empty.
+            await ChangeAppearanceAsync(defaultAppearance, 0);
 
             Engine.Behaviour.OnBehaviourUpdate += RenderAppearance;
         }
 
-        public override async UniTask ChangeAppearanceAsync (string appearance, float duration, EasingType easingType = default,
-            Transition? transition = default, CancellationToken cancellationToken = default)
+        public UniTask BlurAsync (float intensity, float duration, EasingType easingType = default, AsyncToken asyncToken = default)
         {
-            this.appearance = appearance;
+            return TransitionalRenderer.BlurAsync(intensity, duration, easingType, asyncToken);
+        }
 
+        public override async UniTask ChangeAppearanceAsync (string appearance, float duration, EasingType easingType = default,
+            Transition? transition = default, AsyncToken asyncToken = default)
+        {
             if (string.IsNullOrEmpty(appearance))
                 appearance = defaultAppearance;
 
             Behaviour.ApplyComposition(appearance);
             var previousTexture = appearanceTexture;
             appearanceTexture = Behaviour.Render(ActorMetadata.PixelsPerUnit);
-            await TransitionalRenderer.TransitionToAsync(appearanceTexture, duration, easingType, transition, cancellationToken);
-            if (cancellationToken.CancelASAP) return;
+            await TransitionalRenderer.TransitionToAsync(appearanceTexture, duration, easingType, transition, asyncToken);
 
-            // Release texture with the previous appearance.
             if (previousTexture)
                 RenderTexture.ReleaseTemporary(previousTexture);
         }
 
-        public override async UniTask ChangeVisibilityAsync (bool visible, float duration, EasingType easingType = default, CancellationToken cancellationToken = default)
+        public override async UniTask ChangeVisibilityAsync (bool visible, float duration, EasingType easingType = default, AsyncToken asyncToken = default)
         {
-            // When revealing the actor and never rendered before — force render with default appearance.
-            if (!Visible && visible && string.IsNullOrEmpty(appearance))
-                SetAppearance(defaultAppearance);
-
             this.visible = visible;
 
-            await TransitionalRenderer.FadeToAsync(visible ? TintColor.a : 0, duration, easingType, cancellationToken);
-        }
-
-        public override async UniTask HoldResourcesAsync (string appearance, object holder)
-        {
-            if (!heldAppearances.ContainsKey(holder))
-            {
-                await prefabLoader.LoadAndHoldAsync(Id, holder);
-                heldAppearances.Add(holder, new HashSet<string>());
-            }
-
-            heldAppearances[holder].Add(appearance);
-        }
-
-        public override void ReleaseResources (string appearance, object holder)
-        {
-            if (!heldAppearances.ContainsKey(holder)) return;
-            
-            heldAppearances[holder].Remove(appearance);
-            if (heldAppearances.Count == 0)
-            {
-                heldAppearances.Remove(holder);
-                prefabLoader?.Release(Id, holder);
-            }
+            await TransitionalRenderer.FadeToAsync(visible ? TintColor.a : 0, duration, easingType, asyncToken);
         }
 
         public override void Dispose ()
@@ -129,9 +88,11 @@ namespace Naninovel
             if (appearanceTexture)
                 RenderTexture.ReleaseTemporary(appearanceTexture);
 
-            base.Dispose();
+            prefabLoader?.ReleaseAll(this);
 
-            prefabLoader?.UnloadAll();
+            if (Behaviour) ObjectUtils.DestroyOrImmediate(Behaviour.gameObject);
+
+            base.Dispose();
         }
 
         protected virtual void SetAppearance (string appearance) => ChangeAppearanceAsync(appearance, 0).Forget();
@@ -151,7 +112,13 @@ namespace Naninovel
         {
             if (!Behaviour || !Behaviour.Animated || !appearanceTexture) return;
 
-            Behaviour.Render(ActorMetadata.PixelsPerUnit, appearanceTexture);
+            var texture = Behaviour.Render(ActorMetadata.PixelsPerUnit, appearanceTexture);
+            if (texture != appearanceTexture)
+            {
+                RenderTexture.ReleaseTemporary(appearanceTexture);
+                appearanceTexture = texture;
+                TransitionalRenderer.MainTexture = texture;
+            }
         }
     }
 }

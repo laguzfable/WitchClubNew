@@ -1,10 +1,9 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using Naninovel.UI;
 using System.Collections.Generic;
 using System.Threading;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel
@@ -28,7 +27,7 @@ namespace Naninovel
         private readonly List<string> richTextTags = new List<string>();
         private readonly IUIManager uiManager;
         private readonly ICharacterManager characterManager;
-        private readonly ICameraManager cameraManager;
+        private readonly AspectMonitor aspectMonitor;
         private string text, authorId;
         private CancellationTokenSource revealTextCTS;
         private string activeOpenTags, activeCloseTags;
@@ -38,9 +37,9 @@ namespace Naninovel
         {
             uiManager = Engine.GetService<IUIManager>();
             characterManager = Engine.GetService<ICharacterManager>();
-            cameraManager = Engine.GetService<ICameraManager>();
             activeOpenTags = string.Empty;
             activeCloseTags = string.Empty;
+            aspectMonitor = new AspectMonitor();
         }
 
         public override async UniTask InitializeAsync ()
@@ -48,39 +47,41 @@ namespace Naninovel
             await base.InitializeAsync();
 
             var providerManager = Engine.GetService<IResourceProviderManager>();
-            var prefabResource = await ActorMetadata.Loader.CreateFor<GameObject>(providerManager).LoadAsync(Id);
+            var localizationManager = Engine.GetService<ILocalizationManager>();
+            var prefabResource = await ActorMetadata.Loader.CreateLocalizableFor<GameObject>(providerManager, localizationManager).LoadAsync(Id);
             if (!prefabResource.Valid) throw new Exception($"Failed to load `{Id}` UI text printer resource object. Make sure the printer is correctly configured.");
 
-            PrinterPanel = await uiManager.InstantiatePrefabAsync(prefabResource.Object) as UITextPrinterPanel;
+            PrinterPanel = await uiManager.AddUIAsync(prefabResource.Object) as UITextPrinterPanel;
             if (PrinterPanel == null) throw new Exception($"Failed to initialize `{Id}` printer actor: printer panel UI instantiation failed.");
             PrinterPanel.transform.SetParent(Transform);
             PrinterPanel.PrintedText = string.Empty;
             RevealProgress = 0f;
 
-            cameraManager.OnAspectChanged += HandleAspectChanged;
+            aspectMonitor.OnChanged += HandleAspectChanged;
+            aspectMonitor.Start(target: PrinterPanel);
 
             SetAuthorId(null);
             Visible = false;
         }
 
         public override UniTask ChangeAppearanceAsync (string appearance, float duration, EasingType easingType = default,
-            Transition? transition = default, CancellationToken cancellationToken = default)
+            Transition? transition = default, AsyncToken asyncToken = default)
         {
             Appearance = appearance;
             return UniTask.CompletedTask;
         }
 
-        public override async UniTask ChangeVisibilityAsync (bool visible, float duration, EasingType easingType = default, CancellationToken cancellationToken = default)
+        public override async UniTask ChangeVisibilityAsync (bool visible, float duration, EasingType easingType = default, AsyncToken asyncToken = default)
         {
-            await PrinterPanel.ChangeVisibilityAsync(visible, duration, cancellationToken);
+            await PrinterPanel.ChangeVisibilityAsync(visible, duration, asyncToken);
         }
 
-        public virtual async UniTask RevealTextAsync (float revealDelay, CancellationToken cancellationToken = default)
+        public virtual async UniTask RevealTextAsync (float revealDelay, AsyncToken asyncToken = default)
         {
             CancelRevealTextRoutine();
 
-            revealTextCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken.LazyToken);
-            var revealTextToken = new CancellationToken(cancellationToken.ASAPToken, revealTextCTS.Token);
+            revealTextCTS = CancellationTokenSource.CreateLinkedTokenSource(asyncToken.CompletionToken);
+            var revealTextToken = new AsyncToken(asyncToken.CancellationToken, revealTextCTS.Token);
             await PrinterPanel.RevealPrintedTextOverTimeAsync(revealDelay, revealTextToken);
         }
 
@@ -122,7 +123,7 @@ namespace Naninovel
         {
             base.Dispose();
 
-            cameraManager.OnAspectChanged -= HandleAspectChanged;
+            aspectMonitor?.Stop();
 
             CancelRevealTextRoutine();
 
@@ -143,7 +144,7 @@ namespace Naninovel
             var scenePos = new Vector3(
                 PrinterPanel.Content.anchoredPosition.x / PrinterPanel.RectTransform.rect.width,
                 PrinterPanel.Content.anchoredPosition.y / PrinterPanel.RectTransform.rect.height,
-                PrinterPanel.Content.position.z);
+                PrinterPanel.Content.localPosition.z);
 
             return scenePos;
         }
@@ -154,12 +155,12 @@ namespace Naninovel
             if (!PrinterPanel || !PrinterPanel.Content) return;
 
             // Printer position is always relative (0.0-1.0) to parent rect.
-            var anchoredPos = new Vector3(
+            var anchoredPos = new Vector2(
                 position.x * PrinterPanel.RectTransform.rect.width,
-                position.y * PrinterPanel.RectTransform.rect.height,
-                PrinterPanel.Content.position.z);
+                position.y * PrinterPanel.RectTransform.rect.height);
 
             PrinterPanel.Content.anchoredPosition = anchoredPos;
+            PrinterPanel.Content.SetPosZ(position.z, true);
         }
 
         protected override Quaternion GetBehaviourRotation ()
@@ -186,9 +187,9 @@ namespace Naninovel
             PrinterPanel.Content.localScale = scale;
         }
 
-        protected override Color GetBehaviourTintColor () => Color.white;
+        protected override Color GetBehaviourTintColor () => PrinterPanel.TintColor;
 
-        protected override void SetBehaviourTintColor (Color tintColor) { }
+        protected override void SetBehaviourTintColor (Color value) => PrinterPanel.TintColor = value;
 
         protected virtual void SetText (string value)
         {
@@ -201,7 +202,7 @@ namespace Naninovel
             PrinterPanel.PrintedText = UsingRichTags ? string.Concat(activeOpenTags, value, activeCloseTags) : value;
         }
 
-        protected virtual void HandleAspectChanged (float aspect)
+        protected virtual void HandleAspectChanged (AspectMonitor monitor)
         {
             // UI printers anchored to canvas borders are moved on aspect change;
             // re-set position here to return them to correct relative positions.
@@ -242,5 +243,5 @@ namespace Naninovel
 
             return result;
         }
-    } 
+    }
 }

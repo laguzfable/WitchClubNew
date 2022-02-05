@@ -1,12 +1,5 @@
 {
   "dependencies": {
-    "com.elringus.naninovel.spreadsheet": {
-      "version": "https://github.com/Naninovel/Spreadsheet.git?path=Assets/NaninovelSpreadsheet",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "fc533851540ef7a6a82a3a03cc1df70aea672d2d"
-    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,
@@ -20,7 +13,7 @@
       "dependencies": {}
     },
     "com.unity.analytics": {
-      "version": "3.3.5",
+      "version": "3.6.12",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -29,14 +22,14 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ext.nunit": {
-      "version": "1.0.0",
+      "version": "1.0.6",
       "depth": 0,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.rider": {
-      "version": "1.1.4",
+      "version": "1.2.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -44,15 +37,24 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.unity.ide.visualstudio": {
+      "version": "2.0.12",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.test-framework": "1.1.9"
+      },
+      "url": "https://packages.unity.com"
+    },
     "com.unity.ide.vscode": {
-      "version": "1.2.3",
+      "version": "1.2.4",
       "depth": 0,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
     "com.unity.multiplayer-hlapi": {
-      "version": "1.0.6",
+      "version": "1.0.8",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -68,18 +70,18 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.test-framework": {
-      "version": "1.1.18",
+      "version": "1.1.29",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.ext.nunit": "1.0.0",
+        "com.unity.ext.nunit": "1.0.6",
         "com.unity.modules.imgui": "1.0.0",
         "com.unity.modules.jsonserialize": "1.0.0"
       },
       "url": "https://packages.unity.com"
     },
     "com.unity.textmeshpro": {
-      "version": "2.1.3",
+      "version": "2.1.4",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -88,10 +90,15 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.timeline": {
-      "version": "1.2.10",
+      "version": "1.2.18",
       "depth": 0,
       "source": "registry",
-      "dependencies": {},
+      "dependencies": {
+        "com.unity.modules.director": "1.0.0",
+        "com.unity.modules.animation": "1.0.0",
+        "com.unity.modules.audio": "1.0.0",
+        "com.unity.modules.particlesystem": "1.0.0"
+      },
       "url": "https://packages.unity.com"
     },
     "com.unity.ugui": {
@@ -104,10 +111,13 @@
       }
     },
     "com.unity.xr.legacyinputhelpers": {
-      "version": "2.1.4",
+      "version": "2.1.8",
       "depth": 0,
       "source": "registry",
-      "dependencies": {},
+      "dependencies": {
+        "com.unity.modules.vr": "1.0.0",
+        "com.unity.modules.xr": "1.0.0"
+      },
       "url": "https://packages.unity.com"
     },
     "nuget.mono-cecil": {

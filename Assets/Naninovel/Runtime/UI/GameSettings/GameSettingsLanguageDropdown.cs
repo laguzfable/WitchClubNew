@@ -1,8 +1,7 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace Naninovel.UI
 {
@@ -52,18 +51,13 @@ namespace Naninovel.UI
             if (scriptPlayer.PlayedScript != null)
             {
                 var stateManager = Engine.GetService<IStateManager>();
-                
-                // Compensate potential difference in inlined commands count of the localization docs.
-                if (scriptPlayer.PlaybackSpot.InlineIndex > 0 && stateManager.Configuration.EnableStateRollback)
-                    if (!await stateManager.RollbackAsync(s => s.PlaybackSpot.InlineIndex == 0))
-                        Debug.LogWarning("Failed to find a suitable state snapshot to rollback when changing locale.");
 
                 // Reload the game to start playing localized version of the scripts.
                 await stateManager.SaveGameAsync(tempSaveSlotId);
                 await stateManager.ResetStateAsync();
                 await scriptManager.ReloadAllScriptsAsync();
                 await stateManager.LoadGameAsync(tempSaveSlotId);
-                stateManager.GameStateSlotManager.DeleteSaveSlot(tempSaveSlotId);
+                stateManager.GameSlotManager.DeleteSaveSlot(tempSaveSlotId);
                 
                 // If possible, rollback to the start of the played line to localize the printed content.
                 await stateManager.RollbackAsync(s => s.PlaybackSpot.InlineIndex == 0);

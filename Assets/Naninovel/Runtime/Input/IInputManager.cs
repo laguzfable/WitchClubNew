@@ -1,5 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
-
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 namespace Naninovel
 {
@@ -26,5 +25,9 @@ namespace Naninovel
         /// Provided UI will no longer block input processing when visible.
         /// </summary>
         void RemoveBlockingUI (UI.IManagedUI ui);
+        /// <summary>
+        /// Whether input sampler with the provided name is currently being sampled.
+        /// </summary>
+        bool IsSampling (string bindingName);
     } 
 }

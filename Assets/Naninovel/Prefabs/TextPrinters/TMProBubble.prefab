@@ -50,7 +50,7 @@ Canvas:
   m_GameObject: {fileID: 1216038347459006}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_Camera: {fileID: 0}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
@@ -60,7 +60,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_TargetDisplay: 0
 --- !u!114 &114943319459938548
 MonoBehaviour:
@@ -103,7 +103,32 @@ MonoBehaviour:
     FontSizes: 19000000ffffffff2300000028000000
   content: {fileID: 7466899038394840338}
   continueInputTriggers:
-  - {fileID: 1734554740612872}
+  - {fileID: 1560104929271160}
+  onTintChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1881303295573737495}
+        m_MethodName: SetColor
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 9076565106240176523}
+        m_MethodName: SetColor
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   authorNamePanel: {fileID: 4432108616081546113}
   authorAvatarImage: {fileID: 0}
   inputIndicator: {fileID: 114522303404012452, guid: 2554d0900e1a69944bdee8b2feb8207b,
@@ -181,7 +206,6 @@ GameObject:
   - component: {fileID: 224487521181179020}
   - component: {fileID: 222492164724932096}
   - component: {fileID: 8196280805373191985}
-  - component: {fileID: 6795425724327824615}
   m_Layer: 5
   m_Name: DialogueText
   m_TagString: Untagged
@@ -300,7 +324,7 @@ MonoBehaviour:
   m_uvLineOffset: 0
   m_geometrySortingOrder: 0
   m_IsTextObjectScaleStatic: 0
-  m_VertexBufferAutoSizeReduction: 1
+  m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
   m_margin: {x: 0, y: 0, z: 0, w: 0}
@@ -312,24 +336,18 @@ MonoBehaviour:
   revealFadeWidth: 100
   slideClipRect: 1
   italicSlantAngle: 10
+  clipRectScale: {x: 1, y: 1}
   rubyVerticalOffset: 1em
   rubySizeScale: 0.5
+  unlockTipsOnPrint: 1
+  tipTemplate: <u>%TIP%</u>
+  onTipClicked:
+    m_PersistentCalls:
+      m_Calls: []
   fixArabicText: 0
   fixArabicFarsi: 1
   fixArabicTextTags: 1
   fixArabicPreserveNumbers: 0
---- !u!225 &6795425724327824615
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1560104929271160}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 0
-  m_BlocksRaycasts: 0
-  m_IgnoreParentGroups: 0
 --- !u!1 &1734554740612872
 GameObject:
   m_ObjectHideFlags: 0

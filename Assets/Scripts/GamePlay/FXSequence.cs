@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UniRx.Async;
+using Naninovel;
 using UnityEngine;
 
 public enum EFXSequenceType { Enemy, Player, UI, None }

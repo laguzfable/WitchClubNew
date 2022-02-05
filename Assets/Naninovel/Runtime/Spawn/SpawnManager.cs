@@ -1,8 +1,8 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel
@@ -11,21 +11,15 @@ namespace Naninovel
     [InitializeAtRuntime]
     public class SpawnManager : IStatefulService<GameStateMap>, ISpawnManager
     {
-        [System.Serializable]
-        public class GameState 
-        { 
-            public List<SpawnedObjectState> SpawnedObjects; 
-        }
-
-        private class SpawnedObject 
-        { 
-            public GameObject Object; 
-            public SpawnedObjectState State; 
+        [Serializable]
+        public class GameState
+        {
+            public List<SpawnedObjectState> SpawnedObjects;
         }
 
         public virtual SpawnConfiguration Configuration { get; }
 
-        private readonly List<SpawnedObject> spawnedObjects = new List<SpawnedObject>();
+        private readonly Dictionary<string, SpawnedObject> spawnedMap = new Dictionary<string, SpawnedObject>();
         private readonly IResourceProviderManager providersManager;
         private ResourceLoader<GameObject> loader;
 
@@ -43,39 +37,56 @@ namespace Naninovel
 
         public virtual void ResetService ()
         {
-            DestroyAllSpawnedObjects();
+            DestroyAllSpawned();
         }
 
         public virtual void DestroyService ()
         {
-            DestroyAllSpawnedObjects();
+            DestroyAllSpawned();
+            loader?.ReleaseAll(this);
         }
 
         public virtual void SaveServiceState (GameStateMap stateMap)
         {
             var state = new GameState {
-                SpawnedObjects = spawnedObjects.Select(o => o.State).ToList()
+                SpawnedObjects = spawnedMap.Values
+                    .Select(o => new SpawnedObjectState(o)).ToList()
             };
             stateMap.SetState(state);
         }
 
-        public virtual UniTask LoadServiceStateAsync (GameStateMap stateMap)
+        public virtual async UniTask LoadServiceStateAsync (GameStateMap stateMap)
         {
             var state = stateMap.GetState<GameState>();
-            if (state?.SpawnedObjects?.Count > 0)
-            {
-                if (spawnedObjects.Count > 0)
-                    foreach (var obj in spawnedObjects.ToList())
-                        if (!state.SpawnedObjects.Exists(o => o.Path.EqualsFast(obj.State.Path)))
-                            DestroySpawnedObject(obj.State.Path);
+            if (state?.SpawnedObjects?.Count > 0) await LoadObjectsAsync();
+            else if (spawnedMap.Count > 0) DestroyAllSpawned();
 
+            async UniTask LoadObjectsAsync ()
+            {
+                var tasks = new List<UniTask>();
+                var toDestroy = spawnedMap.Values.ToList();
                 foreach (var objState in state.SpawnedObjects)
-                    if (!IsObjectSpawned(objState.Path))
-                        SpawnAsync(objState.Path, CancellationToken.LazyCanceled, objState.Parameters).Forget();
-                    else UpdateSpawnedAsync(objState.Path, CancellationToken.LazyCanceled, objState.Parameters).Forget();
+                    if (IsSpawned(objState.Path)) UpdateObject(objState);
+                    else tasks.Add(SpawnObjectAsync(objState));
+                foreach (var obj in toDestroy)
+                    DestroySpawned(obj.Path);
+                await UniTask.WhenAll(tasks);
+
+                async UniTask SpawnObjectAsync (SpawnedObjectState objState)
+                {
+                    var spawned = await SpawnAsync(objState.Path);
+                    objState.ApplyTo(spawned);
+                    spawned.AwaitSpawnAsync().Forget();
+                }
+
+                void UpdateObject (SpawnedObjectState objState)
+                {
+                    var spawned = GetSpawned(objState.Path);
+                    toDestroy.Remove(spawned);
+                    objState.ApplyTo(spawned);
+                    spawned.AwaitSpawnAsync().Forget();
+                }
             }
-            else if (spawnedObjects.Count > 0) DestroyAllSpawnedObjects();
-            return UniTask.CompletedTask;
         }
 
         public virtual async UniTask HoldResourcesAsync (string path, object holder)
@@ -92,109 +103,56 @@ namespace Naninovel
             loader.Release(resourcePath, holder, false);
             if (loader.CountHolders(resourcePath) == 0)
             {
-                if (IsObjectSpawned(path))
-                    DestroySpawnedObject(path);
-                loader.Unload(resourcePath);
+                if (IsSpawned(path))
+                    DestroySpawned(path);
+                loader.Release(resourcePath, holder);
             }
         }
 
-        public virtual async UniTask SpawnAsync (string path, CancellationToken cancellationToken = default, params string[] parameters)
+        public virtual async UniTask<SpawnedObject> SpawnAsync (string path, AsyncToken asyncToken = default)
         {
-            if (IsObjectSpawned(path))
-            {
-                Debug.LogWarning($"Object `{path}` is already spawned and can't be spawned again before it's destroyed.");
-                return;
-            }
+            if (IsSpawned(path)) throw new Exception($"Object `{path}` is already spawned and can't be spawned again before it's destroyed.");
 
             var resourcePath = SpawnConfiguration.ProcessInputPath(path, out _);
             var prefabResource = await loader.LoadAndHoldAsync(resourcePath, this);
-            if (cancellationToken.CancelASAP) return;
-            if (!prefabResource.Valid)
-            {
-                Debug.LogWarning($"Failed to spawn `{resourcePath}`: resource is not valid.");
-                return;
-            }
+            asyncToken.ThrowIfCanceled();
+            if (!prefabResource.Valid) throw new Exception($"Object `{path}` is already spawned and can't be spawned again before it's destroyed.");
 
-            var obj = Engine.Instantiate(prefabResource.Object, path);
-
-            var spawnedObj = new SpawnedObject { Object = obj, State = new SpawnedObjectState(path, parameters) };
-            spawnedObjects.Add(spawnedObj);
-
-            var parameterized = obj.GetComponent<Commands.Spawn.IParameterized>();
-            parameterized?.SetSpawnParameters(parameters);
-
-            var awaitable = obj.GetComponent<Commands.Spawn.IAwaitable>();
-            if (awaitable != null) await awaitable.AwaitSpawnAsync(cancellationToken);
+            var gameObject = Engine.Instantiate(prefabResource.Object, path);
+            var spawnedObject = new SpawnedObject(path, gameObject);
+            spawnedMap[path] = spawnedObject;
+            return spawnedObject;
         }
 
-        public virtual async UniTask UpdateSpawnedAsync (string path, CancellationToken cancellationToken = default, params string[] parameters)
+        public virtual void DestroySpawned (string path)
         {
-            if (!IsObjectSpawned(path)) return;
-
-            var spawnedData = GetSpawnedObject(path);
-            spawnedData.State = new SpawnedObjectState(path, parameters);
-
-            var parameterized = spawnedData.Object.GetComponent<Commands.Spawn.IParameterized>();
-            parameterized?.SetSpawnParameters(parameters);
-
-            var awaitable = spawnedData.Object.GetComponent<Commands.Spawn.IAwaitable>();
-            if (awaitable != null) await awaitable.AwaitSpawnAsync(cancellationToken);
+            if (!IsSpawned(path)) return;
+            var spawnedObject = GetSpawned(path);
+            spawnedMap.Remove(path);
+            ObjectUtils.DestroyOrImmediate(spawnedObject.GameObject);
         }
 
-        public virtual async UniTask<bool> DestroySpawnedAsync (string path, CancellationToken cancellationToken = default, params string[] parameters)
+        public virtual bool IsSpawned (string path)
         {
-            var spawnedObj = GetSpawnedObject(path);
-            if (spawnedObj is null)
-            {
-                Debug.LogWarning($"Failed to destroy spawned object `{path}`: the object is not found.");
-                return false;
-            }
-
-            var parameterized = spawnedObj.Object.GetComponent<Commands.DestroySpawned.IParameterized>();
-            parameterized?.SetDestroyParameters(parameters);
-
-            var awaitable = spawnedObj.Object.GetComponent<Commands.DestroySpawned.IAwaitable>();
-            if (awaitable != null) await awaitable.AwaitDestroyAsync(cancellationToken);
-            if (cancellationToken.CancelASAP) return false;
-
-            return DestroySpawnedObject(path);
+            if (string.IsNullOrEmpty(path)) return false;
+            return spawnedMap.ContainsKey(path);
         }
 
-        public virtual bool DestroySpawnedObject (string path)
+        public virtual IReadOnlyCollection<SpawnedObject> GetAllSpawned ()
         {
-            var spawnedObj = GetSpawnedObject(path);
-            if (spawnedObj is null)
-            {
-                Debug.LogWarning($"Failed to destroy spawned object `{path}`: the object is not found.");
-                return false;
-            }
-
-            var removed = spawnedObjects?.Remove(spawnedObj);
-            ObjectUtils.DestroyOrImmediate(spawnedObj.Object);
-
-            var resourcePath = SpawnConfiguration.ProcessInputPath(path, out _);
-            loader.Release(resourcePath, this);
-
-            return removed ?? false;
+            return spawnedMap.Values;
         }
 
-        public virtual void DestroyAllSpawnedObjects ()
+        public virtual SpawnedObject GetSpawned (string path)
         {
-            foreach (var spawnedObj in spawnedObjects)
-                ObjectUtils.DestroyOrImmediate(spawnedObj.Object);
-            spawnedObjects.Clear();
-
-            loader?.ReleaseAll(this);
+            return spawnedMap[path];
         }
 
-        public virtual bool IsObjectSpawned (string path)
+        protected virtual void DestroyAllSpawned ()
         {
-            return spawnedObjects?.Exists(o => o.State.Path.EqualsFast(path)) ?? false;
-        }
-
-        private SpawnedObject GetSpawnedObject (string path)
-        {
-            return spawnedObjects?.FirstOrDefault(o => o.State.Path.EqualsFast(path));
+            foreach (var spawnedObj in spawnedMap.Values)
+                ObjectUtils.DestroyOrImmediate(spawnedObj.GameObject);
+            spawnedMap.Clear();
         }
     }
 }

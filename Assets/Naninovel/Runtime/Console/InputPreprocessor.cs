@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
@@ -35,7 +35,7 @@ namespace Naninovel
         /// Adds the provided delegate as the input preprocessor.
         /// The delegate will be invoked before processing the console input.
         /// The only argument is the console input string. The return is the result of the preprocessing.
-        /// When null is returned, the input won't be processed further.
+        /// When null is retured, the input won't be processed further.
         /// </summary>
         public static bool AddPreprocessor (Func<string, string> preprocessor)
         {

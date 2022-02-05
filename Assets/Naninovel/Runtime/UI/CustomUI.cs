@@ -1,10 +1,9 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
-using UniRx.Async;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -89,7 +88,7 @@ namespace Naninovel.UI
             }
         }
 
-        public void SetFontSize (int dropdownIndex)
+        public virtual void SetFontSize (int dropdownIndex)
         {
             if (FontChangeConfigurations is null || FontChangeConfigurations.Count == 0) return;
 
@@ -191,7 +190,7 @@ namespace Naninovel.UI
             {
                 if (scriptPlayer.SkipActive && !(AllowedSamplers?.Contains(InputConfiguration.SkipName) ?? false))
                     scriptPlayer.SetSkipEnabled(false);
-                if (scriptPlayer.AutoPlayActive && !(AllowedSamplers?.Contains(InputConfiguration.AutoPlayName) ?? false)) 
+                if (scriptPlayer.AutoPlayActive && !(AllowedSamplers?.Contains(InputConfiguration.AutoPlayName) ?? false))
                     scriptPlayer.SetAutoPlayEnabled(false);
             }
         }
@@ -208,7 +207,7 @@ namespace Naninovel.UI
                     item.DefaultFont = text.font;
                 }
                 if (item.Object.TryGetComponent<TextMeshProUGUI>(out var tmproText))
-                { 
+                {
                     item.DefaultSize = (int)tmproText.fontSize;
                     item.DefaultTMPFont = tmproText.font;
                 }

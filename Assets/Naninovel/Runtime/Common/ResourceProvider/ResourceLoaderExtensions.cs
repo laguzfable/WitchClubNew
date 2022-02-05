@@ -1,7 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System.Collections.Generic;
-using UniRx.Async;
 
 namespace Naninovel
 {
@@ -45,7 +44,7 @@ namespace Naninovel
         /// <summary>
         /// Attempts to load all the available resources (optionally) filtered by a base path and holds each of them.
         /// </summary>
-        public static async UniTask<IReadOnlyCollection<Resource>> LoadAndHoldAllAsync<TResource> (this IResourceLoader<TResource> loader, object holder, string path = null)
+        public static async UniTask<IReadOnlyCollection<Resource<TResource>>> LoadAndHoldAllAsync<TResource> (this IResourceLoader<TResource> loader, object holder, string path = null)
             where TResource : UnityEngine.Object
         {
             var resources = await loader.LoadAllAsync(path);

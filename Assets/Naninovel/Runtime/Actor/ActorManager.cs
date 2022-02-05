@@ -1,9 +1,8 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel
@@ -46,7 +45,7 @@ namespace Naninovel
 
         public event Action<string> OnActorAdded;
         public event Action<string> OnActorRemoved;
-        
+
         public TConfig Configuration { get; }
         public ActorManagerConfiguration ActorManagerConfiguration => Configuration;
 
@@ -136,7 +135,7 @@ namespace Naninovel
             pendingAddActorTasks.Remove(actorId);
 
             OnActorAdded?.Invoke(actorId);
-            
+
             return constructedActor;
         }
 
@@ -157,7 +156,7 @@ namespace Naninovel
 
         public virtual TActor GetActor (string actorId)
         {
-            if (!ActorExists(actorId)) 
+            if (!ActorExists(actorId))
                 throw new Exception($"Can't find '{actorId}' actor.");
 
             return ManagedActors[actorId];
@@ -174,11 +173,11 @@ namespace Naninovel
         public virtual void RemoveActor (string actorId)
         {
             if (!ActorExists(actorId)) return;
-            
+
             var actor = GetActor(actorId);
             ManagedActors.Remove(actor.Id);
             (actor as IDisposable)?.Dispose();
-            
+
             OnActorRemoved?.Invoke(actorId);
         }
 
@@ -216,8 +215,9 @@ namespace Naninovel
             catch { throw new Exception($"Failed to create instance of `{implementationType.FullName}` actor. Make sure the implementation has a compatible constructor."); }
 
             await actor.InitializeAsync();
+            new TState().ApplyToActor(actor);
 
             return actor;
         }
-    } 
+    }
 }

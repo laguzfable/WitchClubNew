@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using UnityEngine;
 
@@ -36,8 +36,8 @@ namespace Naninovel.UI
         /// </summary>
         /// <param name="count">Number of characters to reveal.</param>
         /// <param name="duration">Duration of the reveal per character, in seconds.</param>
-        /// <param name="cancellationToken">The reveal should be canceled ASAP when requested.</param>
-        void RevealNextChars (int count, float duration, CancellationToken cancellationToken);
+        /// <param name="asyncToken">The reveal should be canceled ASAP when requested.</param>
+        void RevealNextChars (int count, float duration, AsyncToken asyncToken);
         /// <summary>
         /// Returns position (in world space) of the last revealed <see cref="Text"/> character.
         /// </summary>
@@ -46,5 +46,9 @@ namespace Naninovel.UI
         /// Returns last revealed visible (excluding formatting tags) <see cref="Text"/> character.
         /// </summary>
         char GetLastRevealedChar ();
+        /// <summary>
+        /// Renders the reveal effect.
+        /// </summary>
+        void Render ();
     }
 }

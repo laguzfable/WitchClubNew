@@ -1,15 +1,15 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
 
 namespace Naninovel.UI
 {
     public class ExternalScriptsBrowserPanel : ScriptNavigatorPanel, IExternalScriptsUI
     {
-        protected override async UniTask LoadScriptsAsync ()
+        public override async UniTask LocateScriptsAsync (AsyncToken asyncToken = default)
         {
-            var scripts = await ScriptManager.LoadExternalScriptsAsync();
+            var scripts = await ScriptManager.LocateExternalScriptsAsync();
+            asyncToken.ThrowIfCanceled();
             GenerateScriptButtons(scripts);
         }
-    } 
+    }
 }

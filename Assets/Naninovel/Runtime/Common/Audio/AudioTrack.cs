@@ -1,7 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
-using UniRx.Async;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -42,10 +41,16 @@ namespace Naninovel
         /// Starts playing the track.
         /// </summary>
         void Play ();
+
         /// <summary>
         /// Stops playing the track.
         /// </summary>
         void Stop ();
+
+        /// <summary>
+        /// Fades <see cref="Volume"/> to the provided value over the specified time, in seconds.
+        /// </summary>
+        UniTask FadeAsync (float volume, float fadeTime, AsyncToken asyncToken = default);
     }
 
     /// <summary>
@@ -103,14 +108,14 @@ namespace Naninovel
             OnPlay?.Invoke();
         }
 
-        public async UniTask PlayAsync (float fadeInTime, CancellationToken cancellationToken = default)
+        public async UniTask PlayAsync (float fadeInTime, AsyncToken asyncToken = default)
         {
             CompleteAllRunners();
             if (!Valid) return;
 
             if (!Playing) Play();
-            var tween = new FloatTween(0, Volume, fadeInTime, volume => Volume = volume, target: Source);
-            await volumeTweener.RunAsync(tween, cancellationToken);
+            var tween = new FloatTween(0, Volume, fadeInTime, volume => Volume = volume);
+            await volumeTweener.RunAsync(tween, asyncToken, Source);
         }
 
         public void Stop ()
@@ -123,24 +128,23 @@ namespace Naninovel
             OnStop?.Invoke();
         }
 
-        public async UniTask StopAsync (float fadeOutTime, CancellationToken cancellationToken = default)
+        public async UniTask StopAsync (float fadeOutTime, AsyncToken asyncToken = default)
         {
             CompleteAllRunners();
             if (!Valid) return;
 
-            var tween = new FloatTween(Volume, 0, fadeOutTime, volume => Volume = volume, target: Source);
-            await volumeTweener.RunAsync(tween, cancellationToken);
-            if (cancellationToken.CancelASAP) return;
+            var tween = new FloatTween(Volume, 0, fadeOutTime, volume => Volume = volume);
+            await volumeTweener.RunAsync(tween, asyncToken, Source);
             Stop();
         }
 
-        public async UniTask FadeAsync (float volume, float fadeTime, CancellationToken cancellationToken = default)
+        public async UniTask FadeAsync (float volume, float fadeTime, AsyncToken asyncToken = default)
         {
             CompleteAllRunners();
             if (!Valid) return;
 
-            var tween = new FloatTween(Volume, volume, fadeTime, v => Volume = v, target: Source);
-            await volumeTweener.RunAsync(tween, cancellationToken);
+            var tween = new FloatTween(Volume, volume, fadeTime, v => Volume = v);
+            await volumeTweener.RunAsync(tween, asyncToken, Source);
         }
 
         private void CompleteAllRunners ()

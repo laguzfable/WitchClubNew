@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
@@ -41,9 +41,47 @@ namespace Naninovel
             return array.Length > 0 && index >= 0 && index < array.Length;
         }
 
-        public static bool IsIndexValid<T> (this IList<T> list, int index)
+        public static bool IsIndexValid<T> (this List<T> list, int index)
         {
             return list.Count > 0 && index >= 0 && index < list.Count;
+        }
+
+        public static bool IsIndexValid<T> (this IReadOnlyCollection<T> list, int index)
+        {
+            return list.Count > 0 && index >= 0 && index < list.Count;
+        }
+
+        public static int IndexOf<T> (this IReadOnlyList<T> list, T itemToFind)
+        {
+            var i = 0;
+            foreach (T item in list)
+            {
+                if (Equals(item, itemToFind)) return i;
+                i++;
+            }
+            return -1;
+        }
+
+        public static int IndexOf<T> (this IList<T> list, Predicate<T> predicate)
+        {
+            var i = 0;
+            foreach (T item in list)
+            {
+                if (predicate(item)) return i;
+                i++;
+            }
+            return -1;
+        }
+
+        public static int IndexOf<T> (this IReadOnlyList<T> list, Predicate<T> predicate)
+        {
+            var i = 0;
+            foreach (T item in list)
+            {
+                if (predicate(item)) return i;
+                i++;
+            }
+            return -1;
         }
 
         public static T Random<T> (this IList<T> list)
@@ -78,12 +116,12 @@ namespace Naninovel
             list[indexB] = tmp;
             return list;
         }
-        
-        public static int RemoveAll<T>(this LinkedList<T> list, Predicate<T> match)
+
+        public static int RemoveAll<T> (this LinkedList<T> list, Predicate<T> match)
         {
             if (list == null) throw new ArgumentNullException(nameof(list));
             if (match == null) throw new ArgumentNullException(nameof(match));
-            
+
             var count = 0;
             var node = list.First;
             while (node != null)
@@ -122,7 +160,7 @@ namespace Naninovel
 
                 if (alreadyVisited)
                 {
-                    if (inProcess && warnCyclic) 
+                    if (inProcess && warnCyclic)
                         Debug.LogWarning($"Cyclic dependency found while performing topological ordering of {typeof(T).Name}.");
                 }
                 else
@@ -168,7 +206,7 @@ namespace Naninovel
         {
             var prop = property.Invoke(obj);
             if (propertyComparer != null) return propertyComparer.GetHashCode(prop);
-            return (prop == null) ? 0 : prop.GetHashCode();
+            return prop == null ? 0 : prop.GetHashCode();
         }
     }
 
@@ -188,7 +226,8 @@ namespace Naninovel
             if (first == null || second == null) return false;
             if (first.Length != second.Length) return false;
             for (int i = 0; i < first.Length; i++)
-                if (!ITEMS_COMPARER.Equals(first[i], second[i])) return false;
+                if (!ITEMS_COMPARER.Equals(first[i], second[i]))
+                    return false;
             return true;
         }
 

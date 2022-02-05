@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8902765046121747196}
   - component: {fileID: 6572273385375048379}
   m_Layer: 5
-  m_Name: ActorNameText
+  m_Name: AuthorPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -414,10 +414,37 @@ MonoBehaviour:
   onHide:
     m_PersistentCalls:
       m_Calls: []
-  messageText: {fileID: 3072607957971657760}
-  actorNameText: {fileID: 171108238312855663}
+  authorPanel: {fileID: 704182034645755553}
   playVoiceButton: {fileID: 5368557026689653552}
   rollbackButton: {fileID: 2653686865300820875}
+  onMessageChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 3072607957971657760}
+        m_MethodName: set_text
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onAuthorChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 171108238312855663}
+        m_MethodName: set_text
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &4352266858620148058
 GameObject:
   m_ObjectHideFlags: 0
@@ -430,7 +457,7 @@ GameObject:
   - component: {fileID: 4295141719496388099}
   - component: {fileID: 171108238312855663}
   m_Layer: 5
-  m_Name: Text
+  m_Name: AuthorText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -613,7 +640,7 @@ GameObject:
   - component: {fileID: 2961042385880018731}
   - component: {fileID: 712828859072161510}
   m_Layer: 5
-  m_Name: ActorNamePanel
+  m_Name: ControlPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

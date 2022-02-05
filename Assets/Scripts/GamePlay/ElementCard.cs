@@ -6,9 +6,9 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using DG.Tweening;
 using TMPro;
-using UniRx.Async;
 using System.Threading;
 using System;
+using Naninovel;
 
 public enum ECardElement { Blue, Red, Yellow, Green, None }
 

@@ -1,8 +1,7 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
+using System.Collections.Generic;
 using Naninovel.UI;
-using System;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel
@@ -29,17 +28,16 @@ namespace Naninovel
         /// </summary>
         /// <param name="prefab">The prefab to spawn. Should have a <see cref="IManagedUI"/> component attached to the root object.</param>
         /// <param name="name">Unique name of the UI. When not provided will use the prefab name.</param>
-        UniTask<IManagedUI> InstantiatePrefabAsync (GameObject prefab, string name = default);
+        UniTask<IManagedUI> AddUIAsync (GameObject prefab, string name = default);
+        /// <summary>
+        /// Returns all the UIs managed by the service.
+        /// </summary>
+        IReadOnlyCollection<IManagedUI> GetManagedUIs ();
         /// <summary>
         /// Returns a managed UI of the provided type <typeparamref name="T"/>.
         /// Results per requested types are cached, so it's fine to use this method frequently.
         /// </summary>
         T GetUI<T> () where T : class, IManagedUI;
-        /// <summary>
-        /// Returns a managed UI of the provided type.
-        /// Results per requested types are cached, so it's fine to use this method frequently.
-        /// </summary>
-        IManagedUI GetUI (Type type);
         /// <summary>
         /// Returns a managed UI of the provided UI resource name.
         /// </summary>
@@ -50,10 +48,6 @@ namespace Naninovel
         /// <param name="managedUI">Managed UI instance to remove.</param>
         /// <returns>Whether the UI was successfully removed.</returns>
         bool RemoveUI (IManagedUI managedUI);
-        /// <summary>
-        /// Applies provided render mode and camera for all the managed UI objects.
-        /// </summary>
-        void SetRenderMode (RenderMode renderMode, Camera renderCamera);
         /// <summary>
         /// Controls whether the UI (as a whole) is rendered (visible); won't affect visibility state of any particular UI.
         /// Will also spawn <see cref="ClickThroughPanel"/>, which will block input to prevent user from re-showing the UI,

@@ -1,19 +1,23 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
+using UnityEngine;
 
 namespace Naninovel.UI
 {
     public class LoadingPanel : CustomUI, ILoadingUI
     {
+        [Tooltip("Event invoked when script preload progress is changed, in 0.0 to 1.0 range.")]
+        [SerializeField] private FloatUnityEvent onProgressChanged;
+
         private IStateManager stateManager;
-        private IInputManager inputManager;
+        private IScriptPlayer scriptPlayer;
 
         protected override void Awake ()
         {
             base.Awake();
 
             stateManager = Engine.GetService<IStateManager>();
-            inputManager = Engine.GetService<IInputManager>();
+            scriptPlayer = Engine.GetService<IScriptPlayer>();
         }
 
         protected override void OnEnable ()
@@ -24,7 +28,7 @@ namespace Naninovel.UI
             stateManager.OnGameLoadFinished += HandleLoadFinished;
             stateManager.OnResetStarted += Show;
             stateManager.OnResetFinished += Hide;
-            inputManager.AddBlockingUI(this);
+            scriptPlayer.OnPreloadProgress += HandleProgressChanged;
         }
 
         protected override void OnDisable ()
@@ -38,10 +42,19 @@ namespace Naninovel.UI
                 stateManager.OnResetStarted -= Show;
                 stateManager.OnResetFinished -= Hide;
             }
-            inputManager?.RemoveBlockingUI(this);
+
+            if (scriptPlayer != null)
+                scriptPlayer.OnPreloadProgress -= HandleProgressChanged;
         }
 
-        private void HandleLoadStarted (GameSaveLoadArgs args) => Show();
-        private void HandleLoadFinished (GameSaveLoadArgs args) => Hide();
+        protected override void HandleVisibilityChanged (bool visible)
+        {
+            base.HandleVisibilityChanged(visible);
+            onProgressChanged?.Invoke(0);
+        }
+
+        protected virtual void HandleLoadStarted (GameSaveLoadArgs args) => Show();
+        protected virtual void HandleLoadFinished (GameSaveLoadArgs args) => Hide();
+        protected virtual void HandleProgressChanged (float value) => onProgressChanged?.Invoke(value);
     }
 }

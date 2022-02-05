@@ -1,10 +1,9 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 #if ADDRESSABLES_AVAILABLE
 
 using System;
 using System.Collections.Generic;
-using UniRx.Async;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.ResourceLocations;
@@ -36,7 +35,7 @@ namespace Naninovel
             {
                 var task = Addressables.LoadAssetAsync<TResource>(resourceAddress);
                 while (!task.IsDone) // When awaiting the method directly it fails on WebGL (they're using multithreaded Task fot GetAwaiter)
-                    await AsyncUtils.WaitEndOfFrame;
+                    await AsyncUtils.WaitEndOfFrameAsync();
                 asset = task.Result;
             }
 

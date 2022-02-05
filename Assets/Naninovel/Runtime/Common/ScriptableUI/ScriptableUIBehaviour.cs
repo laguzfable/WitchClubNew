@@ -1,7 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
-using UniRx.Async;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -13,7 +12,11 @@ namespace Naninovel
     /// </summary>
     public class ScriptableUIBehaviour : UIBehaviour
     {
-        public enum FocusMode { Visibility, Navigation }
+        public enum FocusMode
+        {
+            Visibility,
+            Navigation
+        }
 
         /// <summary>
         /// Event invoked when visibility of the UI changes.
@@ -64,7 +67,7 @@ namespace Naninovel
         /// <summary>
         /// Topmost parent (in the game object hierarchy) canvas component.
         /// </summary>
-        public virtual Canvas TopmostCanvas => ObjectUtils.IsValid(topmostCanvasCache) ? topmostCanvasCache : (topmostCanvasCache = gameObject.FindTopmostComponent<Canvas>());
+        public virtual Canvas TopmostCanvas => ObjectUtils.IsValid(topmostCanvasCache) ? topmostCanvasCache : topmostCanvasCache = gameObject.FindTopmostComponent<Canvas>();
         /// <summary>
         /// Current sort order of the UI element, as per <see cref="TopmostCanvas"/>.
         /// </summary>
@@ -110,7 +113,7 @@ namespace Naninovel
         /// <summary>
         /// Gradually changes <see cref="Visible"/> with fade animation over <see cref="FadeTime"/> or specified time (in seconds).
         /// </summary>
-        public virtual async UniTask ChangeVisibilityAsync (bool visible, float? duration = null, CancellationToken cancellationToken = default)
+        public virtual async UniTask ChangeVisibilityAsync (bool visible, float? duration = null, AsyncToken asyncToken = default)
         {
             if (fadeTweener.Running)
                 fadeTweener.Stop();
@@ -122,10 +125,7 @@ namespace Naninovel
             if (!CanvasGroup) return;
 
             if (!disableInteraction)
-            {
-                CanvasGroup.interactable = visible;
                 CanvasGroup.blocksRaycasts = visible;
-            }
 
             if (!controlOpacity) return;
 
@@ -138,8 +138,8 @@ namespace Naninovel
                 return;
             }
 
-            var tween = new FloatTween(CanvasGroup.alpha, targetOpacity, fadeDuration, SetOpacity, IgnoreTimeScale, target: this);
-            await fadeTweener.RunAsync(tween, cancellationToken);
+            var tween = new FloatTween(CanvasGroup.alpha, targetOpacity, fadeDuration, SetOpacity, IgnoreTimeScale);
+            await fadeTweener.RunAsync(tween, asyncToken, this);
         }
 
         /// <summary>
@@ -157,10 +157,7 @@ namespace Naninovel
             if (!CanvasGroup) return;
 
             if (!disableInteraction)
-            {
-                CanvasGroup.interactable = visible;
                 CanvasGroup.blocksRaycasts = visible;
-            }
 
             if (controlOpacity)
                 CanvasGroup.alpha = visible ? 1f : 0f;
@@ -239,10 +236,7 @@ namespace Naninovel
             CanvasGroup = GetComponent<CanvasGroup>();
 
             if (CanvasGroup && disableInteraction)
-            {
-                CanvasGroup.interactable = false;
                 CanvasGroup.blocksRaycasts = false;
-            }
 
             SetVisibility(VisibleOnAwake);
         }
@@ -278,31 +272,53 @@ namespace Naninovel
 
         protected virtual void HandleNavigationFocus ()
         {
-            if (focusMode != FocusMode.Navigation || !ObjectUtils.IsValid(FocusOnNavigation) || !Visible || !EventSystem.current) return;
+            if (focusMode != FocusMode.Navigation || !FocusOnNavigation || !Visible || !EventSystem.current) return;
 
-            var navDown = false;
-
-            // ReSharper disable ConditionIsAlwaysTrueOrFalse
-            #if ENABLE_INPUT_SYSTEM && INPUT_SYSTEM_AVAILABLE
-            var gamepad = UnityEngine.InputSystem.Gamepad.current;
-            if (gamepad != null && !navDown)
-                navDown = gamepad.dpad.up.wasPressedThisFrame || gamepad.dpad.down.wasPressedThisFrame || gamepad.dpad.left.wasPressedThisFrame || gamepad.dpad.right.wasPressedThisFrame;
-            var keyboard = UnityEngine.InputSystem.Keyboard.current;
-            if (keyboard != null && !navDown)
-                navDown = keyboard.downArrowKey.wasPressedThisFrame || keyboard.upArrowKey.wasPressedThisFrame || keyboard.leftArrowKey.wasPressedThisFrame || keyboard.rightArrowKey.wasPressedThisFrame;
-            #endif
-
-            #if ENABLE_LEGACY_INPUT_MANAGER
-            if (!navDown)
-                navDown = Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow);
-            #endif
-            // ReSharper restore ConditionIsAlwaysTrueOrFalse
-
-            if (navDown)
+            if (SampleInputSystemNavigation() || SampleLegacyInputNavigation())
             {
                 EventSystem.current.SetSelectedGameObject(FocusOnNavigation);
                 FocusOnNavigation = null;
             }
+        }
+
+        protected virtual bool SampleInputSystemNavigation ()
+        {
+            #if ENABLE_INPUT_SYSTEM && INPUT_SYSTEM_AVAILABLE
+            return UnityEngine.InputSystem.Gamepad.current is UnityEngine.InputSystem.Gamepad gamepad &&
+                   (gamepad.leftStick.up.wasPressedThisFrame ||
+                    gamepad.leftStick.down.wasPressedThisFrame ||
+                    gamepad.leftStick.left.wasPressedThisFrame ||
+                    gamepad.leftStick.right.wasPressedThisFrame ||
+                    gamepad.dpad.up.wasPressedThisFrame ||
+                    gamepad.dpad.down.wasPressedThisFrame ||
+                    gamepad.dpad.left.wasPressedThisFrame ||
+                    gamepad.dpad.right.wasPressedThisFrame) ||
+                   // Generic HID gamepads are detected as joysticks by the input system.
+                   UnityEngine.InputSystem.Joystick.current is UnityEngine.InputSystem.Joystick joystick &&
+                   (joystick.stick.up.wasPressedThisFrame ||
+                    joystick.stick.down.wasPressedThisFrame ||
+                    joystick.stick.left.wasPressedThisFrame ||
+                    joystick.stick.right.wasPressedThisFrame) ||
+                   UnityEngine.InputSystem.Keyboard.current is UnityEngine.InputSystem.Keyboard keyboard &&
+                   (keyboard.downArrowKey.wasPressedThisFrame ||
+                    keyboard.upArrowKey.wasPressedThisFrame ||
+                    keyboard.leftArrowKey.wasPressedThisFrame ||
+                    keyboard.rightArrowKey.wasPressedThisFrame);
+            #else
+            return false;
+            #endif
+        }
+
+        protected virtual bool SampleLegacyInputNavigation ()
+        {
+            #if ENABLE_LEGACY_INPUT_MANAGER
+            return Input.GetKeyDown(KeyCode.UpArrow) ||
+                   Input.GetKeyDown(KeyCode.DownArrow) ||
+                   Input.GetKeyDown(KeyCode.LeftArrow) ||
+                   Input.GetKeyDown(KeyCode.RightArrow);
+            #else
+            return false;
+            #endif
         }
 
         private RectTransform GetRectTransform ()

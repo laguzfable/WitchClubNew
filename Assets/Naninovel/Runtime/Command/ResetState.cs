@@ -1,7 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System.Linq;
-using UniRx.Async;
 
 namespace Naninovel.Commands
 {
@@ -14,17 +13,6 @@ namespace Naninovel.Commands
     /// <br/><br/>
     /// Be aware, that this command can not be undone (rewound back).
     /// </remarks>
-    /// <example>
-    /// ; Reset all the services.
-    /// @resetState
-    /// 
-    /// ; Reset all the services except custom variable and audio managers,
-    /// ; allowing currently played audio tracks continue playing.
-    /// @resetState ICustomVariableManager,IAudioManager
-    /// 
-    /// ; Reset only the `ICharacterManager` and `IBackgroundManager` services.
-    /// @resetState only:ICharacterManager,IBackgroundManager
-    /// </example>
     public class ResetState : Command, Command.IForceWait
     {
         /// <summary>
@@ -39,12 +27,12 @@ namespace Naninovel.Commands
         /// </summary>
         public StringListParameter Only;
 
-        public override async UniTask ExecuteAsync (CancellationToken cancellationToken = default)
+        public override async UniTask ExecuteAsync (AsyncToken asyncToken = default)
         {
             if (Assigned(Exclude)) await Engine.GetService<IStateManager>().ResetStateAsync(Exclude);
             else if (Assigned(Only))
             {
-                var serviceTypes = Engine.GetAllServices<IEngineService>().Select(s => s.GetType()).ToArray();
+                var serviceTypes = Engine.FindAllServices<IEngineService>().Select(s => s.GetType()).ToArray();
                 var onlyTypeNames = Only.Value.Select(v => v.Value);
                 var onlyTypes = serviceTypes.Where(t => onlyTypeNames.Any(ot => ot == t.Name || t.GetInterface(ot) != null));
                 var excludeTypes = serviceTypes.Where(t => !onlyTypes.Any(ot => ot.IsAssignableFrom(t))).ToArray();

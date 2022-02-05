@@ -1,8 +1,7 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.IO;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel
@@ -29,10 +28,29 @@ namespace Naninovel
         protected abstract bool Binary { get; }
         protected abstract string Extension { get; }
 
-        protected void InvokeOnBeforeSave () { Saving = true; OnBeforeSave?.Invoke(); }
-        protected void InvokeOnSaved () { Saving = false; OnSaved?.Invoke(); }
-        protected void InvokeOnBeforeLoad () { Loading = true; OnBeforeLoad?.Invoke(); }
-        protected void InvokeOnLoaded () { Loading = false; OnLoaded?.Invoke(); }
+        protected void InvokeOnBeforeSave ()
+        {
+            Saving = true;
+            OnBeforeSave?.Invoke();
+        }
+
+        protected void InvokeOnSaved ()
+        {
+            Saving = false;
+            OnSaved?.Invoke();
+        }
+
+        protected void InvokeOnBeforeLoad ()
+        {
+            Loading = true;
+            OnBeforeLoad?.Invoke();
+        }
+
+        protected void InvokeOnLoaded ()
+        {
+            Loading = false;
+            OnLoaded?.Invoke();
+        }
     }
 
     /// <summary>
@@ -51,7 +69,7 @@ namespace Naninovel
         public async UniTask SaveAsync (string slotId, TData data)
         {
             while (saveInProgress && Application.isPlaying)
-                await AsyncUtils.WaitEndOfFrame;
+                await AsyncUtils.WaitEndOfFrameAsync();
 
             saveInProgress = true;
 
@@ -140,7 +158,7 @@ namespace Naninovel
 
         protected virtual string GetGameDataPath ()
         {
-            #if UNITY_STANDALONE || UNITY_EDITOR
+            #if UNITY_EDITOR
             return Application.dataPath;
             #else
             return Application.persistentDataPath;

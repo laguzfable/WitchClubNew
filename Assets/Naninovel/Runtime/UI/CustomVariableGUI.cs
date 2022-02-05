@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
@@ -39,6 +39,12 @@ namespace Naninovel.UI
                 instance = Engine.CreateObject<CustomVariableGUI>(nameof(CustomVariableGUI));
             show = !show;
             if (show) instance.UpdateRecords();
+        }
+        
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetOnPlayMode ()
+        {
+            show = false;
         }
 
         private void Awake ()

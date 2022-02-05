@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
@@ -49,7 +49,7 @@ namespace Naninovel
                     if (!int.TryParse(indexString[1], out var index))
                         throw new FormatException($"Property path '{propertyPath}' is malformed.");
 
-                    if (i == (paths.Length - 1)) // Our property is an array.
+                    if (i == paths.Length - 1) // Our property is an array.
                     {
                         var targetArray = (System.Collections.IList)targetObject;
                         return (TValue)targetArray[index];
@@ -119,7 +119,7 @@ namespace Naninovel
                     if (!int.TryParse(indexString[1], out var index))
                         throw new FormatException($"Property path '{propertyPath}' is malformed.");
 
-                    if (i == (paths.Length - 1)) // Our property is an array.
+                    if (i == paths.Length - 1) // Our property is an array.
                     {
                         var targetArray = (System.Collections.IList)targetObject;
                         targetArray[index] = value;
@@ -336,6 +336,40 @@ namespace Naninovel
             EditorGUI.showMixedValue = false;
         }
 
+        public static void FolderField (SerializedProperty property, bool local = true,
+            string title = default, string defaultPath = default)
+        {
+            PathField(property, (t, p) => EditorUtility.OpenFolderPanel(t, p, ""), local, title, defaultPath);
+        }
+
+        public static void FileField (SerializedProperty property, string extension, bool local = true,
+            string title = default, string defaultPath = default)
+        {
+            PathField(property, (t, p) => EditorUtility.OpenFilePanel(t, p, extension), local, title, defaultPath);
+        }
+
+        public static void FileField (SerializedProperty property, string[] filters, bool local = true,
+            string title = default, string defaultPath = default)
+        {
+            PathField(property, (t, p) => EditorUtility.OpenFilePanelWithFilters(t, p, filters), local, title, defaultPath);
+        }
+
+        public static void PathField (SerializedProperty property, Func<string, string, string> openPanel,
+            bool local = false, string title = default, string defaultPath = default)
+        {
+            if (title is null) title = property.displayName;
+            if (defaultPath is null) defaultPath = Application.dataPath;
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.PropertyField(property);
+            if (GUILayout.Button("Select", EditorStyles.miniButton, GUILayout.Width(65)))
+            {
+                var path = openPanel(title, defaultPath);
+                if (local) path = PathUtils.AbsoluteToAssetPath(path);
+                property.stringValue = path;
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
         /// <summary>
         /// Creates a new folder in the project's `Assets` directory. 
         /// Path should be relative to the project (starting with `Assets/`).
@@ -343,14 +377,14 @@ namespace Naninovel
         public static void CreateFolderAsset (string assetPath)
         {
             EnsureFolderIsCreatedRecursively(assetPath);
-        }
 
-        private static void EnsureFolderIsCreatedRecursively (string targetFolder)
-        {
-            if (!AssetDatabase.IsValidFolder(targetFolder))
+            void EnsureFolderIsCreatedRecursively (string targetFolder)
             {
-                EnsureFolderIsCreatedRecursively(Path.GetDirectoryName(targetFolder));
-                AssetDatabase.CreateFolder(Path.GetDirectoryName(targetFolder), Path.GetFileName(targetFolder));
+                if (!AssetDatabase.IsValidFolder(targetFolder))
+                {
+                    EnsureFolderIsCreatedRecursively(Path.GetDirectoryName(targetFolder));
+                    AssetDatabase.CreateFolder(Path.GetDirectoryName(targetFolder), Path.GetFileName(targetFolder));
+                }
             }
         }
     }

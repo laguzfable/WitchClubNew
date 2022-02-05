@@ -1,10 +1,8 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using UnityEngine;
 
 namespace Naninovel
 {
@@ -43,30 +41,6 @@ namespace Naninovel
             }
 
             return records;
-        }
-
-        /// <summary>
-        /// Applies provided record values to the static 
-        /// <see cref="ManagedTextAttribute"/> <see cref="string"/> fields in the application domain.
-        /// </summary>
-        public static void ApplyRecords (HashSet<ManagedTextRecord> records)
-        {
-            foreach (var record in records)
-            {
-                var key = record.Key;
-                var value = record.Value;
-
-                var typeFullName = key.GetBeforeLast(".") ?? key;
-                var fieldName = key.GetAfter(".") ?? key;
-
-                var type = Engine.Types.FirstOrDefault(t => t.FullName.EqualsFast(typeFullName));
-                if (type is null) continue;
-
-                var fieldInfo = type.GetField(fieldName, ManagedFieldBindings);
-                if (fieldInfo is null) { Debug.LogWarning($"Failed to apply managed text record value to '{typeFullName}.{fieldName}' field."); continue; }
-
-                fieldInfo.SetValue(null, value);
-            }
         }
     }
 }

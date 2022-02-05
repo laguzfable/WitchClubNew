@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
@@ -60,7 +60,7 @@ namespace Naninovel
             this.onSelectScript = onSelectScript;
             this.autoPlay = autoPlay;
         }
-
+        
         public override bool Equals (object obj) => obj is ChoiceState state && Equals(state);
 
         public bool Equals (ChoiceState other) => id == other.id;

@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using UnityEngine;
 
@@ -33,6 +33,14 @@ namespace Naninovel
         [Tooltip("Whether to automatically show title screen UI (main menu) after engine initialization. You can modify the title UI using UI customization feature (see online guide for more info).")]
         public bool ShowTitleUI = true;
 
+        [Header("Bridging")]
+        [Tooltip("Whether to automatically start the bridging server to communicate with external Naninovel tools: IDE extension, web editor, etc.")]
+        public bool EnableBridging = true;
+        [Tooltip("The network port for the server to listen. Change both here and in the external tools in case the default port is occupied by another application.")]
+        public int ServerPort = 41016;
+        [Tooltip("Whether to automatically generate project metadata when Unity editor is started.")]
+        public bool AutoGenerateMetadata = true;
+        
         [Header("Development Console")]
         [Tooltip("Whether to enable development console.")]
         public bool EnableDevelopmentConsole = true;

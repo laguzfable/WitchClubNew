@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using UnityEngine;
@@ -17,5 +17,15 @@ namespace Naninovel
         /// </summary>
         [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
         public sealed class EditInProjectSettingsAttribute : Attribute { }
+
+        /// <summary>
+        /// Providers configuration of the requested type either via configuration provider
+        /// (when engine is initialized) or by loading the asset from default resources folder.
+        /// </summary>
+        public static T GetOrDefault<T> () where T : Configuration
+        {
+            if (Engine.Initialized) return Engine.GetConfiguration<T>();
+            else return ProjectConfigurationProvider.LoadOrDefault<T>();
+        }
     }
 }

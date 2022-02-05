@@ -1,24 +1,17 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
 
 namespace Naninovel.Commands
 {
     /// <summary>
     /// Hides a text printer.
     /// </summary>
-    /// <example>
-    /// ; Hide a default printer.
-    /// @hidePrinter
-    /// ; Hide printer with ID `Wide`.
-    /// @hidePrinter Wide
-    /// </example>
     public class HidePrinter : PrinterCommand
     {
         /// <summary>
         /// ID of the printer actor to use. Will use a default one when not provided.
         /// </summary>
-        [ParameterAlias(NamelessParameterAlias), IDEActor(TextPrintersConfiguration.DefaultPathPrefix)]
+        [ParameterAlias(NamelessParameterAlias), ActorContext(TextPrintersConfiguration.DefaultPathPrefix)]
         public StringParameter PrinterId;
         /// <summary>
         /// Duration (in seconds) of the hide animation.
@@ -29,17 +22,13 @@ namespace Naninovel.Commands
 
         protected override string AssignedPrinterId => PrinterId;
 
-        public override async UniTask ExecuteAsync (CancellationToken cancellationToken = default)
+        public override async UniTask ExecuteAsync (AsyncToken asyncToken = default)
         {
-            var printer = await GetOrAddPrinterAsync();
-            if (cancellationToken.CancelASAP) return;
-
+            var printer = await GetOrAddPrinterAsync(asyncToken);
             var printerMeta = PrinterManager.Configuration.GetMetadataOrDefault(printer.Id);
             var hideDuration = Assigned(Duration) ? Duration.Value : printerMeta.ChangeVisibilityDuration;
-
-            if (cancellationToken.CancelLazy)
-                printer.Visible = false;
-            else await printer.ChangeVisibilityAsync(false, hideDuration, cancellationToken: cancellationToken);
+            if (asyncToken.Completed) printer.Visible = false;
+            else await printer.ChangeVisibilityAsync(false, hideDuration, asyncToken: asyncToken);
         }
-    } 
+    }
 }

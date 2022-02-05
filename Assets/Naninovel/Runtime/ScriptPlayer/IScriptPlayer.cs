@@ -1,9 +1,8 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using Naninovel.Commands;
 using System;
 using System.Collections.Generic;
-using UniRx.Async;
+using Naninovel.Commands;
 
 namespace Naninovel
 {
@@ -40,16 +39,15 @@ namespace Naninovel
         /// Event invoked when waiting for input mode changes.
         /// </summary>
         event Action<bool> OnWaitingForInput;
+        /// <summary>
+        /// Event invoked when script preload progress is changed, in 0.0 to 1.0 range.
+        /// </summary>
+        event Action<float> OnPreloadProgress;
 
         /// <summary>
         /// Whether script playback routine is currently running.
         /// </summary>
         bool Playing { get; }
-        /// <summary>
-        /// Whether skip mode can be enabled at the moment.
-        /// Result depends on <see cref="PlayerSkipMode"/> and currently played command.
-        /// </summary>
-        bool SkipAllowed { get; }
         /// <summary>
         /// Whether skip mode is currently active.
         /// </summary>
@@ -113,26 +111,19 @@ namespace Naninovel
         /// <param name="startInlineIndex">Command inline index to start playback from.</param>
         void Play (Script script, int startLineIndex = 0, int startInlineIndex = 0);
         /// <summary>
-        /// Loads a script with the provided name, preloads the script's commands and starts playing at the provided line and inline indexes or a label;
+        /// Preloads the script's commands and starts playing at the provided line and inline indexes or a label;
         /// when <paramref name="label"/> is provided, will ignore line and inline indexes.
         /// </summary>
-        /// <param name="scriptName">Name (resource path) of the script to load and play.</param>
+        /// <remarks>Preload progress is reported by <see cref="OnPreloadProgress"/> event.</remarks>
+        /// <param name="script">The script to play.</param>
         /// <param name="startLineIndex">Line index to start playback from.</param>
         /// <param name="startInlineIndex">Command inline index to start playback from.</param>
         /// <param name="label">Name of a label within the script to start playback from.</param>
-        UniTask PreloadAndPlayAsync (string scriptName, int startLineIndex = 0, int startInlineIndex = 0, string label = null);
+        UniTask PreloadAndPlayAsync (Script script, int startLineIndex = 0, int startInlineIndex = 0, string label = null);
         /// <summary>
         /// Halts the playback of the currently played script.
         /// </summary>
         void Stop ();
-        /// <summary>
-        /// Execute commands in the provided playlist independently of the current playback state.
-        /// </summary>
-        /// <remarks>
-        /// Can be used to additively play a list of commands (not a real script), without interrupting currently played script.
-        /// </remarks>
-        /// <param name="playlist">The playlist to use for playback.</param>
-        UniTask PlayTransientAsync (ScriptPlaylist playlist, CancellationToken cancellationToken = default);
         /// <summary>
         /// Depending on whether the provided <paramref name="lineIndex"/> being before or after currently played command' line index,
         /// performs a fast-forward playback or state rollback of the currently loaded script.
@@ -169,9 +160,17 @@ namespace Naninovel
         /// </summary>
         void RemovePostExecutionTask (Func<Command, UniTask> task);
         /// <summary>
-        /// Requests lazy cancellation of all the concurrently-running commands (via <see cref="CancellationToken.CancelLazy"/>)
+        /// Requests lazy cancellation of all the concurrently-running commands (via <see cref="AsyncToken.Completed"/>)
         /// and waits for them to finish before performing the provided task and executing next commands.
         /// </summary>
         UniTask SynchronizeAndDoAsync (Func<UniTask> task);
-    } 
+        /// <summary>
+        /// Whether the player has ever played a command at the provided script and playlist index (global state).
+        /// </summary>
+        bool HasPlayed (string scriptName, int playlistIndex);
+        /// <summary>
+        /// Whether the player has ever played a script with the specified name.
+        /// </summary>
+        bool HasPlayed (string scriptName);
+    }
 }

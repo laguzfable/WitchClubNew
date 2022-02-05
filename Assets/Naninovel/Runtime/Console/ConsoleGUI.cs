@@ -1,8 +1,9 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace Naninovel
@@ -10,7 +11,7 @@ namespace Naninovel
     public class ConsoleGUI : MonoBehaviour
     {
         // To prevent garbage when the console is hidden.
-        private class OnGUIProxy : MonoBehaviour 
+        private class OnGUIProxy : MonoBehaviour
         {
             public Action OnGUIDelegate;
             private void OnGUI () => OnGUIDelegate();
@@ -38,11 +39,11 @@ namespace Naninovel
         private string input;
         private int inputBufferIndex = 0;
 
-        public static void Initialize ()
+        public static void Initialize (Dictionary<string, MethodInfo> commands = null)
         {
             if (instance) return;
 
-            CommandDatabase.RegisterCommands();
+            CommandDatabase.RegisterCommands(commands);
 
             var hostObject = new GameObject("UnityConsole");
             hostObject.hideFlags = HideFlags.HideAndDontSave;
@@ -51,7 +52,7 @@ namespace Naninovel
             instance = hostObject.AddComponent<ConsoleGUI>();
             instance.style = new GUIStyle {
                 normal = new GUIStyleState { background = Texture2D.whiteTexture, textColor = Color.white },
-                contentOffset = new Vector2(5, 5)
+                contentOffset = new Vector2(5, 5),
             };
 
             instance.guiProxy = hostObject.AddComponent<OnGUIProxy>();

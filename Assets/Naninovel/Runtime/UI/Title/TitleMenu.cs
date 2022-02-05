@@ -1,6 +1,5 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel.UI
@@ -19,17 +18,17 @@ namespace Naninovel.UI
             titleScriptName = Engine.GetConfiguration<ScriptsConfiguration>().TitleScript;
         }
 
-        public override async UniTask ChangeVisibilityAsync (bool visible, float? duration = null, CancellationToken cancellationToken = default)
+        public override async UniTask ChangeVisibilityAsync (bool visible, float? duration = null, AsyncToken asyncToken = default)
         {
             if (visible && !string.IsNullOrEmpty(titleScriptName))
             {
                 await scriptPlayer.PreloadAndPlayAsync(titleScriptName);
-                if (cancellationToken.CancelASAP) return;
+                asyncToken.ThrowIfCanceled();
                 await UniTask.WaitWhile(() => scriptPlayer.Playing);
-                if (cancellationToken.CancelASAP) return;
+                asyncToken.ThrowIfCanceled();
             }
 
-            await base.ChangeVisibilityAsync(visible, duration, cancellationToken);
+            await base.ChangeVisibilityAsync(visible, duration, asyncToken);
         }
     }
 }

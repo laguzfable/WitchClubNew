@@ -1,9 +1,8 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using NLayer;
 using System;
 using System.IO;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel
@@ -87,7 +86,7 @@ namespace Naninovel
             {
                 var samplesRead = mpegFile.ReadSamples(samplesBuffer, 0, bufferLength);
                 if (samplesRead < bufferLength) Array.Resize(ref samplesBuffer, samplesRead);
-                audioClip.SetData(samplesBuffer, (sampleOffset / sizeof(float)) * mpegFile.Channels);
+                audioClip.SetData(samplesBuffer, sampleOffset / sizeof(float) * mpegFile.Channels);
                 if (samplesRead < bufferLength) break;
                 sampleOffset += samplesRead;
             }
@@ -102,7 +101,7 @@ namespace Naninovel
             {
                 var samplesRead = await UniTask.Run(() => mpegFile.ReadSamples(samplesBuffer, 0, bufferLength));
                 if (samplesRead < bufferLength) Array.Resize(ref samplesBuffer, samplesRead);
-                audioClip.SetData(samplesBuffer, (sampleOffset / sizeof(float)) * mpegFile.Channels);
+                audioClip.SetData(samplesBuffer, sampleOffset / sizeof(float) * mpegFile.Channels);
                 if (samplesRead < bufferLength) break;
                 sampleOffset += samplesRead;
             }

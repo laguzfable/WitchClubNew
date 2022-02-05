@@ -1,6 +1,5 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel.UI
@@ -12,6 +11,7 @@ namespace Naninovel.UI
         private string titleScriptName;
         private IScriptPlayer scriptPlayer;
         private IScriptManager scriptManager;
+        private IStateManager stateManager;
 
         protected override void Awake ()
         {
@@ -20,6 +20,7 @@ namespace Naninovel.UI
             scriptManager = Engine.GetService<IScriptManager>();
             titleScriptName = scriptManager.Configuration.TitleScript;
             scriptPlayer = Engine.GetService<IScriptPlayer>();
+            stateManager = Engine.GetService<IStateManager>();
         }
 
         protected override async void OnButtonClick ()
@@ -28,9 +29,12 @@ namespace Naninovel.UI
                 await scriptManager.LoadScriptAsync(titleScriptName) is Script titleScript &&
                 titleScript.LabelExists(titleLabel))
             {
-                await scriptPlayer.PreloadAndPlayAsync(titleScriptName, label: titleLabel);
+                scriptPlayer.ResetService();
+                await scriptPlayer.PreloadAndPlayAsync(titleScript, label: titleLabel);
                 await UniTask.WaitWhile(() => scriptPlayer.Playing);
             }
+
+            await stateManager.SaveGlobalAsync();
 
             if (Application.platform == RuntimePlatform.WebGLPlayer)
                 Application.OpenURL("about:blank");

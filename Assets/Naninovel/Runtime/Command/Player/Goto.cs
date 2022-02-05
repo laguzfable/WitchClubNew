@@ -1,24 +1,13 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Linq;
-using UniRx.Async;
 
 namespace Naninovel.Commands
 {
     /// <summary>
     /// Navigates naninovel script playback to the provided path.
     /// </summary>
-    /// <example>
-    /// ; Loads and starts playing a naninovel script with the name `Script001` from the start.
-    /// @goto Script001
-    /// 
-    /// ; Save as above, but start playing from the label `AfterStorm`.
-    /// @goto Script001.AfterStorm
-    /// 
-    /// ; Navigates the playback to the label `Epilogue` in the currently played script.
-    /// @goto .Epilogue
-    /// </example>
     public class Goto : Command, Command.IForceWait, Command.IPreloadable
     {
         /// <summary>
@@ -43,7 +32,7 @@ namespace Naninovel.Commands
         /// When label name is omitted, will play provided script from the start.
         /// When script name is omitted, will attempt to find a label in the currently played script.
         /// </summary>
-        [ParameterAlias(NamelessParameterAlias), RequiredParameter, IDEResource(ScriptsConfiguration.DefaultScriptsPathPrefix, 0)]
+        [ParameterAlias(NamelessParameterAlias), RequiredParameter, ResourceContext(ScriptsConfiguration.DefaultPathPrefix, 0)]
         public NamedStringParameter Path;
         /// <summary>
         /// When specified, will control whether to reset the engine services state before loading a script (in case the path is leading to another script):<br/>
@@ -65,7 +54,7 @@ namespace Naninovel.Commands
 
         public void ReleasePreloadedResources () { }
         
-        public override async UniTask ExecuteAsync (CancellationToken cancellationToken = default)
+        public override async UniTask ExecuteAsync (AsyncToken asyncToken = default)
         {
             EnsureDontResetTypesLoaded();
             

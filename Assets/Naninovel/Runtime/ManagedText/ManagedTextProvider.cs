@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using UnityEngine;
 using UnityEngine.Events;
@@ -31,8 +31,6 @@ namespace Naninovel
         private ILocalizationManager localizationManager;
         private ITextManager textManager;
 
-        public ManagedTextRecord CreateRecord () => new ManagedTextRecord(Key, DefaultValue, Category);
-
         private void OnEnable ()
         {
             if (Engine.Initialized) HandleEngineInitialized();
@@ -46,7 +44,7 @@ namespace Naninovel
             Engine.OnInitializationFinished -= HandleEngineInitialized;
         }
 
-        private void HandleEngineInitialized () 
+        private void HandleEngineInitialized ()
         {
             Engine.OnInitializationFinished -= HandleEngineInitialized;
 

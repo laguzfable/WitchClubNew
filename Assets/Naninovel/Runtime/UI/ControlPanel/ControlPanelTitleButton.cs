@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 
 namespace Naninovel.UI
@@ -6,7 +6,7 @@ namespace Naninovel.UI
     public class ControlPanelTitleButton : ScriptableButton
     {
         [ManagedText("DefaultUI")]
-        protected static string ConfirmationMessage = "Are you sure you want to quit to the title screen? Any unsaved game progress will be lost.";
+        protected static string ConfirmationMessage = "Are you sure you want to quit to the title screen?\nAny unsaved game progress will be lost.";
 
         private IStateManager gameState;
         private IUIManager uiManager;

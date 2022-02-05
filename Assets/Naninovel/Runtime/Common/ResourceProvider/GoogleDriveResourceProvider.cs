@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 #if UNITY_GOOGLE_DRIVE_AVAILABLE
 
@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UniRx.Async;
+using System.Net;
 using UnityEngine;
 using UnityGoogleDrive;
 
@@ -47,7 +47,11 @@ namespace Naninovel
             }
         }
 
-        public enum CachingPolicyType { Smart, PurgeAllOnInit }
+        public enum CachingPolicyType
+        {
+            Smart,
+            PurgeAllOnInit
+        }
 
         /// <summary>
         /// Full path to the cache directory.
@@ -209,7 +213,7 @@ namespace Naninovel
             if (!string.IsNullOrEmpty(manifest.StartToken))
                 await ProcessChangesListAsync(manifest);
 
-            var newStartToken = (await GoogleDriveChanges.GetStartPageToken().Send()).StartPageTokenValue;
+            var newStartToken = (await SendRequestAsync(GoogleDriveChanges.GetStartPageToken())).StartPageTokenValue;
             manifest.StartToken = newStartToken;
             await manifest.WriteAsync();
             LogMessage($"Updated smart cache changes token: {newStartToken}");
@@ -218,7 +222,7 @@ namespace Naninovel
 
         private async UniTask ProcessChangesListAsync (CacheManifest manifest)
         {
-            var changeList = await GoogleDriveChanges.List(manifest.StartToken).Send();
+            var changeList = await SendRequestAsync(GoogleDriveChanges.List(manifest.StartToken));
             foreach (var change in changeList.Changes)
             {
                 if (!manifest.ContainsKey(change.FileId)) continue;
@@ -238,6 +242,13 @@ namespace Naninovel
             }
 
             IOUtils.WebGLSyncFs();
+        }
+
+        private async UniTask<T> SendRequestAsync<T> (GoogleDriveRequest<T> request)
+        {
+            await request.Send();
+            if (request.IsError) throw new WebException(request.Error);
+            return request.ResponseData;
         }
     }
 }

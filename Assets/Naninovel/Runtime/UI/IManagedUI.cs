@@ -1,8 +1,7 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using TMPro;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel.UI
@@ -25,14 +24,6 @@ namespace Naninovel.UI
         /// </remarks>
         bool Visible { get; set; }
         /// <summary>
-        /// The order in which the element is sorted among other elements.
-        /// </summary>
-        int SortingOrder { get; set; }
-        /// <summary>
-        /// Rendering mode of the UI element.
-        /// </summary>
-        RenderMode RenderMode { get; set; }
-        /// <summary>
         /// Camera the UI element uses for reference when scaling and handling user input.
         /// </summary>
         Camera RenderCamera { get; set; }
@@ -53,7 +44,7 @@ namespace Naninovel.UI
         /// <see cref="Visible"/> should be set to <paramref name="visible"/> at the time this method is invoked.
         /// Should not return until visibility (as perceived by user) has been completely changed (including any associated animations).
         /// </remarks>
-        UniTask ChangeVisibilityAsync (bool visible, float? duration = null, CancellationToken cancellationToken = default);
+        UniTask ChangeVisibilityAsync (bool visible, float? duration = null, AsyncToken asyncToken = default);
         /// <summary>
         /// Applies provided fonts to the uGUI and TMPro text components contained in the UI.
         /// Null identifies default font initially set in text components of the UI prefab.

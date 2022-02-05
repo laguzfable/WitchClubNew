@@ -1,24 +1,17 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
 
 namespace Naninovel.Commands
 {
     /// <summary>
     /// Shows a text printer.
     /// </summary>
-    /// <example>
-    /// ; Show a default printer.
-    /// @showPrinter
-    /// ; Show printer with ID `Wide`.
-    /// @showPrinter Wide
-    /// </example>
     public class ShowPrinter : PrinterCommand
     {
         /// <summary>
         /// ID of the printer actor to use. Will use a default one when not provided.
         /// </summary>
-        [ParameterAlias(NamelessParameterAlias), IDEActor(TextPrintersConfiguration.DefaultPathPrefix)]
+        [ParameterAlias(NamelessParameterAlias), ActorContext(TextPrintersConfiguration.DefaultPathPrefix)]
         public StringParameter PrinterId;
         /// <summary>
         /// Duration (in seconds) of the show animation.
@@ -29,17 +22,13 @@ namespace Naninovel.Commands
 
         protected override string AssignedPrinterId => PrinterId;
 
-        public override async UniTask ExecuteAsync (CancellationToken cancellationToken = default)
+        public override async UniTask ExecuteAsync (AsyncToken asyncToken = default)
         {
-            var printer = await GetOrAddPrinterAsync();
-            if (cancellationToken.CancelASAP) return;
-
+            var printer = await GetOrAddPrinterAsync(asyncToken);
             var printerMeta = PrinterManager.Configuration.GetMetadataOrDefault(printer.Id);
             var showDuration = Assigned(Duration) ? Duration.Value : printerMeta.ChangeVisibilityDuration;
-
-            if (cancellationToken.CancelLazy)
-                printer.Visible = true;
-            else await printer.ChangeVisibilityAsync(true, showDuration, cancellationToken: cancellationToken);
+            if (asyncToken.Completed) printer.Visible = true;
+            else await printer.ChangeVisibilityAsync(true, showDuration, asyncToken: asyncToken);
         }
     } 
 }

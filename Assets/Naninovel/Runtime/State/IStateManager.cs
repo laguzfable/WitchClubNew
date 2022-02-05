@@ -1,7 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
-using UniRx.Async;
 
 namespace Naninovel
 {
@@ -45,21 +44,21 @@ namespace Naninovel
         event Action OnRollbackFinished;
 
         /// <summary>
-        /// Serialized global state of the engine.
+        /// Current global state of the engine.
         /// </summary>
         GlobalStateMap GlobalState { get; }
         /// <summary>
-        /// Serialized state of the engine settings.
+        /// Current settings state of the engine.
         /// </summary>
         SettingsStateMap SettingsState { get; }
         /// <summary>
         /// Save slots manager for global engine state.
         /// </summary>
-        ISaveSlotManager<GlobalStateMap> GlobalStateSlotManager { get; }
+        ISaveSlotManager<GlobalStateMap> GlobalSlotManager { get; }
         /// <summary>
         /// Save slots manager for local engine state.
         /// </summary>
-        ISaveSlotManager<GameStateMap> GameStateSlotManager { get; }
+        ISaveSlotManager<GameStateMap> GameSlotManager { get; }
         /// <summary>
         /// Save slots manager for game settings.
         /// </summary>
@@ -106,7 +105,6 @@ namespace Naninovel
         UniTask<GameStateMap> QuickSaveAsync ();
         /// <summary>
         /// Loads game state from the specified save slot.
-        /// Will reset the engine services and unload unused assets before load.
         /// </summary>
         UniTask<GameStateMap> LoadGameAsync (string slotId);
         /// <summary>
@@ -114,13 +112,13 @@ namespace Naninovel
         /// </summary>
         UniTask<GameStateMap> QuickLoadAsync ();
         /// <summary>
-        /// Serializes (saves) global state of the engine services.
+        /// Persists current global state of the engine.
         /// </summary>
-        UniTask<GlobalStateMap> SaveGlobalStateAsync ();
+        UniTask SaveGlobalAsync ();
         /// <summary>
-        /// Serializes (saves) settings state of the engine services.
+        /// Persists current settings state of the engine.
         /// </summary>
-        UniTask<SettingsStateMap> SaveSettingsAsync ();
+        UniTask SaveSettingsAsync ();
         /// <summary>
         /// Resets engine services and unloads unused assets; will basically revert to an empty initial engine state.
         /// The operation will invoke default on-load events, allowing to mask the process with a loading screen.
@@ -151,11 +149,6 @@ namespace Naninovel
         /// </summary>
         GameStateMap PeekRollbackStack ();
         /// <summary>
-        /// Attempts to rollback (revert) all the engine services to a state they had at the previous rollback step. 
-        /// </summary>
-        /// <returns>Whether the operation succeeded.</returns>
-        UniTask<bool> RollbackAsync ();
-        /// <summary>
         /// Attempts to rollback (revert) all the engine services to a state evaluated with the provided predicate.
         /// Be aware, that this will discard all the state snapshots in the rollback stack until the suitable one is found.
         /// </summary>
@@ -170,5 +163,5 @@ namespace Naninovel
         /// Modifies existing state snapshots to prevent player from rolling back to them.
         /// </summary>
         void PurgeRollbackData ();
-    } 
+    }
 }

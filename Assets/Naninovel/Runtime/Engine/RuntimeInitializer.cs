@@ -1,9 +1,10 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UniRx.Async;
+using Naninovel.Async;
+using Naninovel.Commands;
 using UnityEngine;
 
 namespace Naninovel
@@ -13,41 +14,27 @@ namespace Naninovel
     /// </summary>
     public class RuntimeInitializer : MonoBehaviour
     {
-        private readonly struct ServiceInitData : IEquatable<ServiceInitData>
-        { 
-            public readonly Type Type; 
-            public readonly int Priority;
-            public readonly Type[] CtorArgs;
-
-            public ServiceInitData (Type type, InitializeAtRuntimeAttribute attr)
-            {
-                Type = type;
-                Priority = attr.InitializationPriority;
-                CtorArgs = Type.GetConstructors().First().GetParameters().Select(p => p.ParameterType).ToArray();
-            }
-
-            public override bool Equals (object obj) => obj is ServiceInitData data && Equals(data);
-            public bool Equals (ServiceInitData other) => EqualityComparer<Type>.Default.Equals(Type, other.Type);
-            public override int GetHashCode () => 2049151605 + EqualityComparer<Type>.Default.GetHashCode(Type);
-            public static bool operator == (ServiceInitData left, ServiceInitData right) => left.Equals(right);
-            public static bool operator != (ServiceInitData left, ServiceInitData right) => !(left == right);
-        }
-
         [SerializeField] private bool initializeOnAwake = true;
 
-        private const string defaultInitUIResourcesPath = "Naninovel/EngineInitializationUI";
-        
+        private const string initPrefabName = "EngineInitializationUI";
+
         private static UniTaskCompletionSource initializeTCS;
 
         /// <summary>
         /// Invokes default engine initialization routine.
         /// </summary>
         /// <param name="configurationProvider">Configuration provider to use for engine initialization.</param>
-        public static async UniTask InitializeAsync (IConfigurationProvider configurationProvider = null)
+        /// <param name="customInitializationData">Use to inject services without <see cref="InitializeAtRuntimeAttribute"/>.</param>
+        public static async UniTask InitializeAsync (IConfigurationProvider configurationProvider = null,
+            IEnumerable<ServiceInitializationData> customInitializationData = null)
         {
             if (Engine.Initialized) return;
-            if (initializeTCS != null) { await initializeTCS.Task; return; }
-            
+            if (initializeTCS != null)
+            {
+                await initializeTCS.Task;
+                return;
+            }
+
             initializeTCS = new UniTaskCompletionSource();
 
             if (configurationProvider is null)
@@ -59,18 +46,18 @@ namespace Naninovel
             var initializationUI = default(ScriptableUIBehaviour);
             if (engineConfig.ShowInitializationUI)
             {
-                var initUIPrefab = ObjectUtils.IsValid(engineConfig.CustomInitializationUI) ? engineConfig.CustomInitializationUI : Resources.Load<ScriptableUIBehaviour>(defaultInitUIResourcesPath);
-                initializationUI = Instantiate(initUIPrefab);
+                var initPrefab = engineConfig.CustomInitializationUI ? engineConfig.CustomInitializationUI : Engine.LoadInternalResource<ScriptableUIBehaviour>(initPrefabName);
+                initializationUI = Instantiate(initPrefab);
                 initializationUI.Show();
             }
 
-            var initData = new List<ServiceInitData>();
-            var overridenTypes = new List<Type>();
+            var initData = customInitializationData?.ToList() ?? new List<ServiceInitializationData>();
+            var overridenTypes = initData.Where(d => d.Override != null).Select(d => d.Override).ToList();
             foreach (var type in Engine.Types)
             {
                 var initAttribute = Attribute.GetCustomAttribute(type, typeof(InitializeAtRuntimeAttribute), false) as InitializeAtRuntimeAttribute;
                 if (initAttribute is null) continue;
-                initData.Add(new ServiceInitData(type, initAttribute));
+                initData.Add(new ServiceInitializationData(type, initAttribute));
                 if (initAttribute.Override != null)
                     overridenTypes.Add(initAttribute.Override);
             }
@@ -82,7 +69,7 @@ namespace Naninovel
 
             // Order by initialization priority and then perform topological order to make sure ctor references initialized before they're used.
             // ReSharper disable once AccessToModifiedClosure (false positive: we're assigning result of the closure to the variable in question)
-            IEnumerable<ServiceInitData> GetDependencies (ServiceInitData d) => d.CtorArgs.Where(IsService).SelectMany(argType => initData.Where(dd => d != dd && argType.IsAssignableFrom(dd.Type)));
+            IEnumerable<ServiceInitializationData> GetDependencies (ServiceInitializationData d) => d.CtorArgs.Where(IsService).SelectMany(argType => initData.Where(dd => d != dd && argType.IsAssignableFrom(dd.Type)));
             initData = initData.OrderBy(d => d.Priority).TopologicalOrder(GetDependencies).ToList();
 
             var behaviour = RuntimeBehaviour.Create(engineConfig.SceneIndependent);
@@ -103,30 +90,30 @@ namespace Naninovel
             await Engine.InitializeAsync(configurationProvider, behaviour, services);
             if (!Engine.Initialized) // In case terminated in the midst of initialization.
             {
-                if (initializationUI != null)
+                if (initializationUI)
                     ObjectUtils.DestroyOrImmediate(initializationUI.gameObject);
                 DisposeTCS();
                 return;
             }
-            
+
             ExpressionEvaluator.Initialize();
 
-            if (initializationUI != null)
+            if (initializationUI)
             {
-                await initializationUI.ChangeVisibilityAsync(false);
+                await initializationUI.ChangeVisibilityAsync(false, asyncToken: Engine.DestroyToken);
                 ObjectUtils.DestroyOrImmediate(initializationUI.gameObject);
             }
 
-            var moviePlayer = Engine.GetService<IMoviePlayer>();
-            if (moviePlayer.Configuration.PlayIntroMovie)
-                await moviePlayer.PlayAsync(moviePlayer.Configuration.IntroMovieName);
+            var movieConfig = Engine.GetConfiguration<MoviesConfiguration>();
+            if (movieConfig.PlayIntroMovie)
+                await new PlayMovie { MovieName = movieConfig.IntroMovieName, Duration = 0 }.ExecuteAsync(Engine.DestroyToken);
 
             var scriptPlayer = Engine.GetService<IScriptPlayer>();
             var scriptManager = Engine.GetService<IScriptManager>();
             if (!string.IsNullOrEmpty(scriptManager.Configuration.InitializationScript))
             {
                 await scriptPlayer.PreloadAndPlayAsync(scriptManager.Configuration.InitializationScript);
-                while (scriptPlayer.Playing) await AsyncUtils.WaitEndOfFrame;
+                while (scriptPlayer.Playing) await AsyncUtils.WaitEndOfFrameAsync(Engine.DestroyToken);
             }
 
             if (engineConfig.ShowTitleUI)

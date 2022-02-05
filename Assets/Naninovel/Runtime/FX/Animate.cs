@@ -1,11 +1,10 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using Naninovel.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel.FX
@@ -36,7 +35,7 @@ namespace Naninovel.FX
         private readonly List<UniTask> tasks = new List<UniTask>();
         private CancellationTokenSource loopCTS;
 
-        public virtual void SetSpawnParameters (string[] parameters)
+        public virtual void SetSpawnParameters (IReadOnlyList<string> parameters)
         {
             SpawnedPath = gameObject.name;
             KeyCount = 1 + parameters.Max(s => string.IsNullOrEmpty(s) ? 0 : s.Count(c => c == AnimateActor.KeyDelimiter));
@@ -100,9 +99,9 @@ namespace Naninovel.FX
                 else lastDuration = Duration[keyIdx].Value;
         }
 
-        public async UniTask AwaitSpawnAsync (CancellationToken cancellationToken = default)
+        public async UniTask AwaitSpawnAsync (AsyncToken asyncToken = default)
         {
-            var manager = Engine.GetAllServices<IActorManager>(c => c.ActorExists(ActorId)).FirstOrDefault();
+            var manager = Engine.FindAllServices<IActorManager>(c => c.ActorExists(ActorId)).FirstOrDefault();
             if (manager is null)
             {
                 Debug.LogWarning($"Can't find a manager with `{ActorId}` actor to apply `{SpawnedPath}` command.");
@@ -110,24 +109,21 @@ namespace Naninovel.FX
             }
             var actor = manager.GetActor(ActorId);
 
-            if (Loop) LoopRoutine(actor, cancellationToken).Forget();
+            if (Loop) LoopRoutine(actor, asyncToken).Forget();
             else
             {
                 for (int keyIdx = 0; keyIdx < KeyCount; keyIdx++)
-                {
-                    await AnimateKey(actor, keyIdx, cancellationToken);
-                    if (cancellationToken.CancelASAP) return;
-                }
-                
-                if (SpawnManager.IsObjectSpawned(SpawnedPath))
-                    SpawnManager.DestroySpawnedObject(SpawnedPath);
+                    await AnimateKey(actor, keyIdx, asyncToken);
+
+                if (SpawnManager.IsSpawned(SpawnedPath))
+                    SpawnManager.DestroySpawned(SpawnedPath);
             }
         }
 
-        protected virtual async UniTask AnimateKey (IActor actor, int keyIndex, CancellationToken cancellationToken)
+        protected virtual async UniTask AnimateKey (IActor actor, int keyIndex, AsyncToken asyncToken)
         {
             tasks.Clear();
-            
+
             if (!Duration.IsIndexValid(keyIndex)) return;
 
             var duration = Duration[keyIndex] ?? 0f;
@@ -137,51 +133,51 @@ namespace Naninovel.FX
 
             if (Appearance.ElementAtOrDefault(keyIndex) != null)
             {
-                var transitionName = !string.IsNullOrEmpty(Transition.ElementAtOrDefault(keyIndex)) ? Transition[keyIndex] : TransitionType.Crossfade;
+                var transitionName = !string.IsNullOrEmpty(Transition.ElementAtOrDefault(keyIndex)) ? Transition[keyIndex] : TransitionUtils.DefaultTransition;
                 var transition = new Transition(transitionName);
-                tasks.Add(actor.ChangeAppearanceAsync(Appearance[keyIndex], duration, easingType, transition, cancellationToken));
+                tasks.Add(actor.ChangeAppearanceAsync(Appearance[keyIndex], duration, easingType, transition, asyncToken));
             }
 
             if (Visibility.ElementAtOrDefault(keyIndex).HasValue)
-                tasks.Add(actor.ChangeVisibilityAsync(Visibility[keyIndex] ?? false, duration, easingType, cancellationToken));
+                tasks.Add(actor.ChangeVisibilityAsync(Visibility[keyIndex] ?? false, duration, easingType, asyncToken));
 
             if (PositionX.ElementAtOrDefault(keyIndex).HasValue || PositionY.ElementAtOrDefault(keyIndex).HasValue || PositionZ.ElementAtOrDefault(keyIndex).HasValue)
                 tasks.Add(actor.ChangePositionAsync(new Vector3(
                     PositionX.ElementAtOrDefault(keyIndex) ?? actor.Position.x,
                     PositionY.ElementAtOrDefault(keyIndex) ?? actor.Position.y,
-                    PositionZ.ElementAtOrDefault(keyIndex) ?? actor.Position.z), duration, easingType, cancellationToken));
+                    PositionZ.ElementAtOrDefault(keyIndex) ?? actor.Position.z), duration, easingType, asyncToken));
 
             if (RotationZ.ElementAtOrDefault(keyIndex).HasValue)
-                tasks.Add(actor.ChangeRotationZAsync(RotationZ[keyIndex] ?? 0f, duration, easingType, cancellationToken));
+                tasks.Add(actor.ChangeRotationZAsync(RotationZ[keyIndex] ?? 0f, duration, easingType, asyncToken));
 
             if (Scale.ElementAtOrDefault(keyIndex).HasValue)
-                tasks.Add(actor.ChangeScaleAsync(Scale[keyIndex] ?? Vector3.one, duration, easingType, cancellationToken));
+                tasks.Add(actor.ChangeScaleAsync(Scale[keyIndex] ?? Vector3.one, duration, easingType, asyncToken));
 
             if (TintColor.ElementAtOrDefault(keyIndex) != null)
             {
                 if (ColorUtility.TryParseHtmlString(TintColor[keyIndex], out var color))
-                    tasks.Add(actor.ChangeTintColorAsync(color, duration, easingType, cancellationToken));
+                    tasks.Add(actor.ChangeTintColorAsync(color, duration, easingType, asyncToken));
                 else Debug.LogWarning($"Failed to parse `{TintColor}` color to apply tint animation for `{actor.Id}` actor. See the API docs for supported color formats.");
             }
 
             await UniTask.WhenAll(tasks);
         }
 
-        private async UniTaskVoid LoopRoutine (IActor actor, CancellationToken cancellationToken)
+        private async UniTaskVoid LoopRoutine (IActor actor, AsyncToken asyncToken)
         {
             loopCTS?.Cancel();
             loopCTS?.Dispose();
             loopCTS = new CancellationTokenSource();
-            var combinedCTS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken.ASAPToken, loopCTS.Token);
+            var combinedCTS = CancellationTokenSource.CreateLinkedTokenSource(asyncToken.CancellationToken, loopCTS.Token);
             var combinedCTSToken = combinedCTS.Token;
-            
+
             while (Loop && Application.isPlaying && !combinedCTSToken.IsCancellationRequested)
                 for (int keyIdx = 0; keyIdx < KeyCount; keyIdx++)
                 {
                     await AnimateKey(actor, keyIdx, combinedCTSToken);
                     if (combinedCTSToken.IsCancellationRequested) break;
                 }
-            
+
             combinedCTS.Dispose();
         }
 
@@ -195,8 +191,8 @@ namespace Naninovel.FX
             //   2. When starting animation set real state to the last key frame.
             //   3. When any "normal" command modifies a property that has a transient state -- remove the transient effect.
 
-            if (Engine.Initialized && SpawnManager.IsObjectSpawned(SpawnedPath))
-                SpawnManager.DestroySpawnedObject(SpawnedPath);
+            if (Engine.Initialized && SpawnManager.IsSpawned(SpawnedPath))
+                SpawnManager.DestroySpawned(SpawnedPath);
         }
     }
 }

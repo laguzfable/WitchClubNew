@@ -1,6 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using UniRx.Async;
+using System;
 using UnityEngine;
 
 namespace Naninovel.UI
@@ -8,6 +8,9 @@ namespace Naninovel.UI
     public class TitleNewGameButton : ScriptableButton
     {
         private const string titleLabel = "OnNewGame";
+
+        [Tooltip("Services to exclude from state reset when starting a new game.")]
+        [SerializeField] private string[] excludeFromReset = Array.Empty<string>();
 
         private string startScriptName;
         private string titleScriptName;
@@ -45,21 +48,18 @@ namespace Naninovel.UI
                 return;
             }
 
-            if (!string.IsNullOrEmpty(titleScriptName) && 
-                await scriptManager.LoadScriptAsync(titleScriptName) is Script titleScript && 
+            if (!string.IsNullOrEmpty(titleScriptName) &&
+                await scriptManager.LoadScriptAsync(titleScriptName) is Script titleScript &&
                 titleScript.LabelExists(titleLabel))
             {
-                await scriptPlayer.PreloadAndPlayAsync(titleScriptName, label: titleLabel);
+                scriptPlayer.ResetService();
+                await scriptPlayer.PreloadAndPlayAsync(titleScript, label: titleLabel);
                 await UniTask.WaitWhile(() => scriptPlayer.Playing);
             }
 
             titleMenu.Hide();
-            StartNewGameAsync();
-        }
-
-        private async void StartNewGameAsync ()
-        {
-            await stateManager.ResetStateAsync(() => scriptPlayer.PreloadAndPlayAsync(startScriptName));
+            stateManager.ResetStateAsync(excludeFromReset,
+                () => scriptPlayer.PreloadAndPlayAsync(startScriptName)).Forget();
         }
     }
 }

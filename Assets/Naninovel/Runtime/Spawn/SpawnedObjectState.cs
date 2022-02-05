@@ -1,7 +1,8 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Naninovel
@@ -10,44 +11,40 @@ namespace Naninovel
     public struct SpawnedObjectState : IEquatable<SpawnedObjectState>
     {
         public string Path => path;
-        public string[] Parameters => parameters;
+        public IReadOnlyList<string> Parameters => parameters?.Select(s => s?.Value).ToArray();
+        public Vector3 Position => position;
+        public Quaternion Rotation => rotation;
+        public Vector3 Scale => scale;
 
         [SerializeField] private string path;
-        [SerializeField] private string[] parameters;
+        [SerializeField] private NullableString[] parameters;
+        [SerializeField] private Vector3 position;
+        [SerializeField] private Quaternion rotation;
+        [SerializeField] private Vector3 scale;
 
-        public SpawnedObjectState (string path, string[] parameters)
+        public SpawnedObjectState (SpawnedObject spawnedObject)
         {
-            this.path = path;
-            this.parameters = parameters;
+            path = spawnedObject.Path;
+            parameters = spawnedObject.Parameters?.Select(s => (NullableString)s).ToArray();
+            position = spawnedObject.GameObject.transform.position;
+            rotation = spawnedObject.GameObject.transform.rotation;
+            scale = spawnedObject.GameObject.transform.localScale;
         }
 
-        public override bool Equals (object obj)
+        public void ApplyTo (SpawnedObject spawnedObject)
         {
-            return obj is SpawnedObjectState state && Equals(state);
+            if (!spawnedObject.Path.EqualsFast(Path))
+                throw new Exception($"Failed to apply `{Path}` spawned object state to `{spawnedObject.Path}`: paths are different.");
+            spawnedObject.SetSpawnParameters(Parameters);
+            spawnedObject.GameObject.transform.position = Position;
+            spawnedObject.GameObject.transform.rotation = Rotation;
+            spawnedObject.GameObject.transform.localScale = Scale;
         }
 
-        public bool Equals (SpawnedObjectState other)
-        {
-            return Path == other.Path &&
-                   EqualityComparer<string[]>.Default.Equals(Parameters, other.Parameters);
-        }
-
-        public override int GetHashCode ()
-        {
-            var hashCode = 289869881;
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Path);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string[]>.Default.GetHashCode(Parameters);
-            return hashCode;
-        }
-
-        public static bool operator == (SpawnedObjectState left, SpawnedObjectState right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator != (SpawnedObjectState left, SpawnedObjectState right)
-        {
-            return !(left == right);
-        }
+        public bool Equals (SpawnedObjectState other) => path == other.path;
+        public override bool Equals (object obj) => obj is SpawnedObjectState other && Equals(other);
+        public override int GetHashCode () => Path != null ? Path.GetHashCode() : 0;
+        public static bool operator == (SpawnedObjectState left, SpawnedObjectState right) => left.Equals(right);
+        public static bool operator != (SpawnedObjectState left, SpawnedObjectState right) => !left.Equals(right);
     }
 }

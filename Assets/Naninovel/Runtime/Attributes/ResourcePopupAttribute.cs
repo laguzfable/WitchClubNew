@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using UnityEngine;
 
@@ -9,6 +9,8 @@ namespace Naninovel
     /// </summary>
     public class ResourcePopupAttribute : PropertyAttribute
     {
+        public const string EmptyValue = "None (disabled)";
+
         public readonly string Category;
         public readonly string PathPrefix;
         public readonly string EmptyOption;
@@ -22,5 +24,19 @@ namespace Naninovel
             PathPrefix = pathPrefix;
             EmptyOption = emptyOption;
         }
+
+        /// <param name="category">Category (usually equal path prefix) of the resources.</param>
+        public ResourcePopupAttribute (string category)
+            : this(category, category, EmptyValue) { }
+    }
+
+    /// <summary>
+    /// Draws a dropdown selection list of the actors, which are added via editor managers (aka `EditorResources`).
+    /// </summary>
+    public class ActorPopupAttribute : ResourcePopupAttribute
+    {
+        /// <param name="category">Category (usually equal path prefix) of the actors.</param>
+        public ActorPopupAttribute (string category)
+            : base($"{category}/*", "*", EmptyValue) { }
     }
 }

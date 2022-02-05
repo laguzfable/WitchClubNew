@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using Naninovel.NCalc;
 using System;
@@ -15,45 +15,11 @@ namespace Naninovel
     /// </summary>
     public static class ExpressionEvaluator
     {
-        [ExpressionFunctions]
-        public static class Functions
-        {
-            [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-            public sealed class DocAttribute : Attribute
-            {
-                public string Description { get; }
-                public string Example { get; }
-
-                public DocAttribute (string description, string example = null)
-                {
-                    Description = description;
-                    Example = example;
-                }
-            }
-
-            [Doc("Return a random float number between min [inclusive] and max [inclusive].", "Random(0.1, 0.85)")]
-            public static float Random (double min, double max) => UnityEngine.Random.Range((float)min, (float)max);
-            [Doc("Return a random integer number between min [inclusive] and max [inclusive].", "Random(0, 100)")]
-            public static int Random (int min, int max) => UnityEngine.Random.Range(min, max + 1);
-            [Doc("Return a string chosen from one of the provided strings.", "Random(\"Foo\", \"Bar\", \"Foobar\")")]
-            public static string Random (params string[] args) => args.Random();
-            [Doc("Return a float number in 0.0 to 1.0 range, representing how many unique commands were ever executed compared to the total number of commands in all the available naninovel scripts. 1.0 means the player had `read through` or `seen` all the available game content. Make sure to enable `Count Total Commands` in the script configuration menu before using this function.", "CalculateProgress()")]
-            public static float CalculateProgress ()
-            {
-                var scriptManager = Engine.GetService<IScriptManager>();
-                var player = Engine.GetService<IScriptPlayer>();
-                if (scriptManager.TotalCommandsCount == 0)
-                {
-                    Debug.LogWarning("`CalculateProgress` script expression function were used, while to total number of script commands is zero. You've most likely disabled `UpdateActionCountOnInit` in the script player configuration menu or didn't add any naninovel scripts to the project resources.");
-                    return 0;
-                }
-                return player.PlayedCommandsCount / (float)scriptManager.TotalCommandsCount;
-            }
-        }
-
         public const string ManagedTextScriptCategory = "Script";
         public const string ManagedTextKeyPrefix = "t_";
 
+        private static readonly Regex unescapedSingleQuote = new Regex(@"(?<!\\)'", RegexOptions.Compiled);
+        private static readonly Regex unescapedDoubleQuote = new Regex(@"(?<!\\)""", RegexOptions.Compiled);
         private static readonly List<MethodInfo> functions = new List<MethodInfo>();
 
         public static void Initialize ()
@@ -70,51 +36,49 @@ namespace Naninovel
         public static TResult Evaluate<TResult> (string expressionString, Action<string> onError = null)
         {
             var resultType = typeof(TResult);
-            return (TResult)Evaluate(expressionString, resultType, onError);
+            var result = Evaluate(expressionString, resultType, onError);
+            return resultType.IsInstanceOfType(result) ? (TResult)result : default;
+        }
+
+        public static bool TryEvaluate<TResult> (string expressionString, out TResult result, Action<string> onError = null)
+        {
+            return (result = Evaluate<TResult>(expressionString, onError)) != null;
         }
 
         public static object Evaluate (string expressionString, Type resultType, Action<string> onError = null)
         {
             if (functions.Count == 0)
                 Initialize();
-            
-            try
+
+            if (string.IsNullOrWhiteSpace(expressionString))
             {
-                if (string.IsNullOrWhiteSpace(expressionString))
-                {
-                    onError?.Invoke("Expression is missing.");
-                    return default;
-                }
-
-                // Escape all the un-escaped single quotes.
-                expressionString = Regex.Replace(expressionString, @"(?<!\\)'", @"\'");
-                // Replace un-escaped double quotes with single quotes.
-                expressionString = Regex.Replace(expressionString, @"(?<!\\)""", @"'");
-
-                var expression = new Expression(expressionString, EvaluateOptions.IgnoreCase | EvaluateOptions.MatchStringsOrdinal);
-                expression.EvaluateParameter += EvaluateExpressionParameter;
-                expression.EvaluateFunction += EvaluateExpressionFunction;
-
-                if (expression.HasErrors())
-                {
-                    onError?.Invoke($"Expression `{expressionString}` syntax error: {expression.Error}");
-                    return default;
-                }
-
-                var resultObj = expression.Evaluate();
-                if (resultObj is null)
-                {
-                    onError?.Invoke($"Expression `{expressionString}` result is null.");
-                    return default;
-                }
-
-                return Convert.ChangeType(resultObj, resultType, System.Globalization.CultureInfo.InvariantCulture);
-            }
-            catch (Exception e)
-            {
-                onError?.Invoke($"Failed to evaluate expression `{expressionString}`. Error message: {e.Message}");
+                onError?.Invoke("Expression is missing.");
                 return default;
             }
+
+            // Escape all the un-escaped single quotes.
+            expressionString = unescapedSingleQuote.Replace(expressionString, @"\'");
+            // Replace un-escaped double quotes with single quotes.
+            expressionString = unescapedDoubleQuote.Replace(expressionString, @"'");
+
+            var expression = new Expression(expressionString, EvaluateOptions.IgnoreCase | EvaluateOptions.MatchStringsOrdinal);
+            expression.EvaluateParameter += EvaluateExpressionParameter;
+            expression.EvaluateFunction += EvaluateExpressionFunction;
+
+            if (expression.HasErrors())
+            {
+                onError?.Invoke($"Expression `{expressionString}` syntax error: {expression.Error}");
+                return default;
+            }
+
+            var resultObj = expression.Evaluate();
+            if (resultObj is null)
+            {
+                onError?.Invoke($"Expression `{expressionString}` result is null.");
+                return default;
+            }
+
+            return Convert.ChangeType(resultObj, resultType, System.Globalization.CultureInfo.InvariantCulture);
         }
 
         private static void EvaluateExpressionParameter (string name, ParameterArgs args)
@@ -163,7 +127,11 @@ namespace Naninovel
                 // Check argument type and order equality.
                 var paramTypeCheckPassed = true;
                 for (int i = 0; i < methodParams.Length; i++)
-                    if (methodParams[i].ParameterType != functionParams[i].GetType()) { paramTypeCheckPassed = false; break; }
+                    if (methodParams[i].ParameterType != functionParams[i].GetType())
+                    {
+                        paramTypeCheckPassed = false;
+                        break;
+                    }
                 if (!paramTypeCheckPassed) continue;
 
                 args.Result = methodInfo.Invoke(null, functionParams);

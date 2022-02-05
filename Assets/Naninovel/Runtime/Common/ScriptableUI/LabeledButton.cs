@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,7 +7,7 @@ namespace Naninovel
 {
     public class LabeledButton : Button
     {
-        public virtual Text Label => labelText ? labelText : (labelText = GetComponentInChildren<Text>());
+        public virtual Text Label => labelText ? labelText : labelText = GetComponentInChildren<Text>();
         public virtual ColorBlock LabelColorBlock => labelColors;
         public virtual Color LabelColorMultiplier
         {
@@ -64,8 +64,8 @@ namespace Naninovel
             }
             else if (tintTweener != null)
             {
-                var tween = new ColorTween(Label.color, tintColor * LabelColorBlock.colorMultiplier * LabelColorMultiplier, ColorTweenMode.All, LabelColorBlock.fadeDuration, c => Label.color = c, target: Label);
-                tintTweener.Run(tween);
+                var tween = new ColorTween(Label.color, tintColor * LabelColorBlock.colorMultiplier * LabelColorMultiplier, ColorTweenMode.All, LabelColorBlock.fadeDuration, c => Label.color = c);
+                tintTweener.Run(tween, target: Label);
             }
         }
     }

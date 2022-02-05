@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using UnityEngine;
 
@@ -13,8 +13,8 @@ namespace Naninovel
         public const string MainActorId = "MainBackground";
         public const string DefaultPathPrefix = "Backgrounds";
 
-        protected override BackgroundMetadata DefaultActorMetadata => DefaultMetadata;
-        protected override ActorMetadataMap<BackgroundMetadata> ActorMetadataMap => Metadata;
+        public override BackgroundMetadata DefaultActorMetadata => DefaultMetadata;
+        public override ActorMetadataMap<BackgroundMetadata> ActorMetadataMap => Metadata;
 
         [Tooltip("Metadata to use by default when creating background actors and custom metadata for the created actor ID doesn't exist.")]
         public BackgroundMetadata DefaultMetadata = new BackgroundMetadata();

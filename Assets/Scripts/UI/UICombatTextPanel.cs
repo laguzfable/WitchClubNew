@@ -1,11 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UniRx.Async;
+using System.Threading;
+using Naninovel;
 using UnityEngine;
 
 //Use Respawn tag
 // 考慮改名稱叫TextSpawner
-public class UICombatTextPanel : MonoBehaviour {
+public class UICombatTextPanel : MonoBehaviour 
+{
 
     [SerializeField]
     int totalCount = 30;
@@ -22,6 +24,8 @@ public class UICombatTextPanel : MonoBehaviour {
 
     //List<UICombatText> displayTxtList = new List<UICombatText>();
 
+    public CancellationTokenSource cts = new CancellationTokenSource();
+
 
     class TextContent
     {
@@ -34,17 +38,22 @@ public class UICombatTextPanel : MonoBehaviour {
     
 
     // Use this for initialization
-    void Start () {
-
+    void Start () 
+    {
         txtArr = new UICombatText[totalCount];
+    }
 
+    private void OnDisable()
+    {
+        cts.Cancel();
     }
 
     public void DisplaySystemText(string content)
     {
         UICombatText txt = GetText();
-        txt.Display(content, ECombatTextType.System, systemPos.position).Forget();
+        txt.Display(content, ECombatTextType.System, systemPos.position, cts.Token).Forget();
     }
+
     public void EnqueueText(string content, ECombatTextType type, bool isPlayer)
     {
         contentQueue.Enqueue(new TextContent() {content = content, type = type, isPlayer = isPlayer });
@@ -57,14 +66,14 @@ public class UICombatTextPanel : MonoBehaviour {
         while(contentQueue.Count > 0)
         {
             PopUpText(contentQueue.Dequeue());
-            await UniTask.Delay(System.TimeSpan.FromSeconds(popDelayTime), cancellationToken:this.GetCancellationTokenOnDestroy());
+            await UniTask.Delay(System.TimeSpan.FromSeconds(popDelayTime), cancellationToken: cts.Token);
         }
     }
 
     void PopUpText(TextContent txtContent)
     {
         UICombatText txt = GetText();
-        txt.Display(txtContent.content, txtContent.type, txtContent.isPlayer ? playerPos.position : enemyPos.position).Forget();
+        txt.Display(txtContent.content, txtContent.type, txtContent.isPlayer ? playerPos.position : enemyPos.position, cts.Token).Forget();
     }
 
     UICombatText GetText()

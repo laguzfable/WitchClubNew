@@ -1,8 +1,8 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
+using System.Collections.Generic;
 using Naninovel.Commands;
 using System.Linq;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel.FX
@@ -29,7 +29,7 @@ namespace Naninovel.FX
         private readonly Tweener<FloatTween> focalLengthTweener = new Tweener<FloatTween>();
         private CameraComponent cameraComponent;
 
-        public virtual void SetSpawnParameters (string[] parameters)
+        public virtual void SetSpawnParameters (IReadOnlyList<string> parameters)
         {
             if (cameraComponent is null)
             {
@@ -62,36 +62,36 @@ namespace Naninovel.FX
             Duration = Mathf.Abs(parameters?.ElementAtOrDefault(3)?.AsInvariantFloat() ?? defaultDuration);
         }
 
-        public async UniTask AwaitSpawnAsync (CancellationToken cancellationToken = default) 
+        public async UniTask AwaitSpawnAsync (AsyncToken asyncToken = default) 
         {
             if (focusDistanceTweener.Running)
                 focusDistanceTweener.CompleteInstantly();
             if (focalLengthTweener.Running)
                 focalLengthTweener.CompleteInstantly();
 
-            var duration = cancellationToken.CancelLazy ? 0 : Duration;
-            var focusDistanceTween = new FloatTween(cameraComponent.FocusDistance, FocusDistance, duration, ApplyFocusDistance, target: cameraComponent);
-            var focalLengthTween = new FloatTween(cameraComponent.FocalLength, FocalLength, duration, ApplyFocalLength, target: cameraComponent);
+            var duration = asyncToken.Completed ? 0 : Duration;
+            var focusDistanceTween = new FloatTween(cameraComponent.FocusDistance, FocusDistance, duration, ApplyFocusDistance);
+            var focalLengthTween = new FloatTween(cameraComponent.FocalLength, FocalLength, duration, ApplyFocalLength);
 
-            await UniTask.WhenAll(focusDistanceTweener.RunAsync(focusDistanceTween, cancellationToken), 
-                focalLengthTweener.RunAsync(focalLengthTween, cancellationToken));
+            await UniTask.WhenAll(focusDistanceTweener.RunAsync(focusDistanceTween, asyncToken, cameraComponent), 
+                focalLengthTweener.RunAsync(focalLengthTween, asyncToken, cameraComponent));
         }
 
-        public void SetDestroyParameters (string[] parameters)
+        public void SetDestroyParameters (IReadOnlyList<string> parameters)
         {
             StopDuration = Mathf.Abs(parameters?.ElementAtOrDefault(0)?.AsInvariantFloat() ?? defaultDuration);
         }
 
-        public async UniTask AwaitDestroyAsync (CancellationToken cancellationToken = default)
+        public async UniTask AwaitDestroyAsync (AsyncToken asyncToken = default)
         {
             if (focusDistanceTweener.Running)
                 focusDistanceTweener.CompleteInstantly();
             if (focalLengthTweener.Running)
                 focalLengthTweener.CompleteInstantly();
 
-            var duration = cancellationToken.CancelLazy ? 0 : StopDuration;
+            var duration = asyncToken.Completed ? 0 : StopDuration;
             var focalLengthTween = new FloatTween(cameraComponent.FocalLength, 0, duration, ApplyFocalLength);
-            await focalLengthTweener.RunAsync(focalLengthTween, cancellationToken);
+            await focalLengthTweener.RunAsync(focalLengthTween, asyncToken);
         }
 
         private void ApplyFocusDistance (float value)
@@ -104,7 +104,7 @@ namespace Naninovel.FX
             cameraComponent.FocalLength = value;
         }
 
-        private void OnDestroy ()
+        private void OnDestroy () // Required to disable the effect on rollback.
         {
             if (cameraComponent)
                 Destroy(cameraComponent);

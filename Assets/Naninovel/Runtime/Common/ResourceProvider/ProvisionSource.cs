@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 
@@ -57,7 +57,7 @@ namespace Naninovel
         
         /// <inheritdoc cref="BuildLocalPath(string,string)"/>
         public string BuildLocalPath (string fullPath) => BuildLocalPath(PathPrefix, fullPath);
-        
+         
         public bool Equals (ProvisionSource other) => Equals(Provider, other.Provider) && PathPrefix == other.PathPrefix;
         public override bool Equals (object obj) => obj is ProvisionSource other && Equals(other);
         public static bool operator == (ProvisionSource left, ProvisionSource right) => left.Equals(right);

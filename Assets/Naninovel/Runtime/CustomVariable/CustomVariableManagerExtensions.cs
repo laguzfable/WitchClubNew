@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System.Globalization;
 
@@ -25,7 +25,11 @@ namespace Naninovel
                 value = (TValue)objValue;
                 return true;
             }
-
+            if (typeof(TValue) == typeof(float) && objValue is int intValue)
+            {
+                value = (TValue)(object)(float)intValue;
+                return true;
+            }
             return false;
         }
 

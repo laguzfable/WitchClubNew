@@ -1,6 +1,5 @@
 ﻿using Naninovel;
 using Naninovel.Commands;
-using UniRx.Async;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,7 +10,7 @@ using Naninovel.UI;
 public class GotoTrialCompleteScene : Command, Command.IForceWait
 {
 
-    public async override UniTask ExecuteAsync(CancellationToken cancellationToken = default)
+    public async override UniTask ExecuteAsync(AsyncToken asyncToken = default)
     {
         GameObject.FindObjectOfType<ContinueInputUI>().Visible = false;
 

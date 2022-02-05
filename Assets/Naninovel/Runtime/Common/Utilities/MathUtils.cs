@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using UnityEngine;
 
@@ -76,7 +76,7 @@ namespace Naninovel
 
         public static int ToNearestEven (this int value, int upperLimit = int.MaxValue)
         {
-            return (value % 2 == 0) ? value : Mathf.Min(value + 1, upperLimit);
+            return value % 2 == 0 ? value : Mathf.Min(value + 1, upperLimit);
         }
 
         public static float LinearToDecibel (float linear)

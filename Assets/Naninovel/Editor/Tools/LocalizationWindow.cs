@@ -1,13 +1,12 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using Naninovel.Commands;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using UniRx.Async;
+using Naninovel.Parsing;
 using UnityEditor;
 using UnityEngine;
 
@@ -15,13 +14,29 @@ namespace Naninovel
 {
     public class LocalizationWindow : EditorWindow
     {
-        protected string SourceScriptsPath { get => PlayerPrefs.GetString(sourceScriptsPathKey); set { PlayerPrefs.SetString(sourceScriptsPathKey, value); ValidateOutputPath(); } }
-        protected string SourceManagedTextPath 
-        { 
-            get => PlayerPrefs.GetString(sourceManagedTextPathKey, $"{Application.dataPath}/Resources/Naninovel/{ProjectConfigurationProvider.LoadOrDefault<ManagedTextConfiguration>().Loader.PathPrefix}"); 
-            set => PlayerPrefs.SetString(sourceManagedTextPathKey, value); 
+        protected string SourceScriptsPath
+        {
+            get => PlayerPrefs.GetString(sourceScriptsPathKey);
+            set
+            {
+                PlayerPrefs.SetString(sourceScriptsPathKey, value);
+                ValidateOutputPath();
+            }
         }
-        protected string LocaleFolderPath { get => PlayerPrefs.GetString(localeFolderPathKey); set { PlayerPrefs.SetString(localeFolderPathKey, value); ValidateOutputPath(); } }
+        protected string SourceManagedTextPath
+        {
+            get => PlayerPrefs.GetString(sourceManagedTextPathKey, $"{Application.dataPath}/Resources/Naninovel/{ProjectConfigurationProvider.LoadOrDefault<ManagedTextConfiguration>().Loader.PathPrefix}");
+            set => PlayerPrefs.SetString(sourceManagedTextPathKey, value);
+        }
+        protected string LocaleFolderPath
+        {
+            get => PlayerPrefs.GetString(localeFolderPathKey);
+            set
+            {
+                PlayerPrefs.SetString(localeFolderPathKey, value);
+                ValidateOutputPath();
+            }
+        }
 
         private const string sourceScriptsPathKey = "Naninovel." + nameof(LocalizationWindow) + "." + nameof(SourceScriptsPath);
         private const string sourceManagedTextPathKey = "Naninovel." + nameof(LocalizationWindow) + "." + nameof(SourceManagedTextPath);
@@ -34,12 +49,15 @@ namespace Naninovel
         private static readonly GUIContent localizeManagedTextContent = new GUIContent("Localize Managed Text", "Whether to also generate localization documents for the managed text.");
         private static readonly GUIContent tryUpdateContent = new GUIContent("Try Update", "Whether to preserve existing translation for the lines that didn't change.");
         private static readonly GUIContent autoTranslateContent = new GUIContent("Auto Translate", "Whether to provide Google Translate machine translation for the missing lines. Command lines and injected expressions won't be affected.\n\nBe aware, that public Google Translate web API limits request frequency per IP and won't process too much text at a time; the service could also sometimes fail to translate particular text causing warnings during the process.");
+        private static readonly GUIContent warnUntranslatedContent = new GUIContent("Warn Untranslated", "Whether to log warnings when untranslated lines are found while generating documents with `Try Update` enabled.");
 
-        private static readonly Regex CaptureInlinedRegex = new Regex(@"(?<!\\)\[(.*)(?<!\\)\]"); // The same as DynamicValueData.CaptureExprRegex, but for square brackets.
-        private static readonly Regex CaptureTagsRegex = new Regex(@"(?<!\\)\<(.*)(?<!\\)\>"); // The same as DynamicValueData.CaptureExprRegex, but for angle brackets.
+        private static readonly Regex CaptureInlinedRegex = new Regex(@"(?<!\\)\[(.*)(?<!\\)\]", RegexOptions.Compiled); // The same as DynamicValueData.CaptureExprRegex, but for square brackets.
+        private static readonly Regex CaptureTagsRegex = new Regex(@"(?<!\\)\<(.*)(?<!\\)\>", RegexOptions.Compiled); // The same as DynamicValueData.CaptureExprRegex, but for angle brackets.
 
+        private readonly List<string> availableLocalizations = new List<string>();
+        private bool localizationRootSelected => availableLocalizations.Count > 0;
         private LocalizationConfiguration config;
-        private bool tryUpdate = true, localizeManagedText = true, autoTranslate = false;
+        private bool tryUpdate = true, localizeManagedText = true, warnUntranslated = false;
         private int wordCount = -1;
         private bool outputPathValid = false, scriptSourcePathValid = false;
         private string targetTag, targetLanguage, sourceTag, sourceLanguage;
@@ -47,7 +65,7 @@ namespace Naninovel
         [MenuItem("Naninovel/Tools/Localization")]
         public static void OpenWindow ()
         {
-            var position = new Rect(100, 100, 500, 300);
+            var position = new Rect(100, 100, 500, 325);
             GetWindowWithRect<LocalizationWindow>(position, true, "Localization", true);
         }
 
@@ -60,15 +78,25 @@ namespace Naninovel
         private void ValidateOutputPath ()
         {
             var localizationRoot = config.Loader.PathPrefix;
+
+            availableLocalizations.Clear();
+            if (LocaleFolderPath != null && Directory.Exists(LocaleFolderPath) && LocaleFolderPath.EndsWithFast(localizationRoot))
+            {
+                var locales = Directory.GetDirectories(LocaleFolderPath).Select(Path.GetFileName);
+                foreach (var locale in locales)
+                    if (LanguageTags.ContainsTag(locale))
+                        availableLocalizations.Add(locale);
+            }
+
             targetTag = LocaleFolderPath?.GetAfter("/");
             sourceTag = SourceScriptsPath?.GetAfterFirst($"{localizationRoot}/")?.GetBefore("/");
-            outputPathValid = (LocaleFolderPath?.GetBeforeLast("/")?.EndsWith(localizationRoot) ?? false) && 
+            outputPathValid = localizationRootSelected || (LocaleFolderPath?.GetBeforeLast("/")?.EndsWith(localizationRoot) ?? false) &&
                 LanguageTags.ContainsTag(targetTag) && targetTag != config.SourceLocale;
             scriptSourcePathValid = LanguageTags.ContainsTag(sourceTag) && targetTag != sourceTag && sourceTag != config.SourceLocale;
             if (!scriptSourcePathValid) sourceTag = config.SourceLocale;
             if (outputPathValid)
             {
-                targetLanguage = LanguageTags.GetLanguageByTag(targetTag);
+                targetLanguage = localizationRootSelected ? string.Join(", ", availableLocalizations) : LanguageTags.GetLanguageByTag(targetTag);
                 sourceLanguage = scriptSourcePathValid ? LanguageTags.GetLanguageByTag(sourceTag) : $"{LanguageTags.GetLanguageByTag(config.SourceLocale)} (source)";
             }
         }
@@ -113,15 +141,18 @@ namespace Naninovel
 
             localizeManagedText = EditorGUILayout.Toggle(localizeManagedTextContent, localizeManagedText);
             tryUpdate = EditorGUILayout.Toggle(tryUpdateContent, tryUpdate);
-            //autoTranslate = EditorGUILayout.Toggle(autoTranslateContent, autoTranslate);
+            if (tryUpdate)
+                warnUntranslated = EditorGUILayout.Toggle(warnUntranslatedContent, warnUntranslated);
             GUILayout.FlexibleSpace();
 
-            EditorGUILayout.HelpBox(wordCount >= 0 ? $"Total word count in the localization documents: {wordCount}." : 
-                "Total word count in the localization documents will be printed here after the documents are generated.", MessageType.Info);
+            EditorGUILayout.HelpBox(wordCount >= 0 ? $"Total word count in the localization documents: {wordCount}." : "Total word count in the localization documents will be printed here after the documents are generated.", MessageType.Info);
 
             if (!outputPathValid)
-                if (targetTag == config.SourceLocale) EditorGUILayout.HelpBox($"You're trying to create a `{targetTag}` localization, which is equal to the project source locale. That is not allowed; see `Localization` guide for more info.", MessageType.Error);
-                else EditorGUILayout.HelpBox("Locale Folder path is not valid. Make sure it points to a folder inside localization root with name equal to one of the supported language tags.", MessageType.Error);
+            {
+                if (targetTag == config.SourceLocale)
+                    EditorGUILayout.HelpBox($"You're trying to create a `{targetTag}` localization, which is equal to the project source locale. That is not allowed; see `Localization` guide for more info.", MessageType.Error);
+                else EditorGUILayout.HelpBox("Locale Folder path is not valid. Make sure it points to the localization root or a subdirectory with name equal to one of the supported language tags.", MessageType.Error);
+            }
 
             EditorGUI.BeginDisabledGroup(!outputPathValid);
             if (GUILayout.Button("Generate Localization Resources", GUIStyles.NavigationButton))
@@ -130,14 +161,18 @@ namespace Naninovel
             EditorGUILayout.Space();
         }
 
-        private async void GenerateLocalizationResources ()
+        private void GenerateLocalizationResources ()
         {
             EditorUtility.DisplayProgressBar(progressBarTitle, "Reading source documents...", 0f);
 
             try
             {
-                await LocalizeScriptsAsync();
-                if (localizeManagedText) await LocalizeManagedTextAsync();
+                if (localizationRootSelected)
+                {
+                    foreach (var locale in availableLocalizations)
+                        DoGenerate(Path.Combine(LocaleFolderPath, locale));
+                }
+                else DoGenerate(LocaleFolderPath);
 
                 AssetDatabase.Refresh();
                 AssetDatabase.SaveAssets();
@@ -149,14 +184,27 @@ namespace Naninovel
 
             EditorUtility.ClearProgressBar();
             Repaint();
+
+            void DoGenerate (string localeFolderPath)
+            {
+                LocalizeScripts(localeFolderPath);
+                if (localizeManagedText) LocalizeManagedText(localeFolderPath);
+            }
         }
 
-        private async UniTask LocalizeScriptsAsync ()
+        private string BuildLocalizationHeader (string localeFolderPath, string sourceName)
+        {
+            var targetTag = Path.GetFileName(localeFolderPath);
+            var targetLanguage = LanguageTags.GetLanguageByTag(targetTag);
+            return $"{Identifiers.CommentLine} {sourceLanguage.Remove(" (source)")} <{sourceTag}> to {targetLanguage} <{targetTag}> localization document for {sourceName}\n";
+        }
+
+        private void LocalizeScripts (string localeFolderPath)
         {
             wordCount = 0;
 
             var scriptPathPrefix = ProjectConfigurationProvider.LoadOrDefault<ScriptsConfiguration>().Loader.PathPrefix;
-            var outputDirPath = $"{LocaleFolderPath}/{scriptPathPrefix}";
+            var outputDirPath = $"{localeFolderPath}/{scriptPathPrefix}";
             if (!Directory.Exists(outputDirPath))
                 Directory.CreateDirectory(outputDirPath);
 
@@ -172,63 +220,34 @@ namespace Naninovel
                     EditorUtility.DisplayProgressBar(progressBarTitle, $"Processing `{sourceScriptName}`...", progress);
 
                     var sourceScript = AssetDatabase.LoadAssetAtPath<Script>(PathUtils.AbsoluteToAssetPath(sourceScriptPath));
-                    var sourceTextLines = Script.SplitScriptText(File.ReadAllText(sourceScriptPath));
-                    var outputPath = sourceScriptPath.Replace(LanguageTags.GetTagByLanguage(sourceLanguage), LanguageTags.GetTagByLanguage(targetLanguage));
-                    var outputBuilder = new StringBuilder($"{CommentScriptLine.IdentifierLiteral} Localization script for `{sourceScriptName}`\n");
-
-                    var existingScript = tryUpdate ? AssetDatabase.LoadAssetAtPath<Script>(PathUtils.AbsoluteToAssetPath(outputPath)) : null;
-                    var existingTextLines = existingScript ? Script.SplitScriptText(File.ReadAllText(outputPath)) : null;
-                    var autoTranslatedTextLines = autoTranslate ? await AutoTranslate(sourceTag, targetTag, sourceTextLines, sourceScriptName, progress) : null;
-
+                    var sourceTextLines = Parsing.ScriptParser.SplitText(File.ReadAllText(sourceScriptPath));
                     Debug.Assert(sourceScript.Lines.Count == sourceTextLines.Length);
-                    Debug.Assert(!existingScript || existingScript.Lines.Count == existingTextLines.Length);
-                    Debug.Assert(autoTranslatedTextLines is null || autoTranslatedTextLines.Length == sourceTextLines.Length);
 
+                    var outputPath = sourceScriptPath.Replace(LanguageTags.GetTagByLanguage(sourceLanguage), LanguageTags.GetTagByLanguage(targetLanguage));
+                    var outputBuilder = new StringBuilder(BuildLocalizationHeader(localeFolderPath, $"`{sourceScriptName}` naninovel script"));
+                    var shouldUpdate = ShouldAppendExisting(outputPath, out var existingScript, out var existingTextLines);
                     var currentLabelText = default(string);
-                    var currentSourceLine = default(string);
-                    var currentAutoTranslateLines = new List<string>();
                     for (int lineIdx = 1; lineIdx < sourceScript.Lines.Count; lineIdx++) // Starting from one to skip title comment.
                     {
                         var sourceLine = sourceScript.Lines[lineIdx];
                         if (sourceLine is LabelScriptLine labelLine)
                         {
-                            var locIdx = (existingScript && currentLabelText != null) ? existingScript.GetLineIndexForLabel(currentLabelText) : -1;
-                            var appendedAnyExistingLines = false;
-                            if (locIdx > -1) // Existing localization value is still valid, preserve it.
-                            {
-                                while (existingScript.Lines.IsIndexValid(locIdx + 1))
-                                {
-                                    locIdx++;
-                                    var existingLine = existingScript.Lines[locIdx];
-                                    if (existingLine is CommentScriptLine) continue;
-                                    if (existingLine is LabelScriptLine) break;
-                                    outputBuilder.AppendLine(existingTextLines[locIdx]);
-                                    appendedAnyExistingLines = true;
-                                }
-                            }
-
-                            if (!appendedAnyExistingLines && currentAutoTranslateLines.Count > 0)
-                                foreach (var line in currentAutoTranslateLines)
-                                    outputBuilder.AppendLine(line);
-                            currentAutoTranslateLines.Clear();
+                            if (shouldUpdate)
+                                AppendExistingLines(existingScript, existingTextLines, currentLabelText, outputBuilder);
 
                             currentLabelText = labelLine.LabelText;
                             outputBuilder.AppendLine();
-                            outputBuilder.AppendLine($"{LabelScriptLine.IdentifierLiteral} {labelLine.LabelText}");
+                            outputBuilder.AppendLine($"{Identifiers.LabelLine} {labelLine.LabelText}");
                             continue;
                         }
                         if (!IsLineLocalizable(sourceLine)) continue; // Whether the line contains some actual translation.
 
-                        currentSourceLine = sourceTextLines[lineIdx];
-                        outputBuilder.AppendLine($"{CommentScriptLine.IdentifierLiteral} {currentSourceLine}"); // Copy the source text to comments.
-
-                        if (autoTranslatedTextLines != null && !string.IsNullOrEmpty(autoTranslatedTextLines[lineIdx]))
-                            currentAutoTranslateLines.Add(autoTranslatedTextLines[lineIdx]);
+                        outputBuilder.AppendLine($"{Identifiers.CommentLine} {sourceTextLines[lineIdx]}"); // Copy the source text to comments.
 
                         CountWords(sourceTextLines[lineIdx]);
                     }
 
-                    File.WriteAllText(outputPath, outputBuilder.ToString(), Encoding.UTF8);
+                    File.WriteAllText(outputPath, outputBuilder.ToString());
                 }
             }
             else // Generate based on source scripts.
@@ -244,52 +263,29 @@ namespace Naninovel
                     EditorUtility.DisplayProgressBar(progressBarTitle, $"Processing `{sourceScriptName}`...", pathIdx / (float)sourceScriptPaths.Length);
 
                     var sourceText = File.ReadAllText(sourceScriptPath);
-                    var sourceTextLines = Script.SplitScriptText(sourceText);
+                    var sourceTextLines = Parsing.ScriptParser.SplitText(sourceText);
                     var sourceScript = AssetDatabase.LoadAssetAtPath<Script>(sourceScriptPath);
-                    var outputPath = $"{outputDirPath}/{sourceScript.Name}.nani";
-                    var outputBuilder = new StringBuilder($"{CommentScriptLine.IdentifierLiteral} Localization script for `{sourceScript.Name}`\n");
-
-                    var existingScript = tryUpdate ? AssetDatabase.LoadAssetAtPath<Script>(PathUtils.AbsoluteToAssetPath(outputPath)) : null;
-                    var existingTextLines = existingScript ? Script.SplitScriptText(File.ReadAllText(outputPath)) : null;
-                    var autoTranslatedTextLines = autoTranslate ? await AutoTranslate(sourceTag, targetTag, sourceTextLines, sourceScriptName, progress) : null;
-
                     Debug.Assert(sourceScript.Lines.Count == sourceTextLines.Length);
-                    Debug.Assert(!existingScript || existingScript.Lines.Count == existingTextLines.Length);
-                    Debug.Assert(autoTranslatedTextLines is null || autoTranslatedTextLines.Length == sourceTextLines.Length);
 
+                    var outputPath = $"{outputDirPath}/{sourceScript.Name}.nani";
+                    var outputBuilder = new StringBuilder(BuildLocalizationHeader(localeFolderPath, $"`{sourceScriptName}` naninovel script"));
+                    var shouldUpdate = ShouldAppendExisting(outputPath, out var existingScript, out var existingTextLines);
                     for (int lineIdx = 0; lineIdx < sourceScript.Lines.Count; lineIdx++)
                     {
                         var sourceLine = sourceScript.Lines[lineIdx];
                         if (!IsLineLocalizable(sourceLine)) continue;
 
                         var sourceTextLine = sourceTextLines[lineIdx];
-
                         outputBuilder.AppendLine();
-                        outputBuilder.AppendLine($"{LabelScriptLine.IdentifierLiteral} {sourceLine.LineHash}");
-                        outputBuilder.AppendLine($"{CommentScriptLine.IdentifierLiteral} {sourceTextLine}");
+                        outputBuilder.AppendLine($"{Identifiers.LabelLine} {sourceLine.LineHash}");
+                        outputBuilder.AppendLine($"{Identifiers.CommentLine} {sourceTextLine}");
 
-                        var locIdx = existingScript ? existingScript.GetLineIndexForLabel(sourceLine.LineHash) : -1;
-                        var appendedAnyExistingLines = false;
-                        if (locIdx > -1) // Existing localization value is still valid, preserve it.
-                        {
-                            while (existingScript.Lines.IsIndexValid(locIdx + 1))
-                            {
-                                locIdx++;
-                                var existingLine = existingScript.Lines[locIdx];
-                                if (existingLine is CommentScriptLine) continue;
-                                if (existingLine is LabelScriptLine) break;
-                                outputBuilder.AppendLine(existingTextLines[locIdx]);
-                                appendedAnyExistingLines = true;
-                            }
-                        }
-
-                        if (!appendedAnyExistingLines && autoTranslatedTextLines != null && !string.IsNullOrEmpty(autoTranslatedTextLines[lineIdx]))
-                            outputBuilder.AppendLine(autoTranslatedTextLines[lineIdx]);
-
+                        if (shouldUpdate)
+                            AppendExistingLines(existingScript, existingTextLines, sourceLine.LineHash, outputBuilder);
                         CountWords(sourceTextLine);
                     }
 
-                    File.WriteAllText(outputPath, outputBuilder.ToString(), Encoding.UTF8);
+                    File.WriteAllText(outputPath, outputBuilder.ToString());
                 }
             }
 
@@ -306,14 +302,41 @@ namespace Naninovel
 
             // string.Split(null) will delimit by whitespace chars; `default(char[])` is used to prevent ambiguity in case of overloads.
             void CountWords (string value) => wordCount += value.Split(default(char[]), StringSplitOptions.RemoveEmptyEntries).Length;
+
+            bool ShouldAppendExisting (string outputPath, out Script existingScript, out string[] existingTextLines)
+            {
+                existingScript = tryUpdate ? AssetDatabase.LoadAssetAtPath<Script>(PathUtils.AbsoluteToAssetPath(outputPath)) : null;
+                existingTextLines = existingScript ? Parsing.ScriptParser.SplitText(File.ReadAllText(outputPath)) : null;
+                return tryUpdate && existingScript;
+            }
+
+            void AppendExistingLines (Script existingScript, string[] existingLines, string lineHash, StringBuilder builder)
+            {
+                var locIdx = existingScript.GetLineIndexForLabel(lineHash);
+                if (locIdx == -1) return;
+
+                var appended = false;
+                var hashIndex = locIdx;
+                while (existingScript.Lines.IsIndexValid(locIdx + 1))
+                {
+                    locIdx++;
+                    var existingLine = existingScript.Lines[locIdx];
+                    if (existingLine is CommentScriptLine || existingLine is EmptyScriptLine) continue;
+                    if (existingLine is LabelScriptLine) break;
+                    builder.AppendLine(existingLines[locIdx]);
+                    appended = true;
+                }
+                if (!appended && warnUntranslated)
+                    Debug.LogWarning($"`{AssetDatabase.GetAssetPath(existingScript)}` localization script is missing translation at line #{hashIndex + 1}.");
+            }
         }
 
-        private async UniTask LocalizeManagedTextAsync ()
+        private void LocalizeManagedText (string localeFolderPath)
         {
             if (!Directory.Exists(SourceManagedTextPath)) return;
 
-            var outputPath = $"{LocaleFolderPath}/{ProjectConfigurationProvider.LoadOrDefault<ManagedTextConfiguration>().Loader.PathPrefix}";
-            if (!Directory.Exists(outputPath)) 
+            var outputPath = $"{localeFolderPath}/{ProjectConfigurationProvider.LoadOrDefault<ManagedTextConfiguration>().Loader.PathPrefix}";
+            if (!Directory.Exists(outputPath))
                 Directory.CreateDirectory(outputPath);
 
             var filePaths = Directory.GetFiles(SourceManagedTextPath, "*.txt", SearchOption.AllDirectories);
@@ -336,164 +359,13 @@ namespace Naninovel
                         records.Add(existingRecord);
                     }
                 }
-                else if (autoTranslate)
-                {
-                    var sourceTextLines = records.Select(r => r.ToDocumentTextLine()).ToArray();
-                    var translatedTextLines = await AutoTranslate(sourceTag, targetTag, sourceTextLines, category, i / (float)filePaths.Length);
-                    if (translatedTextLines is null)
-                    {
-                        Debug.LogWarning("Failed to auto-translate managed text documents. Disable auto-translate and try again.");
-                        return;
-                    }
-                    File.WriteAllLines(targetPath, translatedTextLines, Encoding.UTF8);
-                    continue;
-                }
 
                 var outputBuilder = new StringBuilder();
+                outputBuilder.AppendLine(BuildLocalizationHeader(localeFolderPath, $"`{category}` managed text document"));
                 foreach (var record in records)
                     outputBuilder.AppendLine(record.ToDocumentTextLine());
-                File.WriteAllText(targetPath, outputBuilder.ToString(), Encoding.UTF8);
+                File.WriteAllText(targetPath, outputBuilder.ToString());
             }
-        }
-
-        private static async UniTask<string[]> AutoTranslate (string sourceLang, string targetLang, string[] sourceTextLines, string sourceDocumentName, float progress)
-        {
-            await AsyncUtils.WaitEndOfFrame;
-            return sourceTextLines;
-
-            //EditorUtility.DisplayProgressBar(progressBarTitle, $"Google Translate `{sourceDocumentName}`...", progress);
-
-            //const string lineSeparator = "3df75c9f8";
-            //const string injectLiteral = "1i4a028c2";
-            //const string injectPointer = "||";
-
-            //var injectList = new List<string>();
-            //var requestLines = new List<string>();
-            //for (int i = 0; i < sourceTextLines.Length; i++)
-            //{
-            //    var lineText = sourceTextLines[i];
-            //    var lineType = Script.ResolveLineType(lineText.TrimFull());
-            //    if (lineType != typeof(GenericTextScriptLine) || string.IsNullOrWhiteSpace(lineText)) continue;
-
-            //    // Capture author ID.
-            //    var authorId = lineText.GetBefore(GenericTextScriptLine.AuthorIdLiteral);
-            //    if (!string.IsNullOrEmpty(authorId) && !authorId.Any(char.IsWhiteSpace) && !authorId.StartsWithFast("\""))
-            //    {
-            //        lineText = $"{injectLiteral}{injectList.Count}{injectPointer}{lineText.GetAfterFirst(GenericTextScriptLine.AuthorIdLiteral)}";
-            //        injectList.Add(authorId + GenericTextScriptLine.AuthorIdLiteral);
-            //    }
-
-            //    // Capture injected expressions.
-            //    foreach (Match match in DynamicValueData.CaptureExprRegex.Matches(lineText))
-            //    {
-            //        lineText = lineText.Replace(match.Value, $"{injectLiteral}{injectList.Count}{injectPointer}");
-            //        injectList.Add(match.Value);
-            //    }
-
-            //    // Capture inlined commands.
-            //    foreach (Match match in CaptureInlinedRegex.Matches(lineText))
-            //    {
-            //        lineText = lineText.Replace(match.Value, $"{injectLiteral}{injectList.Count}{injectPointer}");
-            //        injectList.Add(match.Value);
-            //    }
-
-            //    // Capture html tags (text formattings).
-            //    foreach (Match match in CaptureTagsRegex.Matches(lineText))
-            //    {
-            //        lineText = lineText.Replace(match.Value, $"{injectLiteral}{injectList.Count}{injectPointer}");
-            //        injectList.Add(match.Value);
-            //    }
-
-            //    requestLines.Add($"{i}{injectPointer}{lineText}");
-            //}
-
-            //var requestText = UnityWebRequest.EscapeURL(string.Join(lineSeparator, requestLines), Encoding.UTF8);
-            //var uri = $"https://translate.googleapis.com/translate_a/single?client=gtx&sl={sourceLang}&tl={targetLang}&dt=t&q={requestText}";
-            //var request = UnityWebRequest.Get(uri);
-
-            //await request.SendWebRequest();
-
-            //if (request is null || request.isHttpError || request.isNetworkError || string.IsNullOrEmpty(request.downloadHandler?.text))
-            //{
-            //    Debug.LogWarning($"Failed to fetch Google Translate: {request?.error}");
-            //    request.Dispose();
-            //    return null;
-            //}
-
-            //var sanitizedResponse = SanitizeResponse(request.downloadHandler.text);
-
-            //var result = new string[sourceTextLines.Length];
-            //foreach (var responseLine in sanitizedResponse.Split(new[] { lineSeparator }, StringSplitOptions.RemoveEmptyEntries))
-            //{
-            //    // Extract source line index.
-            //    if (!int.TryParse(responseLine.GetBefore(injectPointer), out var sourceLineIdx))
-            //    {
-            //        Debug.LogWarning($"Failed to process google translation line `{responseLine}`.");
-            //        continue;
-            //    }
-            //    var translatedLine = responseLine.GetAfterFirst(injectPointer);
-
-            //    // Handle injected parts.
-            //    while (translatedLine.Contains(injectLiteral))
-            //    {
-            //        var after = translatedLine.GetAfterFirst(injectLiteral);
-            //        var before = translatedLine.GetBefore(injectLiteral);
-            //        var idxString = after.GetBefore(injectPointer);
-            //        if (!int.TryParse(idxString, out var injectIdx))
-            //        {
-            //            Debug.LogWarning($"Failed to process google translation line `{responseLine}`.");
-            //            break;
-            //        }
-            //        translatedLine = before + injectList[injectIdx] + after.GetAfterFirst(injectPointer);
-            //    }
-
-            //    // Un-escape double quotes (Google Translate escapes them in response).
-            //    translatedLine = translatedLine.Replace("\\\"", "\"");
-
-            //    result[sourceLineIdx] = translatedLine;
-            //}
-            //request.Dispose();
-
-            //return result.ToArray();
-
-            //string SanitizeResponse (string response)
-            //{
-            //    // https://i.gyazo.com/c7a032372831177e8a8c1f7a05b8b70f.png
-
-            //    response = DecodeNonAsciiCharacters(response);
-            //    var builder = new StringBuilder();
-            //    var bracketLevel = 0;
-            //    var insideBody = false;
-            //    var insideSourceBody = false;
-            //    for (int i = 0; i < response.Length; i++)
-            //    {
-            //        var curChar = response[i];
-            //        var prevChar = i > 0 ? response[i - 1] : default;
-            //        var prePrevChar = i > 1 ? response[i - 2] : default;
-            //        var nextChar = (i + 1) < response.Length ? response[i + 1] : default;
-            //        var escaped = prevChar == '\\' && (i < 2 || prePrevChar != '\\');
-
-            //        if (!insideBody && !insideSourceBody)
-            //        {
-            //            if (curChar == '[') { bracketLevel++; continue; }
-            //            if (curChar == ']') { bracketLevel--; continue; }
-            //            if (bracketLevel == 3 && curChar == '"' && prevChar == '[') { insideBody = true; continue; }
-            //            continue;
-            //        }
-
-            //        if (insideBody && !escaped && curChar == '"' && nextChar == ',') { insideBody = false; insideSourceBody = true; continue; }
-            //        if (insideSourceBody && !escaped && curChar == '"' && nextChar == ',') { insideSourceBody = false; continue; }
-
-            //        if (!insideBody) continue;
-            //        if (curChar == ' ' && prevChar == injectPointer[1] && prePrevChar == injectPointer[0]) continue;
-            //        builder.Append(curChar);
-            //    }
-
-            //    return builder.ToString();
-
-            //    string DecodeNonAsciiCharacters (string value) => Regex.Replace(value, @"\s?\\u(?<Value>[a-zA-Z0-9]{4})\s?",
-            //        m => ((char)int.Parse(m.Groups["Value"].Value, System.Globalization.NumberStyles.HexNumber)).ToString());
-            //}
         }
     }
 }

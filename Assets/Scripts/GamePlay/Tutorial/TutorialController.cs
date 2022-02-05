@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using Naninovel;
-using UniRx.Async;
 using System;
 
 public class TutorialController : MonoBehaviour

@@ -1,7 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel
@@ -9,7 +8,22 @@ namespace Naninovel
     /// <summary>
     /// Allows tweening a <see cref="ITweenValue"/> using coroutine.
     /// </summary>
-    public class Tweener<TTweenValue> 
+    public interface ITweener<TTweenValue>
+        where TTweenValue : struct, ITweenValue
+    {
+        TTweenValue TweenValue { get; }
+        bool Running { get; }
+
+        void Run (in TTweenValue tweenValue, in AsyncToken asyncToken = default, UnityEngine.Object target = default);
+        void Run (in AsyncToken asyncToken = default, UnityEngine.Object target = default);
+        UniTask RunAsync (in TTweenValue tweenValue, in AsyncToken asyncToken = default, UnityEngine.Object target = default);
+        UniTask RunAsync (in AsyncToken asyncToken = default, UnityEngine.Object target = default);
+        void Stop ();
+        void CompleteInstantly ();
+    }
+
+    /// <inheritdoc cref="ITweener{TTweenValue}"/>
+    public class Tweener<TTweenValue> : ITweener<TTweenValue>
         where TTweenValue : struct, ITweenValue
     {
         public TTweenValue TweenValue { get; private set; }
@@ -18,33 +32,43 @@ namespace Naninovel
         private readonly Action onCompleted;
         private float elapsedTime;
         private Guid lastRunGuid;
+        private UnityEngine.Object target;
+        private bool targetProvided;
 
         public Tweener (Action onCompleted = null)
         {
             this.onCompleted = onCompleted;
         }
 
-        public Tweener (TTweenValue tweenValue, Action onCompleted = null)
+        public Tweener (in TTweenValue tweenValue, Action onCompleted = null)
             : this(onCompleted)
         {
             TweenValue = tweenValue;
         }
 
-        public void Run (TTweenValue tweenValue, CancellationToken cancellationToken = default)
+        public void Run (in AsyncToken asyncToken = default, UnityEngine.Object target = default)
         {
-            TweenValue = tweenValue;
-            Run(cancellationToken);
+            targetProvided = this.target = target;
+            TweenAsyncAndForget(asyncToken).Forget();
         }
 
-        public void Run (CancellationToken cancellationToken = default) => TweenAsyncAndForget(cancellationToken).Forget();
-
-        public UniTask RunAsync (TTweenValue tweenValue, CancellationToken cancellationToken = default)
+        public void Run (in TTweenValue tweenValue, in AsyncToken asyncToken = default, UnityEngine.Object target = default)
         {
             TweenValue = tweenValue;
-            return RunAsync(cancellationToken);
+            Run(asyncToken, target);
         }
 
-        public UniTask RunAsync (CancellationToken cancellationToken = default) => TweenAsync(cancellationToken);
+        public UniTask RunAsync (in AsyncToken asyncToken = default, UnityEngine.Object target = default)
+        {
+            targetProvided = this.target = target;
+            return TweenAsync(asyncToken);
+        }
+
+        public UniTask RunAsync (in TTweenValue tweenValue, in AsyncToken asyncToken = default, UnityEngine.Object target = default)
+        {
+            TweenValue = tweenValue;
+            return RunAsync(asyncToken, target);
+        }
 
         public void Stop ()
         {
@@ -59,41 +83,47 @@ namespace Naninovel
             onCompleted?.Invoke();
         }
 
-        protected async UniTask TweenAsync (CancellationToken cancellationToken = default)
+        protected async UniTask TweenAsync (AsyncToken asyncToken = default)
         {
             PrepareTween();
-            if (TweenValue.TweenDuration <= 0f) { CompleteInstantly(); return; }
+            if (TweenValue.TweenDuration <= 0f)
+            {
+                CompleteInstantly();
+                return;
+            }
 
             var currentRunGuid = lastRunGuid;
-            while (!cancellationToken.CancellationRequested && TweenValue.TargetValid && elapsedTime <= TweenValue.TweenDuration)
+            while (elapsedTime <= TweenValue.TweenDuration && asyncToken.EnsureNotCanceledOrCompleted(targetProvided ? target : null))
             {
                 PerformTween();
-                await AsyncUtils.WaitEndOfFrame;
+                await AsyncUtils.WaitEndOfFrameAsync(asyncToken);
                 if (lastRunGuid != currentRunGuid) return; // The tweener was completed instantly or stopped.
             }
 
-            if (cancellationToken.CancelASAP) return;
-            if (cancellationToken.CancelLazy) CompleteInstantly();
+            if (asyncToken.Completed) CompleteInstantly();
             else FinishTween();
         }
 
         // Required to prevent garbage when await is not required (fire and forget).
         // Remember to keep both methods identical.
-        protected async UniTaskVoid TweenAsyncAndForget (CancellationToken cancellationToken = default)
+        protected async UniTaskVoid TweenAsyncAndForget (AsyncToken asyncToken = default)
         {
             PrepareTween();
-            if (TweenValue.TweenDuration <= 0f) { CompleteInstantly(); return; }
+            if (TweenValue.TweenDuration <= 0f)
+            {
+                CompleteInstantly();
+                return;
+            }
 
             var currentRunGuid = lastRunGuid;
-            while (!cancellationToken.CancellationRequested && TweenValue.TargetValid && elapsedTime <= TweenValue.TweenDuration)
+            while (elapsedTime <= TweenValue.TweenDuration && asyncToken.EnsureNotCanceledOrCompleted(targetProvided ? target : null))
             {
                 PerformTween();
-                await AsyncUtils.WaitEndOfFrame;
+                await AsyncUtils.WaitEndOfFrameAsync(asyncToken);
                 if (lastRunGuid != currentRunGuid) return; // The tweener was completed instantly or stopped.
             }
 
-            if (cancellationToken.CancelASAP) return;
-            if (cancellationToken.CancelLazy) CompleteInstantly();
+            if (asyncToken.Completed) CompleteInstantly();
             else FinishTween();
         }
 

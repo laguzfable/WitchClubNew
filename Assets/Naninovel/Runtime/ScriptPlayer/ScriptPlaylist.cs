@@ -1,11 +1,11 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
-using Naninovel.Commands;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
-using UniRx.Async;
+using UnityEngine;
 
 namespace Naninovel
 {
@@ -52,15 +52,24 @@ namespace Naninovel
         /// Preloads and holds resources required to execute <see cref="Command.IPreloadable"/> commands in the specified range.
         /// </summary>
         [CollectionAccess(CollectionAccessType.Read)]
-        public async UniTask PreloadResourcesAsync (int startCommandIndex, int endCommandIndex)
+        public async UniTask PreloadResourcesAsync (int startCommandIndex, int endCommandIndex, Action<float> onProgress = default)
         {
             if (Count == 0) return;
 
             if (!this.IsIndexValid(startCommandIndex) || !this.IsIndexValid(endCommandIndex) || endCommandIndex < startCommandIndex)
                 throw new Exception($"Failed to preload `{ScriptName}` script resources: [{startCommandIndex}, {endCommandIndex}] is not a valid range.");
 
-            var commandsToHold = GetRange(startCommandIndex, (endCommandIndex + 1) - startCommandIndex).OfType<Command.IPreloadable>();
-            await UniTask.WhenAll(commandsToHold.Select(cmd => cmd.PreloadResourcesAsync()));
+            onProgress?.Invoke(0);
+            var count = endCommandIndex + 1 - startCommandIndex;
+            var commandsToHold = GetRange(startCommandIndex, count).OfType<Command.IPreloadable>().ToArray();
+            var heldCommands = 0;
+            await UniTask.WhenAll(commandsToHold.Select(PreloadCommand));
+
+            async UniTask PreloadCommand (Command.IPreloadable command)
+            {
+                await command.PreloadResourcesAsync();
+                onProgress?.Invoke(++heldCommands / (float)commandsToHold.Length);
+            }
         }
 
         /// <summary>
@@ -128,8 +137,27 @@ namespace Naninovel
         public int IndexOf (PlaybackSpot playbackSpot)
         {
             for (int i = 0; i < Count; i++)
-                if (this[i].PlaybackSpot == playbackSpot) return i;
+                if (this[i].PlaybackSpot == playbackSpot)
+                    return i;
             return -1;
+        }
+
+        /// <summary>
+        /// Executes commands in the playlist independently of the current script player state.
+        /// </summary>
+        /// <remarks>
+        /// Can be used to additively play a list of commands (not a real script), without interrupting currently played script.
+        /// </remarks>
+        public async UniTask ExecuteAsync (AsyncToken asyncToken = default)
+        {
+            foreach (var command in this)
+            {
+                if (!command.ShouldExecute) continue;
+                if (Engine.GetConfiguration<ScriptPlayerConfiguration>().ShouldWait(command))
+                    await command.ExecuteAsync(asyncToken);
+                else command.ExecuteAsync(asyncToken).Forget();
+                asyncToken.ThrowIfCanceled();
+            }
         }
     }
 }

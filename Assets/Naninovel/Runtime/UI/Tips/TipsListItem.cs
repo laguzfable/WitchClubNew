@@ -1,29 +1,42 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace Naninovel
 {
     public class TipsListItem : MonoBehaviour
     {
+        [Serializable]
+        private class OnLabelChangedEvent : UnityEvent<string> { }
+        [Serializable]
+        private class OnLabelStyleChangedEvent : UnityEvent<FontStyle> { }
+
         public virtual string UnlockableId { get; private set; }
         public virtual int Number => transform.GetSiblingIndex() + 1;
 
-        protected Button Button => button;
-        protected Text Label => label;
-        protected GameObject SelectedIndicator => selectedIndicator;
+        protected virtual Button Button => button;
+        protected virtual GameObject SelectedIndicator => selectedIndicator;
 
+        [Tooltip("Tip label template. `{N}` will be replaced with the record number, `{T}` — with the title.")]
+        [SerializeField] private string template = "{N}. {T}";
+        [Tooltip("Record title to set when the tip item is locked.")]
+        [SerializeField] private string lockedTitle = "???";
+        [Tooltip("The tip button.")]
         [SerializeField] private Button button = default;
-        [SerializeField] private Text label = default;
+        [Tooltip("When assigned, the game object will be activated when the tip is selected.")]
         [SerializeField] private GameObject selectedIndicator = default;
+        [SerializeField] private OnLabelChangedEvent onLabelChanged = default;
+        [SerializeField] private OnLabelStyleChangedEvent onLabelStyleChanged = default;
 
         private Action<TipsListItem> onClick;
         private string title;
         private bool selectedOnce;
 
-        public static TipsListItem Instantiate (TipsListItem prototype, string unlockableId, string title, bool selectedOnce, Action<TipsListItem> onClick)
+        public static TipsListItem Instantiate (TipsListItem prototype, string unlockableId,
+            string title, bool selectedOnce, Action<TipsListItem> onClick)
         {
             var item = Instantiate(prototype);
 
@@ -40,32 +53,44 @@ namespace Naninovel
             if (selected)
             {
                 selectedOnce = true;
-                label.fontStyle = FontStyle.Normal;
+                SetLabelStyle(FontStyle.Normal);
             }
-            selectedIndicator.SetActive(selected);
+            if (SelectedIndicator)
+                SelectedIndicator.SetActive(selected);
         }
 
         public virtual void SetUnlocked (bool unlocked)
         {
-            label.text = $"{Number}. {(unlocked ? title : "???")}";
-            label.fontStyle = !unlocked || selectedOnce ? FontStyle.Normal : FontStyle.Bold;
-            button.interactable = unlocked;
+            SetLabel(template.Replace("{N}", Number.ToString()).Replace("{T}", unlocked ? title : lockedTitle));
+            SetLabelStyle(!unlocked || selectedOnce ? FontStyle.Normal : FontStyle.Bold);
+            Button.interactable = unlocked;
         }
 
         protected virtual void Awake ()
         {
-            this.AssertRequiredObjects(button, label, selectedIndicator);
-            selectedIndicator.SetActive(false);
+            this.AssertRequiredObjects(Button);
+            if (SelectedIndicator)
+                SelectedIndicator.SetActive(false);
         }
 
         protected virtual void OnEnable ()
         {
-            button.onClick.AddListener(HandleButtonClicked);
+            Button.onClick.AddListener(HandleButtonClicked);
         }
 
         protected virtual void OnDisable ()
         {
-            button.onClick.RemoveListener(HandleButtonClicked);
+            Button.onClick.RemoveListener(HandleButtonClicked);
+        }
+
+        protected virtual void SetLabel (string value)
+        {
+            onLabelChanged?.Invoke(value);
+        }
+
+        protected virtual void SetLabelStyle (FontStyle value)
+        {
+            onLabelStyleChanged?.Invoke(value);
         }
 
         protected virtual void HandleButtonClicked ()

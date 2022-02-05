@@ -6,7 +6,6 @@ using UnityEngine.SceneManagement;
 using DG.Tweening;
 using System.Linq;
 using Naninovel;
-using UniRx.Async;
 using Naninovel.UI;
 using System;
 
@@ -138,7 +137,7 @@ public class CombatSystem : MonoBehaviour
             Debug.Log($"Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[0] : {DataService.Instance.scriptParameter.background}");
             BG.sprite = visualResource.GetBGByName(DataService.Instance.scriptParameter.background);
 
-            var runeActive = true;
+            var runeActive = false;
             Engine.GetService<ICustomVariableManager>().TryGetVariableValue<bool>("RuneActive", out runeActive);
             tutorController.uICollection.SetRunesEnabled(runeActive);
 

@@ -1,5 +1,5 @@
+using Naninovel;
 using UnityEngine;
-using UniRx.Async;
 
 public class MobDataTester : MonoBehaviour
 {

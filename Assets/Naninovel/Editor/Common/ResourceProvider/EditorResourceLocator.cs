@@ -1,18 +1,17 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System.Collections.Generic;
 using System.Linq;
-using UniRx.Async;
 
 namespace Naninovel
 {
-    public class EditorResourceLocator<TResource> : LocateResourcesRunner<TResource> 
+    public class EditorResourceLocator<TResource> : LocateResourcesRunner<TResource>
         where TResource : UnityEngine.Object
     {
         private readonly IReadOnlyCollection<string> editorResourcePaths;
 
-        public EditorResourceLocator (IResourceProvider provider, string resourcesPath, 
-            IReadOnlyCollection<string> editorResourcePaths) : base (provider, resourcesPath ?? string.Empty)
+        public EditorResourceLocator (IResourceProvider provider, string resourcesPath,
+            IReadOnlyCollection<string> editorResourcePaths) : base(provider, resourcesPath ?? string.Empty)
         {
             this.editorResourcePaths = editorResourcePaths;
         }

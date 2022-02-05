@@ -1,7 +1,7 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
-using UniRx.Async;
+using UnityEngine;
 
 namespace Naninovel
 {
@@ -11,7 +11,6 @@ namespace Naninovel
         public bool Loop { get; private set; }
         public bool TimeScaleIgnored { get; private set; }
         public float Duration { get; private set; }
-        public bool TargetValid => !targetProvided || target;
 
         private readonly Action onLoop;
         private readonly Action onCompleted;
@@ -31,7 +30,7 @@ namespace Naninovel
         }
 
         public void Run (float duration, bool loop = false, bool ignoreTimeScale = false, 
-            CancellationToken cancellationToken = default, UnityEngine.Object target = default)
+            in AsyncToken asyncToken = default, UnityEngine.Object target = default)
         {
             if (Running) CompleteInstantly();
 
@@ -42,12 +41,12 @@ namespace Naninovel
 
             targetProvided = this.target = target;
 
-            if (Loop) WaitAndLoop(cancellationToken).Forget();
-            else WaitAndComplete(cancellationToken).Forget();
+            if (Loop) WaitAndLoopAsync(asyncToken).Forget();
+            else WaitAndCompleteAsync(asyncToken).Forget();
         }
 
-        public void Run (CancellationToken cancellationToken = default, UnityEngine.Object target = default) 
-            => Run(Duration, Loop, TimeScaleIgnored, cancellationToken, target);
+        public void Run (in AsyncToken asyncToken = default, UnityEngine.Object target = default) 
+            => Run(Duration, Loop, TimeScaleIgnored, asyncToken, target);
 
         public void Stop ()
         {
@@ -61,17 +60,18 @@ namespace Naninovel
             onCompleted?.Invoke();
         }
 
-        protected virtual async UniTaskVoid WaitAndComplete (CancellationToken cancellationToken = default)
+        protected virtual async UniTaskVoid WaitAndCompleteAsync (AsyncToken asyncToken = default)
         {
             lastRunGuid = Guid.NewGuid();
             var currentRunGuid = lastRunGuid;
+            var startTime = GetTime();
 
-            using (var combinedCTS = cancellationToken.CreateLinkedTokenSource())
-                await UniTask.Delay(TimeSpan.FromSeconds(Duration), TimeScaleIgnored, cancellationToken: combinedCTS.Token);
-            if (cancellationToken.CancelASAP || !TargetValid) return;
+            while (!WaitedEnough(startTime) && asyncToken.EnsureNotCanceledOrCompleted(targetProvided ? target : null))
+                await AsyncUtils.WaitEndOfFrameAsync(asyncToken);
+
             if (lastRunGuid != currentRunGuid) return; // The timer was completed instantly or stopped.
 
-            if (cancellationToken.CancelLazy) CompleteInstantly();
+            if (asyncToken.Completed) CompleteInstantly();
             else
             {
                 Running = false;
@@ -79,21 +79,29 @@ namespace Naninovel
             }
         }
 
-        protected virtual async UniTaskVoid WaitAndLoop (CancellationToken cancellationToken = default)
+        protected virtual async UniTaskVoid WaitAndLoopAsync (AsyncToken asyncToken = default)
         {
             lastRunGuid = Guid.NewGuid();
             var currentRunGuid = lastRunGuid;
-
-            while (!cancellationToken.CancellationRequested)
+            var startTime = GetTime();
+            
+            while (asyncToken.EnsureNotCanceledOrCompleted(targetProvided ? target : null))
             {
-                using (var combinedCTS = cancellationToken.CreateLinkedTokenSource())
-                    await UniTask.Delay(TimeSpan.FromSeconds(Duration), TimeScaleIgnored, cancellationToken: combinedCTS.Token);
-                if (cancellationToken.CancelASAP || !TargetValid) return;
+                await AsyncUtils.WaitEndOfFrameAsync(asyncToken);
+                if (targetProvided && !target) throw new AsyncOperationDestroyedException(target);
                 if (lastRunGuid != currentRunGuid) return; // The timer was stopped.
-                onLoop?.Invoke();
+                if (WaitedEnough(startTime))
+                {
+                    onLoop?.Invoke();
+                    startTime = GetTime();
+                }
             }
 
-            if (cancellationToken.CancelLazy) CompleteInstantly();
+            if (asyncToken.Completed) CompleteInstantly();
         }
+
+        private float GetTime () => TimeScaleIgnored ? Time.unscaledTime : Time.time;
+        
+        private bool WaitedEnough (float startTime) => GetTime() - startTime >= Duration;
     }
 }

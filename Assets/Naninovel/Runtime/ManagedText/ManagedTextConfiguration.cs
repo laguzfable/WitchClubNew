@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using UnityEngine;
 
@@ -7,9 +7,9 @@ namespace Naninovel
     [EditInProjectSettings]
     public class ManagedTextConfiguration : Configuration
     {
-        public const string DefaultManagedTextPathPrefix = "Text";
+        public const string DefaultPathPrefix = "Text";
 
         [Tooltip("Configuration of the resource loader used with the managed text documents.")]
-        public ResourceLoaderConfiguration Loader = new ResourceLoaderConfiguration { PathPrefix = DefaultManagedTextPathPrefix };
+        public ResourceLoaderConfiguration Loader = new ResourceLoaderConfiguration { PathPrefix = DefaultPathPrefix };
     }
 }

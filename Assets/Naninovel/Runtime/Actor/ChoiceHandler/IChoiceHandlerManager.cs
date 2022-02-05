@@ -1,5 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
+using UnityEngine;
 
 namespace Naninovel
 {
@@ -8,6 +9,9 @@ namespace Naninovel
     /// </summary>
     public interface IChoiceHandlerManager : IActorManager<IChoiceHandlerActor, ChoiceHandlerState, ChoiceHandlerMetadata, ChoiceHandlersConfiguration>
     {
-        
+        /// <summary>
+        /// Used by the service to load custom choice button prefabs.
+        /// </summary>
+        IResourceLoader<GameObject> ChoiceButtonLoader { get; }
     }
 }

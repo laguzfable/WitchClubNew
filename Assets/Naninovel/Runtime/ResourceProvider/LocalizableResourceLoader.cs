@@ -1,8 +1,7 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System.Collections.Generic;
 using System.Linq;
-using UniRx.Async;
 
 namespace Naninovel
 {
@@ -17,46 +16,44 @@ namespace Naninovel
         /// When set, will use the provided locale instead of the <see cref="ILocalizationManager.SelectedLocale"/>.
         /// </summary>
         public string OverrideLocale { get => overrideLocale; set => SetOverrideLocale(value); }
-        
+
         protected readonly ILocalizationManager LocalizationManager;
         protected readonly List<IResourceProvider> SourceProviders;
         protected readonly string SourcePrefix;
         protected readonly bool FallbackToSource;
-        
+
         private string overrideLocale;
-        
+
         /// <param name="providersList">Prioritized list of the source providers.</param>
         /// <param name="localizationManager">Localization manager instance.</param>
         /// <param name="sourcePrefix">Resource path prefix for the source providers.</param>
         /// <param name="fallbackToSource">Whether to fallback to the source versions of the resources when localized versions are not available.</param>
-        public LocalizableResourceLoader (List<IResourceProvider> providersList, ILocalizationManager localizationManager, 
-            string sourcePrefix = null, bool fallbackToSource = true) : base(providersList, sourcePrefix)
+        public LocalizableResourceLoader (List<IResourceProvider> providersList, IHoldersTracker holdersTracker, ILocalizationManager localizationManager,
+            string sourcePrefix = null, bool fallbackToSource = true) : base(providersList, holdersTracker, sourcePrefix)
         {
             LocalizationManager = localizationManager;
             SourceProviders = providersList.ToList();
             SourcePrefix = sourcePrefix;
             FallbackToSource = fallbackToSource;
-            
-            LocalizationManager.AddChangeLocaleTask(InitializeProvisionSources);
+
+            LocalizationManager.AddChangeLocaleTask(HandleLocaleChangedAsync);
             InitializeProvisionSources();
         }
 
         ~LocalizableResourceLoader ()
         {
-            LocalizationManager?.RemoveChangeLocaleTask(InitializeProvisionSources);
+            LocalizationManager?.RemoveChangeLocaleTask(HandleLocaleChangedAsync);
         }
-        
+
         protected void SetOverrideLocale (string locale)
         {
             if (overrideLocale == locale) return;
             overrideLocale = locale;
-            InitializeProvisionSources();
+            HandleLocaleChangedAsync().Forget();
         }
 
-        protected UniTask InitializeProvisionSources ()
+        protected void InitializeProvisionSources ()
         {
-            UnloadAll();
-            
             ProvisionSources.Clear();
 
             if (!LocalizationManager.IsSourceLocaleSelected() || !string.IsNullOrEmpty(overrideLocale))
@@ -70,8 +67,38 @@ namespace Naninovel
             if (FallbackToSource)
                 foreach (var provider in SourceProviders)
                     ProvisionSources.Add(new ProvisionSource(provider, SourcePrefix));
-            
-            return UniTask.CompletedTask;
+        }
+
+        protected async UniTask HandleLocaleChangedAsync ()
+        {
+            InitializeProvisionSources();
+
+            var tasks = new List<UniTask>();
+            foreach (var resource in LoadedResources.ToArray())
+                tasks.Add(ReloadIfLocalized(resource));
+            await UniTask.WhenAll(tasks);
+
+            async UniTask ReloadIfLocalized (LoadedResource resource)
+            {
+                if (!resource.Valid || !await IsLocalized(resource)) return;
+                LoadedResources.Remove(resource);
+                if (HoldersTracker.Release(resource.Object, this) == 0)
+                    resource.ProvisionSource.Provider.UnloadResource(resource.FullPath);
+                var localizedResource = await LoadAsync(resource.LocalPath);
+                HoldersTracker.Hold(localizedResource.Object, this);
+                GetLoadedResource(resource.LocalPath).AddHoldersFrom(resource);
+            }
+
+            async UniTask<bool> IsLocalized (LoadedResource resource)
+            {
+                foreach (var source in ProvisionSources)
+                {
+                    if (source == resource.ProvisionSource) return false;
+                    var fullPath = source.BuildFullPath(resource.LocalPath);
+                    if (await source.Provider.ResourceExistsAsync<TResource>(fullPath)) return true;
+                }
+                return false;
+            }
         }
     }
 }

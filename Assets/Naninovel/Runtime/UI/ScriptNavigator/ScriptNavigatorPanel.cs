@@ -1,7 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System.Collections.Generic;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel.UI
@@ -16,32 +15,21 @@ namespace Naninovel.UI
 
         protected IScriptPlayer Player { get; private set; }
         protected IScriptManager ScriptManager { get; private set; }
-        protected bool LoadedScriptsOnce { get; private set; }
 
-        public override async UniTask ChangeVisibilityAsync (bool visible, float? duration = null, CancellationToken cancellationToken = default)
+        public override async UniTask ChangeVisibilityAsync (bool visible, float? duration = null, AsyncToken asyncToken = default)
         {
-            await base.ChangeVisibilityAsync(visible, duration, cancellationToken);
-            if (cancellationToken.CancelASAP) return;
-            
-            if (visible && !LoadedScriptsOnce)
-            {
-                LoadedScriptsOnce = true;
-                await LoadScriptsAsync();
-            }
-        }
-
-        public virtual void GenerateScriptButtons (IEnumerable<Script> scripts)
-        {
-            DestroyScriptButtons();
-
-            foreach (var script in scripts)
-            {
-                var scriptButton = Instantiate(playButtonPrototype, buttonsContainer, false);
-                scriptButton.GetComponent<NavigatorPlayButton>().Initialize(this, script, Player);
-            }
+            await base.ChangeVisibilityAsync(visible, duration, asyncToken);
+            if (visible) await LocateScriptsAsync(asyncToken);
         }
 
         public virtual void DestroyScriptButtons () => ObjectUtils.DestroyAllChildren(buttonsContainer);
+
+        public virtual async UniTask LocateScriptsAsync (AsyncToken asyncToken = default)
+        {
+            var scripts = await ScriptManager.LocateScriptsAsync();
+            asyncToken.ThrowIfCanceled();
+            GenerateScriptButtons(scripts);
+        }
 
         protected override void Awake ()
         {
@@ -65,12 +53,21 @@ namespace Naninovel.UI
             Player.OnPlay -= HandlePlay;
         }
 
-        protected virtual async UniTask LoadScriptsAsync () => await ScriptManager.LoadAllScriptsAsync();
+        protected virtual void GenerateScriptButtons (IEnumerable<string> scriptNames)
+        {
+            DestroyScriptButtons();
+
+            foreach (var name in scriptNames)
+            {
+                var scriptButton = Instantiate(playButtonPrototype, buttonsContainer, false);
+                scriptButton.GetComponent<NavigatorPlayButton>().Initialize(this, name, Player);
+            }
+        }
 
         private void HandlePlay (Script script)
         {
             if (ScriptManager.Configuration.TitleScript == script.Name) return;
             Hide();
-        } 
-    } 
+        }
+    }
 }

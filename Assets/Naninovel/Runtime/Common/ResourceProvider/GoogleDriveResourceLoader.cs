@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 #if UNITY_GOOGLE_DRIVE_AVAILABLE
 
@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UniRx.Async;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityGoogleDrive;
@@ -43,7 +42,6 @@ namespace Naninovel
             #endif
 
             this.converter = converter;
-            usedRepresentation = new RawDataRepresentation();
         }
 
         public override async UniTask RunAsync ()
@@ -134,7 +132,7 @@ namespace Naninovel
 
             var gDriveConverter = converter as IGoogleDriveConverter<TResource>;
 
-            downloadRequest = new GoogleDriveFiles.ExportRequest(fileMeta.Id, gDriveConverter.ExportMimeType);
+            downloadRequest = new GoogleDriveFiles.ExportRequest(fileMeta.Id, gDriveConverter?.ExportMimeType);
             await downloadRequest.SendNonGeneric();
             if (downloadRequest.IsError || downloadRequest.GetResponseData<UnityGoogleDrive.Data.File>().Content == null)
                 throw new Exception($"Failed to export '{Path}' resource from Google Drive.");
@@ -163,6 +161,7 @@ namespace Naninovel
                 UnityWebRequest request = null;
                 if (typeof(TResource) == typeof(AudioClip)) request = UnityWebRequestMultimedia.GetAudioClip(filePath, WebUtils.EvaluateAudioTypeFromMime(converter.Representations[0].MimeType));
                 else if (typeof(TResource) == typeof(Texture2D)) request = UnityWebRequestTexture.GetTexture(filePath, true);
+                else return null;
                 using (request)
                 {
                     await request.SendWebRequest();

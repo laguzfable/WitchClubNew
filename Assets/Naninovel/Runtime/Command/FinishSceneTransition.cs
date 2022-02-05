@@ -1,7 +1,6 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
-using UniRx.Async;
 using UnityEngine;
 
 namespace Naninovel.Commands
@@ -16,7 +15,7 @@ namespace Naninovel.Commands
         /// <summary>
         /// Type of the [transition effect](/guide/transition-effects.md) to use (crossfade is used by default).
         /// </summary>
-        [ParameterAlias(NamelessParameterAlias), IDEConstant(IDEConstantAttribute.Transition)]
+        [ParameterAlias(NamelessParameterAlias), ConstantContext(typeof(TransitionType))]
         public StringParameter Transition;
         /// <summary>
         /// Parameters of the transition effect.
@@ -36,12 +35,12 @@ namespace Naninovel.Commands
         /// <br/><br/>
         /// When not specified, will use a default easing function set in the actor's manager configuration settings.
         /// </summary>
-        [ParameterAlias("easing"), IDEConstant(IDEConstantAttribute.Easing)]
+        [ParameterAlias("easing"), ConstantContext(typeof(EasingType))]
         public StringParameter EasingTypeName;
         /// <summary>
-        /// Duration (in seconds) of the transition. Default value: 0.35 seconds.
+        /// Duration (in seconds) of the transition.
         /// </summary>
-        [ParameterAlias("time")]
+        [ParameterAlias("time"), ParameterDefaultValue("0.35")]
         public DecimalParameter Duration = .35f;
 
         private Texture2D preloadedDissolveTexture;
@@ -61,13 +60,13 @@ namespace Naninovel.Commands
             preloadedDissolveTexture = null;
         }
 
-        public override async UniTask ExecuteAsync (CancellationToken cancellationToken = default)
+        public override async UniTask ExecuteAsync (AsyncToken asyncToken = default)
         {
             var easingType = EasingType.Linear;
             if (Assigned(EasingTypeName) && !Enum.TryParse(EasingTypeName, true, out easingType))
                 LogWarningWithPosition($"Failed to parse `{EasingTypeName}` easing.");
 
-            var transitionName = TransitionType.Crossfade;
+            var transitionName = TransitionUtils.DefaultTransition;
             if (Assigned(Transition))
                 transitionName = Transition.Value;
             var defaultParams = TransitionUtils.GetDefaultParams(transitionName);
@@ -83,7 +82,7 @@ namespace Naninovel.Commands
             var transition = new Transition(transitionName, transitionParams, preloadedDissolveTexture);
             var transitionUI = Engine.GetService<IUIManager>().GetUI<UI.ISceneTransitionUI>();
             if (transitionUI != null)
-                await transitionUI.TransitionAsync(transition, Duration, easingType, cancellationToken);
+                await transitionUI.TransitionAsync(transition, Duration, easingType, asyncToken);
             else LogErrorWithPosition($"Failed to finish scene transition: `{nameof(UI.ISceneTransitionUI)}` UI is not available.");
         }
     }

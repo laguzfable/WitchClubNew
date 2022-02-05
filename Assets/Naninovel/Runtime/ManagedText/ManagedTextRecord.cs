@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 using System;
 using System.Collections.Generic;
@@ -32,7 +32,7 @@ namespace Naninovel
         public ManagedTextRecord (string key, string value, string category)
         {
             Key = key;
-            Value = value;
+            Value = value?.Replace("\\n", "\n");
             Category = category;
         }
 

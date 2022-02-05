@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 namespace Naninovel
 {
@@ -9,7 +9,7 @@ namespace Naninovel
     public enum AutoVoiceMode
     {
         /// <summary>
-        /// Voice clips are associated by <see cref="Commands.Command.PlaybackSpot"/> of the @print commands.
+        /// Voice clips are associated by <see cref="Command.PlaybackSpot"/> of the @print commands.
         /// </summary>
         PlaybackSpot,
         /// <summary>

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using Kenaz;
-using UniRx.Async;
+using Naninovel;
 
 public class PlayerUnit : BaseCombatUnit 
 {

@@ -1,18 +1,20 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
-using Naninovel.UI;
+using System;
 using System.Linq;
 using System.Threading;
-using UniRx.Async;
+using Naninovel.UI;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Naninovel
 {
     public class GameSettingsPreviewPrinter : ScriptableUIBehaviour
     {
-        protected RevealableUIText RevealableText => revealableText;
+        protected virtual IRevealableText RevealableText { get; private set; }
 
-        [SerializeField] private RevealableUIText revealableText = default;
+        [Tooltip("A component implementing `" + nameof(IRevealableText) + "` interface for displaying the preview text.")]
+        [SerializeField] private Graphic revealableText = default;
 
         private CancellationTokenSource revealCTS;
         private ITextPrinterManager printerManager;
@@ -28,12 +30,13 @@ namespace Naninovel
         {
             revealCTS?.Cancel();
 
-            revealableText.RevealProgress = 0;
-            revealableText.Rebuild(UnityEngine.UI.CanvasUpdate.PreRender); // Otherwise it's not displaying anything.
+            RevealableText.RevealProgress = 0;
+            if (RevealableText is Graphic graphic)
+                graphic.Rebuild(CanvasUpdate.PreRender); // Otherwise it's not displaying anything.
 
             var revealDelay = Mathf.Lerp(printerManager.Configuration.MaxRevealDelay, 0, printerManager.BaseRevealSpeed);
             if (revealDelay == 0)
-                revealableText.RevealProgress = 1;
+                RevealableText.RevealProgress = 1;
             else
             {
                 revealCTS = new CancellationTokenSource();
@@ -45,34 +48,41 @@ namespace Naninovel
         {
             base.Awake();
 
-            this.AssertRequiredObjects(revealableText);
+            RevealableText = revealableText as IRevealableText;
+            if (RevealableText is null)
+                throw new Exception($"Field `{nameof(revealableText)}` on `{nameof(GameSettingsPreviewPrinter)}` component is either not assigned or doesn't implement `{nameof(IRevealableText)}` interface.");
             printerManager = Engine.GetService<ITextPrinterManager>();
+        }
+
+        protected virtual void LateUpdate ()
+        {
+            if (Visible) RevealableText?.Render();
         }
 
         protected virtual async UniTask RevealTextOverTimeAsync (float revealDelay, CancellationToken cancellationToken)
         {
             var lastRevealTime = Time.time;
-            while (revealableText.RevealProgress < 1)
+            while (RevealableText.RevealProgress < 1)
             {
                 var timeSinceLastReveal = Time.time - lastRevealTime;
                 var charsToReveal = Mathf.FloorToInt(timeSinceLastReveal / revealDelay);
                 if (charsToReveal > 0)
                 {
                     lastRevealTime = Time.time;
-                    revealableText.RevealNextChars(charsToReveal, revealDelay, cancellationToken);
-                    while (revealableText.Revealing && !cancellationToken.CancelASAP)
-                        await AsyncUtils.WaitEndOfFrame;
-                    if (cancellationToken.CancelASAP) return;
+                    RevealableText.RevealNextChars(charsToReveal, revealDelay, cancellationToken);
+                    while (RevealableText.Revealing && !cancellationToken.IsCancellationRequested)
+                        await AsyncUtils.WaitEndOfFrameAsync();
+                    if (cancellationToken.IsCancellationRequested) return;
                 }
-                await AsyncUtils.WaitEndOfFrame;
+                await AsyncUtils.WaitEndOfFrameAsync();
             }
 
-            var autoPlayDelay = Mathf.Lerp(0, printerManager.Configuration.MaxAutoWaitDelay, printerManager.BaseAutoDelay) * revealableText.Text.Count(char.IsLetterOrDigit);
+            var autoPlayDelay = Mathf.Lerp(0, printerManager.Configuration.MaxAutoWaitDelay, printerManager.BaseAutoDelay) * RevealableText.Text.Count(char.IsLetterOrDigit);
             var waitUntilTime = Time.time + autoPlayDelay;
-            while (Time.time < waitUntilTime && !cancellationToken.CancelASAP)
-                await AsyncUtils.WaitEndOfFrame;
+            while (Time.time < waitUntilTime && !cancellationToken.IsCancellationRequested)
+                await AsyncUtils.WaitEndOfFrameAsync();
 
-            if (cancellationToken.CancelASAP) return;
+            if (cancellationToken.IsCancellationRequested) return;
 
             StartPrinting();
         }

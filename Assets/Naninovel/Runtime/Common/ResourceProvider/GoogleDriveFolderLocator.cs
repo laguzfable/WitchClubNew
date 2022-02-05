@@ -1,9 +1,8 @@
-﻿// Copyright 2017-2020 Elringus (Artyom Sovetnikov). All Rights Reserved.
+// Copyright 2017-2021 Elringus (Artyom Sovetnikov). All rights reserved.
 
 #if UNITY_GOOGLE_DRIVE_AVAILABLE
 
 using System.Collections.Generic;
-using UniRx.Async;
 using UnityGoogleDrive;
 
 namespace Naninovel
