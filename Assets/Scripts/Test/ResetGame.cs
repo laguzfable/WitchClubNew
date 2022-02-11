@@ -28,6 +28,11 @@ public class ResetGame : MonoBehaviour
 
     bool canReset = true;
 
+    Vector3 lastPos;
+
+    float curIdleTime = 0f;
+    public float idleToResetTime = 120f;
+
     // Update is called once per frame
     void Update()
     {
@@ -37,6 +42,8 @@ public class ResetGame : MonoBehaviour
         }
         if(Input.GetKeyUp(key))
         {
+            curPressTime = 0f;
+            curIdleTime = 0f;
             SwitchStateToCombatModeAsync().Forget();
             //SceneManager.LoadSceneAsync("MainScene");
         }
@@ -46,13 +53,33 @@ public class ResetGame : MonoBehaviour
             if(curPressTime >= pressToResetTime)
             {
                 curPressTime = 0f;
+                curIdleTime = 0f;
                 SwitchStateToCombatModeAsync().Forget();
             }
         }
         if(Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1))
         {
             curPressTime = 0f;
+            curIdleTime = 0f;
         }
+
+        if(SceneManager.GetActiveScene().name != mainScene)
+        {
+            if((lastPos - Input.mousePosition).sqrMagnitude < 1f)
+            {
+                curIdleTime += Time.deltaTime;
+            }
+            else
+            {
+                curIdleTime = 0f;
+            }
+            if(curIdleTime >= idleToResetTime)
+            {
+                curIdleTime = 0f;
+                SwitchStateToCombatModeAsync().Forget();
+            }
+        }
+        lastPos = Input.mousePosition;
     }
 
     public async UniTask SwitchStateToCombatModeAsync(AsyncToken asyncToken = default)
