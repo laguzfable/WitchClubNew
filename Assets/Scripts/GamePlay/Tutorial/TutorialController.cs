@@ -65,7 +65,7 @@ public class TutorialController : MonoBehaviour
                 charImg.sprite = tutorial.displayImg;
                 charImg.SetNativeSize();
                 charImg.gameObject.SetActive(true);
-                charImg.GetComponent<RectTransform>().anchoredPosition = tutorial.unitPos;
+                charImg.GetComponent<RectTransform>().anchoredPosition = tutorial.unitPos + new Vector2(0f, 540f);
                 charImg.GetComponent<CharacterMove>().SetOrgY();
                 // charImg.GetComponent<CharacterMove>().enabled = tutorial.displayBG == null;
                 uICollection.mob.sprRend.enabled = false;
