@@ -103,7 +103,7 @@ public class UIWitchAbility : MonoBehaviour
         {
             if(!pc.GetPlayerUnit().HasEffect(EAbilityEffectType.IgnoreEnvironmentEffect) && pc.combatSystem.envEffect.curType == EEnvEffectType.NoRune)
             {
-                pc.combatSystem.SpawnSystemText("無法使用符文能力");
+                pc.combatSystem.SpawnSystemText("CANT_USE_RUNE");
                 return;
             }
             //cost.Value = 0f;

@@ -121,14 +121,14 @@ public class PlayerController : MonoBehaviour
                     {
                         if (isEmptyCards)
                         {
-                            combatSystem.SpawnSystemText("請依教學指示執行動作");
+                            combatSystem.SpawnSystemText("TUTORIAL_WARNING");
                             return;
                         }
                         foreach (var card in result.cardList)
                         {
                             if (card.element != ECardElement.Red)
                             {
-                                combatSystem.SpawnSystemText("請依教學指示執行動作");
+                                combatSystem.SpawnSystemText("TUTORIAL_WARNING");
                                 return;
                             }
                         }
@@ -138,14 +138,14 @@ public class PlayerController : MonoBehaviour
                     {
                         if (isEmptyCards)
                         {
-                            combatSystem.SpawnSystemText("請依教學指示執行動作");
+                            combatSystem.SpawnSystemText("TUTORIAL_WARNING");
                             return;
                         }
                         foreach (var card in result.cardList)
                         {
                             if (card.element != ECardElement.Blue)
                             {
-                                combatSystem.SpawnSystemText("請依教學指示執行動作");
+                                combatSystem.SpawnSystemText("TUTORIAL_WARNING");
                                 return;
                             }
                         }
@@ -155,14 +155,14 @@ public class PlayerController : MonoBehaviour
                     {
                         if (isEmptyCards)
                         {
-                            combatSystem.SpawnSystemText("請依教學指示執行動作");
+                            combatSystem.SpawnSystemText("TUTORIAL_WARNING");
                             return;
                         }
                         foreach (var card in result.cardList)
                         {
                             if (card.element != ECardElement.Green)
                             {
-                                combatSystem.SpawnSystemText("請依教學指示執行動作");
+                                combatSystem.SpawnSystemText("TUTORIAL_WARNING");
                                 return;
                             }
                         }
@@ -179,13 +179,13 @@ public class PlayerController : MonoBehaviour
         {
             if (result.state == EElementState.Multiple && !playerUnit.HasEffect(EAbilityEffectType.IgnoreElement))
             {
-                combatSystem.SpawnSystemText("不能選擇不同系列生物");
+                combatSystem.SpawnSystemText("CANT_DIFF_CARD");
                 return;
             }
             var envEff = combatSystem.envEffect;
             if (envEff.curType == EEnvEffectType.LimitCards && result.cardList.Count > 2)
             {
-                combatSystem.SpawnSystemText("無法出超過2張卡片");
+                combatSystem.SpawnSystemText("CANT_OVER_2");
                 return;
             }
 
@@ -198,27 +198,27 @@ public class PlayerController : MonoBehaviour
                 {
                     if (envEff.curType == EEnvEffectType.NoCharacter && card.ID < 100)
                     {
-                        combatSystem.SpawnSystemText("無法出角色卡");
+                        combatSystem.SpawnSystemText("CANT_PLAY_CHAR");
                         return;
                     }
                     if (envEff.curType == EEnvEffectType.RedSilence && card.element == ECardElement.Red)
                     {
-                        combatSystem.SpawnSystemText("無法出紅色卡");
+                        combatSystem.SpawnSystemText("CANT_PLAY_RED");
                         return;
                     }
                     if (envEff.curType == EEnvEffectType.BlueSilence && card.element == ECardElement.Blue)
                     {
-                        combatSystem.SpawnSystemText("無法出藍色卡");
+                        combatSystem.SpawnSystemText("CANT_PLAY_BLUE");
                         return;
                     }
                     if (envEff.curType == EEnvEffectType.GreenSilence && card.element == ECardElement.Green)
                     {
-                        combatSystem.SpawnSystemText("無法出綠色卡");
+                        combatSystem.SpawnSystemText("CANT_PLAY_GREEN");
                         return;
                     }
                     if (envEff.curType == EEnvEffectType.YellowSilence && card.element == ECardElement.Yellow)
                     {
-                        combatSystem.SpawnSystemText("無法出黃色卡");
+                        combatSystem.SpawnSystemText("CANT_PLAY_YELLOW");
                         return;
                     }
                 }

@@ -52,6 +52,8 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
 
     Color orgOutlineColor;
 
+    CombatSceneLocalization localization;
+
     public int ID
     {
         set
@@ -61,8 +63,8 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
             // cardInst = visualResource.GetBaseCard(id, transform);
             cardData = pc.cardDataCollection.cardDict[id];
             cardPic.sprite = cardData.image;
-            nameTxt.text = cardData.displayName;
-            
+            nameTxt.text = localization.GetLocalizedContent(cardData.localeID, cardData.displayName);
+
             ResetLevel();
             UpdateValue();
         }

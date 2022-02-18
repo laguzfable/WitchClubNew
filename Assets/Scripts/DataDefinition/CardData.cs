@@ -4,6 +4,8 @@ using Sirenix.OdinInspector;
 [CreateAssetMenu(fileName = "CardData", menuName = "Witch Club/CardData")]
 public class CardData : ScriptableObjectID
 {
+    public string localeID;
+
     [PreviewField(80, ObjectFieldAlignment.Left)]
     public Sprite image;
 

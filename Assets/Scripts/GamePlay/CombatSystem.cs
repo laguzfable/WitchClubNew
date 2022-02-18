@@ -141,6 +141,8 @@ public class CombatSystem : MonoBehaviour
             Engine.GetService<ICustomVariableManager>().TryGetVariableValue<bool>("RuneActive", out runeActive);
             tutorController.uICollection.SetRunesEnabled(runeActive);
 
+            Debug.Log(Engine.GetService<ILocalizationManager>().SelectedLocale);
+
         }
         BG.gameObject.SetActive(true);
 
@@ -289,7 +291,7 @@ public class CombatSystem : MonoBehaviour
         CreateOrder((int)Order.InterruptMobsAction, /*isBreakAciton ? 1 : 0*/1, playerUnit, () => { // interrupt
             if (mobUnit.HasEffect(EAbilityEffectType.BreakAction))
             {
-                SpawnCombatText("成功打斷行動", ECombatTextType.Debuff, false);
+                SpawnCombatText("INTERUPT", ECombatTextType.Debuff, false);
             }
             
         });

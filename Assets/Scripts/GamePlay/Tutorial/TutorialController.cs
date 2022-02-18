@@ -23,6 +23,8 @@ public class TutorialController : MonoBehaviour
 
     public bool canGoNext = false;
 
+    [SerializeField] CombatSceneLocalization localization;
+
     private void Start()
     {
         if(isTutorial)
@@ -80,8 +82,8 @@ public class TutorialController : MonoBehaviour
             
             dialog.transform.localScale = Vector3.zero;
             dialog.GetComponentInChildren<Text>().text = "";
-            var dialogContent = tutorial.dialog;
-            if(dialogContent.Contains("P"))
+            var dialogContent = localization.GetLocalizedContent(tutorial.dialogLocaleId, tutorial.dialog);
+            if (dialogContent.Contains("P"))
             {
                 dialogContent = dialogContent.Replace("P", Engine.GetService<ICustomVariableManager>().GetVariableValue("PlayerName"));
             }
@@ -165,6 +167,7 @@ public class TutorialController : MonoBehaviour
 [System.Serializable]
 public class TutorialObject
 {
+    public string dialogLocaleId;
     public string dialog;
     public bool isRight;
     public Sprite displayImg;    

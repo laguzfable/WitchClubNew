@@ -461,7 +461,7 @@ public class EnemyUnit : BaseCombatUnit
                 EN.Value -= useAbility.requireEnergy;
                 CastAbility(useAbility);
                 Debug.LogWarning($"使用了{useAbility.id}!!");
-                combatSystem.SpawnCombatText($"敵人使用了符文!", ECombatTextType.Buff, false);
+                combatSystem.SpawnCombatText("MOB_USE_RUNE", ECombatTextType.Buff, false);
             }
         }
     }
