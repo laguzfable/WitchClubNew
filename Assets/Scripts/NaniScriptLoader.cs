@@ -24,6 +24,21 @@ public class NaniScriptLoader : MonoBehaviour
 
     private void LoadNaniScript()
     {
+        LoadNaniScriptAsync().Forget();
+    }
+
+    private async UniTaskVoid LoadNaniScriptAsync()
+    {
+        if(PlayerPrefs.HasKey("Language"))
+        {
+            var locale = PlayerPrefs.GetString("Language");
+            if(locale != "Inited")
+            {
+                await Engine.GetService<ILocalizationManager>().SelectLocaleAsync(locale);
+                locale = "Inited";
+            }
+        }
+
         // Engine is initialized here, it's safe to use the APIs.
         var player = Engine.GetService<IScriptPlayer>();
 
