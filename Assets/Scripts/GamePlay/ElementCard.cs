@@ -78,6 +78,7 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
     {
         audioSource = gameObject.AddComponent<AudioSource>();
         visualResource = GameObject.FindGameObjectWithTag("GameController").GetComponent<CombatVisualResources>();
+        localization = visualResource.GetComponent<CombatSceneLocalization>();
         //Utility.CreateEvent(gameObject, EventTriggerType.PointerClick, OnClick);
         //Utility.CreateEvent(gameObject, EventTriggerType.PointerDown, OnPressDown);
         //Utility.CreateEvent(gameObject, EventTriggerType.PointerUp, OnPressUp);
