@@ -71,4 +71,14 @@ public class CombatSceneLocalization : MonoBehaviour
         return defaultString;
     }
 
+    public string GetCurLanguage()
+    {
+        if(Engine.Initialized)
+        {
+            return Engine.GetService<ILocalizationManager>().SelectedLocale;
+        }
+        
+        return "zh-TW";
+    }
+
 }

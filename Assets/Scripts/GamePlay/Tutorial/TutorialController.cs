@@ -25,6 +25,10 @@ public class TutorialController : MonoBehaviour
 
     [SerializeField] CombatSceneLocalization localization;
 
+    [SerializeField] Image[] localeImgArr;
+
+    [SerializeField] Sprite[] localeSprArr;//從0開始 0=白板 1=藍 2=綠 以此類推 語言0:中文 3:英文
+
     private void Start()
     {
         if(isTutorial)
@@ -40,8 +44,30 @@ public class TutorialController : MonoBehaviour
 
     Sequence seq;
 
+    int GetIndexFromLanguage(string locale)
+    {
+        if(locale.Equals("zh-TW"))
+        {
+            return 0;
+        }
+        // else if(locale.Equals("en"))
+        // {
+        //     return 3;
+        // }
+        return 3;//先除了中文外統一返回英文圖片
+    }
+
     async UniTaskVoid RunTutorialSequenceAsync()
     {
+        var startIndex = GetIndexFromLanguage(localization.GetCurLanguage());
+        if(startIndex > 0)//不是中文 切換對應語言圖片
+        {
+            for(var i =0; i < localeImgArr.Length; i++)
+            {
+                localeImgArr[i].sprite = localeSprArr[startIndex+i];
+            }
+        }
+
         bool isDialogFinish = false;
         seq = DOTween.Sequence();
         foreach(var tutorial in tutorialArr)
