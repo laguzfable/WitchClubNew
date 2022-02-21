@@ -29,10 +29,13 @@ public sealed class EnvironmentEffect
 
     CombatSystem combatSystem;
 
+    CombatSceneLocalization localization;
+
     public EnvironmentEffect(CombatSystem combatSystem)
     {
         this.combatSystem = combatSystem;
-                
+        localization = combatSystem.gameObject.GetComponent<CombatSceneLocalization>();
+        
         // 黃色卡還沒可以使用之前將魔力狂潮的權重設為0
         envWeight[(int)EEnvEffectType.Energy] = combatSystem.IsEnergyActive() ? 2000 : 0;
         envWeight[(int)EEnvEffectType.NoRune] = combatSystem.IsEnergyActive() ? 500 : 0;
@@ -87,11 +90,13 @@ public sealed class EnvironmentEffect
 
     public string GetCurEffectName(int index)
     {
-        return envEffName[index];
+        // return envEffName[index];
+        return localization.GetLocalizedContent($"ENV_EFFECT_{index+1}", envEffName[index]);
     }
 
     public string GetCurDescription(int index)
     {
-        return envEffDescription[index];
+        // return envEffDescription[index];
+        return localization.GetLocalizedContent($"ENV_EFFECT_{index+1}_DESC", envEffDescription[index]);
     }
 }

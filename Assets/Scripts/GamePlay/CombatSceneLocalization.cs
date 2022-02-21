@@ -44,7 +44,7 @@ public class CombatSceneLocalization : MonoBehaviour
                 dict[grid[n, 0]] = grid[n, i];
                 str += $"{grid[n, 0]} = {grid[n, i]},";
             }
-            Debug.Log($"{str} | {i-1}");
+            // Debug.Log($"{str} | {i-1}");
 
             localeMap[grid[0, i]] = dict;
         }
@@ -59,6 +59,13 @@ public class CombatSceneLocalization : MonoBehaviour
             {
                 if (Engine.Initialized)
                 {
+                    // if(!map.ContainsKey(Engine.GetService<ILocalizationManager>().SelectedLocale))
+                    // {
+                    //     foreach(var kvp in map)
+                    //     {
+                    //         Debug.Log($"{kvp.Key}, {kvp.Value}");
+                    //     }
+                    // }
                     return map[Engine.GetService<ILocalizationManager>().SelectedLocale];
                 }
                 else
