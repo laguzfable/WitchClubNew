@@ -69,7 +69,7 @@ MonoBehaviour:
     - "\uFF1F\uFF1F\uFF1F"
     - "\u5973\u5B50\u7684\u8072\u97F3"
     - "\u512A\u83F2"
-    - "\u6885\u723E\u5E15\u8309\u59AE"
+    - "\u9B45\u5152"
     - "\u8587\u72C4\u4E9E"
     - "\u6D85\u8389"
     - test
@@ -98,6 +98,7 @@ MonoBehaviour:
     - broom
     - "\u827E\u59AE\u62C9\u8FD1"
     - "\u8D6B\u83F2\u62C9\u8FD1"
+    - new
     metas:
     - Implementation: Naninovel.Live2DCharacter, Assembly-CSharp, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
@@ -1470,6 +1471,48 @@ MonoBehaviour:
         height: 1
       BakedLookDirection: 1
       DisplayName: "\u8D6B\u83F2"
+      UseCharacterColor: 0
+      NameColor: {r: 1, g: 1, b: 1, a: 1}
+      MessageColor: {r: 1, g: 1, b: 1, a: 1}
+      HighlightWhenSpeaking: 0
+      HighlightCharacterCount: 0
+      SpeakingPose: 
+      NotSpeakingPose: 
+      PlaceOnTop: 1
+      HighlightDuration: 0.35
+      HighlightEasing: 1
+      MessageSound: 
+      MessageSoundPlayback: 0
+      VoiceSource: {fileID: 0}
+      LinkedPrinter: 
+      Poses: []
+    - Implementation: Naninovel.Live2DCharacter, Assembly-CSharp, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+      Loader:
+        PathPrefix: Characters
+        ProviderTypes:
+        - Naninovel.AddressableResourceProvider, Elringus.Naninovel.Runtime, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+        - Naninovel.ProjectResourceProvider, Elringus.Naninovel.Runtime, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+      guid: 054f6046-0998-4261-9685-c2afba5f3792
+      customData:
+        id: 0
+      Pivot: {x: 0.5, y: 0}
+      PixelsPerUnit: 100
+      EnableDepthPass: 1
+      DepthAlphaCutoff: 0.5
+      CustomTextureShader: {fileID: 0}
+      CustomSpriteShader: {fileID: 0}
+      RenderTexture: {fileID: 0}
+      RenderRectangle:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1
+        height: 1
+      BakedLookDirection: 1
+      DisplayName: 
       UseCharacterColor: 0
       NameColor: {r: 1, g: 1, b: 1, a: 1}
       MessageColor: {r: 1, g: 1, b: 1, a: 1}
