@@ -1,11 +1,17 @@
 ; @processInput set:Rollback.false
 @back bg00
 
-; @set RuneActive=true
+
 WOW
 
 ; @battle scriptName:AAA label:afterbattle background:bg00 target:monster02
-@tutorial scriptName:AAA label:afterbattle background:tsbg
+
+; 測試教學
+; @tutorial scriptName:AAA label:afterbattle background:tsbg
+
+; 測試符文教學
+@set RuneActive=true
+@runeTutorial scriptName:AAA label:afterbattle background:tsbg
 @stop
 
 # afterbattle

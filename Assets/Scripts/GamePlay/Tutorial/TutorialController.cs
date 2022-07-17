@@ -14,8 +14,13 @@ public class TutorialController : MonoBehaviour
     [SerializeField] GameObject leftArrow;
     [SerializeField] GameObject rightDialog;
     [SerializeField] GameObject rightArrow;
+    [SerializeField] GameObject leftUpDialog;
+    [SerializeField] GameObject leftUpArrow;
+    [SerializeField] GameObject rightDownDialog;
+    [SerializeField] GameObject rightDownArrow;
 
     static public bool isTutorial;
+    static public bool isTutorial2;
 
     [SerializeField] TutorialObject[] tutorialArr;
 
@@ -29,14 +34,21 @@ public class TutorialController : MonoBehaviour
 
     [SerializeField] Sprite[] localeSprArr;//從0開始 0=白板 1=藍 2=綠 以此類推 語言0:中文 3:英文
 
-    private void Start()
-    {
-        if(isTutorial)
-        {
-            uICollection.TurnOffAll();
+    //private void Start()
+    //{
+    //    if(isTutorial || isTutorial2)
+    //    {
+    //        uICollection.TurnOffAll();
 
-            RunTutorialSequenceAsync().Forget();
-        }
+    //        RunTutorialSequenceAsync().Forget();
+    //    }
+    //}
+
+    public void Begin()
+    {
+        uICollection.TurnOffAll();
+
+        RunTutorialSequenceAsync().Forget();
     }
 
 
@@ -59,14 +71,14 @@ public class TutorialController : MonoBehaviour
 
     async UniTaskVoid RunTutorialSequenceAsync()
     {
-        var startIndex = GetIndexFromLanguage(localization.GetCurLanguage());
-        if(startIndex > 0)//不是中文 切換對應語言圖片
-        {
-            for(var i =0; i < localeImgArr.Length; i++)
-            {
-                localeImgArr[i].sprite = localeSprArr[startIndex+i];
-            }
-        }
+        //var startIndex = GetIndexFromLanguage(localization.GetCurLanguage());
+        //if(startIndex > 0)//不是中文 切換對應語言圖片
+        //{
+        //    for(var i =0; i < localeImgArr.Length; i++)
+        //    {
+        //        localeImgArr[i].sprite = localeSprArr[startIndex+i];
+        //    }
+        //}
 
         bool isDialogFinish = false;
         seq = DOTween.Sequence();
@@ -101,9 +113,14 @@ public class TutorialController : MonoBehaviour
             
             leftArrow.SetActive(false);
             rightArrow.SetActive(false);
-            var arrow = tutorial.isRight? rightArrow : leftArrow;
+            if(leftUpArrow != null)
+            {
+                leftUpArrow?.SetActive(false);
+                rightDownArrow?.SetActive(false);
+            }
+            var arrow = tutorial.isRightDown ? rightDownArrow : tutorial.isLeftUp ? leftUpArrow : tutorial.isRight? rightArrow : leftArrow;
 
-            var dialog = tutorial.isRight? rightDialog : leftDialog;
+            var dialog = tutorial.isRightDown ? rightDownDialog : tutorial.isLeftUp ? leftUpDialog : tutorial.isRight? rightDialog : leftDialog;
             dialog.SetActive(true);
             
             dialog.transform.localScale = Vector3.zero;
@@ -160,13 +177,26 @@ public class TutorialController : MonoBehaviour
             }
             else
             {
-                playerController.combatSystem.PrepareBeginTurn();
-                playerController.combatSystem.envEffect.SwitchToNextEffect();
-                playerController.combatSystem.envEffect.SetNextEffect(EEnvEffectType.None);
-                playerController.SetControllable(true);
-                await UniTask.Delay(TimeSpan.FromSeconds(1));
-                await UniTask.WaitUntil(()=> canGoNext);
-                await UniTask.Delay(TimeSpan.FromSeconds(0.32f));
+                if(tutorial.customActionID == "fullBlue")
+                {
+                    var rune = uICollection.Runes.transform.Find("SkillBG/SkillButtonB").GetComponent<UIWitchAbility>();
+                    rune.cost.Value = rune.ability.requireEnergy;
+                }
+                else if(tutorial.customActionID == "emptyBlue")
+                {
+                    var rune = uICollection.Runes.transform.Find("SkillBG/SkillButtonB").GetComponent<UIWitchAbility>();
+                    rune.cost.Value = 0;
+                }
+                else
+                {
+                    playerController.combatSystem.PrepareBeginTurn();
+                    playerController.combatSystem.envEffect.SwitchToNextEffect();
+                    playerController.combatSystem.envEffect.SetNextEffect(EEnvEffectType.None);
+                    playerController.SetControllable(true);
+                    await UniTask.Delay(TimeSpan.FromSeconds(1));
+                    await UniTask.WaitUntil(() => canGoNext);
+                    await UniTask.Delay(TimeSpan.FromSeconds(0.32f));
+                }
             }
             if(tutorial.isClearDisplay)
             {
@@ -178,9 +208,14 @@ public class TutorialController : MonoBehaviour
 
             leftDialog.SetActive(false);
             rightDialog.SetActive(false);
-            
+            if(leftUpDialog != null)
+            {
+                leftUpDialog?.SetActive(false);
+                rightDownDialog?.SetActive(false);
+            }
 
-            if(tutorial.displayBG != null)
+
+            if (tutorial.displayBG != null)
             {
                 tutorial.displayBG.SetActive(false);
             }
@@ -193,9 +228,12 @@ public class TutorialController : MonoBehaviour
 [System.Serializable]
 public class TutorialObject
 {
+    [Sirenix.OdinInspector.Title("教學物件")]
     public string dialogLocaleId;
     public string dialog;
     public bool isRight;
+    public bool isLeftUp;
+    public bool isRightDown;
     public Sprite displayImg;    
     public Vector2 unitPos;
     public bool isMobUnit;

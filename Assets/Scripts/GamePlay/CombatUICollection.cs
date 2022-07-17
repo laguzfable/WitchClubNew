@@ -21,7 +21,7 @@ public class CombatUICollection : MonoBehaviour
 
     public void TurnOffAll()
     {
-        Runes.SetActive(false);
+        //Runes.SetActive(false);
         cards.SetActive(false);
         turnBtn.SetActive(false);
         playerStat.SetActive(false);

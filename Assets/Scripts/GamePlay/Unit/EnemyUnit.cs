@@ -151,7 +151,7 @@ public class EnemyUnit : BaseCombatUnit
     protected override void Init()
     {
         orgY = transform.position.y;
-        if(!TutorialController.isTutorial && !combatSystem.IsTestMode)
+        if(!TutorialController.isTutorial && !TutorialController.isTutorial2 && !combatSystem.IsTestMode)
         {
             var mobName = DataService.Instance.scriptParameter.combatTarget;
             Debug.Log($"Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[1] : {mobName}");
@@ -163,15 +163,15 @@ public class EnemyUnit : BaseCombatUnit
             EN.SetBaseValue(mobData.EN);
             
             sprRend.sprite = mobData.sprite;//combatSystem.visualResource.GetMobByName(mobName);
+            sprRend.enabled = true;
         }
         else
         {   // 測試用
             mobData = Resources.Load<MobData>($"MobData/{testMobName}");
             HP.SetBaseValue(mobData.HP);
             EN.SetBaseValue(mobData.EN);
+            sprRend.enabled = combatSystem.IsTestMode;
         }
-
-        sprRend.enabled = true;
         
         base.Init();
 
