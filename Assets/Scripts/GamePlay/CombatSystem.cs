@@ -289,7 +289,7 @@ public class CombatSystem : MonoBehaviour
             else // normal
             {
                 var dealDamage = mobDmg;
-                if(envEffect.curType == EEnvEffectType.MobArmor || mobUnit.HasEffect(EAbilityEffectType.MagicArmor) || mobUnit.HasEffect(EAbilityEffectType.MagicArmorEX))
+                if(envEffect.curType == EEnvEffectType.MobArmor/* || mobUnit.HasEffect(EAbilityEffectType.MagicArmor) || mobUnit.HasEffect(EAbilityEffectType.MagicArmorEX)*/)
                 {
                     dealDamage = Mathf.FloorToInt((float)dealDamage * 0.7f);
                 }

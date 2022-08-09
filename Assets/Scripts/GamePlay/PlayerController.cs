@@ -342,7 +342,7 @@ public class PlayerController : MonoBehaviour
     public void CalculateAttr()
     {
         result = GetPlayedResult();
-        totalAttr = playerUnit.bonusAttr;
+        totalAttr = playerUnit.GetBonusAttr(); //playerUnit.bonusAttr;
 
         foreach (var card in result.cardList)
         {

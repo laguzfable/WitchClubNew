@@ -144,7 +144,7 @@ public class EnemyUnit : BaseCombatUnit
             AddEffect(stunEff);
         }
         AddOnRemoveEffectEvent(EAbilityEffectType.MagicArmor, RemovedMagicArmor);
-        AddOnRemoveEffectEvent(EAbilityEffectType.MagicArmorEX, RemovedMagicArmor);
+        //AddOnRemoveEffectEvent(EAbilityEffectType.MagicArmorEX, RemovedMagicArmor);
     }
 
     [SerializeField] string testMobName = "TestMobData";
@@ -373,11 +373,11 @@ public class EnemyUnit : BaseCombatUnit
             var eff = GetEffect(EAbilityEffectType.MagicArmor);
             conditionStr = $"抗魔裝甲({TransElementToString((ECardElement)eff.value)}):{eff.duration}";
         }
-        if(HasEffect(EAbilityEffectType.MagicArmorEX))
-        {
-            var eff = GetEffect(EAbilityEffectType.MagicArmorEX);
-            conditionStr = $"抗魔裝甲EX({TransElementToString((ECardElement)eff.value)}):{eff.duration}";
-        }
+        //if(HasEffect(EAbilityEffectType.MagicArmorEX))
+        //{
+        //    var eff = GetEffect(EAbilityEffectType.MagicArmorEX);
+        //    conditionStr = $"抗魔裝甲EX({TransElementToString((ECardElement)eff.value)}):{eff.duration}";
+        //}
         // if (act.type == EMobActionType.Power)
         // {
         //     switch (act.breakType)
@@ -523,8 +523,7 @@ public class EnemyUnit : BaseCombatUnit
     {
         Debug.Log($"MobUnitCards this turn use element: {selectElement}");
 
-        var attr = bonusAttr;
-
+        var attr = GetBonusAttr();// bonusAttr;
         
         var targetAttr = mobData.elementData[(int)selectElement].attribute;
 
@@ -608,11 +607,11 @@ public class EnemyUnit : BaseCombatUnit
         {
             attr.ATK = Mathf.FloorToInt((float)attr.ATK * 1.2f);
         }
-        if(HasEffect(EAbilityEffectType.MagicArmorEX))
-        {
-            attr.ATK = Mathf.FloorToInt((float)attr.ATK * 1.2f);
-            attr.ATK = Mathf.FloorToInt((float)attr.HEAL * 1.2f);
-        }
+        //if(HasEffect(EAbilityEffectType.MagicArmorEX))
+        //{
+        //    attr.ATK = Mathf.FloorToInt((float)attr.ATK * 1.2f);
+        //    attr.ATK = Mathf.FloorToInt((float)attr.HEAL * 1.2f);
+        //}
 
         return attr;
     }
@@ -653,12 +652,12 @@ public class EnemyUnit : BaseCombatUnit
     
     public void CheckCostMagicArmor(ECardElement playerElement, int count)
     {
-        if(!HasEffect(EAbilityEffectType.MagicArmor) && !HasEffect(EAbilityEffectType.MagicArmorEX))
+        if(!HasEffect(EAbilityEffectType.MagicArmor)/* && !HasEffect(EAbilityEffectType.MagicArmorEX)*/)
         {
             return;
         }
 
-        AbilityEffectRef effect = HasEffect(EAbilityEffectType.MagicArmor)? GetEffect(EAbilityEffectType.MagicArmor) : GetEffect(EAbilityEffectType.MagicArmorEX);
+        AbilityEffectRef effect = GetEffect(EAbilityEffectType.MagicArmor);// HasEffect(EAbilityEffectType.MagicArmor)? GetEffect(EAbilityEffectType.MagicArmor) : GetEffect(EAbilityEffectType.MagicArmorEX);
 
         var armorElement = (ECardElement)effect.value;
 
