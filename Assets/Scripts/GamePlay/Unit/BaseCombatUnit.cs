@@ -14,7 +14,8 @@ public abstract class BaseCombatUnit : MonoBehaviour
 
     protected CombatSystem combatSystem;
 
-    public CardAttribute bonusAttr;
+    //public CardAttribute bonusAttr;
+    public Dictionary<EAbilityEffectType, CardAttribute> bonusAttrMap = new Dictionary<EAbilityEffectType, CardAttribute>();
 
     Dictionary<EAbilityEffectType, AbilityEffectRef> effectMap = new Dictionary<EAbilityEffectType, AbilityEffectRef>();
 
@@ -66,6 +67,10 @@ public abstract class BaseCombatUnit : MonoBehaviour
 
     public void AddOnRemoveEffectEvent(EAbilityEffectType type, System.Action action)
     {
+        if(bonusAttrMap.ContainsKey(type))
+        {
+            bonusAttrMap.Remove(type);
+        }
         if (!onRemoveEffectEvent.ContainsKey(type))
         {
             onRemoveEffectEvent[type] = action;
@@ -160,7 +165,8 @@ public abstract class BaseCombatUnit : MonoBehaviour
 
     public void ClearEffect()
     {
-        bonusAttr.Init();
+        //bonusAttr.Init();
+        bonusAttrMap.Clear();
         effectMap.Clear();
     }
 
@@ -224,17 +230,20 @@ public abstract class BaseCombatUnit : MonoBehaviour
             {
                 case EAbilityEffectType.IncreaseATK:
                     {
-                        bonusAttr.ATK += (int)effect.value;
+                        //bonusAttr.ATK += (int)effect.value;
+                        bonusAttrMap.Add(effect.type, new CardAttribute() { ATK = (int)effect.value });
                     }
                     break;
                 case EAbilityEffectType.IncreaseDEF:
                     {
-                        bonusAttr.DEF += (int)effect.value;
+                        //bonusAttr.DEF += (int)effect.value;
+                        bonusAttrMap.Add(effect.type, new CardAttribute() { DEF = (int)effect.value });
                     }
                     break;
                 case EAbilityEffectType.IncreaseHeal:
                     {
-                        bonusAttr.HEAL += (int)effect.value;
+                        //bonusAttr.HEAL += (int)effect.value;
+                        bonusAttrMap.Add(effect.type, new CardAttribute() { HEAL = (int)effect.value });
                     }
                     break;
                 case EAbilityEffectType.LevelUp:
@@ -324,7 +333,7 @@ public abstract class BaseCombatUnit : MonoBehaviour
                     break;
                     
                 case EAbilityEffectType.MagicArmor:
-                case EAbilityEffectType.MagicArmorEX:
+                //case EAbilityEffectType.MagicArmorEX:
                     {
                         AbilityEffectRef newEffect = null;
                         if(HasEffect(effect.type))
@@ -340,6 +349,20 @@ public abstract class BaseCombatUnit : MonoBehaviour
                         newEffect.value = Random.Range(0, 4);//四個元素隨機出
                         newEffect.duration = effect.duration;
                         newEffect.isCostByTurn = false;
+                        var bonusAttr = new CardAttribute();
+                        if (effect.value > 0)
+                        {
+                            bonusAttr.DEF += (int)effect.value;
+                        }
+                        else
+                        {
+                            bonusAttr.DEF += 5;
+                        }
+                        if(string.IsNullOrWhiteSpace(effect.param))
+                        {
+                            bonusAttr.ATK += int.Parse(effect.param);
+                        }
+                        bonusAttrMap.Add(effect.type, bonusAttr);
                     }
                     break;
                 case EAbilityEffectType.ChangeEnvironmentEffect:
@@ -388,6 +411,19 @@ public abstract class BaseCombatUnit : MonoBehaviour
     public void CastAbility(Ability ability)
     {
         MakeEffect(ability.effect, ability.element, false);
+    }
+
+    public CardAttribute GetBonusAttr()
+    {
+        var bonusAttr = new CardAttribute();
+        foreach(var attr in bonusAttrMap.Values)
+        {
+            bonusAttr.ATK += attr.ATK;
+            bonusAttr.DEF += attr.DEF;
+            bonusAttr.HEAL += attr.HEAL;
+            bonusAttr.EN += attr.EN;
+        }
+        return bonusAttr;
     }
 }
 

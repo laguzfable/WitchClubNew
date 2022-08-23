@@ -186,7 +186,7 @@ public enum EAbilityEffectType
     /// <summary>
     /// 抗魔裝甲EX
     /// </summary>
-    MagicArmorEX,
+    //MagicArmorEX,
 
     /// <summary>
     /// 持續傷害

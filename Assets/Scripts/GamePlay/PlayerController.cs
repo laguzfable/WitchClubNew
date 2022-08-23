@@ -77,7 +77,10 @@ public class PlayerController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        ReflashCards(false);
+        if(!TutorialController.isTutorial && !TutorialController.isTutorial2)
+        {
+            ReflashCards(false);
+        }
     }
 
     Transform cardContriner = null;
@@ -106,7 +109,7 @@ public class PlayerController : MonoBehaviour
     public void PlayAction()
     {
         // 這邊插入教學的邏輯
-        if (TutorialController.isTutorial)
+        if (TutorialController.isTutorial || TutorialController.isTutorial2)
         {
             var tutorObj = combatSystem.tutorController.curTutorialObj;
 
@@ -168,10 +171,26 @@ public class PlayerController : MonoBehaviour
                         }
                     }
                     break;
+                case "playYellow":
+                    {
+                        if (isEmptyCards || result.cardList.Count < 4)
+                        {
+                            combatSystem.SpawnSystemText("TUTORIAL_WARNING");
+                            return;
+                        }
+                        foreach (var card in result.cardList)
+                        {
+                            if (card.element != ECardElement.Yellow)
+                            {
+                                combatSystem.SpawnSystemText("TUTORIAL_WARNING");
+                                return;
+                            }
+                        }
+                    }
+                    break;
                 default:
-                    // combatSystem.SpawnSystemText("請依教學指示執行動作");
+                     combatSystem.SpawnSystemText("TUTORIAL_WARNING");
                     return;
-
             }
         }
 
@@ -323,7 +342,7 @@ public class PlayerController : MonoBehaviour
     public void CalculateAttr()
     {
         result = GetPlayedResult();
-        totalAttr = playerUnit.bonusAttr;
+        totalAttr = playerUnit.GetBonusAttr(); //playerUnit.bonusAttr;
 
         foreach (var card in result.cardList)
         {
@@ -471,7 +490,7 @@ public class PlayerController : MonoBehaviour
     public void ReflashCards(bool isOnlySelected)
     {
         // 這裡塞教學用指定的卡
-        if(TutorialController.isTutorial)
+        if(TutorialController.isTutorial || TutorialController.isTutorial2)
         {
             int[] cardArr = null;
 
@@ -500,6 +519,11 @@ public class PlayerController : MonoBehaviour
                     case "playGreen":
                         {
                             cardArr = new int[]{103, 101, 103, 102, 103};
+                        }
+                        break;
+                    case "playYellow":
+                        {
+                            cardArr = new int[] { 104, 104, 8, 101, 104 };
                         }
                         break;
                 }

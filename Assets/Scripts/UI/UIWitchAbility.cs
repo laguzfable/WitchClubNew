@@ -98,6 +98,20 @@ public class UIWitchAbility : MonoBehaviour
     */
     public void OnClick()
     {
+        if (TutorialController.isTutorial2)
+        {
+            var tutorObj = pc.combatSystem.tutorController.curTutorialObj;
+            if (tutorObj != null)
+            {
+                // 檢查id
+                if(tutorObj.customActionID != "playRune" || element != ECardElement.Yellow)
+                {
+                    pc.combatSystem.SpawnSystemText("TUTORIAL_WARNING");
+                    return;
+                }
+            }
+            pc.combatSystem.tutorController.canGoNext = true;
+        }
         //cost ability
         if (cost.Value == cost.GetTotalValue() && isControllable)
         {

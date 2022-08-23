@@ -73,7 +73,9 @@ public class CombatSystem : MonoBehaviour
 
     [SerializeField] RawImage blackMask;
 
-    public TutorialController tutorController;
+    public TutorialController tutorController { private set; get; }
+    [SerializeField] TutorialController tutorController1;
+    [SerializeField] TutorialController tutorController2;
 
 
     // public async UniTask SwitchStateToCombatModeAsync(CancellationToken cancellationToken = default)
@@ -139,10 +141,20 @@ public class CombatSystem : MonoBehaviour
 
             var runeActive = false;
             Engine.GetService<ICustomVariableManager>().TryGetVariableValue<bool>("RuneActive", out runeActive);
+
+            if(TutorialController.isTutorial)
+            {
+                tutorController = tutorController1;
+                tutorController.Begin();
+            }
+            else if(TutorialController.isTutorial2)
+            {
+                tutorController = tutorController2;
+                tutorController.Begin();
+            }
             tutorController.uICollection.SetRunesEnabled(runeActive);
 
             Debug.Log(Engine.GetService<ILocalizationManager>().SelectedLocale);
-
         }
         BG.gameObject.SetActive(true);
 
@@ -176,7 +188,10 @@ public class CombatSystem : MonoBehaviour
     void Start()
     {
         envEffect.SetCurrentEffect(EEnvEffectType.None);
-        PrepareBeginTurn();
+        if(!TutorialController.isTutorial && !TutorialController.isTutorial2)
+        {
+            PrepareBeginTurn();
+        }
     }
 
     private void Update()
@@ -274,7 +289,7 @@ public class CombatSystem : MonoBehaviour
             else // normal
             {
                 var dealDamage = mobDmg;
-                if(envEffect.curType == EEnvEffectType.MobArmor || mobUnit.HasEffect(EAbilityEffectType.MagicArmor) || mobUnit.HasEffect(EAbilityEffectType.MagicArmorEX))
+                if(envEffect.curType == EEnvEffectType.MobArmor/* || mobUnit.HasEffect(EAbilityEffectType.MagicArmor) || mobUnit.HasEffect(EAbilityEffectType.MagicArmorEX)*/)
                 {
                     dealDamage = Mathf.FloorToInt((float)dealDamage * 0.7f);
                 }
@@ -343,7 +358,7 @@ public class CombatSystem : MonoBehaviour
         //     envEffect.SetNextEffect(mobActResult.targetEnvEffect, 1);
         // }
 
-        if (TutorialController.isTutorial)
+        if (TutorialController.isTutorial || TutorialController.isTutorial2)
         {
             tutorController.canGoNext = true;
             return;
@@ -391,9 +406,10 @@ public class CombatSystem : MonoBehaviour
         }
 
         pc.ReflashCards(true);
-        
-        if(!TutorialController.isTutorial)
+
+        if (!TutorialController.isTutorial && !TutorialController.isTutorial2)
         {
+
             envEffect.remainTurn--;
             if (envEffect.remainTurn <= 0)
             {

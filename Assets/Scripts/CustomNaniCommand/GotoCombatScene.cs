@@ -34,6 +34,7 @@ public class GotoCombatScene : Command, Command.IForceWait
         */
         DataService.Instance.scriptParameter = new ScriptParameter() { background = Background, combatTarget = Target, scriptName = ScriptName, scriptLabel = Label };
         TutorialController.isTutorial = false;
+        TutorialController.isTutorial2 = false;
         await SceneManager.LoadSceneAsync("CombatScene");
         //return UniTask.CompletedTask;
     }

@@ -3,8 +3,8 @@ using Naninovel.Commands;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-[CommandAlias("Tutorial")]
-public class GotoCombatTutorial : Command, Command.IForceWait
+[CommandAlias("RuneTutorial")]
+public class GotoCombatTutorial2 : Command, Command.IForceWait
 {
     public StringParameter Background;
     public StringParameter ScriptName;
@@ -31,8 +31,8 @@ public class GotoCombatTutorial : Command, Command.IForceWait
         PlayerData.Instance.usingRuneIDs[(int)ECardElement.Blue] = "赫菲";
         */
         DataService.Instance.scriptParameter = new ScriptParameter() { background = Background, scriptName = ScriptName, scriptLabel = Label };
-        TutorialController.isTutorial = true;
-        TutorialController.isTutorial2 = false;
+        TutorialController.isTutorial = false;
+        TutorialController.isTutorial2 = true;
         await SceneManager.LoadSceneAsync("CombatScene");
         //return UniTask.CompletedTask;
     }
