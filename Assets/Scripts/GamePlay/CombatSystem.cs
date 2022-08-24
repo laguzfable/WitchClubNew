@@ -152,7 +152,7 @@ public class CombatSystem : MonoBehaviour
                 tutorController = tutorController2;
                 tutorController.Begin();
             }
-            tutorController.uICollection.SetRunesEnabled(runeActive);
+            tutorController1.uICollection.SetRunesEnabled(runeActive);
 
             Debug.Log(Engine.GetService<ILocalizationManager>().SelectedLocale);
         }
