@@ -30,6 +30,8 @@ public class GotoCombatTutorial2 : Command, Command.IForceWait
         PlayerData.Instance.usingRuneIDs[(int)ECardElement.Green] = "樹女";
         PlayerData.Instance.usingRuneIDs[(int)ECardElement.Blue] = "赫菲";
         */
+        Engine.GetService<ICustomVariableManager>().SetVariableValue("RuneActive", "True");
+
         DataService.Instance.scriptParameter = new ScriptParameter() { background = Background, scriptName = ScriptName, scriptLabel = Label };
         TutorialController.isTutorial = false;
         TutorialController.isTutorial2 = true;
