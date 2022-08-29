@@ -1,7 +1,12 @@
+@GotoCombatTutorial2
 
+@spawn hello
 
 @bgm fantasy
-@back cg00new
+@back cg00new pos:40,50 time:1
+@wait 0.3
+@back cg00new pos:65,50 time:5
+
 
 @choice 這裡是哪裡？我是誰？
 @stop
@@ -43,6 +48,7 @@
 @goto .end_naming
 
 # end_naming
+@despawn hello
 @spawn ShakeBackground
 @back cg02new
 
@@ -249,7 +255,7 @@
 
 @stopBgm
 @bgm tutorial
-@back bg00
+
 
 @tutorial scriptName:chapter0 label:afterbattle background:bg01
 @stop

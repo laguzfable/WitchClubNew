@@ -455,16 +455,14 @@
 ？？？: 不用擔心，一切都很快就會明瞭了。
 
 
-@stopBgm
 
+
+@stopBgm
+@goto chapter2
+@stop
 （DEMO結束）
 
-@gotoUnityScene sceneName:MainScene
 
-; @gotoUntyScene sceneName:MainScene
-
-; @loadScene MainScene
-; @hideall remove:true
 
 @stopBgm
 @goto chapter2
@@ -472,5 +470,11 @@
 
 @trialEnd
 
-
 @stop
+
+@gotoUnityScene sceneName:MainScene
+
+; @gotoUntyScene sceneName:MainScene
+
+; @loadScene MainScene
+; @hideall remove:true

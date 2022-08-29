@@ -5,18 +5,18 @@ DEF,防禦力,Defense
 HEAL,治療,Heal
 EN,能量,Energy
 TURN,結束回合,End Turn
-TRYAGAIN,再玩一次,Play again
-INTERUPT,成功打斷行動,Interrupted !
+TRYAGAIN,再玩一次,Try Again
+INTERUPT,成功打斷行動,Turn Interrupted!
 MOB_USE_RUNE,敵人使用了符文!,Enemy used runes!
-TUTORIAL_WARNING,請依教學指示執行動作,Please follow instruction
-CANT_DIFF_CARD,不能選擇不同系列生物,Cannot choose different series of creatures
-CANT_OVER_2,無法出超過2張卡片,Can't play more than 2 cards
-CANT_PLAY_CHAR,無法出角色卡,Can't play character card
-CANT_PLAY_RED,無法出紅色卡,Can't play red card
-CANT_PLAY_BLUE,無法出藍色卡,Can't play blue card
-CANT_PLAY_GREEN,無法出綠色卡,Can't play green card
-CANT_PLAY_YELLOW,無法出黃色卡,Can't play yellow card
-CANT_USE_RUNE,無法使用符文能力,Can't use rune abilities
+TUTORIAL_WARNING,請依教學指示執行動作,Follow the instructions
+CANT_DIFF_CARD,不能選擇不同系列生物,Choose creatures of the same color
+CANT_OVER_2,無法出超過2張卡片,Play two cards or less
+CANT_PLAY_CHAR,無法出角色卡,Character cards disabled
+CANT_PLAY_RED,無法出紅色卡,Red cards disabled
+CANT_PLAY_BLUE,無法出藍色卡,Blue cards disabled
+CANT_PLAY_GREEN,無法出綠色卡,Green cards disabled
+CANT_PLAY_YELLOW,無法出黃色卡,Yellow cards disabled
+CANT_USE_RUNE,無法使用符文能力,Rune abilities disabled
 RED_MAIN,梅爾帕茉妮,Melpomene
 BLUE_MAIN,優菲,Euphie
 GREEN_MAIN,薇狄亞,Viridia
@@ -25,57 +25,58 @@ RED_CARD,血巫觸手,Blood Tentacle
 BLUE_CARD,雪色魔梟,Snow Owl
 GREEN_CARD,秘林樹精,Forest Dryad
 YELLOW_CARD,安息日羊,Sabbath Sheep
-TUTORIAL_DIALOG_1,巫術世界有四大屬性的法術，在視覺上分類的話，分別為－－學院（藍）、鮮血（紅）、自然（綠），及惡魔（金）。,"There are four kind of magics: Academy (blue), blood (red), nature (green), and demon (gold)."
-TUTORIAL_DIALOG_2,每張牌都有最多2種資訊，攻擊力，以及防禦力。,"Each card has up to 2 informations, attack power, and defense power."
-TUTORIAL_DIALOG_3,唯一的特例是自然（綠）的卡牌，沒有任何攻擊力，只有恢復力與防禦力。,"The only exception is natural (green) cards, which do not have any attack power, only recovery and defense."
-TUTORIAL_DIALOG_4,每個回合，您將會隨機獲得5張牌，只要是相同顏色都可一併打出。,"Each round, you will randomly get 5 cards, as long as they are of the same color, they can be played together."
-TUTORIAL_DIALOG_5,這邊會出現結算後的數字。,The settled numbers will appear here.
-TUTORIAL_DIALOG_6,選好要出的牌後，要按下結束回合，才會打出去唷，在那之前都可以仔細地評估。,"After choosing the card to be played, you have to press the end turn before you can play it, and you can carefully evaluate it before that."
-TUTORIAL_DIALOG_7,試試看吧，先打出鮮血（紅色）的牌，並按下結束回合。,"Try it out, play the blood (red) card first, and press to end the turn."
-TUTORIAL_DIALOG_8,挺會的嘛，現在要來真的囉！,Cool!
-TUTORIAL_DIALOG_9,這邊是P的血量，可別貪杯喝掉了唷，耗盡就輸了。,"Here is your HP, don't drink it too much, you will lose if you run out."
-TUTORIAL_DIALOG_10,至於這上面，則是對手的血量。 同時還會提示對手接下來的動作。,"Up here, it's HP of your opponent. At the same time, it will also prompt the opponent's next move."
-TUTORIAL_DIALOG_11,再試一次吧，用學院（藍色）卡來擋下我的攻擊。,"Try again, block my attack with the Academy (blue) card."
-TUTORIAL_DIALOG_12,很好，就是這樣。,"Good, that's it."
-TUTORIAL_DIALOG_13,沒打出的牌數值上升了。留在手上的牌是會升級的唷！最多升級5次。,The value of unplayed cards increased. The cards left in your hand will be upgraded! Upgrade up to 5 times.
-TUTORIAL_DIALOG_14,把升級過的自然（綠色）牌，打出來吧，把血量補滿。,Play the upgraded natural (green) cards and fill up the blood.
-TUTORIAL_DIALOG_15,沒錯，就是這樣～,"That's right, that's it~"
-TUTORIAL_DIALOG_16,能量開始浮動了呢，快看這裡，每回合都會有不同的影響。,"The energy starts to float, look here, each round will have a different impact."
-TUTORIAL_DIALOG_17,下回合是攻擊加倍的絳紅之夜，我們直接來試試它的效果吧。,"The next turn is the Crimson Night where the attack is doubled, so let's try its effect directly."
-TUTORIAL_DIALOG_18,來吧，打出鮮血（紅色）的牌。,"Come on, play the blood (red) card."
-TUTORIAL_DIALOG_19,哇塞－－這比想像得痛耶，真刺激！,"Wow -- this hurts more than I imagined, it's really exciting!"
-TUTORIAL_DIALOG_20,總、總之P的戰鬥技巧應該是沒問題了！,"In short, your combat skills should be no problem!"
-ENV_EFFECT_1,風和日麗,Sunny Day
+TUTORIAL_DIALOG_1,巫術世界有四大屬性的法術，在視覺上分類的話，分別為－－學院（藍）、鮮血（紅）、自然（綠），及惡魔（金）。,"Time to cover three of the four different types of magic: Academy (blue), Blood (red), & Nature (green)!
+Occult (yellow) magic is a little special so we'll cover that later!"
+TUTORIAL_DIALOG_2,每張牌都有最多2種資訊，攻擊力，以及防禦力。,Each card generally contains two important numbers: Attack and Defense values
+TUTORIAL_DIALOG_3,唯一的特例是自然（綠）的卡牌，沒有任何攻擊力，只有恢復力與防禦力。,"Nature (green) cards are a bit different. Instead of an attack value, they have a recovery value that heals your ＨＰ."
+TUTORIAL_DIALOG_4,每個回合，您將會隨機獲得5張牌，只要是相同顏色都可一併打出。,"At the start of your turn, you will recieve 5 random cards. You can play any number of cards with the SAME color."
+TUTORIAL_DIALOG_5,這邊會出現結算後的數字。,The stats from your turn are tallied up here.
+TUTORIAL_DIALOG_6,選好要出的牌後，要按下結束回合，才會打出去唷，在那之前都可以仔細地評估。,"Ｐress here to play the cards you selected. Obviously, this will also end your turn."
+TUTORIAL_DIALOG_7,試試看吧，先打出鮮血（紅色）的牌，並按下結束回合。,"Try it out! Select the Blood (red) card(s) and press ""End Turn"" to play them."
+TUTORIAL_DIALOG_8,挺會的嘛，現在要來真的囉！,Nice! Let's do this for real now.
+TUTORIAL_DIALOG_9,這邊是P的血量，可別貪杯喝掉了唷，耗盡就輸了。,"This is your ＨＰ. If the glass is empty, you lose!"
+TUTORIAL_DIALOG_10,至於這上面，則是對手的血量。 同時還會提示對手接下來的動作。,"This is your opponent's ＨＰ, as well as a preview of their next move."
+TUTORIAL_DIALOG_11,再試一次吧，用學院（藍色）卡來擋下我的攻擊。,Let's try this again. Block my attack with the Academy (blue) cards.
+TUTORIAL_DIALOG_12,很好，就是這樣。,Good. You're getting the hang of this!
+TUTORIAL_DIALOG_13,沒打出的牌數值上升了。留在手上的牌是會升級的唷！最多升級5次。,The stats for all cards remaining in your hand are upgraded! Each card can upgrade up to five times.
+TUTORIAL_DIALOG_14,把升級過的自然（綠色）牌，打出來吧，把血量補滿。,Ｐlay the Nature (green) card(s) to top off your health!
+TUTORIAL_DIALOG_15,沒錯，就是這樣～,That's it. Just like that!
+TUTORIAL_DIALOG_16,能量開始浮動了呢，快看這裡，每回合都會有不同的影響。,"Ooh, the energy around here is shifting. This here will display the environmental effect for this turn."
+TUTORIAL_DIALOG_17,下回合是攻擊加倍的絳紅之夜，我們直接來試試它的效果吧。,Looks like a Crimson Night has befallen us. That means all attacks are doubled.
+TUTORIAL_DIALOG_18,來吧，打出鮮血（紅色）的牌。,Let's test it out. Play some Blood (red) cards.
+TUTORIAL_DIALOG_19,哇塞－－這比想像得痛耶，真刺激！,Wow! That hurt a little more than I expected. How exciting!
+TUTORIAL_DIALOG_20,總、總之P的戰鬥技巧應該是沒問題了！,That's all you need to know for combat!
+ENV_EFFECT_1,風和日麗,Cloudless Skies
 ENV_EFFECT_2,絳紅之夜,Crimson Night
-ENV_EFFECT_3,高塔之暮,Twilight
-ENV_EFFECT_4,生命之雨,Rain of Life
-ENV_EFFECT_5,魔力狂潮,Sorcery Wave
-ENV_EFFECT_6,沉默：紅,silence: red
-ENV_EFFECT_7,沉默：藍,silence: blue
-ENV_EFFECT_8,沉默：綠,silence: green
-ENV_EFFECT_9,沉默：黃,silence: yellow
-ENV_EFFECT_10,能量束縛,Energy Bound
+ENV_EFFECT_3,高塔之暮,Serene Twilight
+ENV_EFFECT_4,生命之雨,Refreshing Rain
+ENV_EFFECT_5,魔力狂潮,Mystic Tide
+ENV_EFFECT_6,沉默：紅,Silence: Blood
+ENV_EFFECT_7,沉默：藍,Silence: Academy
+ENV_EFFECT_8,沉默：綠,Silence: Nature
+ENV_EFFECT_9,沉默：黃,Silence: Occult
+ENV_EFFECT_10,能量束縛,Energy-Bound
 ENV_EFFECT_11,寂靜破曉,Silent Dawn
-ENV_EFFECT_12,符文封印,Rune Seal
-ENV_EFFECT_13,虛弱結界,Weakness Ward
+ENV_EFFECT_12,符文封印,Interdiction
+ENV_EFFECT_13,虛弱結界,Fragile Domain
 ENV_EFFECT_14,護盾瓦解,Fragile Shield
-ENV_EFFECT_15,護盾瓦解P,Fragile Shield P
-ENV_EFFECT_16,迴避結界,Avoid enchantment
-ENV_EFFECT_17,傷害結界,Damage enchantment
-ENV_EFFECT_1_DESC,無任何效果,no effect
-ENV_EFFECT_2_DESC,攻擊雙倍,Double attack
-ENV_EFFECT_3_DESC,防禦雙倍,Double defense
-ENV_EFFECT_4_DESC,治療雙倍,Double heal
-ENV_EFFECT_5_DESC,獲得能量雙倍,Get double energy
-ENV_EFFECT_6_DESC,禁用血系卡牌,Disable blood cards
-ENV_EFFECT_7_DESC,禁用學院系卡牌,Disable Academy Cards
-ENV_EFFECT_8_DESC,禁用自然系卡牌,Disable Nature Cards
-ENV_EFFECT_9_DESC,禁用惡魔系卡牌,Disable Demon Cards
-ENV_EFFECT_10_DESC,限制最多2張卡牌,Limit up to 2 cards
-ENV_EFFECT_11_DESC,禁用角色卡,Disable character cards
-ENV_EFFECT_12_DESC,禁用符文,Disable Runes
-ENV_EFFECT_13_DESC,治療無效,Invalid Heal
-ENV_EFFECT_14_DESC,防禦無效,Invalid Defense
-ENV_EFFECT_15_DESC,玩家防禦無效,Invalid Player's Defense
-ENV_EFFECT_16_DESC,敵人減免傷害,Enemy damage reduction
-ENV_EFFECT_17_DESC,玩家每回合受到傷害,Player gets damage each turn
+ENV_EFFECT_15,護盾瓦解P,Shattered Shield
+ENV_EFFECT_16,迴避結界,Blinding Fog
+ENV_EFFECT_17,傷害結界,Crippling Mist
+ENV_EFFECT_1_DESC,無任何效果,No effect
+ENV_EFFECT_2_DESC,攻擊雙倍,Double Attack
+ENV_EFFECT_3_DESC,防禦雙倍,Double Defense
+ENV_EFFECT_4_DESC,治療雙倍,Double Healing
+ENV_EFFECT_5_DESC,獲得能量雙倍,Double Energy
+ENV_EFFECT_6_DESC,禁用血系卡牌,Can't use Red cards
+ENV_EFFECT_7_DESC,禁用學院系卡牌,Can't use Blue cards
+ENV_EFFECT_8_DESC,禁用自然系卡牌,Can't use Green cards
+ENV_EFFECT_9_DESC,禁用惡魔系卡牌,Can't use Yellow cards
+ENV_EFFECT_10_DESC,限制最多2張卡牌,Limit: Two Cards
+ENV_EFFECT_11_DESC,禁用角色卡,Can't use Character cards
+ENV_EFFECT_12_DESC,禁用符文,Can't use Runes
+ENV_EFFECT_13_DESC,治療無效,Healing nullified
+ENV_EFFECT_14_DESC,防禦無效,Defense nullified
+ENV_EFFECT_15_DESC,玩家防禦無效,Defense nullified (Player)
+ENV_EFFECT_16_DESC,敵人減免傷害,Receive less damage (Enemy)
+ENV_EFFECT_17_DESC,玩家每回合受到傷害,Receive damage (Player)
