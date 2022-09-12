@@ -1,7 +1,7 @@
 @back huffy_night
 @bgm night
 @spawn hello
-@spawn Rain
+
 
 赫菲: {PlayerName}，來了啊。
 赫菲: ……
@@ -56,7 +56,7 @@
 
 @back Appearance.CloudReveal
 
-
+@despawn hello
 @battle background:bg02 target:monsterbl01 label:night1
 @stop
 
