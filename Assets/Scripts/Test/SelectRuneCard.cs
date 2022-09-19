@@ -16,7 +16,7 @@ public class SelectRuneCard : MonoBehaviour
     public Text abilityDesc;
 
     // Use this for initialization
-    void Start()
+    void Awake()
     {
         ability = DataService.Instance.GetAbilityById(abilityID);
 
@@ -39,6 +39,8 @@ public class SelectRuneCard : MonoBehaviour
             transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
         }
     }
+
+    public void SetInteractable(bool interactable) => btn.interactable = interactable;
 
     public void OnClick()
     {

@@ -491,6 +491,11 @@ public class CombatSystem : MonoBehaviour
             ReloadScene();
             return;
         }
+        string mobListStr = "";
+        Engine.GetService<ICustomVariableManager>().TryGetVariableValue<string>("MobList", out mobListStr);
+        mobListStr += DataService.Instance.scriptParameter.combatTarget + ",";
+        Engine.GetService<ICustomVariableManager>().SetVariableValue("MobList", mobListStr);
+
         var advCamera = GameObject.Find("CombatCamera").GetComponent<Camera>();
         advCamera.enabled = false;
         var naniCamera = Engine.GetService<ICameraManager>().Camera;
