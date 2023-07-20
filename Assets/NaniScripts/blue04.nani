@@ -1,0 +1,48 @@
+@back huffy_night
+@bgm night
+@spawn hello
+
+
+優菲: 我跟魅兒成為朋友之後，過了一段很開心的生活。
+優菲: 一起上學、一起翹課、一起吃鬆餅、一起偷看禁書……
+優菲: 原本以為我們應該就會這樣一起……直到畢業才對的。
+優菲: 直到血巫結社進攻的那一天。
+
+
+@back black
+
+
+導師: 擺好防禦陣型，我們一定要守住圖書館！
+學生: 她們來了！！
+
+(魅兒愣住)
+魅兒: ……！！
+優菲: 魅兒？妳還好嗎？
+魅兒: 鮮紅的……魔法？
+優菲: 小心，妳旁邊有破綻！
+
+
+
+@stopBgm
+@bgm energetic
+
+@back Appearance.CloudReveal
+
+@despawn hello
+@battle background:bg02 target:monsterbl01 label:night1
+@stop
+
+
+# night1
+@stopbgm
+@back huffy_night
+
+優菲: 透過師生們共同努力，圖書館最後是守住了，但是……
+優菲: 我卻沒注意到，那個時候讓魅兒如火焰一般的目光，究竟是從何而來。
+優菲: 也許是因為這樣，所以種下了禍根吧……
+
+
+
+
+@restroom
+@stop
