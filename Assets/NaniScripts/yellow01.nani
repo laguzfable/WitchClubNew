@@ -1,0 +1,75 @@
+@back nelly_night
+@bgm night
+@spawn hello
+
+
+涅莉: 唷唷唷－－看看是誰來啦？
+涅莉: 我就知道 {PlayerName}早就煞到我了對吧？哈哈哈－－
+涅莉: 不要緊張，姊姊我呢，是很有經驗的，來來來，到床上躺下。
+
+
+@choice 應該是我要幫妳做儀式吧？ goto:.yellow01deny
+@choice （照她的指示乖乖躺下。） goto:.yellow01obey
+@stop
+
+# yellow01deny
+
+涅莉: 對啊，我們就一起躺著做嘛。
+涅莉: 幹嘛擺那個臉啊，看不出來我是開玩笑的嗎！真沒幽默感！
+
+goto:.ritual
+
+
+# yellow01obey
+
+涅莉: 哈哈哈－－ {PlayerName}好可愛唷。
+涅莉: 就是這一點讓我愛死了！
+
+goto:.ritual
+
+
+#ritual
+
+涅莉: 好啦，回歸正題……
+涅莉: 說起來有點不可思議，不過，我的記憶完全跟惡魔無關。
+涅莉: 噯，沒錯，完全無關！
+涅莉: 和其他三人不同，我只是惡魔系的代理者而已。
+涅莉: 我們雖然不是真正的女巫，但是可以隨心所欲地精通任何派系的法術。
+涅莉: 其實，小精靈這個古老的種族，原本應該比人類還要更強勢才對的……
+
+@back black
+
+（畫面轉到CG）
+可能小精靈的本性就是比較小氣又自私，也不團結，所以大家的生活過得越來越辛苦。
+最後甚至窮到連衣服都破破爛爛的……
+
+涅莉: 不要打了！妳們不要再打了！
+
+小精靈: 我勸妳別多管閒事喔！
+
+@stopBgm
+@bgm energetic
+
+@back Appearance.CloudReveal
+
+@despawn hello
+@battle background:bg02 target:monsterbl01 label:night1
+@stop
+
+
+# night1
+@stopbgm
+@back nelly_night
+
+涅莉: 唉，反正就這樣。
+涅莉: 不說了，我要先去吃個宵夜壓壓驚。
+涅莉: 蘇菲亞！蘇菲亞？
+涅莉: 啊，{PlayerName}要的話也一起來吧。
+
+（於是跟涅莉一起吃了宵夜）
+
+
+
+
+@restroom
+@stop

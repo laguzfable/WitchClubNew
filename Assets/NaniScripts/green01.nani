@@ -1,0 +1,63 @@
+@back vedia_night
+@bgm night
+@spawn hello
+
+
+薇狄亞: 真是個安靜的夜晚呢，P真的來找我了，我很開心。
+薇狄亞: 我的房間氣氛還可以嗎？我總是希望可以更週到，但沒有經驗的事情還是很有難度呢。
+薇狄亞: P呢？已經替其他人做過了嗎？
+
+
+@choice 做過了。 goto:.green01did
+@choice 沒有，妳是第一個。 goto:.green01didnot
+@stop
+
+# green01did
+
+# green01didnot
+
+薇狄亞: 太好了……我就知道我會是P的第一個。
+薇狄亞: 那麼，現在開始吧。
+
+薇狄亞: 啊……墮星石正閃耀著光芒呢。
+薇狄亞: 是在夢裡才會有的顏色，真是炫目。
+薇狄亞: 讓我想起很久以前的事……
+
+@back black
+
+(CG可愛小狐狸)
+
+那個時候我還只是一隻無辜的小狐狸。
+每天都過著無憂無慮的生活。
+直到有一天……
+
+(CG前面加一隻狼)
+
+
+
+@stopBgm
+@bgm energetic
+
+@back Appearance.CloudReveal
+
+@despawn hello
+@battle background:bg02 target:monsterbl01 label:night1
+@stop
+
+
+# night1
+@stopbgm
+@back vedia_night
+
+薇狄亞: 我奮力抵抗，也許是太過恐懼的緣故，我的周遭開始有一些波動。
+薇狄亞: 該說是神奇的氣流，還是彩色的光芒呢？很難形容，但那應該就是我身上最初的魔力吧。
+薇狄亞: 那隻攻擊我的狼就這麼被嚇跑了。
+薇狄亞: 呼－－這比想像得還要不容易呢。
+薇狄亞: P呢？還好嗎？
+薇狄亞: 希望我的表現沒有太差……
+薇狄亞: 下次我會準備得更好，今天就先休息吧。
+
+
+
+@restroom
+@stop
