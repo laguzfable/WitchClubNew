@@ -381,8 +381,12 @@ CG上菜
 may 馬上來～
 @hide syb,涅莉,蘇菲亞
 
-(入夜)
-(引導02)
+
+@stopbgm
+@restroom scriptName:chapter3 label:afterdate2
+@stop
+
+# afterdate2
 
 
 @back bg05
@@ -491,7 +495,12 @@ may: 來來來，一人一個。
 
 (眾人開心玩耍)
 
-(引導03)
+@hide 涅莉, 薇狄亞, may, 蘇菲亞
+@stopbgm
+@restroom scriptName:chapter3 label:afterdate3
+@stop
+
+# afterdate3
 
 
 @hide 涅莉,薇狄亞,may,蘇菲亞
@@ -634,8 +643,11 @@ nic: 想想那些為了象牙塔而捐軀的烈士們，他們會希望身為現
 
 
 
-(入夜)
-(引導04)
+@stopbgm
+@restroom scriptName:chapter3 label:afterdate4
+@stop
+
+# afterdate4
 
 @goto chapter4
 @stop
