@@ -199,6 +199,9 @@ MonoBehaviour:
     - name: chapter4
       pathPrefix: Scripts
       guid: bc0f37e71d620f742a7f5413bbb592fe
+    - name: chapter5
+      pathPrefix: Scripts
+      guid: 26d101bba7efdbe4fb79e87cecda63e5
     - name: blue01
       pathPrefix: Scripts
       guid: bb9335edeac9bcc4bb3ea14ecb3344c0
@@ -265,7 +268,7 @@ MonoBehaviour:
     Resources:
     - name: "\u512A\u83F2"
       pathPrefix: Characters
-      guid: e161ef6f597aa2c4aadfdbf4a9413ba2
+      guid: 4c81267c8c0c7474b87b025c18bb198c
   - Id: Characters/d28e9628-de18-4289-8bf6-1b535a64f004
     Resources:
     - name: "\u8587\u72C4\u4E9E"
@@ -477,6 +480,9 @@ MonoBehaviour:
     - name: cg02new
       pathPrefix: Backgrounds/MainBackground
       guid: 990a627cd71335445940f25cf4141c82
+    - name: cg30
+      pathPrefix: Backgrounds/MainBackground
+      guid: 02c3b0854c2887840acdcc9c347fc7b9
   - Id: Characters/2e2ce2b9-5a12-417a-9d42-26ad8383d563
     Resources: []
   - Id: Characters/d2d55f76-39a6-459e-b8c6-994b1a1e77ab
@@ -756,6 +762,69 @@ MonoBehaviour:
     - name: battle03
       pathPrefix: Audio
       guid: c2be9c798aafc154b9009e62ca3f61c0
+    - name: bluebattle
+      pathPrefix: Audio
+      guid: ce617b50fb6d3c74faf02aa37d6e61fe
+    - name: chill
+      pathPrefix: Audio
+      guid: 989e737d8194d2b4db2afcf154aa9eee
+    - name: crowd
+      pathPrefix: Audio
+      guid: f273b95e5e7b73048b8b296cd20deb49
+    - name: extreme
+      pathPrefix: Audio
+      guid: 36428aebd5e6d0b4f85be3730f3fa1d8
+    - name: gizmo
+      pathPrefix: Audio
+      guid: 6853a2cb56555c44c9720dba941e1e5e
+    - name: ima
+      pathPrefix: Audio
+      guid: 41aff82b54598f64cbeee4e364da4c19
+    - name: intense
+      pathPrefix: Audio
+      guid: 01577097563987d48bc74f9799f3d1ff
+    - name: ivory
+      pathPrefix: Audio
+      guid: 70911f880e7c0be4abe927724460fccf
+    - name: memories
+      pathPrefix: Audio
+      guid: 5a4a3f8a0584ef34ebfba1f68594787f
+    - name: nelly
+      pathPrefix: Audio
+      guid: f1b019dbf320e734c9889ce5d7a03f3d
+    - name: onfire
+      pathPrefix: Audio
+      guid: 31668ed1a4f19b846942a17f93641aad
+    - name: room
+      pathPrefix: Audio
+      guid: 95c56c5c24d67f146956dd81175a6c56
+    - name: serious
+      pathPrefix: Audio
+      guid: db99d5b95ba279244ba034730a5e6546
+    - name: sol
+      pathPrefix: Audio
+      guid: 7bc5848e137cf94409389d36b29f6fc4
+    - name: superextreme
+      pathPrefix: Audio
+      guid: 8236ea328a289f94fbbe4f26fb197b26
+    - name: theend
+      pathPrefix: Audio
+      guid: 24c893367c2e9d64a850032a743d3535
+    - name: thehunter
+      pathPrefix: Audio
+      guid: 4d3f8697c87ae8840bdbcfb2b10767d4
+    - name: thequeen
+      pathPrefix: Audio
+      guid: 808db50f8b96d49409bd64b019cc3fc8
+    - name: yellowroom
+      pathPrefix: Audio
+      guid: b3e32acb87d6e674483dc155896849c1
+    - name: sad
+      pathPrefix: Audio
+      guid: 1bf496b385cc7b842838c57f22dbceab
+    - name: micha
+      pathPrefix: Audio
+      guid: 1cdbe943f8c5f3c42bab1f7ac46cf6d3
   - Id: Unlockables
     Resources: []
   - Id: Characters/55169dbe-a042-4969-a143-1205e67017ed
@@ -771,10 +840,15 @@ MonoBehaviour:
   - Id: Characters/054f6046-0998-4261-9685-c2afba5f3792
     Resources:
     - name: sol
-      pathPrefix: Characters/new
-      guid: bf76a245e594a9b46b591025af265309
+      pathPrefix: "Characters/\u661F\u5875"
+      guid: 200d6ceb76f115049924a9cf39cc7fd2
   - Id: Characters/dc251680-ce1c-4045-98a4-d126c4ffb78a
     Resources:
     - name: 14imani
       pathPrefix: Characters/ima
       guid: 2930a37ea69a5da4782a3d0dee4d68cd
+  - Id: Characters/95e9ae37-b0cd-4537-964d-521d022dc86e
+    Resources:
+    - name: 13solstice
+      pathPrefix: Characters/sol
+      guid: bf76a245e594a9b46b591025af265309
