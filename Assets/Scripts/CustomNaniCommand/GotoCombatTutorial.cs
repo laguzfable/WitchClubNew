@@ -10,10 +10,14 @@ public class GotoCombatTutorial : Command, Command.IForceWait
     public StringParameter ScriptName;
     public StringParameter Label;
 
+    // ⭐⭐⭐「魔法」讓 Unity 強制刷新
+    public static int magicTutorialPatch = 20240601;
+
     public async override UniTask ExecuteAsync(AsyncToken asyncToken = default)
     {
+        Debug.Log("GotoCombatTutorial 指令被執行！");   
         // Engine.GetService<IUIManager>().SetUIVisibleWithToggle(false, false);
-        
+
         Engine.GetService<IScriptPlayer>().SetSkipEnabled(false);
         Engine.GetService<IBackgroundManager>().GetActor(BackgroundsConfiguration.MainActorId).Visible = false;
         var printerMgr = Engine.GetService<ITextPrinterManager>();
@@ -24,16 +28,9 @@ public class GotoCombatTutorial : Command, Command.IForceWait
             ScriptName = Engine.GetService<IScriptPlayer>().PlayedScript.Name;
         }
 
-        // PlayerData.Instance.playerName = Engine.GetService<ICustomVariableManager>().GetVariableValue("PlayerName");
-        /*
-        PlayerData.Instance.usingRuneIDs[(int)ECardElement.Red] = "艾妮(血系)";
-        PlayerData.Instance.usingRuneIDs[(int)ECardElement.Green] = "樹女";
-        PlayerData.Instance.usingRuneIDs[(int)ECardElement.Blue] = "赫菲";
-        */
         DataService.Instance.scriptParameter = new ScriptParameter() { background = Background, scriptName = ScriptName, scriptLabel = Label };
         TutorialController.isTutorial = true;
         TutorialController.isTutorial2 = false;
         await SceneManager.LoadSceneAsync("CombatScene");
-        //return UniTask.CompletedTask;
     }
 }

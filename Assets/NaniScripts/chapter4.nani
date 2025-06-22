@@ -6,6 +6,20 @@
 
 
 
+@choice 優菲結局 goto: .euphie_end
+@choice 繼續 goto:.777
+
+@stop
+
+
+
+
+#euphie_end
+
+@goto euphie_end
+
+#777
+
 @char witchi pos:35
 @char witchj pos:65
 @bgm chill
@@ -813,6 +827,22 @@ witchc: 迷霧草是最棒的！
 魅兒: 沒辦法，是妳先引誘我的。
 魅兒: 讓我一直忍不住想要靠近……
 優菲: 不行啊，魅兒已經不是原本的魅兒了！
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @char 涅莉 pos:20
