@@ -130,14 +130,10 @@ MonoBehaviour:
   availableCharacters:
   - name: 
     position: {x: -378, y: 114}
-    naninovelScript: 
-    animatorController: {fileID: 9100000, guid: e42ea99ddf87926439d6b19d92550e36,
-      type: 2}
+    events: []
   - name: 
     position: {x: -183, y: 265}
-    naninovelScript: 
-    animatorController: {fileID: 9100000, guid: 0be64c0412d4eac47a8d55e824209813,
-      type: 2}
+    events: []
 --- !u!114 &8640378735371514255
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -288,7 +284,10 @@ PrefabInstance:
       propertyPath: m_TargetGraphic
       value: 
       objectReference: {fileID: 5435847351153342180}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 8532079800605941040, guid: 792e0b1196cb4384ebe7d5c4751626c1, type: 3}
+    - {fileID: 443748630883475415, guid: 792e0b1196cb4384ebe7d5c4751626c1, type: 3}
+    - {fileID: 7959510628811625243, guid: 792e0b1196cb4384ebe7d5c4751626c1, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 792e0b1196cb4384ebe7d5c4751626c1, type: 3}
 --- !u!224 &3641302337061817710 stripped
 RectTransform:

@@ -1,85 +1,200 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 using System.Collections.Generic;
 
 public class MapCharacterSpawner : MonoBehaviour
 {
-    public GameObject characterIconPrefab; // 預設是含 Animator 的按鈕
+    public GameObject characterIconPrefab;
+    public Transform iconParent;
 
     [System.Serializable]
-    public class CharacterData
+    public class CharacterEvent
     {
-        public string name;
-        public Vector2 position; // anchoredPosition
-        public string naninovelScript; // 劇本名稱
-        public RuntimeAnimatorController animatorController; // 每個角色的動畫控制器
+        public string eventName;
+        public string naninovelScript;
+        public RuntimeAnimatorController animatorController;
+        public Vector2 offset;
     }
 
-    public List<CharacterData> availableCharacters = new List<CharacterData>();
-
-    void Start()
+    [System.Serializable]
+    public class CharacterEventList
     {
-        for (int i = 0; i < availableCharacters.Count; i++)
-        {
-            // 複製一份，避免 closure 捕捉錯誤
-            var c = availableCharacters[i];
-
-            var go = Instantiate(characterIconPrefab, transform);
-
-            // ⭐⭐⭐ 保證生成的icon在UI最上層
-            go.transform.SetAsLastSibling();
-
-            var rect = go.GetComponent<RectTransform>();
-            var txt = go.GetComponentInChildren<Text>(true);
-            var btn = go.GetComponentInChildren<Button>(true);
-            var animator = go.GetComponentInChildren<Animator>(true);
-
-            if (rect == null) Debug.LogError("RectTransform 是 null！Prefab 名稱: " + go.name);
-            if (txt == null) Debug.LogError("Text 是 null！Prefab 名稱: " + go.name);
-            if (btn == null) Debug.LogError("Button 是 null！Prefab 名稱: " + go.name);
-            if (animator == null) Debug.LogError("Animator 是 null！Prefab 名稱: " + go.name);
-
-            if (rect != null)
-                rect.anchoredPosition = c.position;
-
-            if (txt != null)
-                txt.text = c.name;
-
-            // 指定角色專屬動畫控制器
-            if (animator != null && c.animatorController != null)
-            {
-                animator.runtimeAnimatorController = c.animatorController;
-
-                // 強制播放第一個動畫 clip
-                var clips = animator.runtimeAnimatorController.animationClips;
-                if (clips != null && clips.Length > 0)
-                    animator.Play(clips[0].name, -1, 0f);
-            }
-
-            if (btn != null)
-            {
-                // closure 捕捉，這樣每顆按鈕按下去都對應正確的 c
-                string scriptName = c.naninovelScript;
-                btn.onClick.AddListener(() => 回到劇本(scriptName));
-            }
-        }
+        public string characterName;
+        public Vector2 position;
+        public List<CharacterEvent> dayEvents = new List<CharacterEvent>();
+        public List<CharacterEvent> nightEvents = new List<CharacterEvent>();
     }
 
-    public void 回到劇本(string 劇本名)
-    {
-        // 關閉地圖畫面
-        gameObject.SetActive(false);
+    public List<CharacterEventList> characterEventTable = new List<CharacterEventList>();
 
-        // 改用 SceneLoader，會自動 loading 並切到劇本
-        var sceneLoader = FindObjectOfType<SceneLoader>();
-        if (sceneLoader)
+    public enum TimeOfDay { Day, Night }
+    public TimeOfDay currentTimeOfDay = TimeOfDay.Day;
+    public bool autoDetectTimeOfDay = true;
+
+    private string logMsg = "▶ Spawner 啟動中...\n";
+
+void Start()
+{
+    // 多重保險：MapIsDay 優先，其次 Game_IsDay，最後預設白天
+    int rawVal = -99;
+    bool isDay = true;
+
+    if (PlayerPrefs.HasKey("MapIsDay"))
+    {
+        rawVal = PlayerPrefs.GetInt("MapIsDay", 1);
+        isDay = rawVal == 1;
+        logMsg += $"⏰ 時段偵測來源：MapIsDay = {rawVal}\n";
+    }
+    else if (PlayerPrefs.HasKey("Game_IsDay"))
+    {
+        rawVal = PlayerPrefs.GetInt("Game_IsDay", 1);
+        isDay = rawVal == 1;
+        logMsg += $"⏰ 時段偵測來源：Game_IsDay = {rawVal}\n";
+    }
+    else
+    {
+        logMsg += $"⏰ 沒有找到任何時段資料，預設為 Day\n";
+    }
+
+    currentTimeOfDay = isDay ? TimeOfDay.Day : TimeOfDay.Night;
+
+    Debug.Log($"🟢 Start() 確認時段：{currentTimeOfDay}（MapIsDay={rawVal}）");
+
+
+        if (iconParent == null)
         {
-            Debug.Log($"[地圖] 透過 SceneLoader 跳轉 Naninovel 劇本: {劇本名}");
-            sceneLoader.GotoScript(劇本名);
+            logMsg += "⚠ iconParent 未指定，角色 icon 將無法正確掛在 MapRoot 下。\n";
         }
         else
         {
-            Debug.LogError("[地圖] SceneLoader 不在場景裡，無法跳轉！");
+            logMsg += $"📌 iconParent：{iconParent.name}\n";
         }
+
+        int count = 0;
+
+        foreach (var c in characterEventTable)
+        {
+            int eventIdx = 0;
+            CharacterEvent evt = null;
+
+            if (currentTimeOfDay == TimeOfDay.Day)
+            {
+                eventIdx = StoryProgressManager.Instance.GetDayProgress(c.characterName);
+                if (c.dayEvents != null && eventIdx < c.dayEvents.Count)
+                    evt = c.dayEvents[eventIdx];
+            }
+            else
+            {
+                eventIdx = StoryProgressManager.Instance.GetNightProgress(c.characterName);
+                if (c.nightEvents != null && eventIdx < c.nightEvents.Count)
+                    evt = c.nightEvents[eventIdx];
+            }
+
+            if (evt != null)
+            {
+                count++;
+                StartCoroutine(CreateCharacterIcon(c, evt));
+            }
+        }
+
+        if (count == 0)
+            logMsg += "⚠ 沒有任何角色生成！可能未設定 characterEventTable。\n";
+
+        Debug.Log(logMsg);
+    }
+
+    IEnumerator CreateCharacterIcon(CharacterEventList c, CharacterEvent evt)
+    {
+        var iconGO = Instantiate(characterIconPrefab, iconParent != null ? iconParent : transform);
+        iconGO.name = $"Icon_{c.characterName}_{evt.eventName}";
+        iconGO.transform.SetAsLastSibling();
+
+        logMsg += $"\n🧩 生成：{iconGO.name} @ {c.position + evt.offset}\n";
+
+        var rect = iconGO.GetComponent<RectTransform>();
+        if (rect != null) rect.anchoredPosition = c.position + evt.offset;
+
+        var txt = iconGO.GetComponentInChildren<Text>(true);
+        if (txt != null)
+        {
+            txt.text = $"{(currentTimeOfDay == TimeOfDay.Day ? "白天" : "晚上")}：{evt.eventName}";
+        }
+
+        var animator = iconGO.GetComponentInChildren<Animator>(true);
+        if (animator != null && evt.animatorController != null)
+        {
+            animator.runtimeAnimatorController = evt.animatorController;
+            var clips = evt.animatorController.animationClips;
+            if (clips != null && clips.Length > 0)
+                animator.Play(clips[0].name, -1, 0f);
+        }
+
+        Debug.Log($"🧩 [生成Icon] {c.characterName} | 時段：{currentTimeOfDay} | 劇本：{evt.naninovelScript}");
+
+        yield return null;
+
+        var btnTransform = iconGO.transform.Find("GirlButton") ?? iconGO.transform.Find("CharacterIcon/GirlButton");
+        if (btnTransform != null)
+        {
+            var button = btnTransform.GetComponent<Button>();
+            if (button != null)
+            {
+                var c911 = button.gameObject.AddComponent<call911>();
+                c911.劇本名 = evt.naninovelScript;
+
+                button.onClick.AddListener(() =>
+                {
+                    Debug.Log($"👉 點擊事件：{c.characterName} | 時段：{currentTimeOfDay} | 執行劇本：{evt.naninovelScript}");
+
+                    if (currentTimeOfDay == TimeOfDay.Day)
+                        StoryProgressManager.Instance.IncrementDayProgress(c.characterName);
+                    else
+                        StoryProgressManager.Instance.IncrementNightProgress(c.characterName);
+                });
+
+                logMsg += $"✅ 掛上 call911 成功：{evt.naninovelScript} @ {button.name}\n";
+            }
+            else
+            {
+                logMsg += $"❌ GirlButton 上找不到 Button 組件！\n";
+                MarkRed(btnTransform.gameObject);
+            }
+        }
+        else
+        {
+            logMsg += $"❌ 找不到 GirlButton！（Prefab 結構錯誤？）\n";
+            MarkRed(iconGO);
+        }
+    }
+
+    void OnGUI()
+    {
+        GUIStyle style = new GUIStyle
+        {
+            fontSize = 18,
+            normal = { textColor = Color.yellow }
+        };
+        GUI.Label(new Rect(10, 10, 1600, 2000), logMsg, style);
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F2))
+        {
+            Debug.Log("🧾【角色進度顯示】");
+            foreach (var c in characterEventTable)
+            {
+                int day = StoryProgressManager.Instance.GetDayProgress(c.characterName);
+                int night = StoryProgressManager.Instance.GetNightProgress(c.characterName);
+                Debug.Log($"📚 {c.characterName} | 白天：{day} | 晚上：{night}");
+            }
+        }
+    }
+
+    void MarkRed(GameObject go)
+    {
+        var img = go.GetComponent<Image>() ?? go.AddComponent<Image>();
+        img.color = new Color(1f, 0f, 0f, 0.5f);
     }
 }

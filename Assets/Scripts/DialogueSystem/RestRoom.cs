@@ -6,41 +6,33 @@ using UnityEngine.UI;
 
 public class RestRoom : MonoBehaviour
 {
-    [SerializeField] GameObject selectPanel;
-
-    [SerializeField] Button chatBtn;
-
+    [SerializeField] private GameObject selectPanel;
+    [SerializeField] private Button chatBtn;
 
     private void Awake()
     {
-        // 1. Disable Naninovel input.
-        //var inputManager = Engine.GetService<IInputManager>();
-        //inputManager.ProcessInput = false;
+        // 停用 Naninovel UI 輸入
+        if (GameObject.FindObjectOfType<ContinueInputUI>() is ContinueInputUI continueUI)
+            continueUI.Visible = false;
 
-        GameObject.FindObjectOfType<ContinueInputUI>().Visible = false;
-
-        // 2. Stop script player.
+        // 暫停劇情播放
         var scriptPlayer = Engine.GetService<IScriptPlayer>();
         scriptPlayer.Stop();
 
-        // 3. Reset state. // 這一條指令會使整個nani重設回初始狀態 而我們只是想暫停而已
-        //var stateManager = Engine.GetService<IStateManager>();
-        //await stateManager.ResetStateAsync();
+        // 啟用 RestRoom 攝影機，關閉 Naninovel 攝影機
+        var advCamera = GameObject.Find("Main Camera")?.GetComponent<Camera>();
+        if (advCamera != null) advCamera.enabled = true;
 
-        
-        // 4. Switch cameras.
-        var advCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
-        advCamera.enabled = true;
         var naniCamera = Engine.GetService<ICameraManager>().Camera;
         naniCamera.enabled = false;
     }
 
     private void Start()
     {
+        // 根據變數決定是否可聊天
         bool canChat = false;
-        Engine.GetService<ICustomVariableManager>().TryGetVariableValue<bool>("CanChat", out canChat);
+        Engine.GetService<ICustomVariableManager>().TryGetVariableValue("CanChat", out canChat);
         selectPanel.SetActive(canChat);
-
         chatBtn.interactable = canChat;
     }
 
@@ -51,9 +43,8 @@ public class RestRoom : MonoBehaviour
 
     public void Sleep()
     {
-        var dataService = DataService.Instance;
-        dataService.scriptParameter = dataService.afterChatScript;
-        GotoNani();
+        // 回到暫存劇情段落
+        NaniBridgeUtility.GoBackToSavedStory();
     }
 
     public void Chat()
@@ -65,26 +56,29 @@ public class RestRoom : MonoBehaviour
     {
         var scriptParameter = new ScriptParameter();
         scriptParameter.scriptName = scriptName;
-        if(!string.IsNullOrEmpty(label))
-        {
+
+        if (!string.IsNullOrEmpty(label))
             scriptParameter.scriptLabel = label;
-        }
 
         DataService.Instance.scriptParameter = scriptParameter;
+
+        // 設定不能再重複聊天
         Engine.GetService<ICustomVariableManager>().SetVariableValue("CanChat", "false");
+
         GotoNani();
     }
 
-    void GotoNani()
+    private void GotoNani()
     {
-        var advCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
-        advCamera.enabled = false;
+        var advCamera = GameObject.Find("Main Camera")?.GetComponent<Camera>();
+        if (advCamera != null) advCamera.enabled = false;
+
         var naniCamera = Engine.GetService<ICameraManager>().Camera;
         naniCamera.enabled = true;
-        //var inputManager = Engine.GetService<IInputManager>();
-        //inputManager.ProcessInput = true;
-        GameObject.FindObjectOfType<ContinueInputUI>().Visible = true;
-        // Engine.GetService<ICustomVariableManager>().SetVariableValue("PlayerName", PlayerData.Instance.playerName);
+
+        if (GameObject.FindObjectOfType<ContinueInputUI>() is ContinueInputUI continueUI)
+            continueUI.Visible = true;
+
         SceneManager.LoadSceneAsync("NaniDialogTest");
     }
 

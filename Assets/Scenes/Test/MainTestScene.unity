@@ -1806,7 +1806,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d3fdc786ba136e408d3bb1997bbfd72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  "\u5287\u672C\u540D": chapter0
+  "\u5287\u672C\u540D": chapter5
 --- !u!1 &1145031558
 GameObject:
   m_ObjectHideFlags: 0
@@ -2515,10 +2515,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   loadingScreenPrefab: {fileID: 1710882796594982, guid: 701099ea473ad834b9c1eba20c2faed6,
     type: 3}
-  ac: {fileID: 8300000, guid: 14a396b1562834718b2d52b9c4639264, type: 3}
+  switchSfx: {fileID: 0}
   defaultSceneName: 
   sceneNameList: []
   nowSceneNum: 0
+  naniSceneName: NaniDialogTest
 --- !u!4 &1410477377
 Transform:
   m_ObjectHideFlags: 0
@@ -4206,7 +4207,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d3fdc786ba136e408d3bb1997bbfd72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  "\u5287\u672C\u540D": chapter5
+  "\u5287\u672C\u540D": MainStory_Test
 --- !u!1 &2081797020
 GameObject:
   m_ObjectHideFlags: 0
