@@ -2,7 +2,8 @@
 
 @wait 0.1
 @saveMapDayNight isDay:false
-@gotoUnityScene sceneName:MapTest
+@GotoUnityScene sceneName:MapTest
+@stop
 
 ;#AfterMap
 回到對話。下一步進入戰鬥場景。
