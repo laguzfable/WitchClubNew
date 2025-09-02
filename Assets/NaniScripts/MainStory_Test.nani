@@ -1,3 +1,5 @@
+
+
 主線開始。先去地圖走一圈。
 
 @wait 0.1
@@ -5,12 +7,18 @@
 @GotoUnityScene sceneName:MapTest
 @stop
 
+
+
 ;#AfterMap
 回到對話。下一步進入戰鬥場景。
 
 @wait 0.1
 @battle background:bg02 target:monster02 label:AfterBattle
 @stop
+
+
+
+
 
 
 ;#AfterBattle

@@ -1189,14 +1189,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aad33d337f964ac469765886547c05d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  E_Day_Button: {fileID: 0}
-  M_Day_Button: {fileID: 0}
-  V_Day_Button: {fileID: 0}
-  N_Day_Button: {fileID: 0}
-  E_Night_Button: {fileID: 0}
-  M_Night_Button: {fileID: 0}
-  V_Night_Button: {fileID: 0}
-  N_Night_Button: {fileID: 0}
+  mapSceneName: MapTest
+  applyDayNightOnStart: 1
+  mapBackgroundController: {fileID: 0}
+  mainCamera: {fileID: 0}
 --- !u!1001 &2001888369
 PrefabInstance:
   m_ObjectHideFlags: 0
