@@ -8,13 +8,6 @@
 涅莉: 不要緊張，姊姊我呢，是很有經驗的，來來來，到床上躺下。
 
 
-@Battle Background:bg02 Target:yellow01 Label:night1
-@stop
-
-
-
-
-
 @choice 應該是我要幫妳做儀式吧？ goto:.yellow01deny
 @choice （照她的指示乖乖躺下。） goto:.yellow01obey
 @stop
