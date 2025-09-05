@@ -105,10 +105,12 @@ may: 很簡單吧～
 may: 至於符文的用法嘛……
 @hide may
 
+
 @stopBgm
 @bgm tutorial
-@GotoCombatTutorial2 scriptName:chapter3 label:afterbattle3 background:bg05
+@RuneTutorial scriptName:chapter3 label:afterbattle3 background:bg05
 @stop
+
 
 # afterbattle3
 @stopbgm
@@ -317,12 +319,11 @@ witchc: 我也要！
 涅莉: 這個時候呀，Ｐ的陪伴就顯得格外重要了呢。
 涅莉: 所以，好好選擇對象吧！
 
-@hide 涅莉
-@stopbgm
-@restroom scriptName:chapter3 label:afterdate1
+@wait 0.1
+@saveMapDayNight isDay:false
+@GotoUnityScene sceneName:MapTest
 @stop
 
-# afterdate1
 
 
 @back bg06
