@@ -11,79 +11,111 @@ public class RestRoom : MonoBehaviour
 
     private void Awake()
     {
-        // 停用 Naninovel UI 輸入
-        if (GameObject.FindObjectOfType<ContinueInputUI>() is ContinueInputUI continueUI)
-            continueUI.Visible = false;
+        if (GameObject.FindObjectOfType<ContinueInputUI>() is ContinueInputUI cont) cont.Visible = false;
 
-        // 暫停劇情播放
-        var scriptPlayer = Engine.GetService<IScriptPlayer>();
-        scriptPlayer.Stop();
+        var player = Engine.GetService<IScriptPlayer>();
+        player.Stop();
 
-        // 啟用 RestRoom 攝影機，關閉 Naninovel 攝影機
-        var advCamera = GameObject.Find("Main Camera")?.GetComponent<Camera>();
-        if (advCamera != null) advCamera.enabled = true;
+        var advCam = GameObject.Find("Main Camera")?.GetComponent<Camera>();
+        if (advCam) advCam.enabled = true;
 
-        var naniCamera = Engine.GetService<ICameraManager>().Camera;
-        naniCamera.enabled = false;
+        var naniCam = Engine.GetService<ICameraManager>().Camera;
+        naniCam.enabled = false;
+
+        Debug.Log("[RR ] Awake: disable Nani UI/camera, enable RestRoom camera.");
     }
 
     private void Start()
     {
-        // 根據變數決定是否可聊天
         bool canChat = false;
         Engine.GetService<ICustomVariableManager>().TryGetVariableValue("CanChat", out canChat);
         selectPanel.SetActive(canChat);
         chatBtn.interactable = canChat;
+        Debug.Log($"[RR ] Start: CanChat={canChat}");
     }
 
     public void ChangeSkill()
     {
+        Debug.Log("[RR ] ChangeSkill -> Load 'ChangeRuneScene'");
         SceneManager.LoadScene("ChangeRuneScene");
     }
 
     public void Sleep()
     {
-        // 回到暫存劇情段落
-        NaniBridgeUtility.GoBackToSavedStory();
+        Debug.Log("[RR ] Sleep clicked.");
+
+        // 1) 先用 MapReturnPoint（主線返回點）
+        if (MapReturnPoint.HasValid())
+        {
+            Debug.Log($"[RR ] Using MapReturnPoint -> {MapReturnPoint.ScriptName}#{MapReturnPoint.Label}");
+            if (SceneLoader.Instance != null)
+            {
+                SceneLoader.Instance.GotoScript(MapReturnPoint.ScriptName, MapReturnPoint.Label);
+            }
+            else
+            {
+                Debug.LogWarning("[RR ] SceneLoader.Instance == null, direct load Nani scene.");
+                SceneManager.LoadScene("NaniDialogTest");
+            }
+            return;
+        }
+
+        // 2) 沒有主線返回點，退而求其次用 ds.scriptParameter（可能是 afterChat 或別處覆蓋）
+        var ds = DataService.Instance;
+        var p  = ds != null ? ds.scriptParameter : null;
+        var snap = p != null ? $"{p.scriptName}#{p.scriptLabel}" : "(null)";
+        Debug.Log($"[RR ] MapReturnPoint empty. ds.scriptParameter={snap}");
+
+        if (p != null && !string.IsNullOrEmpty(p.scriptName))
+        {
+            if (SceneLoader.Instance != null)
+                SceneLoader.Instance.GotoScript(p.scriptName, p.scriptLabel);
+            else
+            {
+                Debug.LogWarning("[RR ] SceneLoader.Instance == null, direct load Nani scene.");
+                SceneManager.LoadScene("NaniDialogTest");
+            }
+            return;
+        }
+
+        // 3) 最後保險
+        Debug.LogWarning("[RR ] No any return point. Go Title.");
+        if (SceneLoader.Instance != null)
+            SceneLoader.Instance.GoScene(SceneLoader.Instance.titleSceneName);
+        else
+            SceneManager.LoadScene("Title");
     }
 
     public void Chat()
     {
         selectPanel.SetActive(true);
+        Debug.Log("[RR ] Chat open.");
     }
 
     public void SelectCharacter(string scriptName, string label)
     {
-        var scriptParameter = new ScriptParameter();
-        scriptParameter.scriptName = scriptName;
+        Debug.Log($"[RR ] SelectCharacter('{scriptName}','{label}')");
+        var ds = DataService.Instance;
+        if (ds != null)
+        {
+            var q = new ScriptParameter { scriptName = scriptName };
+            if (!string.IsNullOrEmpty(label)) q.scriptLabel = label;
+            ds.scriptParameter = q;
+            Debug.Log($"[RR ] ds.scriptParameter set -> {scriptName}#{label}");
+        }
 
-        if (!string.IsNullOrEmpty(label))
-            scriptParameter.scriptLabel = label;
-
-        DataService.Instance.scriptParameter = scriptParameter;
-
-        // 設定不能再重複聊天
-        Engine.GetService<ICustomVariableManager>().SetVariableValue("CanChat", "false");
-
-        GotoNani();
-    }
-
-    private void GotoNani()
-    {
-        var advCamera = GameObject.Find("Main Camera")?.GetComponent<Camera>();
-        if (advCamera != null) advCamera.enabled = false;
-
-        var naniCamera = Engine.GetService<ICameraManager>().Camera;
-        naniCamera.enabled = true;
-
-        if (GameObject.FindObjectOfType<ContinueInputUI>() is ContinueInputUI continueUI)
-            continueUI.Visible = true;
-
-        SceneManager.LoadSceneAsync("NaniDialogTest");
+        if (SceneLoader.Instance != null)
+            SceneLoader.Instance.GotoScript(scriptName, label);
+        else
+        {
+            Debug.LogWarning("[RR ] SceneLoader.Instance == null, direct load Nani scene.");
+            SceneManager.LoadScene("NaniDialogTest");
+        }
     }
 
     public void BackToRoom()
     {
         selectPanel.SetActive(false);
+        Debug.Log("[RR ] BackToRoom: close chat panel.");
     }
 }

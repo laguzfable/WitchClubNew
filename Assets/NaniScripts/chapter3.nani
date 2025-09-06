@@ -9,6 +9,18 @@
 魅兒: 好怪異的氣息……不像是現實的景象……
 @hide 優菲,魅兒
 
+
+
+@DumpReturn
+@SaveReturnPoint script:"chapter3" label:"hallwayMorning"
+@DumpReturn
+@GotoUnityScene sceneName:MapTest
+@stop
+
+
+#hallwayMorning
+哈囉
+
 @char may pos:35
 @char 蘇菲亞 pos:65
 

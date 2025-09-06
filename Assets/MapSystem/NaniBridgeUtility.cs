@@ -1,43 +1,73 @@
-﻿using UnityEngine;
+﻿using Naninovel;
+using UnityEngine;
 using UnityEngine.SceneManagement;
-using Naninovel;
 
 public static class NaniBridgeUtility
 {
-    private const string fallbackScript = "MainStory_Fallback";
-    private const string fallbackLabel = ""; // 可設定預設標籤（如果你願意）
-
     /// <summary>
-    /// 從 Naninovel 的變數中讀取暫存劇情跳接點，回到指定劇本段落。
-    /// 建議用於：RestRoom 睡覺、戰鬥勝利、地圖支線結束等。
+    /// 優先：DataService.scriptParameter → SceneLoader.GotoScript
+    /// 後備：NextScript/NextLabel（舊案）
+    /// 最後：回 Title
     /// </summary>
-    public static void GoBackToSavedStory(string targetSceneName = "NaniDialogTest")
+    public static void GoBackToSavedStory(string _ = null)
     {
-        var vars = Engine.GetService<ICustomVariableManager>();
+        var ds = DataService.Instance;
+        var param = ds != null ? ds.scriptParameter : null;
 
-        string script = fallbackScript;
-        string label = fallbackLabel;
-
-        vars.TryGetVariableValue("NextScript", out script);
-        vars.TryGetVariableValue("NextLabel", out label);
-
-        if (string.IsNullOrEmpty(script))
+        if (param != null && !string.IsNullOrEmpty(param.scriptName))
         {
-            Debug.LogWarning("[NaniBridgeUtility] NextScript 未設置，使用預設劇本。");
-            script = fallbackScript;
+            Debug.Log($"[NBU] Use ds.scriptParameter: {param.scriptName}#{param.scriptLabel}");
+            if (SceneLoader.Instance != null)
+            {
+                SceneLoader.Instance.GotoScript(param.scriptName, param.scriptLabel);
+            }
+            else
+            {
+                Debug.LogWarning("[NBU] SceneLoader.Instance 為空，直接切 'NaniDialogTest'");
+                ds.startScript = param.scriptName;
+                SceneManager.LoadScene("NaniDialogTest");
+            }
+            return;
         }
 
-        var param = new ScriptParameter { scriptName = script };
-        if (!string.IsNullOrEmpty(label))
-            param.scriptLabel = label;
+        var vars = Engine.GetService<ICustomVariableManager>();
+        string script = null, label = null;
+        if (vars != null)
+        {
+            vars.TryGetVariableValue("NextScript", out script);
+            vars.TryGetVariableValue("NextLabel", out label);
+            Debug.Log($"[NBU] Fallback vars: NextScript='{script}', NextLabel='{label}'");
+        }
 
-        DataService.Instance.scriptParameter = param;
+        if (!string.IsNullOrEmpty(script))
+        {
+            vars?.SetVariableValue("NextScript", "");
+            vars?.SetVariableValue("NextLabel", "");
 
-        // 清空變數（避免誤用）
-        vars.SetVariableValue("NextScript", "");
-        vars.SetVariableValue("NextLabel", "");
+            if (SceneLoader.Instance != null)
+            {
+                Debug.Log($"[NBU] -> SceneLoader.GotoScript('{script}','{label}')");
+                SceneLoader.Instance.GotoScript(script, label);
+            }
+            else
+            {
+                Debug.LogWarning("[NBU] 無 SceneLoader，直接切 'NaniDialogTest'");
+                if (ds != null)
+                {
+                    ds.startScript = script;
+                    if (ds.scriptParameter == null) ds.scriptParameter = new ScriptParameter();
+                    ds.scriptParameter.scriptName = script;
+                    ds.scriptParameter.scriptLabel = label;
+                }
+                SceneManager.LoadScene("NaniDialogTest");
+            }
+            return;
+        }
 
-        Debug.Log($"🌀 轉回 Naninovel → 劇本: {script}, 標籤: {label}");
-        SceneManager.LoadScene(targetSceneName);
+        Debug.LogWarning("[NBU] 找不到任何返回點，回 Title。");
+        if (SceneLoader.Instance != null)
+            SceneLoader.Instance.GoScene(SceneLoader.Instance.titleSceneName);
+        else
+            SceneManager.LoadScene("Title");
     }
 }

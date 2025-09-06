@@ -5,9 +5,12 @@ using UnityEngine;
 [CommandAlias("TestLog")]
 public class TestLogCommand : Command
 {
-    public override UniTask ExecuteAsync(AsyncToken asyncToken = default)
+    [ParameterAlias("msg")] public StringParameter Message;
+
+    public override UniTask ExecuteAsync (AsyncToken token = default)
     {
-        Debug.Log("TestLog Command executed!");
+        var text = Assigned(Message) ? Message.Value : "(null)";
+        Debug.Log($"[TestLog] {text}");
         return UniTask.CompletedTask;
     }
 }
