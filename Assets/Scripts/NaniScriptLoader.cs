@@ -1,7 +1,6 @@
 ﻿using Naninovel;
 using UnityEngine;
 using System.Reflection;
-using System.Collections;
 
 public class NaniScriptLoader : MonoBehaviour
 {
@@ -14,9 +13,24 @@ public class NaniScriptLoader : MonoBehaviour
 
         if (!Engine.Initialized)
         {
-            Debug.Log("[NSL] Engine not initialized. Calling RuntimeInitializer.InitializeAsync() …");
+            Debug.Log("[NSL] Engine not initialized. Initialize …");
             await RuntimeInitializer.InitializeAsync();
         }
+
+        // ---- 保險還原（避免前一場景殘留造成黑畫面/看不到 show）----
+        var naniCam = Engine.GetService<ICameraManager>().Camera;
+        if (naniCam && !naniCam.enabled) naniCam.enabled = true;
+
+        var pm = Engine.GetService<ITextPrinterManager>();
+        var printer = pm != null ? pm.GetActor(pm.DefaultPrinterId) : null;
+        if (printer != null && !printer.Visible) await printer.ChangeVisibilityAsync(true, 0f);
+
+        var bgm = Engine.GetService<IBackgroundManager>();
+        var mainBg = bgm != null ? bgm.GetActor(BackgroundsConfiguration.MainActorId) : null;
+        if (mainBg != null && !mainBg.Visible) mainBg.Visible = true;
+
+        if (Time.timeScale != 1f) Time.timeScale = 1f;
+        // -------------------------------------------------------------------
 
         var player  = Engine.GetService<IScriptPlayer>();
         var scripts = Engine.GetService<IScriptManager>();
@@ -27,7 +41,6 @@ public class NaniScriptLoader : MonoBehaviour
             return;
         }
 
-        // 讀 DataService
         string scriptName = null;
         string jumpMark   = null;
 
@@ -51,7 +64,6 @@ public class NaniScriptLoader : MonoBehaviour
         if (string.IsNullOrEmpty(scriptName))
             scriptName = string.IsNullOrEmpty(defaultScriptName) ? "chapter0" : defaultScriptName;
 
-        // 載入腳本
         Debug.Log($"[NSL] LoadScriptAsync('{scriptName}')");
         var script = await scripts.LoadScriptAsync(scriptName);
         if (script == null)
@@ -60,17 +72,14 @@ public class NaniScriptLoader : MonoBehaviour
             return;
         }
 
-        // 取 Lines 與行數
+        // 尋標籤 & 容錯播放
         var t = script.GetType();
         var pLines = t.GetProperty("Lines");
         var linesObj = pLines?.GetValue(script, null) as System.Collections.IEnumerable;
         int lineCount = (linesObj is System.Collections.ICollection coll) ? coll.Count : 0;
         Debug.Log($"[NSL] Script '{scriptName}' lineCount={lineCount}, label='{jumpMark ?? "(none)"}'");
 
-        // 尋找跳點行：優先 label，否則註解跳點
         int lineIndex = -1;
-
-        // label API
         var m1 = t.GetMethod("GetLabelLineIndex");
         var m2 = t.GetMethod("GetLineIndexForLabel");
         if (!string.IsNullOrEmpty(jumpMark) && (m1 != null || m2 != null))
@@ -82,7 +91,6 @@ public class NaniScriptLoader : MonoBehaviour
             if (tmp >= 0) lineIndex = tmp;
         }
 
-        // 註解跳點 ;#Label
         if (lineIndex < 0 && !string.IsNullOrEmpty(jumpMark) && linesObj != null)
         {
             int idx = 0;
@@ -116,10 +124,8 @@ public class NaniScriptLoader : MonoBehaviour
         }
         Debug.Log($"[NSL] startLine={startLine} (from lineIndex={lineIndex})");
 
-        // 停掉殘留播放
         try { if (player.Playing) { Debug.Log("[NSL] player.Stop()"); player.Stop(); } } catch {}
 
-        // 自動探測可播起點
         bool played = false;
         int tries = 0;
         int maxTries = Mathf.Clamp(lineCount, 1, 10);
@@ -143,11 +149,8 @@ public class NaniScriptLoader : MonoBehaviour
         }
 
         if (!played)
-        {
-            Debug.LogError($"[NSL] 前 {tries} 行都無法開始播放。請檢查檔案開頭是否有無效指令/未載入的自訂指令、或 label 是否指向註解後沒有可執行命令。");
-        }
+            Debug.LogError($"[NSL] 無法開始播放（嘗試 {tries} 次）。檢查標籤附近是否有可執行命令。");
 
-        // 清一次性參數（保持你原檔行為）
         if (ds != null) { ds.startScript = null; ds.scriptParameter = null; Debug.Log("[NSL] ds.startScript/scriptParameter cleared."); }
     }
 }

@@ -2,10 +2,11 @@
 using Naninovel.Commands;
 using UnityEngine;
 
+/// <summary>在 Console 列印三種來源：MapReturnPoint / DataService.scriptParameter / Vars(NextScript/NextLabel)</summary>
 [CommandAlias("DumpReturn")]
 public class DumpReturn : Command
 {
-    public override UniTask ExecuteAsync(AsyncToken token = default)
+    public override UniTask ExecuteAsync (AsyncToken token = default)
     {
         var ds = DataService.Instance;
         var p  = ds != null ? ds.scriptParameter : null;

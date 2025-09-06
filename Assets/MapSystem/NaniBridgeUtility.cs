@@ -5,66 +5,77 @@ using UnityEngine.SceneManagement;
 public static class NaniBridgeUtility
 {
     /// <summary>
-    /// 優先：DataService.scriptParameter → SceneLoader.GotoScript
-    /// 後備：NextScript/NextLabel（舊案）
-    /// 最後：回 Title
+    /// 回到暫存劇情：**先**用 MapReturnPoint（主線存點），
+    /// 否則用 ds.scriptParameter，最後才回退到 NextScript/NextLabel。
     /// </summary>
-    public static void GoBackToSavedStory(string _ = null)
+    public static void GoBackToSavedStory (string targetSceneName = "NaniDialogTest")
     {
         var ds = DataService.Instance;
-        var param = ds != null ? ds.scriptParameter : null;
 
-        if (param != null && !string.IsNullOrEmpty(param.scriptName))
+        // A) 最高優先：MapReturnPoint（來自 @SaveReturnPoint）
+        if (MapReturnPoint.HasValid())
         {
-            Debug.Log($"[NBU] Use ds.scriptParameter: {param.scriptName}#{param.scriptLabel}");
+            Debug.Log($"[NBU] Use MapReturnPoint: {MapReturnPoint.ScriptName}#{MapReturnPoint.Label}");
             if (SceneLoader.Instance != null)
             {
-                SceneLoader.Instance.GotoScript(param.scriptName, param.scriptLabel);
+                SceneLoader.Instance.GotoScript(MapReturnPoint.ScriptName, MapReturnPoint.Label);
             }
             else
             {
-                Debug.LogWarning("[NBU] SceneLoader.Instance 為空，直接切 'NaniDialogTest'");
-                ds.startScript = param.scriptName;
-                SceneManager.LoadScene("NaniDialogTest");
+                if (ds != null)
+                {
+                    ds.startScript = MapReturnPoint.ScriptName;
+                    ds.scriptParameter = new ScriptParameter {
+                        scriptName = MapReturnPoint.ScriptName,
+                        scriptLabel = MapReturnPoint.Label
+                    };
+                }
+                SceneManager.LoadScene(targetSceneName);
             }
             return;
         }
 
+        // B) 次優先：若有人已經指定 ds.scriptParameter（例如聊天/教學流程）
+        if (ds != null && ds.scriptParameter != null && !string.IsNullOrEmpty(ds.scriptParameter.scriptName))
+        {
+            var p = ds.scriptParameter;
+            Debug.Log($"[NBU] Use ds.scriptParameter: {p.scriptName}#{p.scriptLabel}");
+            if (SceneLoader.Instance != null)
+                SceneLoader.Instance.GotoScript(p.scriptName, p.scriptLabel);
+            else
+                SceneManager.LoadScene(targetSceneName);
+            return;
+        }
+
+        // C) 最後：舊案的 NextScript/NextLabel 後備
         var vars = Engine.GetService<ICustomVariableManager>();
         string script = null, label = null;
-        if (vars != null)
-        {
-            vars.TryGetVariableValue("NextScript", out script);
-            vars.TryGetVariableValue("NextLabel", out label);
-            Debug.Log($"[NBU] Fallback vars: NextScript='{script}', NextLabel='{label}'");
-        }
+        vars?.TryGetVariableValue("NextScript", out script);
+        vars?.TryGetVariableValue("NextLabel",  out label);
 
         if (!string.IsNullOrEmpty(script))
         {
-            vars?.SetVariableValue("NextScript", "");
-            vars?.SetVariableValue("NextLabel", "");
-
+            Debug.Log($"[NBU] Fallback vars: NextScript='{script}', NextLabel='{label}'");
             if (SceneLoader.Instance != null)
-            {
-                Debug.Log($"[NBU] -> SceneLoader.GotoScript('{script}','{label}')");
                 SceneLoader.Instance.GotoScript(script, label);
-            }
             else
             {
-                Debug.LogWarning("[NBU] 無 SceneLoader，直接切 'NaniDialogTest'");
                 if (ds != null)
                 {
                     ds.startScript = script;
-                    if (ds.scriptParameter == null) ds.scriptParameter = new ScriptParameter();
-                    ds.scriptParameter.scriptName = script;
-                    ds.scriptParameter.scriptLabel = label;
+                    ds.scriptParameter = new ScriptParameter { scriptName = script, scriptLabel = label };
                 }
-                SceneManager.LoadScene("NaniDialogTest");
+                SceneManager.LoadScene(targetSceneName);
             }
+
+            // 清空舊變數，避免下次誤用
+            vars?.SetVariableValue("NextScript", "");
+            vars?.SetVariableValue("NextLabel", "");
             return;
         }
 
-        Debug.LogWarning("[NBU] 找不到任何返回點，回 Title。");
+        // D) 實在沒有任何可回去的點：回 Title
+        Debug.LogWarning("[NBU] No return point found. Back to Title.");
         if (SceneLoader.Instance != null)
             SceneLoader.Instance.GoScene(SceneLoader.Instance.titleSceneName);
         else

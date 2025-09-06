@@ -1510,11 +1510,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1818674045}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ebbaf1541f6656d42a2744eb8f0d6cbd, type: 3}
+  m_Script: {fileID: 11500000, guid: b27f71e447255474187396110638758d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapSceneName: MapTest
-  naniscriptName: 
+  selectPanel: {fileID: 0}
+  chatBtn: {fileID: 0}
 --- !u!4 &1818674047
 Transform:
   m_ObjectHideFlags: 0
@@ -1612,7 +1612,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1818674046}
-        m_MethodName: OnReturnButtonClicked
+        m_MethodName: Sleep
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
