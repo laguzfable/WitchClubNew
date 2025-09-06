@@ -145,12 +145,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 745809740}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cba67ea8eb0f27840ad9bdb1d276a76d, type: 3}
+  m_Script: {fileID: 11500000, guid: 197ab88d14bdad449960176a40cefe3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultScriptName: chapter0
+  defaultScriptName: chapter5
 --- !u!4 &745809742
 Transform:
   m_ObjectHideFlags: 0
@@ -174,7 +174,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1437124073}
-  - component: {fileID: 1437124072}
   m_Layer: 0
   m_Name: NaniBootstrap
   m_TagString: Untagged
@@ -182,19 +181,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1437124072
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1437124071}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cba67ea8eb0f27840ad9bdb1d276a76d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  defaultScriptName: chapter0
 --- !u!4 &1437124073
 Transform:
   m_ObjectHideFlags: 0
