@@ -131,6 +131,7 @@ GameObject:
   m_Component:
   - component: {fileID: 552188038}
   - component: {fileID: 552188037}
+  - component: {fileID: 552188039}
   m_Layer: 0
   m_Name: loader
   m_TagString: Untagged
@@ -154,10 +155,6 @@ MonoBehaviour:
   naniSceneName: NaniDialogTest
   newGameScript: chapter0
   newGameLabel: 
-  uiScript: System_UI
-  labelLoad: openLoad
-  labelSettings: openSettings
-  labelGallery: openGallery
 --- !u!4 &552188038
 Transform:
   m_ObjectHideFlags: 0
@@ -172,6 +169,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &552188039
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 552188036}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5935e4154cb40924ba804de5a95dc696, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  resetKey: 291
 --- !u!1 &632896632
 GameObject:
   m_ObjectHideFlags: 0
