@@ -75,7 +75,9 @@ goto:.ritual
 
 （於是跟涅莉一起吃了宵夜）
 
-
+@print 加即將執行加進度
+@csharp StoryProgressManager.Instance.IncrementNightProgress("Nelly")
+@print 加完了！
 
 
 @restroom

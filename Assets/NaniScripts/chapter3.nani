@@ -11,9 +11,8 @@
 
 
 
-@DumpReturn
+
 @SaveReturnPoint script:"chapter3" label:"hallwayMorning"
-@DumpReturn
 @GotoUnityScene sceneName:MapTest
 @stop
 
@@ -335,12 +334,16 @@ witchc: 我也要！
 涅莉: 這個時候呀，Ｐ的陪伴就顯得格外重要了呢。
 涅莉: 所以，好好選擇對象吧！
 
-@wait 0.1
-@saveMapDayNight isDay:false
+@hide 涅莉
+
+
+@SaveReturnPoint script:"chapter3" label:"afterdate1"
 @GotoUnityScene sceneName:MapTest
 @stop
 
 
+
+#afterdate1
 
 @back bg06
 (背景 二樓走廊)
@@ -467,9 +470,10 @@ may 馬上來～
 @hide syb,涅莉,蘇菲亞
 
 
-@stopbgm
-@restroom scriptName:chapter3 label:afterdate2
+@SaveReturnPoint script:"chapter3" label:"afterdate2"
+@GotoUnityScene sceneName:MapTest
 @stop
+
 
 # afterdate2
 

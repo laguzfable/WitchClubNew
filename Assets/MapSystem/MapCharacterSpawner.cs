@@ -96,10 +96,14 @@ void Start()
                 count++;
                 StartCoroutine(CreateCharacterIcon(c, evt));
             }
+            else
+            {
+                logMsg += $"⭐ {c.characterName} 的事件已播放完畢\n";
+            }
         }
 
         if (count == 0)
-            logMsg += "⚠ 沒有任何角色生成！可能未設定 characterEventTable。\n";
+            logMsg += "⭐ 所有角色的事件都已播畢\n";
 
         Debug.Log(logMsg);
     }
@@ -145,7 +149,7 @@ void Start()
 
                 button.onClick.AddListener(() =>
                 {
-                    Debug.Log($"👉 點擊事件：{c.characterName} | 時段：{currentTimeOfDay} | 執行劇本：{evt.naninovelScript}");
+                    Debug.Log($"👉 點擊事件：{c.characterName} | 時：{currentTimeOfDay} | 執行劇本：{evt.naninovelScript}");
 
                     if (currentTimeOfDay == TimeOfDay.Day)
                         StoryProgressManager.Instance.IncrementDayProgress(c.characterName);

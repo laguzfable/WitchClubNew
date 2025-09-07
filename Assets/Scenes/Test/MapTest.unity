@@ -537,6 +537,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 732b169665f3cca4b9f526e81f730cbe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &814314741 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8638403361283354899, guid: f1c7837f53b1b2346849e1c8df09f222,
+    type: 3}
+  m_PrefabInstance: {fileID: 1000007672}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &820737055 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8411422514412382657, guid: f1c7837f53b1b2346849e1c8df09f222,
@@ -554,6 +566,11 @@ PrefabInstance:
       propertyPath: m_PreserveAspect
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: iconParent
+      value: 
+      objectReference: {fileID: 820737055}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
       propertyPath: availableCharacters.Array.size
@@ -637,7 +654,7 @@ PrefabInstance:
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
       propertyPath: characterEventTable.Array.data[0].nightEvents.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
@@ -658,6 +675,11 @@ PrefabInstance:
         type: 3}
       propertyPath: characterEventTable.Array.data[0].nightEvents.Array.data[1].eventName
       value: 02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[0].nightEvents.Array.data[2].eventName
+      value: 03
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
@@ -696,6 +718,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
+      propertyPath: characterEventTable.Array.data[0].nightEvents.Array.data[2].naninovelScript
+      value: yellow03
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
       propertyPath: characterEventTable.Array.data[0].dayEvents.Array.data[0].animatorController
       value: 
       objectReference: {fileID: 9100000, guid: e42ea99ddf87926439d6b19d92550e36, type: 2}
@@ -709,6 +736,11 @@ PrefabInstance:
       propertyPath: characterEventTable.Array.data[0].nightEvents.Array.data[1].animatorController
       value: 
       objectReference: {fileID: 9100000, guid: 4d98bcd6ad5ffcf419637a489616a4aa, type: 2}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[0].nightEvents.Array.data[2].animatorController
+      value: 
+      objectReference: {fileID: 9100000, guid: 0be64c0412d4eac47a8d55e824209813, type: 2}
     - target: {fileID: 4180383588970663672, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
       propertyPath: m_Name
@@ -1189,10 +1221,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aad33d337f964ac469765886547c05d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapSceneName: MapTest
-  applyDayNightOnStart: 1
-  mapBackgroundController: {fileID: 0}
-  mainCamera: {fileID: 0}
+  E_Day_Button: {fileID: 814314741}
+  M_Day_Button: {fileID: 0}
+  V_Day_Button: {fileID: 0}
+  N_Day_Button: {fileID: 0}
+  E_Night_Button: {fileID: 0}
+  M_Night_Button: {fileID: 0}
+  V_Night_Button: {fileID: 0}
+  N_Night_Button: {fileID: 0}
 --- !u!1001 &2001888369
 PrefabInstance:
   m_ObjectHideFlags: 0
