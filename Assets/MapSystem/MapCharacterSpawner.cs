@@ -24,6 +24,8 @@ public class MapCharacterSpawner : MonoBehaviour
         public Vector2 position;
         public List<CharacterEvent> dayEvents = new List<CharacterEvent>();
         public List<CharacterEvent> nightEvents = new List<CharacterEvent>();
+        [Tooltip("事件是否循環播放（全部播完後會從第一個事件重新開始）")]
+        public bool loop = true; // ✅ 改成角色層級控制是否循環
     }
 
     public List<CharacterEventList> characterEventTable = new List<CharacterEventList>();
@@ -34,42 +36,35 @@ public class MapCharacterSpawner : MonoBehaviour
 
     private string logMsg = "▶ Spawner 啟動中...\n";
 
-void Start()
-{
-    // 多重保險：MapIsDay 優先，其次 Game_IsDay，最後預設白天
-    int rawVal = -99;
-    bool isDay = true;
-
-    if (PlayerPrefs.HasKey("MapIsDay"))
+    void Start()
     {
-        rawVal = PlayerPrefs.GetInt("MapIsDay", 1);
-        isDay = rawVal == 1;
-        logMsg += $"⏰ 時段偵測來源：MapIsDay = {rawVal}\n";
-    }
-    else if (PlayerPrefs.HasKey("Game_IsDay"))
-    {
-        rawVal = PlayerPrefs.GetInt("Game_IsDay", 1);
-        isDay = rawVal == 1;
-        logMsg += $"⏰ 時段偵測來源：Game_IsDay = {rawVal}\n";
-    }
-    else
-    {
-        logMsg += $"⏰ 沒有找到任何時段資料，預設為 Day\n";
-    }
+        int rawVal = -99;
+        bool isDay = true;
 
-    currentTimeOfDay = isDay ? TimeOfDay.Day : TimeOfDay.Night;
-
-    Debug.Log($"🟢 Start() 確認時段：{currentTimeOfDay}（MapIsDay={rawVal}）");
-
-
-        if (iconParent == null)
+        if (PlayerPrefs.HasKey("MapIsDay"))
         {
-            logMsg += "⚠ iconParent 未指定，角色 icon 將無法正確掛在 MapRoot 下。\n";
+            rawVal = PlayerPrefs.GetInt("MapIsDay", 1);
+            isDay = rawVal == 1;
+            logMsg += $"⏰ 時段偵測來源：MapIsDay = {rawVal}\n";
+        }
+        else if (PlayerPrefs.HasKey("Game_IsDay"))
+        {
+            rawVal = PlayerPrefs.GetInt("Game_IsDay", 1);
+            isDay = rawVal == 1;
+            logMsg += $"⏰ 時段偵測來源：Game_IsDay = {rawVal}\n";
         }
         else
         {
-            logMsg += $"📌 iconParent：{iconParent.name}\n";
+            logMsg += $"⏰ 沒有找到任何時段資料，預設為 Day\n";
         }
+
+        currentTimeOfDay = isDay ? TimeOfDay.Day : TimeOfDay.Night;
+        Debug.Log($"🟢 Start() 確認時段：{currentTimeOfDay}（MapIsDay={rawVal}）");
+
+        if (iconParent == null)
+            logMsg += "⚠ iconParent 未指定，角色 icon 將無法正確掛在 MapRoot 下。\n";
+        else
+            logMsg += $"📌 iconParent：{iconParent.name}\n";
 
         int count = 0;
 
@@ -78,27 +73,60 @@ void Start()
             int eventIdx = 0;
             CharacterEvent evt = null;
 
+            // 根據時段抓事件進度
             if (currentTimeOfDay == TimeOfDay.Day)
             {
                 eventIdx = StoryProgressManager.Instance.GetDayProgress(c.characterName);
-                if (c.dayEvents != null && eventIdx < c.dayEvents.Count)
+                if (c.dayEvents != null && c.dayEvents.Count > 0)
+                {
+                    if (eventIdx >= c.dayEvents.Count)
+                    {
+                        // 🔁 若超出範圍且允許循環，重置為0
+                        if (c.loop)
+                        {
+                            eventIdx = 0;
+                            PlayerPrefs.SetInt($"{c.characterName}_DayProgress", 0);
+                            PlayerPrefs.Save();
+                            logMsg += $"🔁 {c.characterName} 的白天事件重新開始\n";
+                        }
+                        else
+                        {
+                            logMsg += $"⭐ {c.characterName} 的白天事件已播完且不循環\n";
+                            continue;
+                        }
+                    }
                     evt = c.dayEvents[eventIdx];
+                }
             }
             else
             {
                 eventIdx = StoryProgressManager.Instance.GetNightProgress(c.characterName);
-                if (c.nightEvents != null && eventIdx < c.nightEvents.Count)
+                if (c.nightEvents != null && c.nightEvents.Count > 0)
+                {
+                    if (eventIdx >= c.nightEvents.Count)
+                    {
+                        // 🔁 若超出範圍且允許循環，重置為0
+                        if (c.loop)
+                        {
+                            eventIdx = 0;
+                            PlayerPrefs.SetInt($"{c.characterName}_NightProgress", 0);
+                            PlayerPrefs.Save();
+                            logMsg += $"🔁 {c.characterName} 的夜晚事件重新開始\n";
+                        }
+                        else
+                        {
+                            logMsg += $"⭐ {c.characterName} 的夜晚事件已播完且不循環\n";
+                            continue;
+                        }
+                    }
                     evt = c.nightEvents[eventIdx];
+                }
             }
 
             if (evt != null)
             {
                 count++;
                 StartCoroutine(CreateCharacterIcon(c, evt));
-            }
-            else
-            {
-                logMsg += $"⭐ {c.characterName} 的事件已播放完畢\n";
             }
         }
 
@@ -149,7 +177,7 @@ void Start()
 
                 button.onClick.AddListener(() =>
                 {
-                    Debug.Log($"👉 點擊事件：{c.characterName} | 時：{currentTimeOfDay} | 執行劇本：{evt.naninovelScript}");
+                    Debug.Log($"👉 點擊事件：{c.characterName} | 時：{currentTimeOfDay} | 劇本：{evt.naninovelScript}");
 
                     if (currentTimeOfDay == TimeOfDay.Day)
                         StoryProgressManager.Instance.IncrementDayProgress(c.characterName);
@@ -157,7 +185,7 @@ void Start()
                         StoryProgressManager.Instance.IncrementNightProgress(c.characterName);
                 });
 
-                logMsg += $"✅ 掛上 call911 成功：{evt.naninovelScript} @ {button.name}\n";
+                logMsg += $"✅ 掛上 call911 成功：{evt.naninovelScript} @ {button.name}（Loop={c.loop}）\n";
             }
             else
             {

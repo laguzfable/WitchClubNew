@@ -589,6 +589,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
+      propertyPath: characterEventTable.Array.data[0].loop
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[1].loop
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
       propertyPath: availableCharacters.Array.data[0].position.x
       value: -314
       objectReference: {fileID: 0}
@@ -669,8 +679,43 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
+      propertyPath: characterEventTable.Array.data[0].dayEvents.Array.data[0].loop
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
       propertyPath: availableCharacters.Array.data[0].events.Array.data[0].eventName
       value: wow
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[0].nightEvents.Array.data[0].loop
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[0].nightEvents.Array.data[1].loop
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[0].nightEvents.Array.data[2].loop
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[1].nightEvents.Array.data[0].loop
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[1].nightEvents.Array.data[1].loop
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[1].nightEvents.Array.data[2].loop
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}

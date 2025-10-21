@@ -1,16 +1,82 @@
+#start
 
 
-主線開始。先去地圖走一圈。
+序章
+玩家和四位女角相遇
+
+第一章
+玩家得到身體
+
+第二章
+墮星石歸來
+
+第三章
+儀式啟動!
 
 @wait 0.1
+
 @saveMapDayNight isDay:false
+@SaveReturnPoint script:"MainStory_Test" label:"afterMap1"
+@GotoUnityScene sceneName:MapTest
+@stop
+
+#afterMap1
+
+
+
+第三章後半
+熱鬧的女巫俱樂部
+
+
+@wait 0.1
+
+@saveMapDayNight isDay:false
+@SaveReturnPoint script:"MainStory_Test" label:"afterMap2"
 @GotoUnityScene sceneName:MapTest
 @stop
 
 
+#afterMap2
+@set affinity_Nelly=affinity_Nelly-3
+涅莉對你的好感目前是 {affinity_Nelly}。
+薇狄亞在深夜來拜訪
+一起去做了護符給梅伊
 
-;#AfterMap
-回到對話。下一步進入戰鬥場景。
+@wait 0.1
+
+@saveMapDayNight isDay:false
+@SaveReturnPoint script:"MainStory_Test" label:"afterMap3"
+@GotoUnityScene sceneName:MapTest
+@stop
+
+
+#afterMap3
+
+女巫們的分歧
+妮可出現
+魅兒甩門離開
+「在意我的話，晚點來找我」
+
+@wait 0.1
+
+@saveMapDayNight isDay:false
+@SaveReturnPoint script:"MainStory_Test" label:"afterMap4"
+@GotoUnityScene sceneName:MapTest
+@stop
+
+#afterMap4
+
+
+
+
+
+
+
+
+
+
+
+
 
 @wait 0.1
 @battle background:bg02 target:monster02 label:AfterBattle
@@ -21,7 +87,9 @@
 
 
 
-;#AfterBattle
+
+
+
 戰鬥結束，今日任務告一段落。
 @wait 0.1
 —— 完 ——
