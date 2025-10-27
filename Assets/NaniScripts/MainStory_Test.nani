@@ -71,28 +71,13 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-@wait 0.1
-@battle background:bg02 target:monster02 label:AfterBattle
+@if affinity_Nelly>=5
+@goto chapter4
 @stop
 
 
 
+@else
+涅莉："……我不想說話。"
+@endif
 
-
-
-
-
-
-戰鬥結束，今日任務告一段落。
-@wait 0.1
-—— 完 ——

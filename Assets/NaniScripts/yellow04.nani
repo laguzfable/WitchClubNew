@@ -7,8 +7,8 @@
 涅莉: 正在想{PlayerName}的事情呢，出現得正是時候。
 涅莉: 吶，陪我玩個遊戲吧？
 
-@choice 不好的預感……一定要嗎？ goto:yellow04no
-@choice 悉聽尊便。goto:yellow04yes
+@choice 不好的預感……一定要嗎？
+@choice 悉聽尊便。
 
 #yellow04yes
 
@@ -52,8 +52,6 @@
 
 @stopBgm
 @bgm energetic
-
-@back Appearance.CloudReveal
 
 @despawn hello
 @battle background:bg02 target:yellow04 label:night4

@@ -2,6 +2,7 @@
 @bgm night
 @spawn hello
 
+@set affinity_Nelly=affinity_Nelly+10
 
 優菲: {PlayerName}，來了啊。
 優菲: ……
@@ -54,7 +55,6 @@
 @stopBgm
 @bgm energetic
 
-@back Appearance.CloudReveal
 
 @despawn hello
 @battle background:bg02 target:blue01 label:night1
