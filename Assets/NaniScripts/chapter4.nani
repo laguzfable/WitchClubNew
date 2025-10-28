@@ -1,28 +1,6 @@
 >>第四章
 
-@back bg01
-
-
-
-
-
-@choice 優菲結局 goto: .euphie_end
-@choice 繼續 goto:.777
-
-@stop
-
-
-
-
-#euphie_end
-
-@goto euphie_end
-
-#777
-
-@char witchi pos:35
-@char witchj pos:65
-@bgm chill
+@back bg0
 
 witchi: 這裡就是女巫俱樂部嗎？
 witchj: 聽朋友介紹所以來看看，想知道有什麼活動？

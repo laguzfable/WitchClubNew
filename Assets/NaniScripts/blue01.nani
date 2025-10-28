@@ -2,7 +2,7 @@
 @bgm night
 @spawn hello
 
-@set affinity_Nelly=affinity_Nelly+10
+
 
 優菲: {PlayerName}，來了啊。
 優菲: ……
@@ -57,6 +57,7 @@
 
 
 @despawn hello
+@set YellowActive=true
 @battle background:bg02 target:blue01 label:night1
 @stop
 
@@ -71,6 +72,9 @@
 優菲: 似乎消耗了很多精力。
 優菲: 趕快回去休息吧。
 優菲: 下次……也要來找我唷。
+
+@set affinity_Eupie=affinity_Eupie+10
+
 
 
 @restroom

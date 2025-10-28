@@ -1,8 +1,7 @@
 >>第五章
 
 
-@saveMapDayNight isDay:false
-@gotoUnityScene sceneName:MapTest
+
 
 @back black
 @bgm micha
@@ -244,8 +243,10 @@
 @hide nic,優菲,薇狄亞,syb
 
 @stopbgm 
-@restroom scriptName:chapter5 label:afterdate20
+@SaveReturnPoint script:"chapter5" label:"afterdate20"
+@GotoUnityScene sceneName:MapTest
 @stop
+
 
 # afterdate20
 

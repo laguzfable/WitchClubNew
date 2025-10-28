@@ -469,7 +469,7 @@ CG上菜
 may 馬上來～
 @hide syb,涅莉,蘇菲亞
 
-
+@saveMapDayNight isDay:true
 @SaveReturnPoint script:"chapter3" label:"afterdate2"
 @GotoUnityScene sceneName:MapTest
 @stop
@@ -596,9 +596,8 @@ may: 來來來，一人一個。
 
 (眾人開心玩耍)
 
-@hide 涅莉, 薇狄亞, may, 蘇菲亞
-@stopbgm
-@restroom scriptName:chapter3 label:afterdate3
+@SaveReturnPoint script:"chapter3" label:"afterdate3"
+@GotoUnityScene sceneName:MapTest
 @stop
 
 # afterdate3
@@ -756,9 +755,10 @@ nic: 想想那些為了象牙塔而捐軀的烈士們，他們會希望身為現
 
 
 
-@stopbgm
-@restroom scriptName:chapter3 label:afterdate4
+@SaveReturnPoint script:"chapter3" label:"afterdate4"
+@GotoUnityScene sceneName:MapTest
 @stop
+
 
 # afterdate4
 

@@ -1,7 +1,6 @@
-@TestLog
+
 @back bg01
-@print [切換到地圖場景]
-@command LoadScene sceneName:MapTest
+
 
 @sfx morning
 @char 涅莉 pos:50
@@ -85,6 +84,8 @@
 
 @hide 薇狄亞,涅莉,魅兒
 
+@set RuneActive=true
+@set YellowActive=true
 @battle background:bg02 target:monster02 label:afterbattle2
 @stop
 
