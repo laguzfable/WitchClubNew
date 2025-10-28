@@ -103,8 +103,7 @@ public class CombatSystem : MonoBehaviour
 
         BG.gameObject.SetActive(true);
 
-        // ✅ 這裡加上能量開關初始化
-        TryEnableEnergySystemFromNaninovel();
+        TryEnableEnergySystemFromNaninovel(); // ✅ 能量啟動改這裡
 
         blackMask.DOFade(0f, 0.3f).OnComplete(() =>
         {
@@ -113,9 +112,7 @@ public class CombatSystem : MonoBehaviour
         });
     }
 
-    /// <summary>
-    /// 從 Naninovel 變數 YellowActive 讀取是否要開啟能量環境
-    /// </summary>
+    /// ✅ 根據這場戰鬥是否設定 YellowActive 來啟用能量
     void TryEnableEnergySystemFromNaninovel()
     {
         if (IsTestMode) return;
@@ -123,36 +120,34 @@ public class CombatSystem : MonoBehaviour
         bool yellowActive = false;
         var vars = Engine.GetService<ICustomVariableManager>();
         if (vars != null)
-        {
             vars.TryGetVariableValue<bool>("YellowActive", out yellowActive);
-        }
 
         if (yellowActive)
         {
-            Debug.Log("[CombatSystem] YellowActive detected → enabling Energy environment.");
+            Debug.Log("[CombatSystem] Enable Energy (YellowActive=true)");
             envEffect.SetNextEffect(EEnvEffectType.Energy);
             envEffect.SwitchToNextEffect();
         }
         else
         {
-            Debug.Log("[CombatSystem] YellowActive = false → normal environment.");
+            envEffect.SetCurrentEffect(EEnvEffectType.None);
         }
     }
 
+    /// ✅ YellowActive 變數是否開啟（黃色能量）
     public bool IsEnergyActive()
     {
         if (!IsTestMode)
         {
-            bool yellowActive = true;
+            bool yellowActive = false;
             Engine.GetService<ICustomVariableManager>().TryGetVariableValue<bool>("YellowActive", out yellowActive);
             return yellowActive;
         }
-        return true;
+        return false;
     }
 
     void Start()
     {
-        // 避免覆蓋 Energy 狀態
         if (envEffect.curType == EEnvEffectType.None)
             envEffect.SetCurrentEffect(EEnvEffectType.None);
 
@@ -182,8 +177,6 @@ public class CombatSystem : MonoBehaviour
         }
     }
 
-    // ---------------- 以下全是原始 CombatSystem 功能 ---------------- //
-
     class ResultOrder
     {
         public int value;
@@ -203,14 +196,12 @@ public class CombatSystem : MonoBehaviour
 
         var playerUnit = pc.GetPlayerUnit();
         var mobActResult = mobUnit.GetActionResult();
+
         int GetDiceValue(int diceCount)
         {
             var total = 0;
             for (int i = 0; i < diceCount; i++)
-            {
-                var dice = UnityEngine.Random.Range(1, 7);
-                total += dice;
-            }
+                total += UnityEngine.Random.Range(1, 7);
             return total;
         }
 
@@ -270,6 +261,7 @@ public class CombatSystem : MonoBehaviour
     {
         if (!isContinue) return;
         pc.ReflashCards(true);
+
         if (!TutorialController.isTutorial && !TutorialController.isTutorial2)
         {
             envEffect.remainTurn--;
@@ -300,7 +292,7 @@ public class CombatSystem : MonoBehaviour
 
     public void UpdateMobActionInfo(string actionStr)
     {
-        // left empty
+        // left empty (原邏輯不動)
     }
 
     public void GameOver(bool isLose)
@@ -320,6 +312,12 @@ public class CombatSystem : MonoBehaviour
 
     public void BackToNani()
     {
+        // ✅ 確保能量狀態不延續到下一場戰鬥
+        var vars = Engine.GetService<ICustomVariableManager>();
+if (vars != null)
+    vars.SetVariableValue("YellowActive", "false");
+
+
         if (IsTestMode)
         {
             ReloadScene();
@@ -345,8 +343,11 @@ public class CombatSystem : MonoBehaviour
         SceneManager.LoadScene("CombatScene");
     }
 
-    public void SpawnCombatText(string content, ECombatTextType type, bool isPlayer) => combatTxtPanel.EnqueueText(content, type, isPlayer);
-    public void SpawnSystemText(string content) => combatTxtPanel.DisplaySystemText(content);
+    public void SpawnCombatText(string content, ECombatTextType type, bool isPlayer)
+        => combatTxtPanel.EnqueueText(content, type, isPlayer);
+
+    public void SpawnSystemText(string content)
+        => combatTxtPanel.DisplaySystemText(content);
 
     public async UniTaskVoid DisplayBreakCloth(GameObject animPrefab)
     {
@@ -365,9 +366,8 @@ public class CombatSystem : MonoBehaviour
         mainCanvas.FadeOut(0.15f);
         Camera.main.transform.DOPunchPosition(Vector3.right, 0.2f);
         if (animPrefab != null)
-        {
             Instantiate(animPrefab);
-        }
+
         CameraPlay.MangaFlash(2.5f);
         await UniTask.Delay(TimeSpan.FromSeconds(2.5f));
         mainCanvas.FadeIn(0.15f);

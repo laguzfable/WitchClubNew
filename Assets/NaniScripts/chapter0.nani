@@ -1,4 +1,10 @@
 
+@SaveMapDayNight isDay:false
+@SaveReturnPoint script:"chapter0" label:"hallwayMorning"
+@GotoUnityScene sceneName:MapTest
+@stop
+
+
 
 @spawn hello
 
@@ -307,6 +313,12 @@
 涅莉.yummy: 耶～食物！
 @hide 涅莉,薇狄亞,優菲
 @stopBgm
+
+
+
+#hallwayMorning
+
+
 @bgm stardust
 @back star1
 
