@@ -13,123 +13,99 @@ MonoBehaviour:
   m_Name: RuneDatabase
   m_EditorClassIdentifier: 
   runes:
-  - AbilityID: blue00
-    DisplayName: "\u9810\u8A2D"
-    Icon: {fileID: 0}
-    Description: 
-    Color: 0
-  - AbilityID: blue01
-    DisplayName: "\u540C\u5B78"
-    Icon: {fileID: 0}
-    Description: 
-    Color: 0
-  - AbilityID: blue02
-    DisplayName: "\u8B1B\u5E2B"
-    Icon: {fileID: 0}
-    Description: 
-    Color: 0
-  - AbilityID: blue03
-    DisplayName: "\u827E\u59AE\uFF08\u5B78\u9662\uFF09"
-    Icon: {fileID: 0}
-    Description: 
-    Color: 0
-  - AbilityID: blue04
-    DisplayName: "\u8840\u7CFB\u5973\u5DEB"
-    Icon: {fileID: 0}
-    Description: 
-    Color: 0
-  - AbilityID: blue05
-    DisplayName: "\u827E\u59AE\uFF08\u8840\u7CFB\uFF09"
-    Icon: {fileID: 0}
-    Description: 
-    Color: 0
-  - AbilityID: red00
-    DisplayName: "\u9810\u8A2D"
-    Icon: {fileID: 0}
-    Description: 
-    Color: 1
-  - AbilityID: red01
-    DisplayName: "\u9B54\u66F8"
-    Icon: {fileID: 0}
-    Description: 
-    Color: 1
-  - AbilityID: red02
-    DisplayName: "\u8C61\u7259\u5854\u4E4B\u773C"
-    Icon: {fileID: 0}
-    Description: 
-    Color: 1
-  - AbilityID: red03
-    DisplayName: "\u4F0A\u838E\u8C9D\u62C9"
-    Icon: {fileID: 0}
-    Description: 
-    Color: 1
-  - AbilityID: red04
-    DisplayName: "\u8840\u7CFB\u5973\u5DEB"
-    Icon: {fileID: 0}
-    Description: 
-    Color: 1
-  - AbilityID: red05
-    DisplayName: "\u8D6B\u83F2"
-    Icon: {fileID: 0}
-    Description: 
-    Color: 1
-  - AbilityID: green00
-    DisplayName: "\u9810\u8A2D"
-    Icon: {fileID: 0}
-    Description: 
-    Color: 2
-  - AbilityID: green01
-    DisplayName: "\u72FC"
-    Icon: {fileID: 0}
-    Description: 
-    Color: 2
-  - AbilityID: green02
-    DisplayName: "\u6A39\u5973"
-    Icon: {fileID: 0}
-    Description: 
-    Color: 2
-  - AbilityID: green03
-    DisplayName: "\u6F7C"
-    Icon: {fileID: 0}
-    Description: 
-    Color: 2
-  - AbilityID: green04
-    DisplayName: "\u5409\u5152"
-    Icon: {fileID: 0}
-    Description: 
-    Color: 2
-  - AbilityID: green05
-    DisplayName: "\u6A39\u6BCD"
-    Icon: {fileID: 0}
-    Description: 
-    Color: 2
-  - AbilityID: yellow00
-    DisplayName: "\u9810\u8A2D"
-    Icon: {fileID: 0}
-    Description: 
-    Color: 3
-  - AbilityID: yellow01
-    DisplayName: "\u5996\u7CBE\u6253\u67B6"
-    Icon: {fileID: 0}
-    Description: 
-    Color: 3
-  - AbilityID: yellow02
-    DisplayName: "\u5403\u53F2\u840A\u59C6"
-    Icon: {fileID: 0}
-    Description: 
-    Color: 3
-  - AbilityID: yellow03
-    DisplayName: "\u9ED1\u8089\u7CBE\u9748"
-    Icon: {fileID: 0}
-    Description: 
-    Color: 3
-  - AbilityID: yellow04
-    DisplayName: "\u5438\u8840\u7CBE\u9748"
-    Icon: {fileID: 0}
-    Description: 
-    Color: 3
-  - AbilityID: yellow05
-    DisplayName: "\u737B\u796D\u5973\u5DEB"
-    Icon: {fileID: 0}
-    Description: 
-    Color: 3
+  - runeName: "\u862D\u9810\u8A2D"
+    icon: {fileID: 21300000, guid: 830ae935baba6a746b95998d8042bf76, type: 3}
+    desc: 11111
+    type: 0
+  - runeName: "\u85CD1"
+    icon: {fileID: 21300000, guid: 830ae935baba6a746b95998d8042bf76, type: 3}
+    desc: 22222
+    type: 0
+  - runeName: "\u85CD2"
+    icon: {fileID: 0}
+    desc: 33333
+    type: 0
+  - runeName: "\u85CD3"
+    icon: {fileID: 0}
+    desc: 444
+    type: 0
+  - runeName: "\u85CD4"
+    icon: {fileID: 0}
+    desc: 555
+    type: 0
+  - runeName: "\u85CD5"
+    icon: {fileID: 0}
+    desc: 666
+    type: 0
+  - runeName: "\u7D05\u9810\u8A2D"
+    icon: {fileID: 0}
+    desc: 11111
+    type: 1
+  - runeName: "\u7D051"
+    icon: {fileID: 0}
+    desc: 22222
+    type: 1
+  - runeName: "\u7D052"
+    icon: {fileID: 0}
+    desc: 333
+    type: 1
+  - runeName: "\u7D053"
+    icon: {fileID: 0}
+    desc: 444
+    type: 1
+  - runeName: "\u7D054"
+    icon: {fileID: 0}
+    desc: 555
+    type: 1
+  - runeName: "\u7D055"
+    icon: {fileID: 0}
+    desc: 666
+    type: 1
+  - runeName: "\u7DA0\u9810\u8A2D"
+    icon: {fileID: 0}
+    desc: 111
+    type: 2
+  - runeName: "\u7DA01"
+    icon: {fileID: 0}
+    desc: 222
+    type: 2
+  - runeName: "\u7DA02"
+    icon: {fileID: 0}
+    desc: 333
+    type: 2
+  - runeName: "\u7DA03"
+    icon: {fileID: 0}
+    desc: 444
+    type: 2
+  - runeName: "\u7DA04"
+    icon: {fileID: 0}
+    desc: 555
+    type: 2
+  - runeName: "\u7DA05"
+    icon: {fileID: 0}
+    desc: 666
+    type: 2
+  - runeName: "\u9EC3\u9810\u8A2D"
+    icon: {fileID: 0}
+    desc: 111
+    type: 3
+  - runeName: "\u9EC31"
+    icon: {fileID: 0}
+    desc: 222
+    type: 3
+  - runeName: "\u9EC32"
+    icon: {fileID: 0}
+    desc: 333
+    type: 3
+  - runeName: "\u9EC33"
+    icon: {fileID: 0}
+    desc: 444
+    type: 3
+  - runeName: "\u9EC34"
+    icon: {fileID: 0}
+    desc: 555
+    type: 3
+  - runeName: "\u9EC35"
+    icon: {fileID: 0}
+    desc: 666
+    type: 3
