@@ -1,40 +1,55 @@
 ﻿using UnityEngine;
+using System.Collections;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
-public class SelectRuneCard : MonoBehaviour, IPointerClickHandler
+public class SelectRuneCard : MonoBehaviour
 {
-    [Header("UI")]
-    public Text nameText;
-    public Text descText;
-    public Image iconImage;
+    public string abilityID;
 
-    private int index;
-    private RuneData data;
-    private bool unlocked;
+    public Image img;
 
-    public void Setup(int index, RuneData data, bool unlocked)
+    public Button btn;
+
+    Ability ability;
+
+    public Text abilityName;
+    public Text abilityDesc;
+
+    // Use this for initialization
+    void Awake()
     {
-        this.index = index;
-        this.data = data;
-        this.unlocked = unlocked;
+        ability = DataService.Instance.GetAbilityById(abilityID);
 
-        if (nameText) nameText.text = data.runeName;
-        if (descText) descText.text = data.desc;
-        if (iconImage) iconImage.sprite = data.icon;
+        if (ability.image != null)
+        {
+            img.sprite = ability.image;
+        }
+        if (ability.requireEnergy <= 0)
+        {
+            // not avaliable yet;
+            btn.interactable = false;
+        }
+        abilityName.text = ability.name;
+        abilityDesc.text = ability.description;
 
-        Debug.Log($"[RuneCard] 顯示資料：{data.runeName}");
+        btn.onClick.AddListener(OnClick);
+
+        if(PlayerData.Instance.usingRuneIDs[(int)ability.element] == abilityID)
+        {
+            transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
+        }
     }
 
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        if (!unlocked)
-        {
-            Debug.Log($"[RuneCard] ❌ 尚未解鎖 index={index}");
-            return;
-        }
+    public void SetInteractable(bool interactable) => btn.interactable = interactable;
 
-        Debug.Log($"[RuneCard] ✅ 點擊符文 index={index}");
-        FindObjectOfType<RuneUIManager>()?.OnRuneClicked(index);
+    public void OnClick()
+    {
+        PlayerData.Instance.usingRuneIDs[(int)ability.element] = abilityID;
+        var parent = transform.parent;
+
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            parent.GetChild(i).localScale = parent.GetChild(i).GetComponent<SelectRuneCard>() == this ? new Vector3(1.2f, 1.2f, 1.2f) : Vector3.one;
+        }
     }
 }
