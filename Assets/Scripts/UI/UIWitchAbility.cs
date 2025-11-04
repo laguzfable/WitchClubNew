@@ -46,49 +46,51 @@ public class UIWitchAbility : MonoBehaviour
     [SerializeField]
     Image fullChargedImage;
 
-    private void Awake()
-    {
-        //slider = GetComponent<Slider>();
-        cost.OnValueChanged += (value) =>
-        {
-            fillImage.DOFillAmount(cost.GetPercent(), 0.3f);
-            if(cost.GetPercent() != 1f && fullChargedImage.color.a > 0f)
-            {
-                fullChargedImage.DOFade(0f, 0.15f);
-            }
-        };
-        cost.OnValueFull += ()=>
-        {
-            var seq = DOTween.Sequence();
-            seq.Append(fullChargedImage.DOFade(1f, 0.15f))
-                .Append(transform.DOScale(1.2f, 0.15f))
-                .AppendInterval(0.1f)
-                .Append(transform.DOScale(1f, 0.2f));
-            /*transform.DOScale(1.2f, 0.15f).onComplete += ()=>
-            {
-                transform.DOScale(1f, 0.2f);
-            };*/
-        };
-        //Check(0f);
-
-        // ✅ 已解鎖優先：若該元素已有解鎖記錄，覆蓋 usingRuneIDs
-// key 範例： "Yellow_UnlockedRune" / "Blue_UnlockedRune" ...
-string unlockedKey = $"{element}_UnlockedRune";
-string savedRune = PlayerPrefs.GetString(unlockedKey, "");
-
-if (!string.IsNullOrEmpty(savedRune))
+private void Awake()
 {
-    // 將解鎖結果套入當前使用的 rune 配置
-    PlayerData.Instance.usingRuneIDs[(int)element] = savedRune;
+    //slider = GetComponent<Slider>();
+    cost.OnValueChanged += (value) =>
+    {
+        fillImage.DOFillAmount(cost.GetPercent(), 0.3f);
+        if(cost.GetPercent() != 1f && fullChargedImage.color.a > 0f)
+        {
+            fullChargedImage.DOFade(0f, 0.15f);
+        }
+    };
+    cost.OnValueFull += ()=>
+    {
+        DOTween.Sequence()
+            .Append(fullChargedImage.DOFade(1f, 0.15f))
+            .Append(transform.DOScale(1.2f, 0.15f))
+            .AppendInterval(0.1f)
+            .Append(transform.DOScale(1f, 0.2f));
+    };
+
+    // ✅ ✅ ✅ 只讀取裝備資料，不再強制覆蓋 usingRuneIDs
+    string equipKey = $"Equipped_{element}";
+    string savedEquip = PlayerPrefs.GetString(equipKey, "");
+
+    if (!string.IsNullOrEmpty(savedEquip))
+    {
+        abilityID = savedEquip;
+        PlayerData.Instance.usingRuneIDs[(int)element] = savedEquip;
+    }
+    else
+    {
+        // ✅ 沒有裝備資料 → 使用 PlayerData 現有值
+        abilityID = PlayerData.Instance.usingRuneIDs[(int)element];
+    }
+
+    // ✅ 讀取能力資料
+    ability = DataService.Instance.GetAbilityById(abilityID);
+
+    // ✅ 設定符文能量
+    cost.SetBaseValue(ability.requireEnergy);
+    cost.Value = 0; // ✅ 避免繼承舊能量
+
+    fullChargedImage.DOFade(0f, 0.15f);
 }
 
-        abilityID = PlayerData.Instance.usingRuneIDs[(int)element];
-
-        ability = DataService.Instance.GetAbilityById(abilityID);
-        //Debug.Log($"abilityID : {abilityID} ability.requireEnergy : {ability.requireEnergy}");
-        cost.SetBaseValue(ability.requireEnergy);
-        fullChargedImage.DOFade(0f, 0.15f);
-    }
 
     void Start()
     {
@@ -137,6 +139,15 @@ if (!string.IsNullOrEmpty(savedRune))
             SpecialFXCoroutine().Forget();
         }
     }
+
+    public void RefreshRune()
+{
+    abilityID = PlayerData.Instance.usingRuneIDs[(int)element];
+    ability = DataService.Instance.GetAbilityById(abilityID);
+    cost.SetBaseValue(ability.requireEnergy);
+    cost.Value = 0; // 重置能量避免舊值影響
+}
+
 
     async UniTaskVoid SpecialFXCoroutine()
     {

@@ -58,26 +58,48 @@ public class CombatSystem : MonoBehaviour
     [SerializeField] GameObject localEventSystem;
     public bool IsTestMode => localEventSystem.activeSelf;
 
-    void Awake()
+void Awake()
+{
+    localEventSystem.SetActive(!Engine.Initialized);
+
+    pc = GameObject.FindWithTag("Player").GetComponent<PlayerController>();
+    combatTxtPanel = GameObject.FindWithTag("Respawn").GetComponent<UICombatTextPanel>();
+    envEffect = new EnvironmentEffect(this);
+
+    monsterID = PlayerPrefs.GetString("enemyName");
+    bossName.text = monsterID;
+
+    audioSource = gameObject.GetComponent<AudioSource>();
+    dialogText = dialogObj.transform.Find("Image/Text").GetComponent<Text>();
+    mobUnit = GameObject.FindGameObjectWithTag("Enemy").GetComponent<EnemyUnit>();
+    visualResource = GetComponent<CombatVisualResources>();
+
+    Init();
+
+    Debug.Log($"[Debug] Fight Enemy: {monsterID}");
+
+    // ✅ 放這裡！24行 Init 之後，第一次 GameOver 前讀到正確裝備
+    LoadEquippedRunes();
+}
+
+private void LoadEquippedRunes()
+{
+    var names = System.Enum.GetNames(typeof(ECardElement));
+    int len = names.Length;
+
+    for (int i = 0; i < len; i++)
     {
-        localEventSystem.SetActive(!Engine.Initialized);
-
-        pc = GameObject.FindWithTag("Player").GetComponent<PlayerController>();
-        combatTxtPanel = GameObject.FindWithTag("Respawn").GetComponent<UICombatTextPanel>();
-        envEffect = new EnvironmentEffect(this);
-
-        monsterID = PlayerPrefs.GetString("enemyName");
-        bossName.text = monsterID;
-
-        audioSource = gameObject.GetComponent<AudioSource>();
-        dialogText = dialogObj.transform.Find("Image/Text").GetComponent<Text>();
-        mobUnit = GameObject.FindGameObjectWithTag("Enemy").GetComponent<EnemyUnit>();
-        visualResource = GetComponent<CombatVisualResources>();
-
-        Init();
-
-        Debug.Log($"[Debug] Fight Enemy: {monsterID}");
+        string key = $"Equipped_{names[i]}";
+        if (PlayerPrefs.HasKey(key))
+        {
+            string value = PlayerPrefs.GetString(key);
+            PlayerData.Instance.usingRuneIDs[i] = value;
+            Debug.Log($"[EquippedLoad] {(ECardElement)i} = {value}");
+        }
     }
+}
+
+
 
     void Init()
     {
@@ -373,8 +395,8 @@ if (vars != null)
 
 void TryUnlockRune(string mobID)
 {
-    mobID = mobID.Trim().ToLower(); // ✅ 再清洗一次保險
-    
+    mobID = mobID.Trim().ToLower();
+
     var data = mobUnlockTable.Find(x => 
         x.mobID.Trim().ToLower() == mobID
     );
@@ -386,11 +408,21 @@ void TryUnlockRune(string mobID)
     }
 
     var ab = DataService.Instance.GetAbilityById(data.runeID);
-    string elementKey = $"{ab.element}_UnlockedRune";
-    PlayerPrefs.SetString(elementKey, data.runeID);
+    string key = $"UnlockedRunes_{ab.element}";
+
+    // ✅ 讀取舊清單
+    string current = PlayerPrefs.GetString(key, "");
+    var list = current.Split(new[]{','}, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+    // ✅ 已有解鎖就不重複
+    if (!list.Contains(data.runeID))
+        list.Add(data.runeID);
+
+    // ✅ 回寫
+    PlayerPrefs.SetString(key, string.Join(",", list));
     PlayerPrefs.Save();
 
-    Debug.Log($"[RuneUnlock] ✅ 解鎖 {data.runeID} → 寫入 {elementKey}");
+    Debug.Log($"[RuneUnlock] ✅ 加入解鎖清單: {data.runeID} → key:{key} = {PlayerPrefs.GetString(key)}");
 }
 
 
