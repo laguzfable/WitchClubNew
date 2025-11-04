@@ -328,7 +328,7 @@ witchc: 我也要！
 
 @hide 涅莉
 
-
+@saveMapDayNight isDay:false
 @SaveReturnPoint script:"chapter3" label:"afterdate1"
 @GotoUnityScene sceneName:MapTest
 @stop
@@ -461,7 +461,7 @@ CG上菜
 may 馬上來～
 @hide syb,涅莉,蘇菲亞
 
-@saveMapDayNight isDay:true
+@saveMapDayNight isDay:false
 @SaveReturnPoint script:"chapter3" label:"afterdate2"
 @GotoUnityScene sceneName:MapTest
 @stop

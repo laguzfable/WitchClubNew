@@ -34,15 +34,20 @@ public class SelectRuneCard : MonoBehaviour
             transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
     }
 
-    bool IsRuneUnlocked()
-    {
-        // ✅ 前四張符文永遠解鎖
-        if (runeIndex < 4)
-            return true;
+bool IsRuneUnlocked()
+{
+    // ✅ 前四張符文永遠解鎖
+    if (runeIndex < 4)
+        return true;
 
-        // ✅ 其餘符文須先解鎖
-        return PlayerPrefs.GetString(abilityID, "") == "Unlocked";
-    }
+    // ✅ 正確的資料來源
+    // 這裡不是用 abilityID 查，而是查這個元素目前解鎖的是哪一個
+    string key = $"{ability.element}_UnlockedRune";
+    string unlockedRune = PlayerPrefs.GetString(key, ""); // ex: "blue04"
+
+    return unlockedRune == abilityID;
+}
+
 
     public void OnClick()
     {

@@ -70,6 +70,18 @@ public class UIWitchAbility : MonoBehaviour
             };*/
         };
         //Check(0f);
+
+        // ✅ 已解鎖優先：若該元素已有解鎖記錄，覆蓋 usingRuneIDs
+// key 範例： "Yellow_UnlockedRune" / "Blue_UnlockedRune" ...
+string unlockedKey = $"{element}_UnlockedRune";
+string savedRune = PlayerPrefs.GetString(unlockedKey, "");
+
+if (!string.IsNullOrEmpty(savedRune))
+{
+    // 將解鎖結果套入當前使用的 rune 配置
+    PlayerData.Instance.usingRuneIDs[(int)element] = savedRune;
+}
+
         abilityID = PlayerData.Instance.usingRuneIDs[(int)element];
 
         ability = DataService.Instance.GetAbilityById(abilityID);

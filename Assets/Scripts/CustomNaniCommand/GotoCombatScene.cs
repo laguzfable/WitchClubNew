@@ -76,19 +76,33 @@ public class GotoCombatScene : Command, Command.IForceWait
             } else Debug.LogWarning($"[{AliasName}] 找不到 ITextPrinterManager（略過）。");
         } catch (System.Exception ex) { Debug.LogWarning($"[{AliasName}] 隱藏文字框例外：{ex.Message}"); }
 
-        // 4) 傳遞資料
-        try {
-            if (DataService.Instance == null) Debug.LogError($"[{AliasName}] DataService.Instance 為空，無法傳遞參數。");
-            else {
-                DataService.Instance.scriptParameter = new ScriptParameter {
-                    background   = bgId,
-                    combatTarget = targetId,
-                    scriptName   = scriptName,
-                    scriptLabel  = labelName
-                };
-                Debug.Log($"[{AliasName}] 已設定 DataService.scriptParameter");
-            }
-        } catch (System.Exception ex) { Debug.LogError($"[{AliasName}] 設定 DataService 失敗：{ex.Message}"); }
+// 4) 傳遞資料 + 設定敵方 ID 到 PlayerPrefs
+try {
+    if (DataService.Instance == null)
+    {
+        Debug.LogError($"[{AliasName}] DataService.Instance 為空，無法傳遞參數。");
+    }
+    else
+    {
+        DataService.Instance.scriptParameter = new ScriptParameter {
+            background   = bgId,
+            combatTarget = targetId,
+            scriptName   = scriptName,
+            scriptLabel  = labelName
+        };
+        Debug.Log($"[{AliasName}] 已設定 DataService.scriptParameter");
+    }
+
+    // ✅ 核心補丁：立即寫入敵人 ID
+    var t = targetId?.Trim().ToLower();
+    PlayerPrefs.SetString("enemyName", t);
+    PlayerPrefs.Save();
+    Debug.Log($"[{AliasName}] >>> Set enemyName = '{t}'");
+}
+catch (System.Exception ex)
+{
+    Debug.LogError($"[{AliasName}] 設定參數失敗：{ex.Message}");
+}
 
         // 5) 教學旗標重置
         try { TutorialController.isTutorial = false; TutorialController.isTutorial2 = false; }

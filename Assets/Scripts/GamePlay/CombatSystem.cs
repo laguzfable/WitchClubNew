@@ -315,11 +315,17 @@ public class MobRuneUnlockData
 {
     Debug.Log($"isLose?: {isLose}");
 
-    // ✅ 只有勝利才解鎖符文
-    if (!isLose)
-    {
-        TryUnlockRune(monsterID);
-    }
+// ✅ 清洗 monsterID
+monsterID = monsterID.Trim().ToLower();
+Debug.Log($"[RuneUnlock-Check] monsterID cleaned = '{monsterID}' (length={monsterID.Length})");
+
+// ✅ 只有勝利才解鎖符文
+if (!isLose)
+{
+    TryUnlockRune(monsterID);
+}
+
+
 
     if (isLose)
     {
@@ -365,21 +371,28 @@ if (vars != null)
 
 
 
-    void TryUnlockRune(string mobID)
+void TryUnlockRune(string mobID)
 {
-    var data = mobUnlockTable.Find(x => x.mobID == mobID);
+    mobID = mobID.Trim().ToLower(); // ✅ 再清洗一次保險
+    
+    var data = mobUnlockTable.Find(x => 
+        x.mobID.Trim().ToLower() == mobID
+    );
+
     if (data == null)
     {
-        Debug.Log($"[RuneUnlock] ❌ {mobID} 沒有解鎖設定");
+        Debug.Log($"[RuneUnlock] ❌ mobID='{mobID}' 找不到對應解鎖設定");
         return;
     }
 
-    // 存到 PlayerPrefs
-    PlayerPrefs.SetString(data.runeID, "Unlocked");
+    var ab = DataService.Instance.GetAbilityById(data.runeID);
+    string elementKey = $"{ab.element}_UnlockedRune";
+    PlayerPrefs.SetString(elementKey, data.runeID);
     PlayerPrefs.Save();
 
-    Debug.Log($"[RuneUnlock] ✅ 解鎖符文: {data.runeID}（因勝利擊敗 {mobID}）");
+    Debug.Log($"[RuneUnlock] ✅ 解鎖 {data.runeID} → 寫入 {elementKey}");
 }
+
 
 
 
