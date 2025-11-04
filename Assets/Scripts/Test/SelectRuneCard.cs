@@ -1,55 +1,64 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.UI;
 
 public class SelectRuneCard : MonoBehaviour
 {
     public string abilityID;
+    public int runeIndex; // 在 Inspector 標註符文位置 (0~3 是預設開啟)
 
     public Image img;
-
     public Button btn;
 
-    Ability ability;
-
+    private Ability ability;
     public Text abilityName;
     public Text abilityDesc;
 
-    // Use this for initialization
     void Awake()
     {
         ability = DataService.Instance.GetAbilityById(abilityID);
 
+        // 設定圖片與文字
         if (ability.image != null)
-        {
             img.sprite = ability.image;
-        }
-        if (ability.requireEnergy <= 0)
-        {
-            // not avaliable yet;
-            btn.interactable = false;
-        }
         abilityName.text = ability.name;
         abilityDesc.text = ability.description;
 
+        // ✅ 設定可否點擊（解鎖狀態）
+        btn.interactable = IsRuneUnlocked();
+
+        // ✅ 綁定點擊事件
         btn.onClick.AddListener(OnClick);
 
-        if(PlayerData.Instance.usingRuneIDs[(int)ability.element] == abilityID)
-        {
+        // ✅ 已裝備的符文放大顯示
+        if (PlayerData.Instance.usingRuneIDs[(int)ability.element] == abilityID)
             transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
-        }
     }
 
-    public void SetInteractable(bool interactable) => btn.interactable = interactable;
+    bool IsRuneUnlocked()
+    {
+        // ✅ 前四張符文永遠解鎖
+        if (runeIndex < 4)
+            return true;
+
+        // ✅ 其餘符文須先解鎖
+        return PlayerPrefs.GetString(abilityID, "") == "Unlocked";
+    }
 
     public void OnClick()
     {
-        PlayerData.Instance.usingRuneIDs[(int)ability.element] = abilityID;
-        var parent = transform.parent;
+        if (!btn.interactable) return; // ✅ 避免未解鎖誤點擊
 
+        // ✅ 裝備這顆符文
+        PlayerData.Instance.usingRuneIDs[(int)ability.element] = abilityID;
+
+        // ✅ UI 放大效果
+        var parent = transform.parent;
         for (int i = 0; i < parent.childCount; i++)
         {
-            parent.GetChild(i).localScale = parent.GetChild(i).GetComponent<SelectRuneCard>() == this ? new Vector3(1.2f, 1.2f, 1.2f) : Vector3.one;
+            var card = parent.GetChild(i).GetComponent<SelectRuneCard>();
+            card.transform.localScale = (card == this)
+                ? new Vector3(1.2f, 1.2f, 1.2f)
+                : Vector3.one;
         }
     }
 }

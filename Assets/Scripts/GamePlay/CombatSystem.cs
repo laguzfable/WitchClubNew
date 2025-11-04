@@ -75,6 +75,8 @@ public class CombatSystem : MonoBehaviour
         visualResource = GetComponent<CombatVisualResources>();
 
         Init();
+
+        Debug.Log($"[Debug] Fight Enemy: {monsterID}");
     }
 
     void Init()
@@ -133,6 +135,20 @@ public class CombatSystem : MonoBehaviour
             envEffect.SetCurrentEffect(EEnvEffectType.None);
         }
     }
+
+
+
+    [Header("⚡ Mob → Rune Unlock Table")]
+public List<MobRuneUnlockData> mobUnlockTable = new List<MobRuneUnlockData>();
+
+[System.Serializable]
+public class MobRuneUnlockData
+{
+    public string mobID;    // 敵人代號
+    public string runeID;   // 對應符文 abilityID
+}
+
+
 
     /// ✅ YellowActive 變數是否開啟（黃色能量）
     public bool IsEnergyActive()
@@ -295,20 +311,29 @@ public class CombatSystem : MonoBehaviour
         // left empty (原邏輯不動)
     }
 
-    public void GameOver(bool isLose)
+   public void GameOver(bool isLose)
+{
+    Debug.Log($"isLose?: {isLose}");
+
+    // ✅ 只有勝利才解鎖符文
+    if (!isLose)
     {
-        Debug.Log($"isLose?: {isLose}");
-        if (isLose)
-        {
-            var go = GameObject.FindGameObjectWithTag("Finish");
-            go.transform.Find("Image/Text").GetComponent<Text>().text = isLose ? "太大意惹..." : "贏惹!";
-            go.transform.Find("Image").GetComponent<CGFadeHelper>().FadeIn();
-        }
-        else
-        {
-            blackMask.DOFade(1f, 0.5f).SetDelay(0.3f).OnComplete(BackToNani);
-        }
+        TryUnlockRune(monsterID);
     }
+
+    if (isLose)
+    {
+        var go = GameObject.FindGameObjectWithTag("Finish");
+        go.transform.Find("Image/Text").GetComponent<Text>().text = "太大意惹...";
+        go.transform.Find("Image").GetComponent<CGFadeHelper>().FadeIn();
+    }
+    else
+    {
+        var go = GameObject.FindGameObjectWithTag("Finish");
+        go.transform.Find("Image/Text").GetComponent<Text>().text = "贏惹!";
+        blackMask.DOFade(1f, 0.5f).SetDelay(0.3f).OnComplete(BackToNani);
+    }
+}
 
     public void BackToNani()
     {
@@ -337,6 +362,26 @@ if (vars != null)
 
         SceneManager.LoadSceneAsync("NaniDialogTest");
     }
+
+
+
+    void TryUnlockRune(string mobID)
+{
+    var data = mobUnlockTable.Find(x => x.mobID == mobID);
+    if (data == null)
+    {
+        Debug.Log($"[RuneUnlock] ❌ {mobID} 沒有解鎖設定");
+        return;
+    }
+
+    // 存到 PlayerPrefs
+    PlayerPrefs.SetString(data.runeID, "Unlocked");
+    PlayerPrefs.Save();
+
+    Debug.Log($"[RuneUnlock] ✅ 解鎖符文: {data.runeID}（因勝利擊敗 {mobID}）");
+}
+
+
 
     public void ReloadScene()
     {
@@ -371,6 +416,8 @@ if (vars != null)
         CameraPlay.MangaFlash(2.5f);
         await UniTask.Delay(TimeSpan.FromSeconds(2.5f));
         mainCanvas.FadeIn(0.15f);
+
+
         GameOver(false);
     }
 }
