@@ -19,8 +19,9 @@ namespace Naninovel.UI
             base.Start();
 
             var galleryUI = uiManager.GetUI<ICGGalleryUI>();
-            if (galleryUI is null || galleryUI.CGCount == 0)
-                gameObject.SetActive(false);
+if (galleryUI is null)
+    gameObject.SetActive(false);
+
         }
 
         protected override void OnButtonClick () => uiManager.GetUI<ICGGalleryUI>()?.Show();
