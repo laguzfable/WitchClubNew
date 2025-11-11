@@ -75,14 +75,14 @@ may: 我們先來示範一次吧，蘇菲亞。
 
 
 @hide 蘇菲亞,優菲,may
-@stopBgm
+@stopBgm 
 @bgm battle02
 
 @battle background:bg05 target:monster05 label:afterbattle6
 @stop
 
 # afterbattle6
-@stopBgm
+@stopBgm 
 
 
 @back bg01
@@ -113,14 +113,14 @@ may: 至於符文的用法嘛……
 @hide may
 
 
-@stopBgm
+@stopBgm 
 @bgm tutorial
-@RuneTutorial scriptName:chapter3 label:afterbattle3 background:bg05
+@RuneTutorial background:bg05 scriptName:chapter3 label:afterbattle3
 @stop
 
 
 # afterbattle3
-@stopbgm
+@stopbgm 
 @back bg05
 @bgm peace
 
@@ -167,7 +167,7 @@ may: 在這過程當中可能會有一些不穩定的魔力被釋放出來，打
 @hide 優菲,魅兒,涅莉
 
 @char may pos:35
-@char 蘇菲亞 pos:65蘇菲亞 pos:65
+@char 蘇菲亞 pos:65蘇菲亞
 
 may: 反正妳們多試試看吧，有問題的話就找蘇菲亞……還是應該叫尤芙蘿絲呢？別看她這樣唷，她以前玩得可大了呢，十八般武藝樣樣精通。
 蘇菲亞: 好了啦，may～妳自己還不是賣過一堆情趣－－
@@ -224,14 +224,14 @@ chl: 我的狗閉著眼睛都能打贏妳們。
 
 @hide 魅兒,chl,優菲
 
-@stopBgm
+@stopBgm 
 @bgm thehunter
 
 @battle background:bg05 target:monster05 label:afterbattle7
 @stop
 
 # afterbattle7
-@stopBgm
+@stopBgm 
 @back bg12
 @bgm serious
 
@@ -276,7 +276,7 @@ chl: 不要太想我啊，我是女巫獵人第七分部的指揮官吉兒，掰
 魅兒: ……
 @hide 莉莉娜,魅兒
 
-@stopBgm
+@stopBgm 
 @bgm peace
 
 @char witcha pos:25
@@ -327,7 +327,7 @@ witchc: 我也要！
 涅莉: 所以，好好選擇對象吧！
 
 @hide 涅莉
-
+@stopBgm 
 @saveMapDayNight isDay:false
 @SaveReturnPoint script:"chapter3" label:"afterdate1"
 @GotoUnityScene sceneName:MapTest
@@ -335,7 +335,7 @@ witchc: 我也要！
 
 
 
-#afterdate1
+# afterdate1
 
 @back bg06
 (背景 二樓走廊)
@@ -461,6 +461,7 @@ CG上菜
 may 馬上來～
 @hide syb,涅莉,蘇菲亞
 
+@stopBgm 
 @saveMapDayNight isDay:false
 @SaveReturnPoint script:"chapter3" label:"afterdate2"
 @GotoUnityScene sceneName:MapTest
@@ -500,7 +501,7 @@ syb: 沒什麼好怕的，天地萬物都只是在遵循各自的生存之道呀
 syb: 人要活著，有時候為了利益衝突就不得不自相殘殺的嘛。
 syb: 所以，別躲了，快出來吧。
 薇狄亞: ……？！
-@stopBgm
+@stopBgm 
 @bgm strange
 syb: 這麼紊亂的氣息，還想偽裝什麼呢？
 @char 薇狄亞 pos:25
@@ -518,7 +519,7 @@ chl: ……
 @hide chl
 @char 薇狄亞 pos:35
 @char syb pos:65
-@stopBgm
+@stopBgm 
 @bgm quiet
 
 薇狄亞: 她……暈過去了？！
@@ -541,7 +542,7 @@ syb: 有空再一起研究藥草吧。
 
 (回到房間)
 
-@stopBgm
+@stopBgm 
 @bgm room
 
 @char 薇狄亞 pos:50
@@ -551,7 +552,7 @@ syb: 有空再一起研究藥草吧。
 薇狄亞: 趁著還有一點時間，我要趕緊把護符做好。 
 
 @hide 薇狄亞
-@stopBgm
+@stopBgm 
 
 
 (隔天)
@@ -585,9 +586,11 @@ may: 這個糖果吃下去的話可以暫時改變外型唷！雖然只能持續
 may: 來來來，一人一個。
 涅莉: 耶～～
 
+@hide 涅莉,薇狄亞,may,蘇菲亞
 
 (眾人開心玩耍)
 
+@stopBgm 
 @SaveReturnPoint script:"chapter3" label:"afterdate3"
 @GotoUnityScene sceneName:MapTest
 @stop
@@ -624,7 +627,7 @@ witchf: 對啊對啊，我們不希望沒本事的人自稱女巫，只會敗壞
 @hide witchf,優菲,witchd
 @char 魅兒 pos:50
 
-@stopBgm
+@stopBgm 
 @bgm emotional
 
 魅兒: ……(落寞)
@@ -715,7 +718,7 @@ nic: 想想那些為了象牙塔而捐軀的烈士們，他們會希望身為現
 
 @hide 涅莉,薇狄亞
 @back bg02
-@stopBgm
+@stopBgm 
 @bgm sad
 
 
@@ -746,7 +749,7 @@ nic: 想想那些為了象牙塔而捐軀的烈士們，他們會希望身為現
 @hide 魅兒
 
 
-
+@stopBgm 
 @SaveReturnPoint script:"chapter3" label:"afterdate4"
 @GotoUnityScene sceneName:MapTest
 @stop

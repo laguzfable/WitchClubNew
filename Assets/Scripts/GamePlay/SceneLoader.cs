@@ -11,6 +11,23 @@ public class NaniScriptLoader : MonoBehaviour
     {
         Debug.Log("[NSL] Start()");
 
+
+        // 清掉 Title 場景的舊 UI（除了自己）
+foreach (var obj in UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects())
+{
+    if (obj != this.gameObject) // 不清掉自己
+    {
+        if (obj.name.Contains("Title") || obj.name.Contains("Canvas") || obj.name.Contains("BackgroundLayer") || obj.name.Contains("Blurred"))
+        {
+            Debug.Log($"[NSL] Destroy leftover: {obj.name}");
+            GameObject.Destroy(obj);
+        }
+    }
+}
+
+
+
+
         if (!Engine.Initialized)
         {
             Debug.Log("[NSL] Engine not initialized. Initialize …");
