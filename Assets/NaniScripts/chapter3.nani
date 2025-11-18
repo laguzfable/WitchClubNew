@@ -729,9 +729,24 @@ nic: 想想那些為了象牙塔而捐軀的烈士們，他們會希望身為現
 魅兒: ……我現在不想講話。
 
 選項
-@choice 抱住她(CG抱住魅兒)
-@choice 繼續沉默
+@choice 抱住她(CG抱住魅兒) goto:.hold
+
+
+
+@choice 繼續沉默 goto:.silence
 @stop
+
+
+#hold
+@set affinity_Mel=100
+@print 梅爾好感度：{affinity_Mel}
+
+
+
+#silence
+
+
+……
 
 
 魅兒: 我知道啊，我是個失格的女巫……

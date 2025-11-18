@@ -637,7 +637,7 @@ nic: 是她先挑釁的。
 
 @hide nic
 
-@char 魅兒格玫 pos:35
+@char 魅兒 pos:35
 @char 優菲 pos:65
 
 魅兒: 抱歉喔，只是我受夠妳們的狗屁象牙塔計畫了。
@@ -663,13 +663,41 @@ nic: 終於走了，我們繼續吧……學姊？
 @hide nic,優菲
 @back cg30
 
+
+
 優菲: 抱歉……我只是……突然覺得好難過……
 優菲: 沒事，繼續開會吧。
 
-@choice 安慰優菲
-@choice 追魅兒
-@choice 跟著涅莉
+@choice 安慰優菲 goto:.ch4eupie
+@choice 追魅兒 (好感度不足會追不到) goto:.ch4mel
+@choice 跟著涅莉 goto:.ch4nelly
 @stop
+
+
+#ch4eupie
+優菲: P特地來安慰我嗎？真貼心。
+優菲: 不用擔心，我沒事的。
+
+
+
+#ch4mel
+
+@if affinity_Mel >= 50
+@goto chapter4red
+
+@else
+
+一轉眼，已經看不到梅爾的人影。
+
+
+
+#ch4nelly
+
+涅莉: 來來來，快跟著我。
+
+
+@endif
+
 
 @back bg01
 
@@ -814,15 +842,30 @@ witchc: 迷霧草是最棒的！
 
 
 
+魅兒: 還要……
+魅兒: 更多……更……
+妮可: 不行啊，能量要爆發了！
+妮可: 小心！學姐！
+
+@char 優菲 pos:25
+@char 魅兒 pos:75
+@char 妮可 pos:50
+
+
+@choice 讓妮可營救優菲 goto:.bd01
+@choice 自己上前解救優菲 goto:.ch5b
+@hide 優菲,魅兒,妮可
+@stop
+
+
+#bd01
+
+@goto badend01
 
 
 
-
-
-
-
-
-
+#ch5b
+@goto chapter5blue
 
 
 
