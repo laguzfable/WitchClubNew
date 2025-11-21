@@ -18,6 +18,9 @@
 
 @wait 0.1
 
+
+
+@overrideEvent char:"Eupie" evt:"yummy"
 @saveMapDayNight isDay:false
 @SaveReturnPoint script:"MainStory_Test" label:"afterMap1"
 @GotoUnityScene sceneName:MapTest

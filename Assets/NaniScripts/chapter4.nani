@@ -668,6 +668,14 @@ nic: 終於走了，我們繼續吧……學姊？
 優菲: 抱歉……我只是……突然覺得好難過……
 優菲: 沒事，繼續開會吧。
 
+@if affinity_Ved >= 50
+@goto chapter4green
+@else
+
+
+
+
+
 @choice 安慰優菲 goto:.ch4eupie
 @choice 追魅兒 (好感度不足會追不到) goto:.ch4mel
 @choice 跟著涅莉 goto:.ch4nelly

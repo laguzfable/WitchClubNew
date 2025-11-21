@@ -568,7 +568,7 @@ PrefabInstance:
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
       propertyPath: characterEventTable.Array.size
-      value: 5
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
@@ -598,6 +598,11 @@ PrefabInstance:
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
       propertyPath: characterEventTable.Array.data[4].loop
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[5].loop
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
@@ -707,6 +712,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
+      propertyPath: characterEventTable.Array.data[5].characterName
+      value: other
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
       propertyPath: availableCharacters.Array.data[0].events.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -737,6 +747,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
+      propertyPath: characterEventTable.Array.data[5].dayEvents.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
       propertyPath: characterEventTable.Array.data[0].nightEvents.Array.size
       value: 5
       objectReference: {fileID: 0}
@@ -758,6 +773,21 @@ PrefabInstance:
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
       propertyPath: characterEventTable.Array.data[4].nightEvents.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[0].specialEvents.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[3].specialEvents.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[5].specialEvents.Array.size
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
@@ -814,6 +844,11 @@ PrefabInstance:
         type: 3}
       propertyPath: characterEventTable.Array.data[2].dayEvents.Array.data[0].eventName
       value: chapter0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[5].dayEvents.Array.data[0].eventName
+      value: 666
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
@@ -977,6 +1012,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
+      propertyPath: characterEventTable.Array.data[0].specialEvents.Array.data[0].eventName
+      value: yummy
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[5].specialEvents.Array.data[0].eventName
+      value: 666
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
       propertyPath: availableCharacters.Array.data[0].events.Array.data[0].animatorController
       value: 
       objectReference: {fileID: 9100000, guid: 4d98bcd6ad5ffcf419637a489616a4aa, type: 2}
@@ -999,6 +1044,11 @@ PrefabInstance:
         type: 3}
       propertyPath: characterEventTable.Array.data[2].dayEvents.Array.data[0].naninovelScript
       value: chapter0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[5].dayEvents.Array.data[0].naninovelScript
+      value: chapter1
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
@@ -1122,6 +1172,21 @@ PrefabInstance:
       objectReference: {fileID: 9100000, guid: e42ea99ddf87926439d6b19d92550e36, type: 2}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
+      propertyPath: characterEventTable.Array.data[5].dayEvents.Array.data[0].animatorController
+      value: 
+      objectReference: {fileID: 9100000, guid: 659486cc3f59eeb4a8b65a04d809ead0, type: 2}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[0].specialEvents.Array.data[0].naninovelScript
+      value: chapter4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[5].specialEvents.Array.data[0].naninovelScript
+      value: chapter1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
       propertyPath: characterEventTable.Array.data[0].nightEvents.Array.data[0].animatorController
       value: 
       objectReference: {fileID: 9100000, guid: b4e0438aba7b45141b3cde565a748b90, type: 2}
@@ -1225,6 +1290,16 @@ PrefabInstance:
       propertyPath: characterEventTable.Array.data[4].nightEvents.Array.data[0].animatorController
       value: 
       objectReference: {fileID: 9100000, guid: fa87090a06dd6634db2fe66f8cc9e926, type: 2}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[0].specialEvents.Array.data[0].animatorController
+      value: 
+      objectReference: {fileID: 9100000, guid: 6ffb2ba300fca4a40823deb3a76a9016, type: 2}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[5].specialEvents.Array.data[0].animatorController
+      value: 
+      objectReference: {fileID: 9100000, guid: 659486cc3f59eeb4a8b65a04d809ead0, type: 2}
     - target: {fileID: 3641302337061817710, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
       propertyPath: m_SizeDelta.x
