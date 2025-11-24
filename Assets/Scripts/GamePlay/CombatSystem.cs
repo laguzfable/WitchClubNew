@@ -228,60 +228,100 @@ public class MobRuneUnlockData
     [SerializeField] CGFadeHelper blackScreen;
     [SerializeField] Image comboSpecialImg;
 
-    public async UniTask PlayCardAsync()
+public async UniTask PlayCardAsync()
+{
+    pc.SetControllable(false);
+
+    var playerUnit = pc.GetPlayerUnit();
+    var mobActResult = mobUnit.GetActionResult();
+
+    int GetDiceValue(int diceCount)
     {
-        pc.SetControllable(false);
-
-        var playerUnit = pc.GetPlayerUnit();
-        var mobActResult = mobUnit.GetActionResult();
-
-        int GetDiceValue(int diceCount)
-        {
-            var total = 0;
-            for (int i = 0; i < diceCount; i++)
-                total += UnityEngine.Random.Range(1, 7);
-            return total;
-        }
-
-        var mobDmg = pc.ATK - mobActResult.attr.DEF;
-
-        orderList.Clear();
-        CreateOrder((int)Order.MobDealDamage, mobActResult.attr.ATK, mobUnit, () =>
-        {
-            if (mobUnit.HasEffect(EAbilityEffectType.BreakAction)) return;
-            var dmg = mobActResult.attr.ATK - pc.DEF;
-            if (playerUnit.HasEffect(EAbilityEffectType.Shield)) return;
-            if (playerUnit.HasEffect(EAbilityEffectType.Reflect))
-                mobUnit.ApplyDamage(mobActResult.attr.ATK);
-            else
-                playerUnit.ApplyDamage(dmg);
-        });
-
-        CreateOrder((int)Order.PlayerDealDamage, pc.ATK, playerUnit, () =>
-        {
-            visualResource.GetCardFX(pc.result.fxID);
-            if (mobUnit.HasEffect(EAbilityEffectType.Shield)) return;
-            var dealDamage = mobDmg;
-            if (envEffect.curType == EEnvEffectType.MobArmor)
-                dealDamage = Mathf.FloorToInt((float)dealDamage * 0.7f);
-            mobUnit.ApplyDamage(dealDamage);
-        });
-
-        foreach (var or in orderList.OrderBy(or => or.value))
-        {
-            or.action();
-            await UniTask.Delay(TimeSpan.FromSeconds(waitTurnTime));
-            if (!isContinue) return;
-        }
-
-        if (TutorialController.isTutorial || TutorialController.isTutorial2)
-        {
-            tutorController.canGoNext = true;
-            return;
-        }
-
-        PrepareBeginTurn();
+        var total = 0;
+        for (int i = 0; i < diceCount; i++)
+            total += UnityEngine.Random.Range(1, 7);
+        return total;
     }
+
+    var mobDmg = pc.ATK - mobActResult.attr.DEF;
+
+    // 清空 orderList，準備重建這一回合的行動順序
+    orderList.Clear();
+
+    // =====================
+    // 先處理補血
+    // =====================
+
+    // 玩家補血（來自卡片計算出的 HEAL）
+    if (pc.HEAL > 0)
+    {
+        CreateOrder((int)Order.PlayerHealing, pc.HEAL, playerUnit, () =>
+        {
+            playerUnit.ApplyHealing(pc.HEAL);
+        });
+    }
+
+    // 敵人補血（如果牠行動有 HEAL）
+    if (mobActResult.attr.HEAL > 0)
+    {
+        CreateOrder((int)Order.MobHealing, mobActResult.attr.HEAL, mobUnit, () =>
+        {
+            mobUnit.ApplyHealing(mobActResult.attr.HEAL);
+        });
+    }
+
+    // =====================
+    // 再處理攻擊
+    // =====================
+
+    // 敵人攻擊玩家
+    CreateOrder((int)Order.MobDealDamage, mobActResult.attr.ATK, mobUnit, () =>
+    {
+        if (mobUnit.HasEffect(EAbilityEffectType.BreakAction)) return;
+
+        var dmg = mobActResult.attr.ATK - pc.DEF;
+        if (playerUnit.HasEffect(EAbilityEffectType.Shield)) return;
+
+        if (playerUnit.HasEffect(EAbilityEffectType.Reflect))
+            mobUnit.ApplyDamage(mobActResult.attr.ATK);
+        else
+            playerUnit.ApplyDamage(dmg);
+    });
+
+    // 玩家攻擊敵人
+    CreateOrder((int)Order.PlayerDealDamage, pc.ATK, playerUnit, () =>
+    {
+        visualResource.GetCardFX(pc.result.fxID);
+
+        if (mobUnit.HasEffect(EAbilityEffectType.Shield)) return;
+
+        var dealDamage = mobDmg;
+        if (envEffect.curType == EEnvEffectType.MobArmor)
+            dealDamage = Mathf.FloorToInt((float)dealDamage * 0.7f);
+
+        mobUnit.ApplyDamage(dealDamage);
+    });
+
+    // =====================
+    // 依照 enum 順序執行
+    // =====================
+
+    foreach (var or in orderList.OrderBy(or => or.value))
+    {
+        or.action();
+        await UniTask.Delay(TimeSpan.FromSeconds(waitTurnTime));
+        if (!isContinue) return;
+    }
+
+    if (TutorialController.isTutorial || TutorialController.isTutorial2)
+    {
+        tutorController.canGoNext = true;
+        return;
+    }
+
+    PrepareBeginTurn();
+}
+
 
     void CreateOrder(int order, int value, BaseCombatUnit owner, System.Action action)
     {
