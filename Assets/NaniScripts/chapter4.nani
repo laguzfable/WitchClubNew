@@ -655,6 +655,7 @@ nic: 是她先挑釁的。
 
 @hide 魅兒
 
+
 @char nic pos:50
 nic: 終於走了，我們繼續吧……學姊？
 
@@ -667,6 +668,8 @@ nic: 終於走了，我們繼續吧……學姊？
 
 優菲: 抱歉……我只是……突然覺得好難過……
 優菲: 沒事，繼續開會吧。
+
+
 
 @if affinity_Ved >= 50
 @goto chapter4green
@@ -873,310 +876,20 @@ witchc: 迷霧草是最棒的！
 
 
 #ch5b
-@goto chapter5blue
 
 
 
 
 
-@char 涅莉 pos:20
-@char 優菲 pos:40
-@char 魅兒 pos:60
-@char nic pos:80
+@if affinity_Nel >= 50 
 
-涅莉: 謝天謝地，終於找到妳們了！
-優菲: 幫我、幫我把她架開。
-妮可: 學姊，她要進入能量耗竭狀態了。
-優菲: ……！
-妮可: 就讓它發生嗎？
-優菲: ……
-涅莉: 等等，妳們在說什麼？那個會怎麼樣啊？
 
-(魅兒倒地)
+@goto chapter5yellow
 
-@hide 魅兒
-@char 涅莉 pos:25
-@char 優菲 pos:50
-@char nic pos:75
+@endif
 
-優菲: {PlayerName}，幫我扛著她，我們需要離開這裡。
 
-@back bg022
 
-涅莉: 呼、呼、呼－－
-涅莉: 要死了，差點就要窒息了！
-涅莉: 妳們都還好嗎？魅兒、魅兒有沒有怎麼樣？
-妮可: 沒怎麼樣，昏過去而已。
-涅莉: 妳們還沒有解釋剛剛說的那個……
-優菲: 能量耗竭，只是一次用太多迷霧草的後遺症而已。
-優菲: 休息一下就沒事了……
-妮可: 嗯，要完全恢復的話可能要休息很多下。
-涅莉: 豈有此理！她們搞成這樣，妳們還一副無所謂的樣子？！
-妮可: 注意妳的語氣，精靈，如果我們沒出現，妳們早就不知道死哪去了。
-涅莉: ……
-涅莉: 我現在不想跟妳吵架。
-涅莉: {PlayerName}，魅兒的呼吸越來越微弱了。
-涅莉: 想想辦法……
 
-@choice 幫魅兒急救(人工呼吸)
-@choice 坐視不管(涅莉會去人工呼吸)
-@stop
 
-
-@char 涅莉 pos:20
-@char 優菲 pos:40
-@char 魅兒 pos:60
-@char nic pos:80
-
-
-魅兒: ……嗚……
-魅兒: 我、我剛剛怎麼了？
-涅莉: 太好了，魅兒，妳活過來了！
-涅莉: 還不就是某人的毒藥草差點把我們都害死了。
-妮可: 我就說注意妳的用詞了，現在是想打架嗎？
-涅莉: 來啊來啊我怕妳嗎？妳這個象牙塔瞎妹！
-魅兒: 等等等，妳們都先冷靜點……
-魅兒: 可惡，頭好痛……
-涅莉: 我們還是先回去休息吧。
-
-
-
-@hide 涅莉,nic,優菲,魅兒
-@back bg03
-
-
-
-@char witcha pos:75
-@char broom pos:50
-@char nic pos:25
-
-
-
-
-
-witcha: 呀啊啊啊－－
-nic: 不要再打了！
-broom: 妳們這些不三不四的人，給我滾出去！！！
-
-@hide nic,witcha
-@char broom pos:25
-@char 蘇菲亞 pos:50
-@char 涅莉 pos:75
-蘇菲亞: 別激動啊，艾札蘭大人～
-涅莉: 究竟發生了什麼事？
-蘇菲亞: 就……她們在討論的時候，舉起各種東西示意，不小心誤抓了艾札蘭大人。
-
-@hide 蘇菲亞,涅莉
-
-@char broom pos:20
-@char 優菲 pos:40
-@char nic pos:65
-@char witcha pos:80
-
-優菲: 妳們先回去吧，這裡我來處理就好。
-艾札蘭: 滾！！！
-
-@hide nic,witcha
-
-
-@char broom pos:65
-@char 優菲 pos:35
-
-
-優菲: 如果妳有什麼意見的話，盡管跟我講，不要欺負我的同伴。
-艾札蘭: 想擺象牙塔的架子，妳還不夠格啦。
-艾札蘭: 我活幾萬年了，還沒看過像妳這麼爛的學院系領導。
-
-@hide broom
-@char 優菲 pos:50
-
-優菲: ……
-
-@char nic pos:35
-@char 優菲 pos:65
-
-妮可: 學姊，別在意，它就只是一隻瘋掃帚而已……
-優菲: 是嗎……
-優菲: 就這麼多人……對我不滿嗎？
-
-@char nic pos:25
-@char 優菲 pos:50
-@char 薇狄亞 pos:75
-
-
-薇狄亞: 我回來了……咦？
-薇狄亞: {PlayerName}，氣氛是不是……怪怪的？
-
-
-@char nic pos:20
-@char 優菲 pos:40
-@char 薇狄亞 pos:60
-@char 涅莉 pos:80
-
-涅莉: 會滿意才有鬼吧，妳剛剛明明就想對魅兒見死不救！
-妮可: 下等生物給我閉嘴！
-涅莉: 妳看啦哪有人這樣講話的！
-薇狄亞: 冷靜點、冷靜點，這一定只是誤會……
-涅莉: 說起來妳也是罪魁禍首吧，薇狄亞！
-涅莉: 妳整天替她們做那個奇怪的藥草，妳知道那個東西有多恐怖嗎？
-薇狄亞: ……
-薇狄亞: 我還以為妳一直都挺喜歡的，不是嗎？
-涅莉: ……我……
-
-魅兒: 算了，涅莉。
-@hide nic,優菲,薇狄亞,涅莉
-@char 魅兒 pos:50
-
-魅兒: 沒什麼好吵的，我們守好自己的本分就好。
-魅兒: 有人要走偏門，那是她們的事……
-魅兒: 頭好痛，我先上去休息了。
-
-@hide 魅兒
-@char 涅莉 pos:50
-
-涅莉: ……
-涅莉: 我相信{PlayerName}的決定。
-
-@hide 涅莉
-
-@char nic pos:25
-@char 優菲 pos:50
-@char 薇狄亞 pos:75
-
-妮可: 真是狂妄的精靈耶，在那邊意有所指，真好笑。
-薇狄亞: 但是，今天到底發生了什麼事了……？
-妮可: 新的藥草一次燒太多了吧，僅此而已。
-薇狄亞: 那也不太好吧？抱歉，我都不在場，沒有幫上什麼忙。
-薇狄亞: 我再和西碧爾討論看看能不能把效果調緩一些好了。
-妮可: 我倒覺得妳不用做什麼調整。
-妮可: 反對的人就是想反對啊，不是嗎？
-薇狄亞: 她們變成這樣的……立場了嗎？
-妮可: 還用說嗎。
-薇狄亞: 我需要優菲的回答……
-優菲: ……
-優菲: 我不會輸的。
-
-@hide 優菲,nic
-@char 薇狄亞 pos:50
-
-薇狄亞: {PlayerName}啊……
-薇狄亞: 這樣下去我們到底會變成什麼樣子呢？
-@hide 薇狄亞
-
-
-@stopBgm
-@saveMapDayNight isDay:false
-@SaveReturnPoint script:"chapter4" label:"afterdate7"
-@GotoUnityScene sceneName:MapTest
-@stop
-
-
-# afterdate7
-
-
-@back bg03
-
-
-(隔天)
-(走廊)
-……
-(大廳)
-……
-
-
-@char 優菲 pos:50
-優菲: 我出門囉！
-@char nic pos:35
-@char 優菲 pos:65
-nic: 優菲學姊，東西太多了，我幫忙拿。
-@char nic pos:25
-@char 優菲 pos:50
-@char 蘇菲亞 pos:75
-
-蘇菲亞: 你們大包小包的是要去哪裡呀？
-優菲: 就上次艾札蘭大人嚇到大家都不敢來了，我們另外找了地方要開象牙塔的會。
-nic: 走吧～
-
-@hide nic,優菲
-
-@char 蘇菲亞 pos:50
-
-涅莉: 怎麼這樣……我早餐都做好了說。
-
-@char 蘇菲亞 pos:35
-@char 薇狄亞 pos:65
-
-薇狄亞: 我今天會晚點回來唷。
-蘇菲亞: 咦？
-薇狄亞: 沒辦法呀，我有很重要的事情……
-
-@hide 薇狄亞
-
-@char 蘇菲亞 pos:35
-@char 魅兒 pos:65
-
-魅兒: 蘇菲亞，還有酒嗎？
-蘇菲亞: 不是都有的嗎……等等，為什麼大清早的妳就醉成這樣？
-魅兒: 我喝完了啊，不管了啦，不然我自己下去搬好了。
-
-@hide 魅兒
-@char 蘇菲亞 pos:50
-
-蘇菲亞: {PlayerName}，大家到底都怎麼了……
-
-
-@char 蘇菲亞 pos:35
-@char 涅莉 pos:65
-
-涅莉: 喂喂喂{PlayerName}，快點，陪我一起去精靈競技場。
-涅莉: 贏了可以有一年份的炸雞耶，走嘛走嘛！
-
-（然後跟涅莉一起玩了一整天）
-
-@hide 蘇菲亞,涅莉
-
-
-
-(又玩了一整天，這天可以選跟誰玩)
-
-@stopBgm
-@saveMapDayNight isDay:false
-@SaveReturnPoint script:"chapter4" label:"afterdate8"
-@GotoUnityScene sceneName:MapTest
-@stop
-
-
-# afterdate8
-
-(然後總之大家就越來越墮落了)
-
-@stopBgm
-@saveMapDayNight isDay:false
-@SaveReturnPoint script:"chapter4" label:"afterdate9"
-@GotoUnityScene sceneName:MapTest
-@stop
-
-
-# afterdate9
-
-@stopBgm
-@saveMapDayNight isDay:false
-@SaveReturnPoint script:"chapter4" label:"afterdate10"
-@GotoUnityScene sceneName:MapTest
-@stop
-
-
-# afterdate10
-
-
-@back star1
-
-
-？？？: 啊……
-？？？: 那景象，越來越清晰了。
-？？？: 是凡人所謂的……末日嗎？
-？？？: ……不，不是的。
-？？？: 因為您的出現，這次的結局，將會截然……不同。
-
-@goto chapter5
-@stop
+@goto chapter5blue 

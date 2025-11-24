@@ -10,14 +10,11 @@
 @hide 優菲,魅兒
 
 
-@overrideEvent char:"other" evt:"666"
-@saveMapDayNight isDay:true
-@SaveReturnPoint script:"chapter3" label:"ttt"
-@GotoUnityScene sceneName:MapTest
-@stop
+@set affinity_Mel=0
+@set affinity_Ved=0
+@set affinity_Eup=0
+@set affinity_Nel=0
 
-#
-ttt
 
 @back bg01
 
