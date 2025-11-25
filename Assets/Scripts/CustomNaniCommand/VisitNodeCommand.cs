@@ -11,6 +11,9 @@ public class VisitNodeCommand : Command
     [ParameterAlias("id"), RequiredParameter]
     public StringParameter NodeId;
 
+    [ParameterAlias("label")]
+    public StringParameter label;  // ⭐ 新增：可以不填
+
     public override UniTask ExecuteAsync(AsyncToken asyncToken = default)
     {
         var id = Assigned(NodeId) ? NodeId.Value : null;
@@ -27,7 +30,7 @@ public class VisitNodeCommand : Command
             return UniTask.CompletedTask;
         }
 
-        VisitedNodeManager.Instance.MarkVisited(id);
+        VisitedNodeManager.Instance.MarkVisited(id, label);
         return UniTask.CompletedTask;
     }
 }

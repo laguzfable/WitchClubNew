@@ -24,25 +24,37 @@ public class NodeButton : MonoBehaviour
         if (!cg) cg = gameObject.AddComponent<CanvasGroup>();
     }
 
-    public void Init(BranchNode data)
+public void Init(BranchNode data)
+{
+    nodeId = data.nodeId;
+    scriptName = data.scriptName;
+    label = data.label;
+
+    if (labelText)
+        labelText.text = data.displayName;
+
+    bool visited = VisitedNodeManager.Instance.IsVisited(nodeId, label);
+
+    if (visited)
     {
-        nodeId = data.nodeId;
-        scriptName = data.scriptName;
-        label = data.label;
-
-        if (labelText)
-            labelText.text = data.displayName;
-
-        bool visited = VisitedNodeManager.Instance.IsVisited(nodeId);
-        cg.alpha = visited ? 1f : 0.5f;
-
+        cg.alpha = 1f;
         btn.interactable = true;
         cg.interactable = true;
         cg.blocksRaycasts = true;
-
-        btn.onClick.RemoveAllListeners();
-        btn.onClick.AddListener(OnNodeClick);
     }
+    else
+    {
+        cg.alpha = 0.4f;
+        btn.interactable = false;
+        cg.interactable = false;
+        cg.blocksRaycasts = false;
+    }
+
+    btn.onClick.RemoveAllListeners();
+    if (visited)
+        btn.onClick.AddListener(OnNodeClick);
+}
+
 
     private void OnNodeClick()
     {

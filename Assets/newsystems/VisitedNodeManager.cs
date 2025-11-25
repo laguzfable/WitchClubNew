@@ -6,7 +6,12 @@ public class VisitedNodeManager : MonoBehaviour
     public static VisitedNodeManager Instance { get; private set; }
 
     private const string PlayerPrefsKey = "WC/VisitedNodes/v1";
-    private HashSet<string> visitedNodes = new HashSet<string>();
+
+    // ★ 現在改成「完整 key」：
+    //   chapter0
+    //   chapter0#afterbattle
+    //   chapter1#bossdead
+    private HashSet<string> visited = new HashSet<string>();
 
     void Awake()
     {
@@ -22,39 +27,54 @@ public class VisitedNodeManager : MonoBehaviour
         Load();
     }
 
+    // ============================================================
+    //  ⭐ 新版：支援 node + label
+    // ============================================================
+    private void Save()
+    {
+        var raw = string.Join("|", visited);
+        PlayerPrefs.SetString(PlayerPrefsKey, raw);
+        PlayerPrefs.Save();
+    }
+
     private void Load()
     {
-        visitedNodes.Clear();
+        visited.Clear();
         var raw = PlayerPrefs.GetString(PlayerPrefsKey, "");
         if (string.IsNullOrEmpty(raw)) return;
 
         var parts = raw.Split('|');
         foreach (var p in parts)
         {
-            if (!string.IsNullOrEmpty(p)) visitedNodes.Add(p);
+            if (!string.IsNullOrEmpty(p))
+                visited.Add(p);
         }
     }
 
-    private void Save()
-    {
-        var raw = string.Join("|", visitedNodes);
-        PlayerPrefs.SetString(PlayerPrefsKey, raw);
-        PlayerPrefs.Save();
-    }
-
-    public void MarkVisited(string nodeId)
+    // ============================================================
+    //  ⭐ 供 VisitNodeCommand 呼叫
+    // ============================================================
+    public void MarkVisited(string nodeId, string label = "")
     {
         if (string.IsNullOrEmpty(nodeId)) return;
-        if (visitedNodes.Add(nodeId))
+
+        string key = string.IsNullOrEmpty(label) ? nodeId : $"{nodeId}#{label}";
+
+        if (visited.Add(key))
         {
             Save();
-            Debug.Log($"[VisitedNodeManager] Visited: {nodeId}");
+            Debug.Log($"[VisitedNodeManager] Visited: {key}");
         }
     }
 
-    public bool IsVisited(string nodeId)
+    // ============================================================
+    //  ⭐ 給地圖使用，判斷是否亮起
+    // ============================================================
+    public bool IsVisited(string nodeId, string label = "")
     {
         if (string.IsNullOrEmpty(nodeId)) return false;
-        return visitedNodes.Contains(nodeId);
+
+        string key = string.IsNullOrEmpty(label) ? nodeId : $"{nodeId}#{label}";
+        return visited.Contains(key);
     }
 }
