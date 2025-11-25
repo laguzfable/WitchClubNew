@@ -10,6 +10,7 @@ public class NodeButton : MonoBehaviour
 
     private string nodeId;
     private string scriptName;
+    private string label;
 
     private Button btn;
     private CanvasGroup cg;
@@ -21,26 +22,18 @@ public class NodeButton : MonoBehaviour
 
         cg = GetComponent<CanvasGroup>();
         if (!cg) cg = gameObject.AddComponent<CanvasGroup>();
-
-        var img = GetComponent<Image>();
-
-        Debug.Log($"[NodeButton Awake] name = {gameObject.name}, layer = {gameObject.layer}, " +
-                  $"imageRaycast = {img?.raycastTarget}, " +
-                  $"buttonInteractable = {btn.interactable}, " +
-                  $"cgInteractable = {cg.interactable}");
     }
 
     public void Init(BranchNode data)
     {
-        this.nodeId = data.nodeId;
-        this.scriptName = data.scriptName;
+        nodeId = data.nodeId;
+        scriptName = data.scriptName;
+        label = data.label;
 
         if (labelText)
             labelText.text = data.displayName;
 
         bool visited = VisitedNodeManager.Instance.IsVisited(nodeId);
-
-        // 看過亮、沒看過灰，但全部能按
         cg.alpha = visited ? 1f : 0.5f;
 
         btn.interactable = true;
@@ -49,127 +42,77 @@ public class NodeButton : MonoBehaviour
 
         btn.onClick.RemoveAllListeners();
         btn.onClick.AddListener(OnNodeClick);
-
-        var img = GetComponent<Image>();
-        if (img) img.raycastTarget = true;
-
-        Debug.Log($"[RaycastCheck] NodeButton {scriptName} raycastTarget = {img?.raycastTarget}");
     }
 
-    /// <summary>
-    /// 這裡的過場邏輯，模仿 TitleNewGameButton：
-    /// 1. 關掉場景中所有 Title / Canvas 類 root 物件
-    /// 2. 從 UIManager 拿到 BranchMapUI，直接 Destroy（連帶所有子物件）
-    /// 3. 隱藏 ITitleUI
-    /// 4. Reset ScriptPlayer 服務
-    /// 5. ResetStateAsync 後，在 callback 裡 PreloadAndPlayAsync(scriptName)
-    /// </summary>
     private void OnNodeClick()
     {
-        Debug.Log($"[NodeButton] Click nodeId={nodeId}, script={scriptName}");
+        Debug.Log($"[NodeButton] Click nodeId={nodeId}, script={scriptName}, label={label}");
 
-        // 先拿到 Nani 服務
-        var uiManager    = Engine.GetService<IUIManager>();
-        var stateManager = Engine.GetService<IStateManager>();
-        var scriptPlayer = Engine.GetService<IScriptPlayer>();
-
-        // ================================
-        // 1) 關掉場景中所有 Title / Canvas root 物件
-        //    （完全模仿 TitleNewGameButton 的掃描方式）
-        // ================================
-        var activeScene = SceneManager.GetActiveScene();
-        var roots       = activeScene.GetRootGameObjects();
-
-        foreach (var obj in roots)
+        // ============================================================
+        // 1) 設定 NextScript / NextLabel
+        //    Naninovel v1.17 “正統標籤跳轉方式”
+        // ============================================================
+        var vars = Engine.GetService<ICustomVariableManager>();
+        if (vars != null)
         {
-            if (obj == null) continue;
+            vars.SetVariableValue("NextScript", scriptName);
+            vars.SetVariableValue("NextLabel", string.IsNullOrEmpty(label) ? "" : label);
 
-            if (obj.name.Contains("Title") || obj.name.Contains("Canvas"))
-            {
-                Debug.Log("[NodeButton] Deactivate root object: " + obj.name);
-                obj.SetActive(false);
-            }
+            Debug.Log($"[NodeButton] Set NextScript={scriptName}, NextLabel={label}");
         }
+        else
+            Debug.LogWarning("[NodeButton] 找不到 ICustomVariableManager");
 
-        // ================================
-        // 2) 處理 BranchMapUI：不只 Hide，而是整個 Destroy 掉
-        // ================================
+
+        // ============================================================
+        // 2) 徹底關閉 TitleMenu 與 BranchMapUI
+        // ============================================================
+        var uiManager = Engine.GetService<IUIManager>();
         if (uiManager != null)
         {
-            // 先用型別抓 BranchMapUI（你已經用 CustomUI 繼承了）
-            var branchMap = uiManager.GetUI<BranchMapUI>();
-            if (branchMap != null)
+            // --- 關掉 TitleMenu ---
+            var titleMenu = uiManager.GetUI<TitleMenu>();
+            if (titleMenu != null)
             {
-                Debug.Log("[NodeButton] Destroy BranchMapUI (含所有子物件).");
-
-                // 這個 gameObject 底下就是你所有 nodeButton 的實體
-                var branchGO = (branchMap as MonoBehaviour).gameObject;
-                Object.Destroy(branchGO);
-            }
-            else
-            {
-                Debug.Log("[NodeButton] BranchMapUI not found in IUIManager, skip Destroy.");
+                Debug.Log("[NodeButton] Hide TitleMenu");
+                titleMenu.Hide();
             }
 
-            // ================================
-            // 3) 處理 ITitleUI：跟你之前寫的一樣，Hide 掉
-            // ================================
-            var titleUI = uiManager.GetUI<ITitleUI>();
-            if (titleUI != null)
+            // --- Destroy BranchMapUI prefab ---
+            var mapUI = uiManager.GetUI<BranchMapUI>();
+            if (mapUI != null)
             {
-                Debug.Log("[NodeButton] Hide ITitleUI.");
-                titleUI.Hide();
-            }
-            else
-            {
-                Debug.Log("[NodeButton] ITitleUI not found, skip Hide.");
+                Debug.Log("[NodeButton] Destroy BranchMapUI");
+                Object.Destroy((mapUI as MonoBehaviour).gameObject);
             }
         }
         else
+            Debug.LogWarning("[NodeButton] uiManager is null");
+
+
+        // ============================================================
+        // 3) Reset ScriptPlayer（必要，不然會出問題）
+        // ============================================================
+        var player = Engine.GetService<IScriptPlayer>();
+        if (player != null)
         {
-            Debug.LogWarning("[NodeButton] IUIManager service is NULL.");
+            Debug.Log("[NodeButton] Reset ScriptPlayer");
+            player.ResetService();
         }
 
-        // ================================
-        // 4) Reset ScriptPlayer 服務
-        //    （模仿 TitleNewGameButton 的 ResetService）
-        // ================================
-        if (scriptPlayer != null)
+
+        // ============================================================
+        // 4) 回到小說場景 → Naninovel 會自動讀取 NextScript#NextLabel
+        // ============================================================
+        try
         {
-            Debug.Log("[NodeButton] Reset ScriptPlayer service.");
-            scriptPlayer.ResetService();
+            Debug.Log("[NodeButton] Go back to NaniDialogTest");
+            NaniBridgeUtility.GoBackToSavedStory("NaniDialogTest");
         }
-        else
+        catch
         {
-            Debug.LogWarning("[NodeButton] IScriptPlayer service is NULL.");
-        }
-
-        // ================================
-        // 5) ResetStateAsync → callback 裡啟動該按鈕的 scriptName
-        //    簡化版：不帶 exclude，全部重置
-        // ================================
-        if (stateManager != null && scriptPlayer != null)
-        {
-            Debug.Log("[NodeButton] Call ResetStateAsync, then start script: " + scriptName);
-
-            // Naninovel 1.17：ResetStateAsync(string[] exclude = null, Action onCompleted = null)
-string[] exclude = new string[0];
-
-stateManager.ResetStateAsync(exclude, async () =>
-{
-    Debug.Log("[NodeButton] Reset complete → Play: " + scriptName);
-    await scriptPlayer.PreloadAndPlayAsync(scriptName);
-});
-
-
-        }
-        else
-        {
-            // 後備方案：若 stateManager 為空，就直接跳腳本（至少不會卡死）
-            Debug.LogWarning("[NodeButton] StateManager or ScriptPlayer missing, fallback to direct PreloadAndPlayAsync.");
-
-            if (scriptPlayer != null)
-                scriptPlayer.PreloadAndPlayAsync(scriptName);
+            Debug.LogWarning("[NodeButton] FallBack LoadScene");
+            SceneManager.LoadScene("NaniDialogTest");
         }
     }
 }
