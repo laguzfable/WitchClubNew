@@ -56,75 +56,86 @@ public void Init(BranchNode data)
 }
 
 
-    private void OnNodeClick()
+private async void OnNodeClick()
     {
         Debug.Log($"[NodeButton] Click nodeId={nodeId}, script={scriptName}, label={label}");
 
-        // ============================================================
-        // 1) 設定 NextScript / NextLabel
-        //    Naninovel v1.17 “正統標籤跳轉方式”
-        // ============================================================
-        var vars = Engine.GetService<ICustomVariableManager>();
-        if (vars != null)
-        {
-            vars.SetVariableValue("NextScript", scriptName);
-            vars.SetVariableValue("NextLabel", string.IsNullOrEmpty(label) ? "" : label);
-
-            Debug.Log($"[NodeButton] Set NextScript={scriptName}, NextLabel={label}");
-        }
-        else
-            Debug.LogWarning("[NodeButton] 找不到 ICustomVariableManager");
-
-
-        // ============================================================
-        // 2) 徹底關閉 TitleMenu 與 BranchMapUI
-        // ============================================================
+        // 1. 關閉 UI (保持不變)
         var uiManager = Engine.GetService<IUIManager>();
         if (uiManager != null)
         {
-            // --- 關掉 TitleMenu ---
-            var titleMenu = uiManager.GetUI<TitleMenu>();
-            if (titleMenu != null)
-            {
-                Debug.Log("[NodeButton] Hide TitleMenu");
-                titleMenu.Hide();
-            }
+            uiManager.GetUI<TitleMenu>()?.Hide();
+            uiManager.GetUI<BranchMapUI>()?.Hide();
+        }
 
-            // --- Destroy BranchMapUI prefab ---
-            var mapUI = uiManager.GetUI<BranchMapUI>();
-            if (mapUI != null)
-            {
-                Debug.Log("[NodeButton] Destroy BranchMapUI");
-                Object.Destroy((mapUI as MonoBehaviour).gameObject);
-            }
+        // 2. 準備切換
+        var player = Engine.GetService<IScriptPlayer>();
+        var stateManager = Engine.GetService<IStateManager>();
+        
+        // 停止播放，避免舊指令干擾
+        player?.Stop(); 
+
+        // 3. 設定變數 (保持相容性，以防其他系統需要)
+        var vars = Engine.GetService<ICustomVariableManager>();
+        vars?.SetVariableValue("NextScript", scriptName);
+        vars?.SetVariableValue("NextLabel", string.IsNullOrEmpty(label) ? "" : label);
+
+        // =========================================================
+        // 重點修正：如何過場
+        // =========================================================
+
+        string targetScene = "NaniDialogTest";
+        
+        // 如果當前已經是小說場景，直接播放
+        if (SceneManager.GetActiveScene().name == targetScene)
+        {
+            await LoadAndPlaySafe(player, scriptName, label);
         }
         else
-            Debug.LogWarning("[NodeButton] uiManager is null");
+        {
+            // 如果需要切換場景，我們不要依賴場景本身的 Auto-Start 腳本
+            // 而是掛載一個事件，等場景載入完後，由我們這邊發動播放
+            
+            SceneManager.sceneLoaded += OnSceneLoaded;
+            SceneManager.LoadScene(targetScene);
+        }
+    }
 
+    // 場景載入完成的回調
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name == "NaniDialogTest")
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded; // 移除監聽，避免重複執行
+            
+            // 延遲一點點執行，確保 Naninovel 引擎初始化完畢
+            LoadAfterSceneInit().Forget(); // 這裡需要引入 UniTask 或使用 Coroutine
+        }
+    }
 
-        // ============================================================
-        // 3) Reset ScriptPlayer（必要，不然會出問題）
-        // ============================================================
+    private async UniTaskVoid LoadAfterSceneInit()
+    {
+        // 等待一幀，讓 Engine 準備好
+        await UniTask.Yield(); 
+
         var player = Engine.GetService<IScriptPlayer>();
-        if (player != null)
-        {
-            Debug.Log("[NodeButton] Reset ScriptPlayer");
-            player.ResetService();
-        }
+        
+        // 呼叫安全播放
+        await LoadAndPlaySafe(player, scriptName, label);
+    }
 
+    // ★★★ 核心解決方案：安全播放方法 ★★★
+    private async UniTask LoadAndPlaySafe(IScriptPlayer player, string scriptName, string label)
+    {
+        // 1. 先預載腳本
+        await player.PreloadAndPlayAsync(scriptName, label: label);
 
-        // ============================================================
-        // 4) 回到小說場景 → Naninovel 會自動讀取 NextScript#NextLabel
-        // ============================================================
-        try
+        // 2. ★ 檢測是否卡在空行 ★
+        // 如果播放清單是空的 (代表該 Label 下面沒東西)，手動停止它，防止當機
+        if (player.Playlist == null || player.Playlist.Count == 0)
         {
-            Debug.Log("[NodeButton] Go back to NaniDialogTest");
-            NaniBridgeUtility.GoBackToSavedStory("NaniDialogTest");
-        }
-        catch
-        {
-            Debug.LogWarning("[NodeButton] FallBack LoadScene");
-            SceneManager.LoadScene("NaniDialogTest");
+            Debug.LogWarning($"[NodeButton] 檢測到 {scriptName}#{label} 是空標籤，強制停止以防當機！");
+            player.Stop();
         }
     }
 }

@@ -1,82 +1,50 @@
 @back nelly_night
 @bgm night
 @spawn hello
-
-
 (涅莉變小在喝酒)
 涅莉: 正在想{PlayerName}的事情呢，出現得正是時候。
 涅莉: 吶，陪我玩個遊戲吧？
-
 @choice 不好的預感……一定要嗎？
 @choice 悉聽尊便。
 @stop
-
 #yellow04yes
-
 涅莉: 哈哈哈，幹嘛這麼見外呀，那我出招了唷，只要回答我的問題就好。
 涅莉: 我們第一次見面是在……哪裡？
-   
-
-
-
 @choice 女巫的包包裡。 goto:.ritual
 @choice 街上。 goto:.ritual
 @choice 道具店。 goto:.ritual
-
 @stop
-
-
 #ritual
-
 (這邊應該是幫涅莉加戲分 然後考驗玩家之前有沒有仔細玩)
 (涅莉可能需要再多個2-3張CG)
-
-
 涅莉: 哈哈哈，好啦，不鬧了，我們開始吧。
 涅莉: 上次說到那個魔化的小精靈攻擊了同伴……
-
 (回憶中)
-
 結果啊，被她攻擊的小精靈也魔化了，出現了相同的症狀。
 最後，我們的整個村莊都淪陷了－－
-
 (CG)
-
 金髮的少女: 救命啊－－
 涅莉: 妳妳妳妳們瘋了，快放開她！
 小精靈a: 以瑪坤．薩爾之名……
 小精靈b: 好好感受這份榮耀吧，凡人！
-
-
-
 @back black
-
 @stopBgm
 @bgm energetic
-
 @despawn hello
 @battle background:bg02 target:yellow04 label:night4
 @stop
-
-
 # night4
 @stopbgm
 @back nelly_night
-
 (進入戰鬥)
-
 涅莉: 嗯？後來啊……
 涅莉: 嗚噁噁噁－－我好像喝太多了，借我、借我靠一下。
 涅莉: 就先……先這樣待著就好……
 涅莉: zzz……
-
 (CG: 涅莉躺在床上)
-
 @choice 幫她蓋好被子就走 goto:.yellow04end
 @choice 陪她直到她醒來 goto:.yellow04end
-
-
+@end
 # yellow04end
-
 @restroom
 @stop

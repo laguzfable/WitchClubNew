@@ -1,40 +1,28 @@
 #start
 @back bg01
-
-
 @sfx morning
 @char 涅莉 pos:50
 涅莉.happy: 早啊～{PlayerName}，怎麼臉色看起來不太好的樣子？
-
-
 @choice 妳可以看出骷髏的臉色，真是不簡單。 goto:.C01a
 @choice 我作了一個奇怪的夢……。 goto:.C01b
 @stop
-
-
 # C01a
 涅莉: 當然啦，我可是閱髏無數呢。
 @goto .C01
-
 # C01b
 涅莉: 怪夢啊，有時候是運氣要變好的預兆唷。
 @goto .C01
-
 # C01
 @stopsfx
 @sfx slam1 loop:false
 @sfx slam2 loop:false
 @sfx glassbreak loop:false
-
 涅莉.suprised: 媽呀，大清早是在拆房子嗎？我們快去看看怎麼回事。
 @hide 涅莉
 @back bg03
-
 @stopBgm
 @bgm hurry
-
 @sfx bark loop:false
-
 獵犬: 汪汪汪！汪！
 優菲: 咿咿咿－－是女巫獵犬！
 @sfx magicattack loop:false
@@ -42,11 +30,7 @@
 @sfx bark loop:false
 @sfx hitmetal loop:false
 獵犬: 汪汪汪汪汪－－汪！
-
 優菲: 居然是抗魔裝甲，啊－－
-
-
-
 @char 魅兒 pos:35
 @char 薇狄亞 pos:65
 薇狄亞.sad: 優菲！
@@ -54,7 +38,6 @@
 魅兒.sad: 很久沒用血咒術了，我要從哪裡下刀比較好啊－－
 @hide 薇狄亞
 @char 涅莉 pos:65
-
 涅莉: 欸等等，妳手上那不就是武器嗎？朝那狗刺下去啊。
 魅兒: 不行啊，我的血魔法獻祭只能用我自己的血……不管了，血咒術！
 @sfx stab loop:false
@@ -72,47 +55,34 @@
 @char 魅兒 pos:25
 @sfx slip loop:false
 薇狄亞: 別怕，我來補血！呀啊啊－－地板好滑－－
-
 優菲: 妳不是可以跟動物溝通嗎？快點呀！跟牠溝通啊！
 薇狄亞: 不行呀！牠一直對著我罵髒話！
 @sfx bark loop:false
 獵犬: 汪汪汪！
 涅莉: ……真是看不下去了，{PlayerName}，幫忙一下吧。
-
 @stopBgm
 @bgm energetic
-
 @hide 薇狄亞,涅莉,魅兒
-
 @set RuneActive=false
 @set YellowActive=false
 @battle background:bg02 target:monster02 label:afterbattle2
 @stop
-
 # afterbattle2
-
 @back bg03 time:0
 @char 薇狄亞 pos:60 time:0
 @char 優菲 pos:40 time:0
 @char 魅兒 pos:20 time:0
 @char 涅莉 pos:80 time:0
-
-
 @stopBgm
 @bgm peace
-
-
 獵犬: 汪汪！
 優菲: 啊！跑走了！
 魅兒.talking: 那個招牌還是太張揚了，才會馬上就引來敵人。
 優菲.talk: 搞不好跟那無關啊。
 魅兒: 不然呢？女巫獵人不獵巫是要幹嘛……
 優菲: 有個人應該會知道！
-
 @hide 涅莉,優菲,魅兒,薇狄亞
-
 @back bg02
-
 @char 涅莉 pos:50
 涅莉.talk: 說起來妳在同個地方繞老半天了……
 @char 優菲 pos:35
@@ -123,7 +93,6 @@
 薇狄亞.love: 妳們快看！快看！那個！
 優菲.what: 喔喔喔？薇狄亞發現什麼了嗎？
 薇狄亞: 這攤的馬鈴薯超便宜耶，一大籃只要3銀！請幫我包下來！
-
 @char 魅兒 pos:25
 @char 優菲 pos:50
 @char 薇狄亞 pos:75
@@ -140,7 +109,6 @@
 @hide 薇狄亞
 @char 涅莉 pos:75
 涅莉: 喔唷？火藥味越來越濃了耶！
-
 @hide 涅莉
 @char 魅兒 pos:35
 @char 優菲 pos:65
@@ -155,25 +123,17 @@
 @hide 涅莉,優菲,魅兒,薇狄亞
 @char 陰陰 pos:65
 @char 鬱鬱 pos:35
-
-
 ？？？: 要打架可以去別的地方嗎，我們這裡還要做生意的！
 @hide 陰陰,鬱鬱
-
-
 @stopBgm
 @bgm energetic
-
 @back black
 @battle background:bg02 target:monster01 label:afterbattle3
 @stop
-
 # afterbattle3
 @stopBgm
 @bgm lilina
-
 @back bg02
-
 @char 莉莉娜 pos:50
 莉莉娜: 什麼事情那麼吵呀？啊！優菲！好久不見耶。
 @char 莉莉娜 pos:35
@@ -186,9 +146,7 @@
 莉莉娜: 沒有啦，騙吃騙喝而已，別站在外面說話了，趕快進來吧。
 @back bg04 time:0
 @hide 優菲
-
 @back bg04
-
 @char 莉莉娜 pos:50 time:0
 莉莉娜.idle: 不好意思，還有客人在，妳們就隨便坐，當自己家呀。
 @hide 莉莉娜
@@ -234,14 +192,10 @@
 @char 優菲 pos:35
 @char 涅莉 pos:65
 涅莉.yummy: 就在黯鴉農舍旁邊！
-
 @hide 涅莉,優菲
-
-
 @back bg02
 @stopBgm
 @bgm white
-
 @char 魅兒 pos:50
 魅兒.talking: 那個還是丟掉吧。
 @char 魅兒 pos:35
@@ -256,63 +210,45 @@
 魅兒: 那妳慢慢吃吧，在象牙塔唸了這麼多年書，還是只能用這種邪魔歪道，真替妳的教授感到可悲。
 優菲: 連畢業都沒有的人憑什麼講這種話！
 魅兒: 妳！！！
-
-
 @char 薇狄亞 pos:50
 薇狄亞.sad: 妳們兩個都冷靜一點！
-
 @hide 魅兒,薇狄亞,優菲
-
 @char 涅莉 pos:50
 涅莉: 妳們看，蘇菲亞慌慌張張地跑過來了耶。
 @hide 涅莉
-
 @stopBgm
 @bgm hurry
-
 @char 蘇菲亞 pos:35
 @char 優菲 pos:65
 蘇菲亞.sad: 不好了，妳們的房間燒起來了！
 優菲.what: 怎麼會？！
-
-
 @hide 蘇菲亞,優菲
-
 @back bg01b
-
-
 @char 魅兒 pos:35
 @char 優菲 pos:65
 魅兒.sad: 我不是說水晶要用布蓋住嗎！
 優菲.what: 想說都買那麼久了沒看過什麼鬼應該是沒差……
 魅兒.rage: 問題是太陽照到會起火啊！！！
-
 @hide 魅兒,優菲
 @char 蘇菲亞 pos:65
 @char 薇狄亞 pos:35
 @back bg01c
-
 蘇菲亞.talking: 還好發現得早，沒什麼損失。
 薇狄亞.sad: 不過燒焦味好重唷……
 蘇菲亞: 反正這房間早就該整修了，妳們就先搬到樓上吧，有好幾間雜物間，整理一下還可以用的。
 @hide 薇狄亞
 @char 優菲 pos:35
-
 優菲.smile: 謝謝妳，蘇菲亞，妳人真好。
 蘇菲亞.angry: 不過一樓這邊的修補費用要由妳們出！
 優菲: 欸～～～？
 @hide 蘇菲亞
 @char 魅兒 pos:65
 魅兒.talking: 蘇菲亞沒計較已經不錯了，就努力賺錢吧。
-
 @hide 魅兒,優菲
-
 @back bg05
-
 @char 魅兒 pos:25
 @char 薇狄亞 pos:50
 @char 優菲 pos:75
-
 魅兒.sad: 啊～有股發霉的味道。
 薇狄亞.talk: 整理一下還是可以使用的嘛。
 優菲.what: 對嘛對嘛，反正蘇菲亞說雜物都給我們處理……搞不好可以挖到寶，哇噢！魅兒妳看，這罐不就是我之前想買的邪神的嘔吐物嗎！
@@ -321,41 +257,27 @@
 @hide 魅兒,薇狄亞,優菲
 @char 涅莉 pos:50
 涅莉.yummy: 矮額，有黑黑的東西出來了！
-
-
 @hide 涅莉
 @stopBgm
 @bgm battle03
 @battle background:bg05 target:monster03 label:afterbattle4
 @stop
-
 # afterbattle4
 @stopBgm
 @back bg05 time:0
-
-
-
-
 ？？？: 尤芙蘿絲，我不會放過妳的！
 @char 涅莉 pos:50
 涅莉.eee: 誰啊！
 @char 涅莉 pos:35
 @char 優菲 pos:65
-
 @stopBgm
 @bgm happy
-
-
 優菲.bling: 原來這就是邪神吐出來的東西嗎？真是長知識了，我得趕快記錄下來。
 @char 涅莉 pos:25
 @char 優菲 pos:50
 @char 薇狄亞 pos:75
 薇狄亞: 我覺得還是趕快整理房間比較好……
-
-
 @hide 涅莉,優菲,薇狄亞
-
-
 @char 魅兒 pos:50
 魅兒.idle: 這樣就差不多了。
 魅兒: 搬這麼多東西真是累人哪……嗯？這個是……？
@@ -366,7 +288,6 @@
 優菲: 看起來放了一陣子了，上面都是灰，不過沒有組裝過的樣子。
 魅兒: 有一張說明書……
 優菲.smile: 研究看看吧！
-
 (一陣子後)
 優菲.smile: 完成！
 @char 魅兒 pos:25
@@ -375,26 +296,19 @@
 薇狄亞.love: 再穿上斗篷的話，看起來就很有樣子了呢。
 @hide 薇狄亞,魅兒,優菲
 @back cg06
-
 優菲: 這樣{PlayerName}就能盡情體驗生活了。
 魅兒: 也可以幫忙抄寫咒文了。
-
-
 @choice 原來這是妳打的主意嗎……
 @choice 有了身體當然要到處去玩呀！
 @stop
 @back bg05
-
-
 @char 薇狄亞 pos:35
 @char 優菲 pos:65
 薇狄亞.talk: 說起來涅莉從剛剛開始就跑哪去了呀？
 優菲.idle: 不知道耶，要不要去餐廳找找看？
 薇狄亞: 反正晚餐時間也快到了，大家就一起下去吧。
-
 @hide 薇狄亞,優菲
 @back bg08
-
 @char 薇狄亞 pos:50
 薇狄亞: 涅莉？妳在這裡嗎？
 @sfx rustle loop:false
@@ -420,23 +334,17 @@
 魅兒.rage: 上課是能幹嘛，有本事來決鬥啊！
 優菲: 誰怕誰啊。
 涅莉: 哈哈，又要開打了，真精彩。
-
 @hide 薇狄亞,優菲,魅兒
 @back cg07
 @stopBgm
 @bgm fantasy
-
 薇狄亞: 老、老鼠？不……涅莉？
 優菲: 咦？涅莉又變得跟之前一樣小了耶。
 薇狄亞: 為什麼呢……
 涅莉: 因為啊，妳們想想看嘛，身體變小的話，食物自然而然就變得超級多了耶。
 涅莉: 有這麼方便的技能，當然要好好利用一下囉。
 優菲: 有道理欸！
-
-
 @back bg08
-
-
 @char 蘇菲亞 pos:50
 蘇菲亞.happy: 整理好了嗎？哇！{PlayerName}的新造型真好看呢。
 蘇菲亞.beer: 今天有上等的起司還有橄欖唷，吃飽了明天好好工作還錢吧。
@@ -444,45 +352,13 @@
 @char 優菲.smile pos:35
 @char 涅莉.yummy pos:65
 優菲&涅莉: 耶耶耶～
-
 @hide 優菲,涅莉
-
 @back black
 @stopBgm
 @bgm stardust
-
-
 ？？？: 新的身體看起來真不錯，異鄉人。
 ？？？: 是否還在疑惑，為何會身處在這？
 ？？？: 不用擔心，一切都很快就會明瞭了。
-
-
-
-
 @stopBgm
 @goto chapter2
 @stop
-（DEMO結束）
-
-
-
-@stopBgm
-@goto chapter2
-@stop
-
-@trialEnd
-
-@stop
-
-@gotoUnityScene sceneName:MainScene
-
-; @gotoUntyScene sceneName:MainScene
-
-; @loadScene MainScene
-; @hideall remove:true
-
-
-
-#test
-777
-666

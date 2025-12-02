@@ -1,41 +1,28 @@
 @back huffy_night
 @bgm night
 @spawn hello
-
 優菲: 莉莉娜被退學之後，我又過著獨來獨往的生活，直到那天……
 優菲: 紅色如火焰般耀眼的長髮、樸素的打扮、土氣的眼鏡……
 優菲: 也包含莉莉娜在內……{PlayerName}一定很難想像，那個人啊……嘻嘻～
-
 @back black
-
 魅兒: 妳就是優菲，對吧？
 優菲: 啊……蛤？妳是……？
 魅兒: 我要挑戰妳！
 優菲: ……？！
-
-
 @stopBgm
 @bgm energetic
-
-
 @despawn hello
 @battle background:bg02 target:blue03 label:night3
 @stop
-
-
 # night3
 @stopbgm
 @back huffy_night
-
 優菲: 那個時候的魅兒，除了魔法什麼都沒興趣。
 優菲: 她一心一意只想追求更高的境界。
 優菲: 身為象牙塔榜首的我，理所當然地成為她挑戰的目標。
 優菲: 那次切磋的結果其實是不分上下的，我們就這麼成為好朋友。
 優菲: 嗯，很好很好的朋友……
 優菲: 呼～今天有點累了，我們下次繼續吧。
-
-
 @set affinity_Eupie=affinity_Eupie+10
-
 @restroom
 @stop

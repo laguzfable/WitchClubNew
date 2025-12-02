@@ -1,48 +1,33 @@
-#start
-
 @back bg06
 @sfx morning
 @char 涅莉 pos:50
 涅莉.talk: 早啊{PlayerName}，昨晚睡得如何呀？有夢到我嗎？
 涅莉.happy: 開玩笑的啦，哈哈哈～
-
 @stopSfx
 @sfx dooropen
 @bgm chill
-
 @hide 涅莉
 @char 薇狄亞 pos:35
 @char 魅兒 pos:65
-
 薇狄亞.smile: 大家早安。
 魅兒.idle: 今天是很重要的工作日，動作快一點。
 薇狄亞.idle: 可是優菲好像還在睡……
 魅兒: 反正{PlayerName}也沒什麼事要做，就負責叫那個懶鬼起床吧。
-
 @hide 薇狄亞,魅兒
 @back bg07
-
 @sfx knocking
 ......
-
 @back cg09
 優菲: ……象牙塔的最後一座堡壘，才沒有那麼容易淪陷呢……
 優菲: 只要有我在……
 優菲: 奧術．椒鹽捲餅衝擊！
-
-
 @choice 出聲叫醒她。
 @choice 對她搔癢。
 @stop
-
-
-
-
 優菲: 欸欸欸？！原來是{PlayerName}啊？嚇我一跳。
 優菲: 嗚～我一定是睡過頭了對不對？
 優菲: 對不起，昨天玩太瘋了。
 優菲: 啊啊，先等我一下，我換個衣服。
-
 @back bg05
 @char 優菲 pos:50
 優菲.sad: 大家都去找工作了呀……唉。
@@ -54,16 +39,12 @@
 優菲: 我要把我的收藏品拿去估價，幫我拿著。
 優菲: 就這箱，還有這幾袋，那邊那個盆子也要。
 優菲: 別用那種眼神看我嘛，這些東西只是舊了點，搞不好可以賣到好價錢耶。
-
-
 @back bg04
-
 @char 優菲 pos:50
 優菲.talk: 莉莉娜以前可是開過當鋪的唷！
 優菲: 如何？我的這些商品價值多少呢？
 @stopBgm
 @bgm lilina
-
 @char 鬱鬱 pos:25
 @char 陰陰 pos:75
 陰陰: 看起來都是一些廢物。
@@ -80,7 +61,6 @@
 陰陰: 喂，我們不要妳這些東西，快滾！
 莉莉娜: 不要擔心我，沒事的。
 莉莉娜: 優菲，這些應該不是全部吧？說到象牙塔，從那邊留下來的遺物什麼的才真的值錢呢。
-
 @hide 陰陰,鬱鬱,莉莉娜,優菲
 @stopBgm
 @bgm quiet
@@ -92,13 +72,10 @@
 @char 莉莉娜 pos:50
 @char 優菲 pos:75
 莉莉娜: 她就是我之前提到的藥草專家，叫作西碧兒。
-
 優菲.idle: 西碧兒……有股特別的氣息，妳是從哪裡來的？
 syb.happy: 特別嗎？嘻嘻，妳才是吧。
 莉莉娜: 我們要工作了，真想要大筆現金的話，明天拿更好的東西來換吧。
 @hide syb,莉莉娜,優菲
-
-
 @back bg08b
 @stopBgm
 @bgm happy
@@ -116,49 +93,33 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @hide 涅莉,薇狄亞,魅兒
 @char 蘇菲亞 pos:50
 蘇菲亞.beer: 慶祝大家都找到工作，我做了三種口味的特製炸雞，另外還有豬腳唷。
-
-
 @hide 蘇菲亞,優菲
 @back cg10
-
 優菲: 耶～～
-
-
 @back bg08b
 @stopBgm
 @bgm white
 @char 蘇菲亞.idle pos:50
 蘇菲亞.idle: 早安，{PlayerName}，大家都出門工作了呢。
 蘇菲亞.idle: 要不要出去探班呢？她們一定會很開心的。
-
-
-
 @choice 去找優菲和魅兒吧！ goto:.C02a
 @choice 想知道薇狄亞和涅莉的情況。 goto:.C02b
 @hide 蘇菲亞
 @stop
-
 @stopBgm
 @bgm peace
-
-
-
-
 # C02a
-
 @back bg02
 @stopBgm
 @bgm peace
 @char 優菲 pos:65
 @char 魅兒 pos:35
-
 優菲: 耶咿，新開的鬆餅店聽說超級好吃！
 魅兒: 就去一下下喔，我等等還要工作。
 優菲: 欸～？
 魅兒: 欸什麼？話說妳不是應該也要賺錢嗎？
 優菲: 今天整理要賣的遺物時，在茶葉罐裡找到一堆金幣呢！當然先享樂再說！
 魅兒: 真是幸運啊……
-
 @hide 優菲,魅兒
 @back cg16
 優菲: 魅兒，啊～
@@ -174,16 +135,13 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 優菲: 魅兒需要的話，我可以加入唷？
 魅兒: 別開玩笑了，我才不要。
 魅兒: 妳還是繼續死守著那無趣的象牙塔吧，那樣比較適合妳。
-
 @choice 就是說嘛。
 @stop
-
 @back bg02
 @stopBgm
 @bgm happy
 @char 優菲 pos:65
 @char 魅兒 pos:35
-
 優菲: {PlayerName}怎麼也在這裡？！
 魅兒: 真是的，在旁邊也不出個聲，整天裝神弄鬼的……
 優菲: {PlayerName}只是比較少話啦！
@@ -193,24 +151,13 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 優菲: 好，這是妳說的，魔法飛彈－－
 魅兒: {PlayerName}，我們趁她在施法的時候趕快跑吧。
 優菲: 欸欸？！怎麼這樣－－
-
-
-
 @hide 優菲,魅兒
 @goto .C02
-
-
-
 # C02b
-
 @back bg02
-(背景 城鎮中心)
-
 @back cg17
-
 @stopBgm
 @bgm happy
-
 薇狄亞: ……香芹、鼠尾草、迷迭香與百里香……
 薇狄亞: 請代我問候住在那裡的某個人……
 薇狄亞: ……他曾是我的真愛。
@@ -221,16 +168,12 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 圍觀的民眾: 我要贊助30銀。
 涅莉: 感謝各位乾爹乾媽～
 薇狄亞: 如果喜歡我們的表演，來闇鴉農舍旁邊的女巫俱樂部也會有不定時現場演出唷。
-
 @goto .C02
-
 # C02
-
 @back bg08b
 @stopBgm
 @bgm white
 @char 蘇菲亞.idle pos:50
-
 蘇菲亞: 大家今天真的都累了呢，這麼早就上去睡覺了。
 蘇菲亞: {PlayerName}，待在巫術世界這陣子，適應得還好嗎？
 蘇菲亞: 我曾經見過一些像{PlayerName}這樣的異鄉人，不過最後都離開了。
@@ -240,14 +183,11 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 蘇菲亞: 之前還以為她們就要這樣玩物喪志一輩子呢，還好有{PlayerName}出現，帶來了異域之力，讓她們重燃熱情，還把女巫俱樂部重新開張了。
 蘇菲亞: 這一切，都要感謝{PlayerName}唷。
 蘇菲亞.happy: 今後也請您多多關照了。
-
 @hide 蘇菲亞
 @back bg06
 @char 涅莉 pos:50
-
 涅莉: 早哇，{PlayerName}～
 涅莉: 啊啊，大家都出門了，我也得快點才行，不然上班要遲到了。
-
 @hide 涅莉
 @back bg08b
 @char 蘇菲亞.talking pos:50
@@ -257,37 +197,26 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 蘇菲亞: 這個早上真是安靜呀。
 蘇菲亞: 她們動作好快唷，一溜煙就不見了。
 蘇菲亞: 優菲越來越積極了，這孩子終於長大了……
-
 @sfx dooropen
-
 @char 蘇菲亞 pos:35
 @char 優菲 pos:65
 @stopBgm
 @bgm hurry
-
-
 優菲: {PlayerName}！我接到大生意了，我們趕快去找魅兒！
 蘇菲亞: 什麼生意呀？最好不要是什麼危險的事唷。
 優菲: 沒事的沒事的，{PlayerName}，趕快跟我來。
 @hide 蘇菲亞,優菲
-
 @back cg12
-
-
 女巫D: 好準喔～
 女巫B: 真的！
 女巫D: 換我了，我想知道我跟我的好朋友告白會不會有結果。
 女巫B: 這不用算了啦一定沒有！
-
 優菲: 魅兒！快跟我來，我找到賺大錢的機會了！
 魅兒: 欸？妳確定嗎？我還在工作耶。
 優菲: 相信我就對了！
-
 @back bg01
-
 @char 魅兒 pos:35
 @char 優菲 pos:65
-
 優菲: 莉莉娜說她要象牙塔的書，我記得妳那邊不是還有一些嗎？
 魅兒: 妳自己的書賣不夠，居然還要賣我的喔……
 優菲: 正確地說，那是象牙塔的啦。
@@ -297,60 +226,39 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 魅兒: 雖然我不是象牙塔的人，但我建議不要選有核心內容的比較好……
 優菲: 沒關係啦，是莉莉娜要的耶。
 優菲: {PlayerName}來幫我一起選，我們賣哪一本好呢？
-
 （會影響結局boss的強度）
-
 @choice 奧秘之書《無窮魔源》(The Tome of Infinite Magic)
 @choice 學院中的禁忌藥草 (Forbidden Herbs in the Academy)
 @choice 蝕之聖典 (Script of Eclipse)
-
 @stop
-
 優菲: 太棒了！我們趕快去賺錢吧！
-
-
 @back bg04
-
 @stopBgm
 @bgm lilina
-
 @char 莉莉娜 pos:25
 @char 魅兒 pos:50
 @char 優菲 pos:75
-
-
 莉莉娜: 喔，妳們來了啊。
-
 @char 莉莉娜 pos:35
 @char 魅兒 pos:65
 魅兒: 等、等一下，這裡發生什麼事了？
 莉莉娜: 妳看妳後面。
-
 @char 莉莉娜 pos:25
 @char 魅兒 pos:50
 @char 優菲 pos:75
-
 優菲: 啊啊啊有埋伏！
-
 @hide 莉莉娜,魅兒,優菲
-
 @stopBgm
 @bgm energetic
 @battle background:bg02 target:monster02 label:ch2bt1
 @stop
-
-
 # ch2bt1
-
 @stopbgm
 @back bg04
 @bgm lilina
-
 @char 莉莉娜 pos:25
 @char 魅兒 pos:50
 @char 優菲 pos:75
-
-
 莉莉娜: 謝啦！剛好西碧爾跟陰陰鬱鬱都出門了，還好有妳們在。
 魅兒: 她們真是越來越囂張了…
 莉莉娜: 沒關係，等我做出更強的藥草，她們絕～對不會是我的對手。
@@ -360,41 +268,30 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 莉莉娜: 那袋金幣就給妳們吧，反正這裡快要放不下了，哈哈哈－－
 優菲: 耶咿，謝謝妳，莉莉娜！
 魅兒: 天啊，好重……
-
-
 @hide syb,莉莉娜,優菲,魅兒
-
 @back bg08
 @stopBgm
 @bgm happy
-
 @char 薇狄亞 pos:75
 @char 涅莉 pos:50
 @char 優菲 pos:25
-
 涅莉: 欸欸欸？？妳們這樣就拿到這麼多錢？
 薇迪亞: 太不可思議了吧……
 優菲: 我就說我買的東西都是好貨了！
 @hide 優菲
 @char 魅兒 pos:25
-
 魅兒: 那明明就是我的書……
 薇狄亞: 說起來，這一大筆錢可以把這邊好好裝潢一下了耶。
-
 @hide 魅兒
 @char 優菲 pos:25
-
-
 優菲: 一定可以吸引到更多的客人！
 涅莉: 感覺要重組什麼系都可以了唷！
 優菲: 今天也要好好慶祝一下～
 薇狄亞: 耶～～
-
 @hide 涅莉,優菲,薇狄亞
 @char 蘇菲亞 pos:50
 蘇菲亞: 太好了，那我來準備大餐，妳們就去樓下酒窖幫忙搬兩桶酒上來吧。
 @hide 蘇菲亞
-
 @back bg11
 @char 涅莉 pos:65
 @char 魅兒 pos:35
@@ -405,10 +302,8 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @char 優菲 pos:65
 優菲: {PlayerName}，要不要趁這機會試試看義體的機能呢？搬這個酒桶看看！
 魅兒: 不要找藉口使喚{PlayerName}做事好嗎，這種東西我自己都能應付的……呃？！
-
 @stopBgm
 @bgm strange
-
 魅兒: 呀啊啊啊啊啊－－
 優菲: 魅兒又在大驚小怪了啦，怎麼樣？這次又是看到什麼蒼蠅屍體之類的嗎？
 魅兒: 那那那那那、那邊！
@@ -431,22 +326,14 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 涅莉: 矮額，有股熟悉的詭異氣息呢。
 ？？？: 尤芙蘿絲！給我滾出來！
 @hide 涅莉
-
 @stopBgm
 @bgm battle03
-
 @battle background:bg11 target:monster04 label:afterbattle5
 @stop
-
 # afterbattle5
-
-
-
 @back bg11
-
 @stopBgm
 @bgm white
-
 @char 蘇菲亞 pos:50
 蘇菲亞: 請妳們下來搬兩桶酒怎麼搞這麼久呢，大餐都準備好了說。
 蘇菲亞: ！！！
@@ -492,10 +379,8 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @char 涅莉 pos:25
 涅莉: 耶～
 @hide 涅莉,蘇菲亞,優菲
-
 (隔天)
 @back bg06
-
 @stopBgm
 @bgm happy
 @sfx construction
@@ -505,12 +390,9 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 優菲: 蘇菲亞已經找人來裝潢了！
 @char 薇狄亞 pos:75
 薇狄亞: 似乎很快就能有漂亮的空間了呢。
-
 @stopSfx
 @hide 涅莉,優菲,薇狄亞
 @back bg12
-
-
 @char 魅兒 pos:50
 魅兒: 這些麻煩搬過去，那一面牆的顏色要統一。
 @char 魅兒 pos:35
@@ -529,7 +411,6 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @hide 魅兒,薇狄亞,涅莉
 @char 優菲 pos:50
 優菲: 哼！我就做給妳們看！
-
 @hide 優菲
 @char 涅莉 pos:65
 @char 薇狄亞 pos:35
@@ -538,13 +419,11 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @sfx slam2
 @sfx explosion
 薇狄亞: 我去看看。
-
 @hide 薇狄亞
 薇狄亞: 呀啊啊－－
 @char 魅兒 pos:35
 魅兒: 怎麼了？！
 @hide 魅兒,涅莉
-
 @back cg18
 @sfx success loop:false
 涅莉: 媽呀，看起來也太好吃了吧！
@@ -553,7 +432,6 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 優菲: 快來嚐嚐我特製的象牙塔式早午餐吧。
 薇狄亞: 耶～
 涅莉: 開動～
-
 @back bg12
 @char 魅兒 pos:50
 @char 涅莉 pos:75
@@ -561,14 +439,10 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 魅兒: 嗯……奧術做的東西雖然美味，但其實完全沒有營養喔。
 涅莉: 那不就更棒了嗎？可以盡情享用美食卻不會變胖耶！
 薇狄亞: 太棒了～
-
 @hide 魅兒,涅莉,薇狄亞
-
 @char may pos:50
-
 @stopBgm
 @bgm hurry
-
 ？？？: 妳們好啊，這裡真熱鬧耶。
 @char 薇狄亞 pos:35
 @char may pos:65
@@ -581,22 +455,14 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 ？？？: 挺有架式的嘛，血巫結社就是不一樣唷……我看看，四個系都到齊了嘛，居然還有異鄉人，這下有趣了。
 may.happy: 來吧，讓我瞧瞧那異域之力－－
 @hide may
-
-
 @stopBgm
 @bgm battle02
-
 @battle background:bg05 target:monster05 label:afterbattle6
 @stop
-
 # afterbattle6
-
 @hide may
-
-
 @stopBgm
 @bgm peace
-
 @back bg12
 @char 涅莉 pos:65
 @char 薇狄亞 pos:35
@@ -607,14 +473,11 @@ may.happy: 來吧，讓我瞧瞧那異域之力－－
 ？？？: 小狐狸，想死妳了，在這邊過得還好嗎？
 薇狄亞: 託主人的福，每天都很開心呢。
 薇狄亞: 各位，向妳們介紹，她是我的主人－－梅伊，在我剛蛻變成人形時，是她收留了我，並且教導我人類世界的各種知識。
-
 @hide 薇狄亞
 @char may pos:65
 @char 魅兒 pos:35
-
 魅兒: 妳們重逢的方式還真奇怪。
 梅伊: 哈哈，抱歉抱歉，太久沒跟女巫交手，有點太興奮了。
-
 @hide 魅兒
 @char 蘇菲亞 pos:35
 蘇菲亞: 各位，我回來了，哎呀……梅伊？妳這麼早就到了呀？
@@ -626,11 +489,8 @@ may: 當然囉！
 @char 優菲 pos:65
 優菲: 什麼什麼？蘇菲亞買了什麼？
 蘇菲亞: 是能讓妳們變強的好東西唷，趕快拿出來看看吧。
-
 @hide 優菲,蘇菲亞
-
 @back cg19
-
 薇狄亞: 好強的能量－－
 優菲: 這、這是？
 魅兒: 難道這是傳說中的那個？
@@ -639,44 +499,25 @@ may: 當然囉！
 蘇菲亞: 因為戰亂的緣故所以遺失了，還好梅伊在商人圈裡有管道，才能順利買回來。
 may: 只要有錢，什麼都能搞定的！
 優菲: 好厲害呀，這可是只有在課本上面看過的神器耶。
-
-
 @back bg12
-
 @char 薇狄亞 pos:25
 @char may pos:50
 @char 魅兒 pos:75
-
 薇狄亞: 那麼，這個要怎麼使用呢？
 may: 嗯～要先解除封印。
 魅兒: 這加密的程度似乎要一陣子才能破解……
-
 @stopBgm
 @bgm stardust
-
 @hide may,魅兒
 @char 薇狄亞 pos:50
-
 薇狄亞: 涅莉？
-
 @hide 薇狄亞
 @char 涅莉 pos:50
-
 涅莉.idle: 它好像在呼喚……
 涅莉: 我……
-
 @hide 涅莉
-
 ？？？: 比我想像的還要快呢。
 ？？？: 有些事是從一開始就註定結果的吧，就像妳們那已然降臨的……命運。
-
 @stopBgm
 @goto chapter3
 @stop
-
-
-
-
-#test
-999
-666
