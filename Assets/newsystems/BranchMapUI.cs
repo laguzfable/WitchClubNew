@@ -32,19 +32,30 @@ public override async UniTask ChangeVisibilityAsync(bool visible, float? duratio
     if (visible)
         GenerateNodes();
 
+    // 讓 Naninovel 自己處理 fade
     await base.ChangeVisibilityAsync(visible, duration, asyncToken);
 
-    // 🔥🔥🔥 在 Nani 淡入動畫後強制把互動改回來
+    // === 修正 CanvasGroup 狀態 ===
     var cg = GetComponent<CanvasGroup>();
-    if (cg)
+    if (!cg) return;
+
+    if (visible)
     {
+        // 打開：確保能點
         cg.interactable = true;
         cg.blocksRaycasts = true;
         cg.alpha = 1f;
-
-        Debug.Log("[BranchMapUI] After Fade → 強制啟用互動");
+    }
+    else
+    {
+        // 關閉：避免透明牆
+        cg.interactable = false;
+        cg.blocksRaycasts = false;
+        // alpha 在這裡不用管，Naninovel 會 fade 到 0
     }
 }
+
+
 
     private void GenerateNodes()
     {
