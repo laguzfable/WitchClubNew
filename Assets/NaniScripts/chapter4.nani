@@ -492,10 +492,12 @@ nic: 終於走了，我們繼續吧……學姊？
 @choice 安慰優菲 goto:.ch4eupie
 @choice 追梅爾 (好感度不足會追不到) goto:.ch4mel
 @choice 跟著涅莉 goto:.ch4nelly
+@return
 @stop
 #ch4eupie
 優菲: {PlayerName}特地來安慰我嗎？真貼心。
 優菲: 不用擔心，我沒事的。
+@return
 #ch4mel
 @if affinity_Mel >= 50
 @goto chapter4red
@@ -615,7 +617,10 @@ witchc: 迷霧草是最棒的！
 #bd01
 @goto badend01
 #ch5b
-@if affinity_Nel >= 50 
-@goto chapter5yellow
+@if affinity_Nel >= 50
+    @goto chapter5yellow
+@elseif affinity_Eup >= 50
+    @goto chapter5blue
+@else
+    @goto chapter5common
 @endif
-@goto chapter5blue 
