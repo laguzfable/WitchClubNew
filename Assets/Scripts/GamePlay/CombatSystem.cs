@@ -205,6 +205,9 @@ public class MobRuneUnlockData
         advCamera.enabled = true;
         var naniCamera = Engine.GetService<ICameraManager>().Camera;
         naniCamera.enabled = false;
+
+         var audioManager = Engine.GetService<IAudioManager>();
+         audioManager.PlayBgmAsync("你的戰鬥BGM檔名", volume: 1f, fadeTime: 0.5f, loop: true).Forget();
     }
 
     private void Update()
@@ -373,27 +376,42 @@ public async UniTask PlayCardAsync()
         // left empty (原邏輯不動)
     }
 
-   public void GameOver(bool isLose)
+
+
+
+
+public void GameOver(bool isLose)
 {
     Debug.Log($"isLose?: {isLose}");
 
-// ✅ 清洗 monsterID
-monsterID = monsterID.Trim().ToLower();
-Debug.Log($"[RuneUnlock-Check] monsterID cleaned = '{monsterID}' (length={monsterID.Length})");
-
-// ✅ 只有勝利才解鎖符文
-if (!isLose)
-{
-    TryUnlockRune(monsterID);
-}
-
-
-
-    if (isLose)
+    // ✅ 把勝敗結果寫進 Naninovel 變數（給 @if CombatResult 用）
+    if (!IsTestMode)
     {
-        var go = GameObject.FindGameObjectWithTag("Finish");
-        go.transform.Find("Image/Text").GetComponent<Text>().text = "太大意惹...";
-        go.transform.Find("Image").GetComponent<CGFadeHelper>().FadeIn();
+var vars = Engine.GetService<ICustomVariableManager>();
+vars.SetVariableValue("CombatWin", isLose ? "False" : "True");
+
+
+
+    }
+
+    // ✅ 清洗 monsterID
+    monsterID = monsterID.Trim().ToLower();
+    Debug.Log($"[RuneUnlock-Check] monsterID cleaned = '{monsterID}' (length={monsterID.Length})");
+
+    // ✅ 只有勝利才解鎖符文
+    if (!isLose)
+        TryUnlockRune(monsterID);
+
+if (isLose)
+{
+    var go = GameObject.FindGameObjectWithTag("Finish");
+    go.transform.Find("Image/Text").GetComponent<Text>().text = "太大意惹...";
+
+    var finishImage = go.transform.Find("Image").gameObject;
+    finishImage.SetActive(false); // 暫時不顯示結算遮罩
+
+        // ✅ 戰敗也回 Nani（不然 Nani 永遠不會知道輸贏）
+        blackMask.DOFade(1f, 0.5f).SetDelay(0.8f).OnComplete(BackToNani);
     }
     else
     {
@@ -403,34 +421,32 @@ if (!isLose)
     }
 }
 
-    public void BackToNani()
+public void BackToNani()
+{
+    // ✅ 確保能量狀態不延續到下一場戰鬥
+    var vars = Engine.GetService<ICustomVariableManager>();
+    if (vars != null)
+        vars.SetVariableValue("YellowActive", "false");
+
+    if (IsTestMode)
     {
-        // ✅ 確保能量狀態不延續到下一場戰鬥
-        var vars = Engine.GetService<ICustomVariableManager>();
-if (vars != null)
-    vars.SetVariableValue("YellowActive", "false");
-
-
-        if (IsTestMode)
-        {
-            ReloadScene();
-            return;
-        }
-
-        string mobListStr = "";
-        Engine.GetService<ICustomVariableManager>().TryGetVariableValue<string>("MobList", out mobListStr);
-        mobListStr += DataService.Instance.scriptParameter.combatTarget + ",";
-        Engine.GetService<ICustomVariableManager>().SetVariableValue("MobList", mobListStr);
-
-        var advCamera = GameObject.Find("CombatCamera").GetComponent<Camera>();
-        advCamera.enabled = false;
-        var naniCamera = Engine.GetService<ICameraManager>().Camera;
-        naniCamera.enabled = true;
-        GameObject.FindObjectOfType<ContinueInputUI>().Visible = true;
-
-        SceneManager.LoadSceneAsync("NaniDialogTest");
+        ReloadScene();
+        return;
     }
 
+    string mobListStr = "";
+    Engine.GetService<ICustomVariableManager>().TryGetVariableValue<string>("MobList", out mobListStr);
+    mobListStr += DataService.Instance.scriptParameter.combatTarget + ",";
+    Engine.GetService<ICustomVariableManager>().SetVariableValue("MobList", mobListStr);
+
+    var advCamera = GameObject.Find("CombatCamera").GetComponent<Camera>();
+    advCamera.enabled = false;
+    var naniCamera = Engine.GetService<ICameraManager>().Camera;
+    naniCamera.enabled = true;
+    GameObject.FindObjectOfType<ContinueInputUI>().Visible = true;
+
+    SceneManager.LoadSceneAsync("NaniDialogTest");
+}
 
 
 void TryUnlockRune(string mobID)

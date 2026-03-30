@@ -68,6 +68,12 @@
 @battle background:bg02 target:monster02 label:afterbattle2
 @stop
 # afterbattle2
+@if CombatWin
+@goto .ab2win
+@else 
+@goto .ab2lose
+@endif
+#ab2win
 @back bg03 time:0
 @char 薇狄亞 pos:60 time:0
 @char 優菲 pos:40 time:0
@@ -121,6 +127,34 @@
 @sfx magicattack loop:false
 @spawn ShakeBackground
 @hide 涅莉,優菲,魅兒,薇狄亞
+@goto .ininyuyu
+#ab2lose
+@back bg03 time:0
+@char 薇狄亞 pos:60 time:0
+@char 優菲 pos:40 time:0
+@char 魅兒 pos:20 time:0
+@char 涅莉 pos:80 time:0
+@stopBgm
+@bgm peace
+薇狄亞.sad: 怎麼這樣……
+魅兒: 看起來所謂的異域之力也沒什麼用嘛。
+涅莉.suprised: ……
+優菲: 沒、沒關係啦，只是衣服破了而已，回去縫縫就可以的。
+優菲: 莉莉娜家就在前面了……
+薇狄亞: 小心走喔……
+@hide 涅莉,優菲,魅兒,薇狄亞
+@stopBgm
+@bgm lilina
+@back bg02
+@char 莉莉娜 pos:35
+@char 優菲 pos:65
+莉莉娜: 優菲！好久不見耶。
+優菲: 莉莉娜！
+莉莉娜: 哇，妳們怎麼傷成這樣，來來來，快進來裡面包紮。
+@back bg04 time:0
+@hide 優菲,莉莉娜
+@goto .lilina
+#ininyuyu
 @char 陰陰 pos:65
 @char 鬱鬱 pos:35
 ？？？: 要打架可以去別的地方嗎，我們這裡還要做生意的！
@@ -131,6 +165,12 @@
 @battle background:bg02 target:monster01 label:afterbattle3
 @stop
 # afterbattle3
+@if CombatWin
+@goto .ab3win
+@else 
+@goto .ab3lose
+@endif
+#ab3win
 @stopBgm
 @bgm lilina
 @back bg02
@@ -149,6 +189,27 @@
 @back bg04
 @char 莉莉娜 pos:50 time:0
 莉莉娜.idle: 不好意思，還有客人在，妳們就隨便坐，當自己家呀。
+#ab3lose
+@stopBgm
+@bgm lilina
+@back bg02
+@char 莉莉娜 pos:50
+莉莉娜: 什麼事情這麼吵……？！
+莉莉娜: 我的天喔，你們在做什麼，優菲，妳怎麼被打成這樣？
+@char 莉莉娜 pos:20
+@char 優菲 pos:40
+@char 陰陰 pos:60
+@char 鬱鬱 pos:80
+陰陰: 她們先在這裡亂搞的！
+鬱鬱: 主、主人，對不起……
+陰陰: 哼……
+（好像得罪了陰陰跟鬱鬱）
+@hide 陰陰,鬱鬱
+莉莉娜: 抱歉抱歉，快進來屋裡，我有好東西給你們療傷。
+@back bg04 time:0
+@hide 優菲,莉莉娜
+@back bg04
+#lilina
 @hide 莉莉娜
 @char 薇狄亞 pos:35
 薇狄亞: 這個味道是……

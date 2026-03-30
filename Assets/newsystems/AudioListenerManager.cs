@@ -18,10 +18,11 @@ public class AudioListenerManager : MonoBehaviour
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        FixListeners();
-    }
+private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+{
+    if (scene.name == "CombatScene") return;  // ← 加這行
+    FixListeners();
+}
 
     private void FixListeners()
     {
