@@ -942,8 +942,8 @@
 優菲: 梅爾她一直都有個心願——讓血巫結社重生。
 優菲: 你覺得，我應該完成她的心願嗎？
 
-@choice 由你來完成梅爾的心願吧。 goto:.end_crimson
-@choice 你還是更適合帶領象牙塔。 goto:.end_blue_crown
+@goto .end_crimson if:route_crimson==1
+@goto .end_blue_crown
 
 #end_crimson
 （結局：緋紅替身）

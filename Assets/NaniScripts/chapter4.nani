@@ -1,22 +1,10 @@
->>第四章
+﻿>>第四章
 
 @back bg01
 
 
 
 
-
-@choice 優菲結局 goto: .euphie_end
-@choice 繼續 goto:.777
-
-@stop
-
-
-
-
-#euphie_end
-
-@goto euphie_end
 
 #777
 
@@ -331,9 +319,9 @@ broom: 我先！
 
 @hide 涅莉,優菲
 
-@stopbgm 
-@restroom scriptName:chapter4 label:afterdate5
-@stop
+@stopBgm
+@SaveReturnPoint script:chapter4 label:afterdate5
+@GotoUnityScene sceneName:MapTest
 
 # afterdate5
 隔天
@@ -582,9 +570,9 @@ syb: 嘻嘻，多得是機會呢。
 
 
 
-@stopbgm 
-@restroom scriptName:chapter4 label:afterdate6
-@stop
+@stopBgm
+@SaveReturnPoint script:chapter4 label:afterdate6
+@GotoUnityScene sceneName:MapTest
 
 # afterdate6
 
@@ -686,7 +674,7 @@ nic: 終於走了，我們繼續吧……學姊？
 優菲: 沒事，繼續開會吧。
 
 @choice 安慰優菲 goto:.ch4_cont2
-@choice 追魅兒 goto:.ch4_cont2
+@choice 追魅兒 set:route_crimson=1 goto:.ch4_cont2
 @choice 跟著涅莉 goto:.ch4_cont2
 @stop
 
@@ -1034,9 +1022,9 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 
 
 
-@stopbgm 
-@restroom scriptName:chapter4 label:afterdate7
-@stop
+@stopBgm
+@SaveReturnPoint script:chapter4 label:afterdate7
+@GotoUnityScene sceneName:MapTest
 
 # afterdate7
 
@@ -1106,23 +1094,23 @@ nic: 走吧～
 
 (又玩了一整天，這天可以選跟誰玩)
 
-@stopbgm 
-@restroom scriptName:chapter4 label:afterdate8
-@stop
+@stopBgm
+@SaveReturnPoint script:chapter4 label:afterdate8
+@GotoUnityScene sceneName:MapTest
 
 # afterdate8
 
 (然後總之大家就越來越墮落了)
 
-@stopbgm 
-@restroom scriptName:chapter4 label:afterdate9
-@stop
+@stopBgm
+@SaveReturnPoint script:chapter4 label:afterdate9
+@GotoUnityScene sceneName:MapTest
 
 # afterdate9
 
-@stopbgm 
-@restroom scriptName:chapter4 label:afterdate10
-@stop
+@stopBgm
+@SaveReturnPoint script:chapter4 label:afterdate10
+@GotoUnityScene sceneName:MapTest
 
 # afterdate10
 
