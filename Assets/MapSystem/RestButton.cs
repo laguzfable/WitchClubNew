@@ -1,13 +1,18 @@
-﻿using Naninovel;
 using UnityEngine;
 
 public class RestButton : MonoBehaviour
 {
-    public async void OnRestButtonClicked ()
+    public void OnRestButtonClicked ()
     {
-        var player = Engine.GetService<IScriptPlayer>();
-        if (MapReturnPoint.HasValid())
-            await player.PreloadAndPlayAsync(
-                MapReturnPoint.ScriptName, label: MapReturnPoint.Label);
+        if (!MapReturnPoint.HasValid()) return;
+
+        var loader = SceneLoader.Instance;
+        if (loader == null)
+        {
+            Debug.LogError("[RestButton] 找不到 SceneLoader！");
+            return;
+        }
+
+        loader.GotoScript(MapReturnPoint.ScriptName, MapReturnPoint.Label);
     }
 }
