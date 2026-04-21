@@ -543,7 +543,12 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 優菲: 我要在這裡將這個叛徒就地正法—－
 @back bg03
 @hide chl,魅兒,優菲
-(戰鬥)
+@bgm energetic
+@battle background:bg03 target:monster02 label:ch5bt_mel
+@stop
+# ch5bt_mel
+@stopBgm
+@bgm serious
 @char chl pos:50
 克蘿伊: 夠了。
 克蘿伊: 妳清醒一點，梅爾根本沒有還手啊，妳的對手不該是她。
@@ -589,8 +594,15 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 優菲: 我……
 @hide chl,薇狄亞,優菲,魅兒
 轟隆隆隆隆－－
-(進入戰鬥)
-戰鬥結束
+@bgm energetic
+@battle background:bg03 target:monster03 label:ch5bt_micha
+@stop
+# ch5bt_micha
+@stopBgm
+@if CombatWin
+@goto euphie_end label:end1
+@endif
+@bgm serious
 @char 蘇菲亞 pos:25
 @char broom pos:50
 @char nic pos:75
@@ -599,7 +611,21 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 蘇菲亞: 接下來該怎麼辦，艾札蘭大人？
 艾札蘭: 沒救了，除了惡魔女王之外，誰也……救不了我們了。
 艾札蘭: 我們將會被「淨化」。
-@hide broom,nic,蘇菲亞
+@hide broom,蘇菲亞
+@char 優菲 pos:35
+@char nic pos:65
+優菲: 妮可，妳快離開，米夏還在——
+（優菲的魔力突然失控，爆發出強烈的衝擊波）
+妮可: 學姊！！
+
+@choice 衝過去擋住那股力量 goto:.player_guards
+@choice 被震開了，動不了 goto:.nic_sacrifice
+
+# nic_sacrifice
+@goto badend01
+
+# player_guards
+@hide 優菲,nic
 @char 魅兒 pos:50
 梅爾: 沒有這種事。
 梅爾: 學徒，過來。
