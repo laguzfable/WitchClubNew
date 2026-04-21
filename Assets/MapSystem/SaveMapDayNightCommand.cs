@@ -7,7 +7,9 @@ public class SaveMapDayNightCommand : Command
     public BooleanParameter isDay;
     public override UniTask ExecuteAsync (AsyncToken asyncToken = default)
     {
-        UnityEngine.PlayerPrefs.SetInt("MapIsDay", isDay.Value ? 1 : 0);
+        int val = isDay.Value ? 1 : 0;
+        UnityEngine.PlayerPrefs.SetInt("MapIsDay", val);
+        UnityEngine.PlayerPrefs.SetInt("IsDay", val);   // MapEventManager 讀這個
         UnityEngine.PlayerPrefs.Save();
         return UniTask.CompletedTask;
     }
