@@ -76,6 +76,22 @@
 米夏: 真是搞不懂啊～
 米夏: 不過，沒關係。
 米夏: 今後我們，將會合而為一……
+米夏: 妳……也想要這樣的力量，對吧？
+@char syb pos:25
+@char 魅兒 pos:50
+@char 優菲 pos:75
+米夏: 喝下我的血吧，少女。
+米夏: 妳將成為這個世界上最強的存在。
+優菲: ……
+梅爾: {PlayerName}，阻止她！
+
+@choice 擋在優菲和米夏之間 goto:.stop_eupie
+@choice 腳僵住了，動不了 goto:.eupie_drinks
+
+# eupie_drinks
+@goto chapter6blue
+
+# stop_eupie
 @char syb pos:35
 @char 魅兒 pos:50
 梅爾: 但是，妳的肉身已經被毀，儀式是無法繼續的……
