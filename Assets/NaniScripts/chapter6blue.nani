@@ -51,7 +51,12 @@
 涅莉: {PlayerName}，這是最後了。
 涅莉: 使盡全力替女朋友報仇吧。
 @hide syb,涅莉
-(戰鬥)
+@bgm energetic
+@battle background:bg05 target:monster02 label:ch6bt_blue
+@stop
+# ch6bt_blue
+@stopBgm
+@bgm sad
 @char 涅莉 pos:25
 @char 薇狄亞 pos:50
 @char 魅兒 pos:75
@@ -101,8 +106,49 @@
 (一道白光)
 @hide 魅兒,涅莉
 (翌日)
+
 @back bg06
 @char 優菲 pos:50
-優菲: 早啊！{PlayerName}
-……
+
+優菲: ……早啊，{PlayerName}。
+優菲: 我昨晚做了個很奇怪的夢。
+優菲: 有個女人說要把我的身體借走……
+優菲: 嗯，不說了，反正只是夢。
+
+@char nic pos:25
+@char 優菲 pos:50
+@char 薇狄亞 pos:75
+
+妮可: 學姐，妳沒事吧？臉色很差耶。
+薇狄亞: ……
+薇狄亞: 妳真的不記得任何事嗎？
+優菲: 記得什麼？
+
+@hide nic,薇狄亞
+
+優菲: {PlayerName}，梅爾呢？
+優菲: 從昨晚到現在都沒看到她——
+優菲: 她……去哪裡了？
+
+@char nic pos:25
+@char 優菲 pos:50
+
+妮可: 學姐……
+妮可: 梅帕莫妮她，已經不在了。
+優菲: ……什麼意思。
+妮可: 就是……字面上的意思。
+
+@hide nic
+
+優菲: ……
+優菲: ……哈哈。
+優菲: 這種玩笑一點都不好笑。
+優菲: 她是我的宿敵欸，她不可以先走的。
+優菲: 她答應過我，她一輩子都是我的對手——
+
+（優菲沉默了很久很久）
+
+優菲: ……傻瓜。
+
+（END：穢血新神）
 @stop
