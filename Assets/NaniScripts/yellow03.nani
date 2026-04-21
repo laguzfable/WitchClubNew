@@ -49,6 +49,6 @@ goto:.ritual
 涅莉: 哎唷，講著講著有點口渴，我要去跟蘇菲亞要點巧克力牛奶來喝，P也一起吧？
 涅莉: 走吧走吧～
 (CG 重新用第一次兩人吃宵夜的，但食物改成飲料)
-涅莉對你的好感目前是 {affinity_Nelly}。
-@restroom
-@stop
+涅莉對你的好感目前是 {affinity_Nel}。
+@set affinity_Nel=affinity_Nel+15
+@GotoUnityScene sceneName:MapTest

@@ -1168,5 +1168,9 @@ nic: 走吧～
 ？？？: ……不，不是的。
 ？？？: 因為您的出現，這次的結局，將會截然……不同。
 
+@goto chapter5blue   if:affinity_Eup>=30
+@goto chapter5yellow if:affinity_Nel>=30
+@goto chapter4green  if:affinity_Ved>=30
+@goto chapter4red    if:affinity_Mel>=30
 @goto chapter5common
 @stop

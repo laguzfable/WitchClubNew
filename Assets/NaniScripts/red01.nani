@@ -41,5 +41,5 @@
 魅兒: 但……我不太會控制，有時候睡覺還會亂噴煙火，把我的弟弟妹妹炸飛。
 魅兒: 唉……
 魅兒: 突然覺得很累是正常的嗎？也辛苦P了，我下次再講之後的事吧。
-@restroom
-@stop
+@set affinity_Mel=affinity_Mel+10
+@GotoUnityScene sceneName:MapTest

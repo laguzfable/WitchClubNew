@@ -46,5 +46,5 @@
 @choice 陪她直到她醒來 goto:.yellow04end
 @end
 # yellow04end
-@restroom
-@stop
+@set affinity_Nel=affinity_Nel+20
+@GotoUnityScene sceneName:MapTest

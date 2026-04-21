@@ -64,5 +64,5 @@
 魅兒: 接下來的事情很有名啊－－第一次巫術戰爭開打了。
 魅兒: 嗯，欲知詳情，請待下回分曉。
 魅兒: 晚安。
-@restroom
-@stop
+@set affinity_Mel=affinity_Mel+15
+@GotoUnityScene sceneName:MapTest
