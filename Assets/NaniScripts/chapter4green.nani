@@ -196,24 +196,185 @@
 @choice 告訴薇狄亞 goto:.vedia
 @choice 告訴西碧兒 goto:.sybil
 #vedia
-（薇狄亞得知此事之後希望玩家可以救西碧兒）
-（於是之後可以引導西碧兒）（三夜）
-（但是如果跟西碧兒擦出火花　薇狄亞會來殺死玩家　Bad End）
-如果引導完 玩家也沒有踰矩
-則最後女巫俱樂部繼續經營
-衝突變少
-薇狄亞帶著玩家隱居森林(好結局)
+@char 薇狄亞 pos:35
+@char nic pos:65
+
+薇狄亞: ……是嗎。
+薇狄亞: 謝謝{PlayerName}告訴我。
+妮可: 妳打算怎麼做？
+薇狄亞: 我去找西碧兒大人談談。
+薇狄亞: {PlayerName}，陪我一起嗎？
+
+@hide nic,薇狄亞
+
+@saveMapDayNight isDay:false
+@SaveReturnPoint script:"chapter4green" label:"greennight_v1"
+@GotoUnityScene sceneName:MapTest
+@stop
+#greennight_v1
+@back bg04
+@char syb pos:35
+@char 薇狄亞 pos:65
+
+西碧兒: 小狐狸，這麼晚了，有什麼事嗎？
+薇狄亞: 西碧兒大人……我有話想說。
+薇狄亞: 關於儀式的事。
+西碧兒: ……
+西碧兒: 是誰告訴妳的？
+薇狄亞: 這不重要，重要的是……
+薇狄亞: 大人，妳不需要這樣做的。
+西碧兒: 小狐狸，妳知道什麼是「需要」嗎？
+薇狄亞: 我知道妳很累了。
+薇狄亞: 我知道妳想讓世界變好，我也想。
+薇狄亞: 但是……用這種方式，會傷害很多人。
+西碧兒: ……
+
+@hide syb,薇狄亞
+
+@saveMapDayNight isDay:true
+@SaveReturnPoint script:"chapter4green" label:"greenday_v2"
+@GotoUnityScene sceneName:MapTest
+@stop
+#greenday_v2
+@back bg04
+@char syb pos:35
+@char 薇狄亞 pos:65
+
+西碧兒: 妳昨晚說的那些話……
+西碧兒: 我一直在想。
+薇狄亞: 大人。
+西碧兒: 妳是個很奇怪的孩子，小狐狸。
+西碧兒: 明明可以什麼都不管，卻偏偏要管。
+薇狄亞: 因為大人對我而言很重要嘛。
+薇狄亞: 比巫術世界的未來，還要重要。
+西碧兒: ……哈。
+西碧兒: 這種話……說得可真直接。
+
+@hide syb,薇狄亞
+
+@saveMapDayNight isDay:false
+@SaveReturnPoint script:"chapter4green" label:"greennight_v2"
+@GotoUnityScene sceneName:MapTest
+@stop
+#greennight_v2
+@back bg04
+@char syb pos:35
+@char 薇狄亞 pos:65
+
+西碧兒: 好了，我想通了。
+西碧兒: 儀式的事……就到此為止吧。
+薇狄亞: 大人！
+西碧兒: 別這樣，我自己的決定。
+西碧兒: 說起來，這一切都是因為那個傻狐狸一直在我面前晃，
+西碧兒: 讓我想到了一些事。
+薇狄亞: 大人……嗯哼，傻狐狸是什麼意思——
+西碧兒: 就是字面意思。
+
+@hide syb,薇狄亞
+
+（女巫俱樂部仍舊燈火通明）
+（衝突少了很多，日子平靜地過著）
+
+@back bg03
+@char 薇狄亞 pos:50
+
+薇狄亞: {PlayerName}，跟我來。
+薇狄亞: 至高秘林的深處，有個沒人知道的地方。
+
+@back bg01
+
+薇狄亞: 妳看，連月光都照不到的地方。
+薇狄亞: 這裡，只有我和{PlayerName}知道。
+薇狄亞: 如果有一天，世界讓妳很累……
+薇狄亞: 就來這裡吧。
+薇狄亞: 我，一直都在這裡。
+
+（END：小狐狸的歸林）
+@stop
+
 #sybil
-（玩家跑去跟西碧兒攤牌）
-西碧兒表示希望玩家保護她
-他暗示玩家把克蘿伊還有魅兒殺了
-（總之她本人不會動手）
-這邊也是三夜後導向結局
-暗殺當天
-西碧兒被玩家還有薇狄亞救了下來
-於是白色的火焰燒啊燒的把大家都燒成灰了
-「我只剩下你們了，我的信徒」
-「但是妳看，妳的願望實現了呢」
-「大家的願望也都實現了」
-火中的幻影END
+@back vedia_night
+@char syb pos:50
+
+西碧兒: ……喔？
+西碧兒: 妳選擇來找我。
+西碧兒: 有趣。
+西碧兒: 說吧，妳想要什麼報酬？
+
+（玩家告訴西碧兒事情始末）
+
+西碧兒: 嘻嘻，妳真是個聰明的異鄉人。
+西碧兒: 那麼——幫我個忙，就一個。
+西碧兒: 克蘿伊，還有梅爾帕莫妮。
+西碧兒: 讓她們，從這個世界上消失。
+西碧兒: 我不會親自動手，但妳可以。
+西碧兒: 作為回報……妳想要的一切，都歸妳。
+
+@hide syb
+
+@saveMapDayNight isDay:false
+@SaveReturnPoint script:"chapter4green" label:"greennight_s1"
+@GotoUnityScene sceneName:MapTest
+@stop
+#greennight_s1
+
+@back bg04
+@char 薇狄亞 pos:50
+
+薇狄亞: ……{PlayerName}，妳真的決定好了嗎？
+薇狄亞: 西碧兒大人要妳做的那件事……
+薇狄亞: 算了，不管了。妳知道妳在做什麼就好。
+
+@hide 薇狄亞
+
+@saveMapDayNight isDay:true
+@SaveReturnPoint script:"chapter4green" label:"greenday_s1"
+@GotoUnityScene sceneName:MapTest
+@stop
+#greenday_s1
+
+@back bg01
+@char 克蘿伊 pos:50
+
+克蘿伊: ……異鄉人。
+克蘿伊: 妳最近老是盯著我看，有什麼事嗎？
+克蘿伊: 說吧，我不咬人的。
+
+@hide chl
+
+@saveMapDayNight isDay:false
+@SaveReturnPoint script:"chapter4green" label:"greennight_s2"
+@GotoUnityScene sceneName:MapTest
+@stop
+#greennight_s2
+（暗殺當天）
+@back bg04
+@char chl pos:25
+@char 魅兒 pos:50
+@char syb pos:75
+
+西碧兒: {PlayerName}，妳來了。
+克蘿伊: ……異鄉人，妳要做什麼？
+梅爾: 這不對，停下來——
+
+@char 薇狄亞 pos:50
+
+薇狄亞: 西碧兒大人！住手！
+西碧兒: 小狐狸……
+薇狄亞: 我不允許這樣，就算是妳的命令也不行！
+
+@hide chl,魅兒
+
+（白色的火焰從西碧兒身上蔓延開來）
+（特效：火焰逐漸吞噬一切）
+
+@hide 薇狄亞
+@char syb pos:50
+
+西碧兒: ……沒關係，小狐狸。
+西碧兒: 我只剩下你們了，我的信徒。
+西碧兒: 但是妳看，妳的願望實現了呢。
+西碧兒: 大家的願望，也都實現了。
+
+（火中的幻影 END）
 @stop
