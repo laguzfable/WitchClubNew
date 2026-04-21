@@ -6,8 +6,8 @@ public class RestButton : MonoBehaviour
     public async void OnRestButtonClicked ()
     {
         var player = Engine.GetService<IScriptPlayer>();
-        if (!string.IsNullOrEmpty(MapReturnData.ScriptName))
+        if (MapReturnPoint.HasValid())
             await player.PreloadAndPlayAsync(
-                MapReturnData.ScriptName, MapReturnData.LineIndex);
+                MapReturnPoint.ScriptName, label: MapReturnPoint.Label);
     }
 }
