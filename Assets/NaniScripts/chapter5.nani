@@ -15,10 +15,11 @@
 「全部都……全部都……」
 
 
-@choice 要結束了，對嗎？
-@choice 妳到底是誰？
+@choice 要結束了，對嗎？ goto:.ch5_cont1
+@choice 妳到底是誰？ goto:.ch5_cont1
 @stop
 
+#ch5_cont1
 @back bg06
 
 @char 薇狄亞 pos:50
@@ -37,9 +38,10 @@
 西碧爾: 莉莉娜交給我就好了，快去支援她們！
 西碧爾: {PlayerName}，還可以嗎？別太勉強唷。
 
-@choice 等一下，這也太混亂了吧？
+@choice 等一下，這也太混亂了吧？ goto:.ch5_cont2
 @stop
 
+#ch5_cont2
 @hide syb
 @char 涅莉 pos:50
 
@@ -228,10 +230,11 @@
 優菲: 也不是那個意思啦……
 妮可: {PlayerName}感覺就比較喜歡學姊啊，不是嗎？
 
-@choice 是啊。
-@choice 這……
+@choice 是啊。 goto:.ch5_cont3
+@choice 這…… goto:.ch5_cont3
 @stop
 
+#ch5_cont3
 優菲: 別別別別別－－別再說了啦！！
 薇狄亞: 好嘛，乾掉這杯就放過妳。
 優菲: 咦咦咦－－
@@ -536,11 +539,12 @@
 優菲: 我有點不懂妳為什麼要這麼緊張就是了……
 優菲: {PlayerName}有什麼頭緒嗎？
 
-@choice 沒辦法，因為妳是她的偶像囉。
-@choice 最近妳變得不一樣，我也覺得有點緊張呢。
+@choice 沒辦法，因為妳是她的偶像囉。 goto:.ch5_cont4
+@choice 最近妳變得不一樣，我也覺得有點緊張呢。 goto:.ch5_cont4
 
 @stop
 
+#ch5_cont4
 妮可: 這裡的環境好舒服啊－－
 優菲: 妳還記得那門課嗎？占星術基礎。
 妮可: 啊，我記得我記得。
@@ -706,7 +710,13 @@
 
 @hide chl,魅兒,優菲
 
-(戰鬥)
+@bgm energetic
+@battle background:bg03 target:monster02 label:ch5bt3
+@stop
+
+# ch5bt3
+@stopBgm
+@bgm serious
 
 
 @char 薇狄亞 pos:50
@@ -814,8 +824,13 @@
 
 @hide syb,涅莉
 
+@bgm energetic
+@battle background:bg03 target:monster02 label:ch5bt4
+@stop
 
-(戰鬥)
+# ch5bt4
+@stopBgm
+@bgm serious
 
 
 @char 涅莉 pos:25
@@ -891,6 +906,80 @@
 優菲: 早啊！{PlayerName}
 
 ……
+
+@bgm white
+@back bg06
+@char 優菲 pos:50
+
+優菲: ……我好像做了很長很長的夢。
+優菲: 但是最後，你有在那裡……對吧？
+優菲: 謝謝你，{PlayerName}。
+
+@hide 優菲
+@back bg03
+
+@char 薇狄亞 pos:20
+@char 優菲 pos:40
+@char 涅莉 pos:60
+@char nic pos:80
+
+薇狄亞: 優菲！太好了……
+涅莉: 歡迎回來，大笨蛋。
+妮可: 學姊……嗚嗚嗚——
+優菲: 好了好了……別哭了，我沒事的。
+優菲: ……梅爾呢？
+
+涅莉: 她在我這裡好端端的，只是一時半刻回不來。
+優菲: 這樣啊……
+
+@hide 薇狄亞,涅莉,nic,優菲
+@back bg022
+
+@char 優菲 pos:50
+
+優菲: {PlayerName}，陪我走走。
+優菲: 我一直在想……以後該怎麼辦。
+優菲: 梅爾她一直都有個心願——讓血巫結社重生。
+優菲: 你覺得，我應該完成她的心願嗎？
+
+@choice 由你來完成梅爾的心願吧。 goto:.end_crimson
+@choice 你還是更適合帶領象牙塔。 goto:.end_blue_crown
+
+#end_crimson
+（結局：緋紅替身）
+@stopBgm
+@bgm title
+
+優菲: ……嗯。
+優菲: 你說得對。
+優菲: 我要成為血巫結社的族母。
+優菲: 替梅爾，把她愛護的人好好守護起來。
+優菲: 有你在身邊，我才有勇氣說出這句話。
+優菲: 謝謝你，{PlayerName}。
+
+@back stardust1
+（END：緋紅替身）
+@stop
+
+#end_blue_crown
+（結局：純藍之冠）
+@stopBgm
+@bgm title
+
+優菲: ……
+優菲: 也許你說得對。
+優菲: 象牙塔才是我的根，那裡還有很多人需要我。
+優菲: 妮可一直都等著我……我沒有理由讓她失望。
+優菲: 梅爾……一定也希望我能做自己吧。
+優菲: {PlayerName}，謝謝你。
+
+@back stardust1
+
+@char nic pos:50
+妮可: 學姊！我就知道！
+
+（END：純藍之冠）
+@stop
 
 
 

@@ -32,7 +32,7 @@ public class MapCharacterSpawner : MonoBehaviour
     public TimeOfDay currentTimeOfDay = TimeOfDay.Day;
     public bool autoDetectTimeOfDay = true;
 
-    private string logMsg = "▶ Spawner 啟動中...\n";
+    private string logMsg = "";
 
 void Start()
 {
@@ -166,16 +166,6 @@ void Start()
             logMsg += $"❌ 找不到 GirlButton！（Prefab 結構錯誤？）\n";
             MarkRed(iconGO);
         }
-    }
-
-    void OnGUI()
-    {
-        GUIStyle style = new GUIStyle
-        {
-            fontSize = 18,
-            normal = { textColor = Color.yellow }
-        };
-        GUI.Label(new Rect(10, 10, 1600, 2000), logMsg, style);
     }
 
     void Update()

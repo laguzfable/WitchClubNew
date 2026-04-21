@@ -165,13 +165,15 @@ syb: 但是，也別忽略妳自己內心的想法唷，薇狄亞。
 薇狄亞: P啊，我該怎麼辦才好？？
 
 
-@choice 別想太多，繼續壯大妳們的陣營吧。
-@choice 西碧兒說得對，妳應該正視自己內心的想法。
+@choice 別想太多，繼續壯大妳們的陣營吧。 goto:.ch4_cont1
+@choice 西碧兒說得對，妳應該正視自己內心的想法。 goto:.ch4_cont1
 
 @stop
 
 
 
+
+#ch4_cont1
 
 (蘇菲亞&涅莉出現)
 
@@ -683,11 +685,12 @@ nic: 終於走了，我們繼續吧……學姊？
 優菲: 抱歉……我只是……突然覺得好難過……
 優菲: 沒事，繼續開會吧。
 
-@choice 安慰優菲
-@choice 追魅兒
-@choice 跟著涅莉
+@choice 安慰優菲 goto:.ch4_cont2
+@choice 追魅兒 goto:.ch4_cont2
+@choice 跟著涅莉 goto:.ch4_cont2
 @stop
 
+#ch4_cont2
 @back bg01
 
 @char 涅莉 pos:50
@@ -884,11 +887,11 @@ witchc: 迷霧草是最棒的！
 涅莉: {PlayerName}，魅兒的呼吸越來越微弱了。
 涅莉: 想想辦法……
 
-@choice 幫魅兒急救(人工呼吸)
-@choice 坐視不管(涅莉會去人工呼吸)
+@choice 幫魅兒急救(人工呼吸) goto:.ch4_cont3
+@choice 坐視不管(涅莉會去人工呼吸) goto:.ch4_cont3
 @stop
 
-
+#ch4_cont3
 @char 涅莉 pos:20
 @char 優菲 pos:40
 @char 魅兒 pos:60

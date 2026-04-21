@@ -1,10 +1,23 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class MapEventManager : MonoBehaviour
 {
     public Button E_Day_Button, M_Day_Button, V_Day_Button, N_Day_Button;
     public Button E_Night_Button, M_Night_Button, V_Night_Button, N_Night_Button;
+
+    [System.Serializable]
+    public class EventScriptEntry
+    {
+        public string character;        // "E", "M", "V", "N"
+        public bool isDay;
+        public int progressIndex;       // 第幾次觸發（從 1 開始）
+        public string naninovelScript;  // 對應的 .nani 腳本名稱
+    }
+
+    [Header("事件劇本對照表（在 Inspector 填入）")]
+    public List<EventScriptEntry> eventScripts = new List<EventScriptEntry>();
 
     void Start()
     {
@@ -41,9 +54,26 @@ public class MapEventManager : MonoBehaviour
         string key = $"{ch}_Event_{(isDay ? "Day" : "Night")}";
         int prog = PlayerPrefs.GetInt(key, 1);
 
-        Debug.Log($"{ch} {(isDay ? "白天" : "晚上")}事件 {prog}");
+        var entry = eventScripts.Find(e =>
+            e.character == ch && e.isDay == isDay && e.progressIndex == prog);
 
-        // TODO：呼叫 Naninovel 劇本事件
+        if (entry != null && !string.IsNullOrEmpty(entry.naninovelScript))
+        {
+            var loader = SceneLoader.Instance;
+            if (loader != null)
+            {
+                loader.GotoScript(entry.naninovelScript);
+            }
+            else
+            {
+                Debug.LogError("[MapEventManager] 找不到 SceneLoader！請確認場景中有 SceneLoader 物件。");
+                return;
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"[MapEventManager] 找不到劇本設定：{ch} {(isDay ? "白天" : "晚上")} prog={prog}，請在 Inspector 的「事件劇本對照表」填入對應腳本。");
+        }
 
         // 事件結束後進度+1
         PlayerPrefs.SetInt(key, prog + 1);
