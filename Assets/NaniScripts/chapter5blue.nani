@@ -645,5 +645,40 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 優菲: 陪了我這麼久，我真的很感謝呢。
 優菲: 我也即將上任了，到時候，也請多指教囉。
 優菲: 為了繼承梅爾的意念……
-（優菲線 血系結局end）
+優菲: {PlayerName}，你覺得呢？
+
+@choice 成為血巫結社的族母吧，那是梅爾的心願。 goto:.end_crimson
+@choice 你應該回象牙塔，那才是你的根。 goto:.end_blue_crown
+
+#end_crimson
+@stopBgm
+@bgm title
+@back stardust1
+
+優菲: ……嗯。
+優菲: 你說得對。
+優菲: 我要成為血巫結社的族母。
+優菲: 替梅爾，把她愛護的人好好守護起來。
+優菲: 有你在身邊，我才有勇氣說出這句話。
+優菲: 謝謝你，{PlayerName}。
+
+（END：緋紅替身）
+@stop
+
+#end_blue_crown
+@stopBgm
+@bgm title
+@back stardust1
+
+優菲: ……
+優菲: 也許你說得對。
+優菲: 象牙塔才是我的根，那裡還有很多人需要我。
+優菲: 妮可一直都等著我……我沒有理由讓她失望。
+優菲: 梅爾……一定也希望我能做自己吧。
+優菲: {PlayerName}，謝謝你。
+
+@char nic pos:50
+妮可: 學姊！我就知道！
+
+（END：純藍之冠）
 @stop
