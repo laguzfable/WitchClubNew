@@ -100,8 +100,16 @@
 薇狄亞: 妳沒有任何逃脫命運的可能。
 克蘿伊: 這很難講喔。
 @hide 薇狄亞,syb,chl
-（與克蘿伊的戰鬥）
-（本場戰鬥綠色卡將會是最強攻擊卡）
+@bgm energetic
+@battle background:bg04 target:monster02 label:ch4g_chl
+@stop
+# ch4g_chl
+@stopBgm
+@if CombatWin
+@goto .chl_win
+@endif
+@goto badend15
+# chl_win
 @char 薇狄亞 pos:25
 @char syb pos:50
 @char chl pos:75
@@ -347,6 +355,9 @@
 @GotoUnityScene sceneName:MapTest
 @stop
 #greennight_s2
+@if affinity_Syb>=30
+@goto badend13
+@endif
 （暗殺當天）
 @back bg04
 @char chl pos:25

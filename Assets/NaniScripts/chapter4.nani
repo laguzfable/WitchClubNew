@@ -121,6 +121,10 @@ syb: 但是，也別忽略妳自己內心的想法唷，薇狄亞。
 @stop
 
 # ch4bt1
+@set lost_bt1=1
+@if CombatWin
+@set lost_bt1=0
+@endif
 
 
 
@@ -218,6 +222,14 @@ nic:  我來抄寫降靈術的咒語，在這同時，學姐，請把邪靈給�
 @stop
 
 # ch4bt2
+@if CombatWin
+@goto .bt2_win
+@endif
+@if lost_bt1>0
+@goto badend14
+@endif
+@goto badend16
+# bt2_win
 
 @stopBgm
 
@@ -786,6 +798,11 @@ witchc: 迷霧草是最棒的！
 @stop
 
 # ch4bt3
+@if CombatWin
+@goto .bt3_win
+@endif
+@goto badend17
+# bt3_win
 
 
 @stopBgm
