@@ -782,6 +782,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
+      propertyPath: characterEventTable.Array.data[2].specialEvents.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
       propertyPath: characterEventTable.Array.data[3].specialEvents.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -1017,6 +1022,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
+      propertyPath: characterEventTable.Array.data[2].specialEvents.Array.data[0].eventName
+      value: guidance
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
       propertyPath: characterEventTable.Array.data[5].specialEvents.Array.data[0].eventName
       value: 666
       objectReference: {fileID: 0}
@@ -1182,6 +1192,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
+      propertyPath: characterEventTable.Array.data[2].specialEvents.Array.data[0].naninovelScript
+      value: yellow_guidance
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
       propertyPath: characterEventTable.Array.data[5].specialEvents.Array.data[0].naninovelScript
       value: chapter1
       objectReference: {fileID: 0}
@@ -1295,6 +1310,11 @@ PrefabInstance:
       propertyPath: characterEventTable.Array.data[0].specialEvents.Array.data[0].animatorController
       value: 
       objectReference: {fileID: 9100000, guid: 6ffb2ba300fca4a40823deb3a76a9016, type: 2}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[2].specialEvents.Array.data[0].animatorController
+      value: 
+      objectReference: {fileID: 9100000, guid: 0be64c0412d4eac47a8d55e824209813, type: 2}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
       propertyPath: characterEventTable.Array.data[5].specialEvents.Array.data[0].animatorController

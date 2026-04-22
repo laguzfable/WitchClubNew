@@ -691,14 +691,23 @@ nic: 終於走了，我們繼續吧……學姊？
 @goto chapter4green
 @else
 
-@choice 安慰優菲 goto:.ch4_cont2
-@choice 追魅兒 set:route_crimson=1 goto:.ch4_cont2
-@choice 跟著涅莉 goto:.ch4_cont2
+@choice 安慰優菲 goto:.ch4eupie
+@choice 追梅爾 (好感度不足會追不到) goto:.ch4mel
+@choice 跟著涅莉 goto:.ch4nelly
 @stop
 
 @endif
 
-#ch4_cont2
+#ch4mel
+@goto chapter4red    if:affinity_Mel>=50
+@goto .ch4eupie      if:affinity_Eup>=50
+@goto .ch4nelly      if:affinity_Nel>=50
+@goto chapter5common
+
+#ch4nelly
+@goto chapter5yellow
+
+#ch4eupie
 @back bg01
 
 @char 涅莉 pos:50
@@ -1197,8 +1206,5 @@ nic: 走吧～
 ？？？: ……不，不是的。
 ？？？: 因為您的出現，這次的結局，將會截然……不同。
 
-@goto chapter5blue   if:affinity_Eup>=30
-@goto chapter5yellow if:affinity_Nel>=30
-@goto chapter4red    if:affinity_Mel>=30
-@goto chapter5common
+@goto chapter5blue
 @stop
