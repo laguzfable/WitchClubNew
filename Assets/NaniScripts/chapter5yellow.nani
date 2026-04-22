@@ -122,6 +122,7 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 @stop
 # afterdate1
 @back bg03
+@stopBgm
 @bgm chill
 
 @if affinity_Nel>=100
@@ -140,6 +141,7 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 
 @hide 涅莉
 @back bg03
+@stopBgm
 @bgm energetic
 @battle background:bg03 target:monster03 label:ch5yt_micha
 @stop
@@ -191,6 +193,7 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 @stop
 # eclipse
 @back black
+@stopBgm
 @bgm white
 
 涅莉: ……好。
@@ -209,6 +212,7 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 
 # realworld
 @back bg01
+@stopBgm
 @bgm white
 
 涅莉: ……說真的，我累了。
@@ -219,6 +223,7 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 涅莉: 能夠不再背負這些，也挺好的。
 
 @back bg01
+@stopBgm
 @bgm chill
 
 涅莉: 喂，{PlayerName}，這個東西怎麼用？
@@ -231,6 +236,7 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 
 # success
 @back bg03
+@stopBgm
 @bgm title
 
 涅莉: 成了。

@@ -332,6 +332,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 西碧兒: 來來來，大家開動了。
 @hide 薇狄亞,syb
 (爆炸聲)
+@stopBgm
 @bgm energetic
 @battle background:bg02 target:monster02 label:ch5bt6
 @stop
@@ -545,6 +546,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 優菲: 我要在這裡將這個叛徒就地正法—－
 @back bg03
 @hide chl,魅兒,優菲
+@stopBgm
 @bgm energetic
 @battle background:bg03 target:monster02 label:ch5bt_mel
 @stop
@@ -596,6 +598,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 優菲: 我……
 @hide chl,薇狄亞,優菲,魅兒
 轟隆隆隆隆－－
+@stopBgm
 @bgm energetic
 @battle background:bg03 target:monster03 label:ch5bt_micha
 @stop
@@ -604,6 +607,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 @if CombatWin
 @goto euphie_end label:end1
 @endif
+@stopBgm
 @bgm serious
 @char 蘇菲亞 pos:25
 @char broom pos:50
