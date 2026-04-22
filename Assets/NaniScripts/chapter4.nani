@@ -332,7 +332,7 @@ broom: 我先！
 @hide 涅莉,優菲
 
 @stopBgm
-@saveMapDayNight isDay:true
+@saveMapDayNight isDay:false
 @SaveReturnPoint script:chapter4 label:afterdate5
 @GotoUnityScene sceneName:MapTest
 
@@ -584,7 +584,7 @@ syb: 嘻嘻，多得是機會呢。
 
 
 @stopBgm
-@saveMapDayNight isDay:true
+@saveMapDayNight isDay:false
 @SaveReturnPoint script:chapter4 label:afterdate6
 @GotoUnityScene sceneName:MapTest
 
@@ -1042,7 +1042,7 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 
 
 @stopBgm
-@saveMapDayNight isDay:true
+@saveMapDayNight isDay:false
 @SaveReturnPoint script:chapter4 label:afterdate7
 @GotoUnityScene sceneName:MapTest
 
@@ -1115,7 +1115,7 @@ nic: 走吧～
 (又玩了一整天，這天可以選跟誰玩)
 
 @stopBgm
-@saveMapDayNight isDay:true
+@saveMapDayNight isDay:false
 @SaveReturnPoint script:chapter4 label:afterdate8
 @GotoUnityScene sceneName:MapTest
 
@@ -1141,7 +1141,7 @@ nic: 走吧～
 
 @hide nic
 
-@saveMapDayNight isDay:true
+@saveMapDayNight isDay:false
 @SaveReturnPoint script:chapter4 label:afterdate9
 @GotoUnityScene sceneName:MapTest
 

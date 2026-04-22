@@ -185,7 +185,7 @@
 西碧兒: 一定要記住這一點。
 薇狄亞: 我、我知道了！
 @hide syb,薇狄亞
-@saveMapDayNight isDay:true
+@saveMapDayNight isDay:false
 @SaveReturnPoint script:"chapter4green" label:"greennight1"
 @GotoUnityScene sceneName:MapTest
 @stop
@@ -239,7 +239,7 @@
 
 @hide syb,薇狄亞
 
-@saveMapDayNight isDay:true
+@saveMapDayNight isDay:false
 @SaveReturnPoint script:"chapter4green" label:"greenday_v2"
 @GotoUnityScene sceneName:MapTest
 @stop
@@ -335,7 +335,7 @@
 
 @hide 薇狄亞
 
-@saveMapDayNight isDay:true
+@saveMapDayNight isDay:false
 @SaveReturnPoint script:"chapter4green" label:"greenday_s1"
 @GotoUnityScene sceneName:MapTest
 @stop
