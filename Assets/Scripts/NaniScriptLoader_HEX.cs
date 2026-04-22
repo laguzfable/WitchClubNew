@@ -48,7 +48,7 @@ public class NaniScriptLoader_HEX : MonoBehaviour
         catch (Exception e) { Debug.LogWarning($"★HEXE★ camera ex: {e.Message}"); }
 
         var ds = DataService.Instance;
-        Debug.Log($"★HEXE★ DataService={(ds==null?"NULL":"OK")}  scriptParameter={(ds?.scriptParameter==null?"null":ds.scriptParameter.scriptName)}");
+        Debug.Log($"★HEXE★ DataService={(ds==null?"NULL":"OK")}  scriptParameter={(ds?.scriptParameter==null?"null":ds.scriptParameter.scriptName.ToString())}");
         var sp = ds != null ? ds.scriptParameter : null;
 
         string scriptName = null;
