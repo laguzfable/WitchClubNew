@@ -621,7 +621,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 
 @choice 衝過去擋住那股力量 goto:.player_guards
 @choice 被震開了，動不了 goto:.nic_sacrifice
-
+@stop
 # nic_sacrifice
 @goto euphie_end label:end2
 
@@ -676,7 +676,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 
 @choice 成為血巫結社的族母吧，那是梅爾的心願。 goto:.end_crimson
 @choice 你應該回象牙塔，那才是你的根。 goto:.end_blue_crown
-
+@stop
 #end_crimson
 @stopBgm
 @bgm title

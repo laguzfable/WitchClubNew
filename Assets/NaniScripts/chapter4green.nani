@@ -159,6 +159,7 @@
 薇狄亞: 這是最好的結局了，對不對？！
 @choice 當然。 goto:.c4gsure
 @choice 不，我也覺得少了什麼…… goto:.c4gnotsure
+@stop
 #c4gsure
 薇狄亞: 嘻嘻嘻，我就知道{Playername}最好了！我說什麼都依我～
 薇狄亞: 最愛{Playername}了！
@@ -203,6 +204,7 @@
 把這件事……
 @choice 告訴薇狄亞 goto:.vedia
 @choice 告訴西碧兒 goto:.sybil
+@stop
 #vedia
 @char 薇狄亞 pos:35
 @char nic pos:65

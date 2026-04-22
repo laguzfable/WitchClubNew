@@ -687,7 +687,8 @@ nic: 終於走了，我們繼續吧……學姊？
 優菲: 抱歉……我只是……突然覺得好難過……
 優菲: 沒事，繼續開會吧。
 
-@if affinity_Ved >= 50
+@print [Eup:{affinity_Eup} Nel:{affinity_Nel} Ved:{affinity_Ved} Mel:{affinity_Mel}]
+@if affinity_Ved>=50
 @goto chapter4green
 @else
 

@@ -1,3 +1,5 @@
+@back bg04
+@bgm crowd
 @char 涅莉 pos:20
 @char 優菲 pos:40
 @char 魅兒 pos:60
@@ -185,7 +187,7 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 
 @choice 為了其他人，我可以再試一遍。 goto:.eclipse
 @choice 累了的話就和我走吧。 goto:.realworld
-
+@stop
 # eclipse
 @back black
 @bgm white

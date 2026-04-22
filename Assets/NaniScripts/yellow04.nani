@@ -44,7 +44,7 @@
 (CG: 涅莉躺在床上)
 @choice 幫她蓋好被子就走 goto:.yellow04end
 @choice 陪她直到她醒來 goto:.yellow04end
-@end
+@stop
 # yellow04end
 @set affinity_Nel=affinity_Nel+20
 @restroom
