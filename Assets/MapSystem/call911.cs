@@ -24,6 +24,7 @@ public class call911 : MonoBehaviour
 
     void CallNaniScript()
     {
+        Debug.Log($"★HEXE★ call911.CallNaniScript  劇本={劇本名}  busy={_busy}");
         if (_busy) { Debug.Log("【call911】忽略：上次切場尚未完成。"); return; }
         _busy = true;
         if (_btn) _btn.interactable = false;
