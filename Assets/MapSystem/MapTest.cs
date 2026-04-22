@@ -23,9 +23,13 @@ public class MapTest : MonoBehaviour
             continueUI.Visible = false;
 
         var printerMgr = Engine.GetService<ITextPrinterManager>();
-        var dialoguePrinter = printerMgr.GetActor(printerMgr.DefaultPrinterId);
-        if (dialoguePrinter != null)
-            dialoguePrinter.Visible = false;
+        try
+        {
+            var dialoguePrinter = printerMgr?.GetActor(printerMgr.DefaultPrinterId);
+            if (dialoguePrinter != null)
+                dialoguePrinter.Visible = false;
+        }
+        catch { }
 
         var naniCamera = Engine.GetService<ICameraManager>().Camera;
         naniCamera.enabled = false;

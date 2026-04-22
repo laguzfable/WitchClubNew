@@ -4,9 +4,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Ä„¡±¾ßMÈëĞİÏ¢ÊÒ¡£¿É§ ScriptName/Label ÔO¶¨ afterChatScript£¨ÓÃì¶ÁÄÌì·ÖÖ§£©£¬
-/// ²»•ş„ÓÖ÷¾€·µ»Øüc£¨MapReturnPoint£©¡£Åf°æ Naninovel£ºAsyncToken + IForceWait¡£
-/// ÓÃ·¨£º@Restroom ScriptName:"yellow01" Label:"night1"
+/// ï¿½Ä„ï¿½ï¿½ï¿½ï¿½Mï¿½ï¿½ï¿½ï¿½Ï¢ï¿½Ò¡ï¿½ï¿½Éï¿½ ScriptName/Label ï¿½Oï¿½ï¿½ afterChatScriptï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö§ï¿½ï¿½ï¿½ï¿½
+/// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½cï¿½ï¿½MapReturnPointï¿½ï¿½ï¿½ï¿½ï¿½fï¿½ï¿½ Naninovelï¿½ï¿½AsyncToken + IForceWaitï¿½ï¿½
+/// ï¿½Ã·ï¿½ï¿½ï¿½@Restroom ScriptName:"yellow01" Label:"night1"
 /// </summary>
 [CommandAlias("Restroom")]
 public class GotoRestRoomScene : Command, Command.IForceWait
@@ -22,24 +22,28 @@ public class GotoRestRoomScene : Command, Command.IForceWait
 
         Debug.Log($"[GRS] Restroom called. Assigned? ScriptName={Assigned(ScriptName)}, Label={Assigned(Label)}");
 
-        // êPé]¿ìŞD¡¢±³¾°ÅcÎÄ×Ö¿ò£¨¸úÄãÔ­Ê¼ĞĞéÒ»ÖÂ£©
+        // ï¿½Pï¿½]ï¿½ï¿½ï¿½Dï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½cï¿½ï¿½ï¿½Ö¿ò£¨¸ï¿½ï¿½ï¿½Ô­Ê¼ï¿½Ğï¿½Ò»ï¿½Â£ï¿½
         scriptPlayer.SetSkipEnabled(false);
         if (bgm != null && bgm.GetActor(BackgroundsConfiguration.MainActorId) != null)
             bgm.GetActor(BackgroundsConfiguration.MainActorId).Visible = false;
 
         if (printerMgr != null && printerMgr.DefaultPrinterId != null)
-            await printerMgr.GetActor(printerMgr.DefaultPrinterId).ChangeVisibilityAsync(false, 0.1f);
+        {
+            try { await printerMgr.GetActor(printerMgr.DefaultPrinterId).ChangeVisibilityAsync(false, 0.1f); }
+            catch { }
+        }
 
-        // ÈôÓĞ§Ä_±¾…¢”µ£¬ÔO¶¨ afterChatScript£¨½oĞİÏ¢ÊÒÁÄÌìÊ¹ÓÃ£©
+        // ï¿½ï¿½ï¿½Ğï¿½ï¿½_ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Oï¿½ï¿½ afterChatScriptï¿½ï¿½ï¿½oï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ã£ï¿½
         if (Assigned(ScriptName))
         {
             var sn = ScriptName.Value;
             var lb = Assigned(Label) ? Label.Value : null;
             DataService.Instance.afterChatScript = new ScriptParameter() { scriptName = sn, scriptLabel = lb };
+            MapReturnPoint.Set(sn, lb);
             Debug.Log($"[GRS] afterChatScript <- {sn}#{lb}");
         }
 
-        // ›Q¶¨ÊÇ·ñÄÜÁÄÌì
+        // ï¿½Qï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         var canChat = Assigned(ScriptName).ToString();
         Engine.GetService<ICustomVariableManager>().SetVariableValue("CanChat", canChat);
         Debug.Log($"[GRS] Set CanChat={canChat}");
