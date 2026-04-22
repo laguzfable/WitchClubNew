@@ -20,10 +20,13 @@ public class NaniScriptLoader_HEX : MonoBehaviour
         Debug.Log($"★HEXE★ NaniScriptLoader_HEX.Start");
         Debug.Log($"{TAG} Start");
 
+        Debug.Log($"★HEXE★ Engine.Initialized={Engine.Initialized}");
         if (!Engine.Initialized)
         {
+            Debug.Log($"★HEXE★ initializing engine...");
             try { await RuntimeInitializer.InitializeAsync(); }
-            catch (Exception e) { Debug.LogWarning($"{TAG} Init error: {e.Message}"); }
+            catch (Exception e) { Debug.LogWarning($"★HEXE★ Init error: {e.Message}"); }
+            Debug.Log($"★HEXE★ engine init done");
         }
 
         Debug.Log($"★HEXE★ waiting services...");
@@ -38,12 +41,14 @@ public class NaniScriptLoader_HEX : MonoBehaviour
             if (cam != null && !cam.enabled)
             {
                 cam.enabled = true;
-                Debug.Log($"{TAG} re-enabled naniCamera.");
+                Debug.Log($"★HEXE★ re-enabled naniCamera");
             }
+            else Debug.Log($"★HEXE★ naniCamera cam={(cam==null?"null":"ok")} enabled={(cam?.enabled)}");
         }
-        catch { }
+        catch (Exception e) { Debug.LogWarning($"★HEXE★ camera ex: {e.Message}"); }
 
         var ds = DataService.Instance;
+        Debug.Log($"★HEXE★ DataService={(ds==null?"NULL":"OK")}  scriptParameter={(ds?.scriptParameter==null?"null":ds.scriptParameter.scriptName)}");
         var sp = ds != null ? ds.scriptParameter : null;
 
         string scriptName = null;
@@ -53,16 +58,16 @@ public class NaniScriptLoader_HEX : MonoBehaviour
         {
             scriptName = sp.scriptName;
             label      = string.IsNullOrEmpty(sp.scriptLabel) ? null : sp.scriptLabel;
-            Debug.Log($"{TAG} got scriptParameter: name='{scriptName}', label='{(label ?? "<null>")}'");
+            Debug.Log($"★HEXE★ scriptParameter name='{scriptName}' label='{(label ?? "<null>")}'");
         }
         else if (ds != null && !string.IsNullOrEmpty(ds.startScript))
         {
             scriptName = ds.startScript;
-            Debug.Log($"{TAG} got startScript: '{scriptName}'");
+            Debug.Log($"★HEXE★ startScript='{scriptName}'");
         }
         else
         {
-            Debug.Log($"{TAG} no entry param; do nothing.");
+            Debug.Log($"★HEXE★ no entry param → do nothing");
             return;
         }
 
@@ -74,15 +79,16 @@ public class NaniScriptLoader_HEX : MonoBehaviour
             {
                 label = scriptName.Substring(i + 1);
                 scriptName = scriptName.Substring(0, i);
-                Debug.Log($"{TAG} parsed inline label -> name='{scriptName}', label='{label}'");
+                Debug.Log($"★HEXE★ inline label → name='{scriptName}' label='{label}'");
             }
         }
 
         var scripts = Engine.GetService<IScriptManager>();
         var player  = Engine.GetService<IScriptPlayer>();
+        Debug.Log($"★HEXE★ IScriptManager={(scripts==null?"NULL":"OK")}  IScriptPlayer={(player==null?"NULL":"OK")}");
         if (scripts == null || player == null)
         {
-            Debug.LogWarning($"{TAG} ScriptManager or ScriptPlayer missing. Abort.");
+            Debug.LogWarning($"★HEXE★ ABORT: service missing");
             return;
         }
 
@@ -94,7 +100,7 @@ public class NaniScriptLoader_HEX : MonoBehaviour
         Debug.Log($"★HEXE★ LoadScriptAsync({scriptName}) start");
         try { scriptObj = await scripts.LoadScriptAsync(scriptName); }
         catch (Exception e) { Debug.LogWarning($"★HEXE★ LoadScriptAsync EXCEPTION: {e.Message}"); }
-        Debug.Log($"★HEXE★ LoadScriptAsync done, scriptObj={(scriptObj == null ? "NULL" : "OK")}");
+        Debug.Log($"★HEXE★ LoadScriptAsync done  scriptObj={(scriptObj == null ? "NULL" : "OK")}");
 
         // 找 label 對應行號（可選）
         int? lineIndexFromLabel = null;
@@ -104,17 +110,20 @@ public class NaniScriptLoader_HEX : MonoBehaviour
         // 若需要（某些舊版才用得到）
         var playlistCandidate = BuildPlaylistIfPossible(scriptName, scriptObj, label, lineIndexFromLabel);
 
+        Debug.Log($"★HEXE★ TryPlayOnTarget start");
         // 先試「含行號/標籤」→ 再退回 (0,0)
         bool played =
             await TryPlayOnTarget(player,  "IScriptPlayer",  scriptName, scriptObj, label, lineIndexFromLabel, playlistCandidate, preferZeroArg:false, preferJump:true) ||
             await TryPlayOnTarget(scripts, "IScriptManager", scriptName, scriptObj, label, lineIndexFromLabel, playlistCandidate, preferZeroArg:false, preferJump:true);
 
+        Debug.Log($"★HEXE★ TryPlayOnTarget result={played}");
         if (!played)
             played = await SetScriptThenZeroArgPlay(player, scriptObj, scriptName);
 
+        Debug.Log($"★HEXE★ final played={played}");
         if (!played)
         {
-            Debug.LogError($"{TAG} All play attempts failed.");
+            Debug.LogError($"★HEXE★ ALL PLAY ATTEMPTS FAILED");
             return;
         }
 
