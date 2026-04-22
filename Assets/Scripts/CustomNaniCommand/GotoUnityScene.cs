@@ -17,9 +17,9 @@ public class GotoUnityScene : Command, Command.IForceWait
         var scriptPlayer = Engine.GetService<IScriptPlayer>();
         scriptPlayer.Stop();
 
-        // 3. Reset state.
+        // 3. Reset state，保留 CustomVariable（affinity 等不能被清除）
         var stateManager = Engine.GetService<IStateManager>();
-        await stateManager.ResetStateAsync();
+        await stateManager.ResetStateAsync(new[] { typeof(ICustomVariableManager) });
 
         // 4. Switch cameras.
         //var advCamera = GameObject.Find("CombatCamera").GetComponent<Camera>();
