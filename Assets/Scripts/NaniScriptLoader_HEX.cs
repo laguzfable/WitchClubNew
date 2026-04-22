@@ -28,6 +28,18 @@ public class NaniScriptLoader_HEX : MonoBehaviour
         await WaitServicesReadyAsync();
         HideLoadingIfAny();
 
+        // MapTest 會把 naniCamera 關掉，回到對話場景時必須重新打開
+        try
+        {
+            var cam = Engine.GetService<ICameraManager>()?.Camera;
+            if (cam != null && !cam.enabled)
+            {
+                cam.enabled = true;
+                Debug.Log($"{TAG} re-enabled naniCamera.");
+            }
+        }
+        catch { }
+
         var ds = DataService.Instance;
         var sp = ds != null ? ds.scriptParameter : null;
 
