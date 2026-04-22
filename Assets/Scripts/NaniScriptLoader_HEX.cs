@@ -26,7 +26,9 @@ public class NaniScriptLoader_HEX : MonoBehaviour
             catch (Exception e) { Debug.LogWarning($"{TAG} Init error: {e.Message}"); }
         }
 
+        Debug.Log($"★HEXE★ waiting services...");
         await WaitServicesReadyAsync();
+        Debug.Log($"★HEXE★ services ready");
         HideLoadingIfAny();
 
         // MapTest 會把 naniCamera 關掉，回到對話場景時必須重新打開
@@ -89,8 +91,10 @@ public class NaniScriptLoader_HEX : MonoBehaviour
 
         // 取 Script 物件
         object scriptObj = null;
+        Debug.Log($"★HEXE★ LoadScriptAsync({scriptName}) start");
         try { scriptObj = await scripts.LoadScriptAsync(scriptName); }
-        catch (Exception e) { Debug.LogWarning($"{TAG} LoadScriptAsync exception: {e.Message}"); }
+        catch (Exception e) { Debug.LogWarning($"★HEXE★ LoadScriptAsync EXCEPTION: {e.Message}"); }
+        Debug.Log($"★HEXE★ LoadScriptAsync done, scriptObj={(scriptObj == null ? "NULL" : "OK")}");
 
         // 找 label 對應行號（可選）
         int? lineIndexFromLabel = null;
