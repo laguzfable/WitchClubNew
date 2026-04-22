@@ -1,0 +1,30 @@
+@stopBgm
+@back bg01
+
+@choice "緋紅替身（ch5blue）" goto:chapter5blue label:end_crimson
+@choice "純藍之冠（ch5blue）" goto:chapter5blue label:end_blue_crown
+@choice "在妳身邊（ch6red）" goto:chapter6red label:zaiyushenbian
+@choice "穢血新神（ch6red）" goto:chapter6red label:eupie_newgod
+@choice "深春（ch4green）" goto:chapter4green label:greennight_v2
+@choice "火中の幻影（ch4green・需Syb<30）" goto:.setup_kachuu
+@choice "輪迴の鑰匙（ch5yellow）" goto:chapter5yellow label:eclipse
+@choice "背棄世界（ch5yellow）" goto:chapter5yellow label:realworld
+@choice "小精靈，飛走了（ch5yellow）" goto:.setup_pixie
+@choice "改寫命運（euphie_end）" goto:euphie_end label:end1
+@choice "殉道（euphie_end）" goto:euphie_end label:end2
+@choice "異端（badend12）" goto:badend12
+@choice "唯一（badend13）" goto:badend13
+@choice "壞滅（badend14）" goto:badend14
+@choice "肅清（badend15）" goto:badend15
+@choice "魔蝕（badend16）" goto:badend16
+@choice "蘇生（badend17）" goto:badend17
+@choice "終焉（ch5common）" goto:chapter5common label:end
+@stop
+
+# setup_kachuu
+@set affinity_Syb=0
+@goto chapter4green label:greennight_s2
+
+# setup_pixie
+@set affinity_Nel=100
+@goto chapter5yellow label:success
