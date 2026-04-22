@@ -24,7 +24,7 @@
 涅莉: 下次再試好嗎？
 
 @set affinity_Nel=affinity_Nel+20
-@if affinity_Nel < 100
+@if affinity_Nel<100
 @overrideEvent char:Nelly evt:guidance
 @endif
 @restroom
