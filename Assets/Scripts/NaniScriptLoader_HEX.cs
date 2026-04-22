@@ -17,6 +17,7 @@ public class NaniScriptLoader_HEX : MonoBehaviour
 
     private async void Start()
     {
+        Debug.Log($"★HEXE★ NaniScriptLoader_HEX.Start");
         Debug.Log($"{TAG} Start");
 
         if (!Engine.Initialized)

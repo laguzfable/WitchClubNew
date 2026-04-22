@@ -32,12 +32,12 @@ public class call911 : MonoBehaviour
         var loader = FindObjectOfType<SceneLoader>();
         if (loader != null)
         {
-            Debug.Log($"【call911】SceneLoader → GotoScript({劇本名})");
+            Debug.Log($"★HEXE★ SceneLoader FOUND → GotoScript({劇本名})");
             loader.GotoScript(劇本名);
             return;
         }
 
-        Debug.LogWarning("【call911】找不到 SceneLoader，改走後備。");
+        Debug.LogWarning("★HEXE★ SceneLoader NOT FOUND → 走後備");
         try
         {
             var vars = Engine.GetService<ICustomVariableManager>();
