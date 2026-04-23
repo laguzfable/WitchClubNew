@@ -3,35 +3,83 @@
 @hidePrinter
 
 # page1
-@choice "緋紅替身（ch5blue）" goto:chapter5blue label:end_crimson
-@choice "純藍之冠（ch5blue）" goto:chapter5blue label:end_blue_crown
-@choice "在妳身邊（ch6red）" goto:chapter6red label:zaiyushenbian
-@choice "穢血新神（ch6red）" goto:chapter6red label:eupie_newgod
-@choice "深春（ch4green）" goto:chapter4green label:greennight_v2
+@choice "緋紅替身（ch5blue）" goto:.goto_end_crimson
+@choice "純藍之冠（ch5blue）" goto:.goto_end_blue_crown
+@choice "在妳身邊（ch6red）" goto:.goto_zaiyushenbian
+@choice "穢血新神（ch6red）" goto:.goto_eupie_newgod
+@choice "深春（ch4green）" goto:.goto_greennight_v2
 @choice "火中の幻影（ch4green・需Syb<30）" goto:.setup_kachuu
-@choice "輪迴の鑰匙（ch5yellow）" goto:chapter5yellow label:eclipse
-@choice "背棄世界（ch5yellow）" goto:chapter5yellow label:realworld
+@choice "輪迴の鑰匙（ch5yellow）" goto:.goto_eclipse
+@choice "背棄世界（ch5yellow）" goto:.goto_realworld
 @choice "小精靈，飛走了（ch5yellow）" goto:.setup_pixie
 @choice "▼ 下一頁" goto:.page2
 @stop
 
 # page2
-@choice "改寫命運（euphie_end）" goto:euphie_end label:end1
-@choice "殉道（euphie_end）" goto:euphie_end label:end2
-@choice "異端（badend12）" goto:badend12
-@choice "唯一（badend13）" goto:badend13
-@choice "壞滅（badend14）" goto:badend14
-@choice "肅清（badend15）" goto:badend15
-@choice "魔蝕（badend16）" goto:badend16
-@choice "蘇生（badend17）" goto:badend17
-@choice "終焉（ch5common）" goto:chapter5common label:end
+@choice "改寫命運（euphie_end）" goto:.goto_end1
+@choice "殉道（euphie_end）" goto:.goto_end2
+@choice "異端（badend12）" goto:.goto_badend12
+@choice "唯一（badend13）" goto:.goto_badend13
+@choice "壞滅（badend14）" goto:.goto_badend14
+@choice "肅清（badend15）" goto:.goto_badend15
+@choice "魔蝕（badend16）" goto:.goto_badend16
+@choice "蘇生（badend17）" goto:.goto_badend17
+@choice "終焉（ch5common）" goto:.goto_ch5end
 @choice "▲ 上一頁" goto:.page1
 @stop
 
+# goto_end_crimson
+@gotoScript script:"chapter5blue" label:"end_crimson"
+
+# goto_end_blue_crown
+@gotoScript script:"chapter5blue" label:"end_blue_crown"
+
+# goto_zaiyushenbian
+@gotoScript script:"chapter6red" label:"zaiyushenbian"
+
+# goto_eupie_newgod
+@gotoScript script:"chapter6red" label:"eupie_newgod"
+
+# goto_greennight_v2
+@gotoScript script:"chapter4green" label:"greennight_v2"
+
 # setup_kachuu
 @set affinity_Syb=0
-@goto chapter4green label:greennight_s2
+@gotoScript script:"chapter4green" label:"greennight_s2"
+
+# goto_eclipse
+@gotoScript script:"chapter5yellow" label:"eclipse"
+
+# goto_realworld
+@gotoScript script:"chapter5yellow" label:"realworld"
 
 # setup_pixie
 @set affinity_Nel=100
-@goto chapter5yellow label:success
+@gotoScript script:"chapter5yellow" label:"success"
+
+# goto_end1
+@gotoScript script:"euphie_end" label:"end1"
+
+# goto_end2
+@gotoScript script:"euphie_end" label:"end2"
+
+# goto_badend12
+@gotoScript script:"badend12"
+
+# goto_badend13
+@gotoScript script:"badend13"
+
+# goto_badend14
+@gotoScript script:"badend14"
+
+# goto_badend15
+@gotoScript script:"badend15"
+
+# goto_badend16
+@gotoScript script:"badend16"
+
+# goto_badend17
+@gotoScript script:"badend17"
+
+# goto_ch5end
+@gotoScript script:"chapter5common" label:"end"
