@@ -29,57 +29,75 @@
 @stop
 
 # goto_end_crimson
-@gotoScript script:"chapter5blue" label:"end_crimson"
+@SaveReturnPoint script:"chapter5blue" label:"end_crimson"
+@GotoUnityScene sceneName:NaniDialogTest
 
 # goto_end_blue_crown
-@gotoScript script:"chapter5blue" label:"end_blue_crown"
+@SaveReturnPoint script:"chapter5blue" label:"end_blue_crown"
+@GotoUnityScene sceneName:NaniDialogTest
 
 # goto_zaiyushenbian
-@gotoScript script:"chapter6red" label:"zaiyushenbian"
+@SaveReturnPoint script:"chapter6red" label:"zaiyushenbian"
+@GotoUnityScene sceneName:NaniDialogTest
 
 # goto_eupie_newgod
-@gotoScript script:"chapter6red" label:"eupie_newgod"
+@SaveReturnPoint script:"chapter6red" label:"eupie_newgod"
+@GotoUnityScene sceneName:NaniDialogTest
 
 # goto_greennight_v2
-@gotoScript script:"chapter4green" label:"greennight_v2"
+@SaveReturnPoint script:"chapter4green" label:"greennight_v2"
+@GotoUnityScene sceneName:NaniDialogTest
 
 # setup_kachuu
 @set affinity_Syb=0
-@gotoScript script:"chapter4green" label:"greennight_s2"
+@SaveReturnPoint script:"chapter4green" label:"greennight_s2"
+@GotoUnityScene sceneName:NaniDialogTest
 
 # goto_eclipse
-@gotoScript script:"chapter5yellow" label:"eclipse"
+@SaveReturnPoint script:"chapter5yellow" label:"eclipse"
+@GotoUnityScene sceneName:NaniDialogTest
 
 # goto_realworld
-@gotoScript script:"chapter5yellow" label:"realworld"
+@SaveReturnPoint script:"chapter5yellow" label:"realworld"
+@GotoUnityScene sceneName:NaniDialogTest
 
 # setup_pixie
 @set affinity_Nel=100
-@gotoScript script:"chapter5yellow" label:"success"
+@SaveReturnPoint script:"chapter5yellow" label:"success"
+@GotoUnityScene sceneName:NaniDialogTest
 
 # goto_end1
-@gotoScript script:"euphie_end" label:"end1"
+@SaveReturnPoint script:"euphie_end" label:"end1"
+@GotoUnityScene sceneName:NaniDialogTest
 
 # goto_end2
-@gotoScript script:"euphie_end" label:"end2"
+@SaveReturnPoint script:"euphie_end" label:"end2"
+@GotoUnityScene sceneName:NaniDialogTest
 
 # goto_badend12
-@gotoScript script:"badend12"
+@SaveReturnPoint script:"badend12"
+@GotoUnityScene sceneName:NaniDialogTest
 
 # goto_badend13
-@gotoScript script:"badend13"
+@SaveReturnPoint script:"badend13"
+@GotoUnityScene sceneName:NaniDialogTest
 
 # goto_badend14
-@gotoScript script:"badend14"
+@SaveReturnPoint script:"badend14"
+@GotoUnityScene sceneName:NaniDialogTest
 
 # goto_badend15
-@gotoScript script:"badend15"
+@SaveReturnPoint script:"badend15"
+@GotoUnityScene sceneName:NaniDialogTest
 
 # goto_badend16
-@gotoScript script:"badend16"
+@SaveReturnPoint script:"badend16"
+@GotoUnityScene sceneName:NaniDialogTest
 
 # goto_badend17
-@gotoScript script:"badend17"
+@SaveReturnPoint script:"badend17"
+@GotoUnityScene sceneName:NaniDialogTest
 
 # goto_ch5end
-@gotoScript script:"chapter5common" label:"end"
+@SaveReturnPoint script:"chapter5common" label:"end"
+@GotoUnityScene sceneName:NaniDialogTest

@@ -60,6 +60,13 @@ public class NaniScriptLoader_HEX : MonoBehaviour
             label      = string.IsNullOrEmpty(sp.scriptLabel) ? null : sp.scriptLabel;
             Debug.Log($"★HEXE★ scriptParameter name='{scriptName}' label='{(label ?? "<null>")}'");
         }
+        else if (MapReturnPoint.HasValid())
+        {
+            scriptName = MapReturnPoint.ScriptName;
+            label      = string.IsNullOrEmpty(MapReturnPoint.Label) ? null : MapReturnPoint.Label;
+            MapReturnPoint.Clear();
+            Debug.Log($"★HEXE★ MapReturnPoint name='{scriptName}' label='{(label ?? "<null>")}'");
+        }
         else if (ds != null && !string.IsNullOrEmpty(ds.startScript))
         {
             scriptName = ds.startScript;
