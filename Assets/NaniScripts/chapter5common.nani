@@ -19,7 +19,8 @@
 ？？？: 就讓我們一起看這一切毀滅吧。
 （所有的光消失了）
 （END：失敗終焉）
-@goto test_endings
+@wait input:true
+@exitToTitle
 @stop
 
 #who

@@ -196,7 +196,8 @@
 優菲: 到時候……記得提醒我。
 
 （END：穢血新神）
-@goto test_endings
+@wait input:true
+@exitToTitle
 @stop
 
 # zaiyushenbian
@@ -240,5 +241,6 @@
 「這個骷髏看起來好厲害，好想買啊！」
 「不要啦，買這個做什麼……」
 END
-@goto test_endings
+@wait input:true
+@exitToTitle
 @stop
