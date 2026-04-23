@@ -267,7 +267,7 @@
 @SaveReturnPoint script:"chapter4green" label:"greennight_v2"
 @GotoUnityScene sceneName:MapTest
 @stop
-#greennight_v2
+# greennight_v2
 @back bg04
 @char syb pos:35
 @char 薇狄亞 pos:65
@@ -359,7 +359,7 @@
 @SaveReturnPoint script:"chapter4green" label:"greennight_s2"
 @GotoUnityScene sceneName:MapTest
 @stop
-#greennight_s2
+# greennight_s2
 @if affinity_Syb>=30
 @goto badend13
 @endif
