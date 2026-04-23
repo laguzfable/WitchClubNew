@@ -1,6 +1,7 @@
 @stopBgm
 @back bg01
 
+# page1
 @choice "緋紅替身（ch5blue）" goto:chapter5blue label:end_crimson
 @choice "純藍之冠（ch5blue）" goto:chapter5blue label:end_blue_crown
 @choice "在妳身邊（ch6red）" goto:chapter6red label:zaiyushenbian
@@ -10,6 +11,10 @@
 @choice "輪迴の鑰匙（ch5yellow）" goto:chapter5yellow label:eclipse
 @choice "背棄世界（ch5yellow）" goto:chapter5yellow label:realworld
 @choice "小精靈，飛走了（ch5yellow）" goto:.setup_pixie
+@choice "▼ 下一頁" goto:.page2
+@stop
+
+# page2
 @choice "改寫命運（euphie_end）" goto:euphie_end label:end1
 @choice "殉道（euphie_end）" goto:euphie_end label:end2
 @choice "異端（badend12）" goto:badend12
@@ -19,6 +24,7 @@
 @choice "魔蝕（badend16）" goto:badend16
 @choice "蘇生（badend17）" goto:badend17
 @choice "終焉（ch5common）" goto:chapter5common label:end
+@choice "▲ 上一頁" goto:.page1
 @stop
 
 # setup_kachuu
