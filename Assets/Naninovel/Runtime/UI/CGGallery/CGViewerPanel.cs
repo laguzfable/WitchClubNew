@@ -101,42 +101,48 @@ namespace Naninovel.UI
 
         private void ApplyScrollLayout (Texture2D texture)
         {
-            Debug.Log($"[SCROLL] ApplyScrollLayout called. scrollRect={scrollRect}, scrollContent={scrollContent}");
-            if (scrollRect == null || scrollContent == null)
-            {
-                Debug.LogWarning("[SCROLL] scrollRect or scrollContent is null — skipping layout.");
-                return;
-            }
+            if (scrollRect == null || scrollContent == null) return;
 
             var viewportRect = scrollRect.viewport != null
                 ? scrollRect.viewport
                 : scrollRect.GetComponent<RectTransform>();
-            var viewportWidth = viewportRect.rect.width;
+            var viewportWidth  = viewportRect.rect.width;
             var viewportHeight = viewportRect.rect.height;
-            Debug.Log($"[SCROLL] texture={texture.width}x{texture.height}  viewport={viewportWidth}x{viewportHeight}");
 
-            var scale = viewportHeight / texture.height;
-            var displayedWidth = texture.width * scale;
-            var isWide = displayedWidth > viewportWidth + 60f;
-            Debug.Log($"[SCROLL] displayedWidth={displayedWidth}  isWide={isWide}");
-
-            if (aspectRatioFitter != null)
-                aspectRatioFitter.enabled = false;
+            // 長寬比超過 16:9 + 容差 → 寬圖，需要滾動
+            const float standardAspect = 16f / 9f;
+            var textureAspect = (float)texture.width / texture.height;
+            var isWide = textureAspect > standardAspect + 0.05f;
 
             scrollRect.horizontal = isWide;
-            scrollRect.vertical = false;
-
-            var contentWidth = isWide ? displayedWidth : viewportWidth;
-            scrollContent.sizeDelta = new Vector2(contentWidth, 0f);
-            Debug.Log($"[SCROLL] contentWidth set to {contentWidth}");
-
-            var imageRect = contentImage.rectTransform;
-            imageRect.anchorMin = Vector2.zero;
-            imageRect.anchorMax = Vector2.one;
-            imageRect.sizeDelta = Vector2.zero;
+            scrollRect.vertical   = false;
 
             if (isWide)
+            {
+                if (aspectRatioFitter != null) aspectRatioFitter.enabled = false;
+
+                // 寬圖：以 viewport 高度為基準，算出原始比例寬度
+                var displayedWidth = texture.width * (viewportHeight / texture.height);
+                scrollContent.sizeDelta = new Vector2(displayedWidth, 0f);
+
+                var imageRect = contentImage.rectTransform;
+                imageRect.anchorMin  = Vector2.zero;
+                imageRect.anchorMax  = Vector2.one;
+                imageRect.sizeDelta  = Vector2.zero;
+
                 scrollRect.normalizedPosition = new Vector2(0f, 0f);
+            }
+            else
+            {
+                // 標準圖：還原 AspectRatioFitter，讓原本的縮放邏輯處理
+                if (aspectRatioFitter != null) aspectRatioFitter.enabled = true;
+                scrollContent.sizeDelta = new Vector2(viewportWidth, 0f);
+
+                var imageRect = contentImage.rectTransform;
+                imageRect.anchorMin  = Vector2.zero;
+                imageRect.anchorMax  = Vector2.one;
+                imageRect.sizeDelta  = Vector2.zero;
+            }
         }
     }
 }
