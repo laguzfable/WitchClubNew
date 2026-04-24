@@ -111,7 +111,8 @@ namespace Naninovel.UI
 
             var scale = viewportHeight / texture.height;
             var displayedWidth = texture.width * scale;
-            var isWide = displayedWidth > viewportWidth + 1f;
+            // 1980x1080 は canvas 1920 より少し広いので許容値を設ける
+            var isWide = displayedWidth > viewportWidth + 60f;
 
             if (aspectRatioFitter != null)
                 aspectRatioFitter.enabled = false;
@@ -119,8 +120,9 @@ namespace Naninovel.UI
             scrollRect.horizontal = isWide;
             scrollRect.vertical = false;
 
+            // Content の Y は stretch anchor（0→1）なので sizeDelta.y=0 が全高
             var contentWidth = isWide ? displayedWidth : viewportWidth;
-            scrollContent.sizeDelta = new Vector2(contentWidth, viewportHeight);
+            scrollContent.sizeDelta = new Vector2(contentWidth, 0f);
 
             var imageRect = contentImage.rectTransform;
             imageRect.anchorMin = Vector2.zero;
