@@ -1,7 +1,7 @@
 ﻿// Assets\Naninovel\Runtime\UI\CGGallery\CGViewerPanel.cs
 
 using System.Collections.Generic;
-using System.Linq; // 確保有這個才能用 Count()
+using System.Linq;
 using Naninovel.Runtime.UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,19 +16,21 @@ namespace Naninovel.UI
         [SerializeField] private RawImage contentImage = default;
         [Tooltip("When multiple CGs assigned, controls crossfade duration, in seconds.")]
         [SerializeField] private float crossfadeDuration = .3f;
+        [Tooltip("ScrollRect used for wide CGs. When null, scrolling is disabled.")]
+        [SerializeField] private ScrollRect scrollRect = default;
+        [Tooltip("RectTransform of the content inside ScrollRect (parent of contentImage).")]
+        [SerializeField] private RectTransform scrollContent = default;
+        [Tooltip("AspectRatioFitter on the image — disabled when scroll layout is active.")]
+        [SerializeField] private AspectRatioFitter aspectRatioFitter = default;
 
         private readonly Queue<Texture2D> textureQueue = new Queue<Texture2D>();
         private ImageCrossfader crossfader;
-        private CanvasGroup canvasGroup; // 引用 CanvasGroup
-
+        private CanvasGroup canvasGroup;
 
         public virtual void Show (IEnumerable<Texture2D> textures)
         {
-            // 🔥 步驟 1: 強制啟用 GameObject (解決「隱藏狀態」問題)
-            gameObject.SetActive(true); 
-
-            EnsureInitialized(); // 確保 crossfader 和 canvasGroup 存在
-
+            gameObject.SetActive(true);
+            EnsureInitialized();
             EnqueueTextures(textures);
 
             if (textureQueue.Count == 0)
@@ -37,25 +39,19 @@ namespace Naninovel.UI
                 return;
             }
 
+            base.Show();
+            Canvas.ForceUpdateCanvases();
             ShowNextTexture(0);
-            
-            // 🔥 步驟 2: 強制設定 CanvasGroup.alpha 為 1 (解決「Alpha是0」問題)
+
             if (canvasGroup)
             {
                 canvasGroup.alpha = 1;
                 canvasGroup.interactable = true;
                 canvasGroup.blocksRaycasts = true;
-                Debug.Log("[VIEWER SHOW FIX FINAL] Forced Active, Alpha=1, Interaction Enabled.");
             }
 
-            // 呼叫 base.Show() 確保基礎邏輯運行，但現在它是否成功已不再重要
-            base.Show(); 
-
-            // 步驟 3: 再次檢查並強制設定 (以防 base.Show() 試圖將 alpha 設回 0)
             if (canvasGroup && canvasGroup.alpha < 1)
-            {
                 canvasGroup.alpha = 1;
-            }
         }
 
         protected override void Awake ()
@@ -77,15 +73,12 @@ namespace Naninovel.UI
             else Hide();
         }
 
-        // 統一初始化邏輯 (確保 crossfader 和 canvasGroup 存在)
         private void EnsureInitialized()
         {
-            if (crossfader != null && canvasGroup != null) return; 
-            
+            if (crossfader != null && canvasGroup != null) return;
+
             this.AssertRequiredObjects(contentImage);
             crossfader = new ImageCrossfader(contentImage);
-
-            // 獲取 CanvasGroup
             canvasGroup = GetComponent<CanvasGroup>();
             this.AssertRequiredObjects(canvasGroup);
         }
@@ -101,11 +94,41 @@ namespace Naninovel.UI
         private void ShowNextTexture (float duration)
         {
             var texture = textureQueue.Dequeue();
-            
-            // 強制清除材質，解決圖片透明問題
-            contentImage.material = null; 
-
+            contentImage.material = null;
             crossfader.Crossfade(texture, duration);
+            ApplyScrollLayout(texture);
+        }
+
+        private void ApplyScrollLayout (Texture2D texture)
+        {
+            if (scrollRect == null || scrollContent == null) return;
+
+            var viewportRect = scrollRect.viewport != null
+                ? scrollRect.viewport
+                : scrollRect.GetComponent<RectTransform>();
+            var viewportWidth = viewportRect.rect.width;
+            var viewportHeight = viewportRect.rect.height;
+
+            var scale = viewportHeight / texture.height;
+            var displayedWidth = texture.width * scale;
+            var isWide = displayedWidth > viewportWidth + 1f;
+
+            if (aspectRatioFitter != null)
+                aspectRatioFitter.enabled = false;
+
+            scrollRect.horizontal = isWide;
+            scrollRect.vertical = false;
+
+            var contentWidth = isWide ? displayedWidth : viewportWidth;
+            scrollContent.sizeDelta = new Vector2(contentWidth, viewportHeight);
+
+            var imageRect = contentImage.rectTransform;
+            imageRect.anchorMin = Vector2.zero;
+            imageRect.anchorMax = Vector2.one;
+            imageRect.sizeDelta = Vector2.zero;
+
+            if (isWide)
+                scrollRect.normalizedPosition = new Vector2(0f, 0f);
         }
     }
 }
