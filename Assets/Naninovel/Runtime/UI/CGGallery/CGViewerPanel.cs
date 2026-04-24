@@ -101,18 +101,24 @@ namespace Naninovel.UI
 
         private void ApplyScrollLayout (Texture2D texture)
         {
-            if (scrollRect == null || scrollContent == null) return;
+            Debug.Log($"[SCROLL] ApplyScrollLayout called. scrollRect={scrollRect}, scrollContent={scrollContent}");
+            if (scrollRect == null || scrollContent == null)
+            {
+                Debug.LogWarning("[SCROLL] scrollRect or scrollContent is null — skipping layout.");
+                return;
+            }
 
             var viewportRect = scrollRect.viewport != null
                 ? scrollRect.viewport
                 : scrollRect.GetComponent<RectTransform>();
             var viewportWidth = viewportRect.rect.width;
             var viewportHeight = viewportRect.rect.height;
+            Debug.Log($"[SCROLL] texture={texture.width}x{texture.height}  viewport={viewportWidth}x{viewportHeight}");
 
             var scale = viewportHeight / texture.height;
             var displayedWidth = texture.width * scale;
-            // 1980x1080 は canvas 1920 より少し広いので許容値を設ける
             var isWide = displayedWidth > viewportWidth + 60f;
+            Debug.Log($"[SCROLL] displayedWidth={displayedWidth}  isWide={isWide}");
 
             if (aspectRatioFitter != null)
                 aspectRatioFitter.enabled = false;
@@ -120,9 +126,9 @@ namespace Naninovel.UI
             scrollRect.horizontal = isWide;
             scrollRect.vertical = false;
 
-            // Content の Y は stretch anchor（0→1）なので sizeDelta.y=0 が全高
             var contentWidth = isWide ? displayedWidth : viewportWidth;
             scrollContent.sizeDelta = new Vector2(contentWidth, 0f);
+            Debug.Log($"[SCROLL] contentWidth set to {contentWidth}");
 
             var imageRect = contentImage.rectTransform;
             imageRect.anchorMin = Vector2.zero;
