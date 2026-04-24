@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Naninovel.Runtime.UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,9 +24,13 @@ namespace Naninovel.UI
         [Tooltip("AspectRatioFitter on the image — disabled when scroll layout is active.")]
         [SerializeField] private AspectRatioFitter aspectRatioFitter = default;
 
+        [Tooltip("寬圖自動滾動到底所需的秒數。")]
+        [SerializeField] private float autoScrollDuration = 5f;
+
         private readonly Queue<Texture2D> textureQueue = new Queue<Texture2D>();
         private ImageCrossfader crossfader;
         private CanvasGroup canvasGroup;
+        private CancellationTokenSource scrollCancel;
 
         public virtual void Show (IEnumerable<Texture2D> textures)
         {
@@ -64,6 +69,8 @@ namespace Naninovel.UI
         {
             base.OnDestroy();
             crossfader?.Dispose();
+            scrollCancel?.Cancel();
+            scrollCancel?.Dispose();
         }
 
         protected override void OnButtonClick ()
@@ -131,6 +138,7 @@ namespace Naninovel.UI
                 imageRect.sizeDelta  = Vector2.zero;
 
                 scrollRect.normalizedPosition = new Vector2(0f, 0f);
+                StartAutoScroll();
             }
             else
             {
@@ -143,6 +151,32 @@ namespace Naninovel.UI
                 imageRect.anchorMax  = Vector2.one;
                 imageRect.sizeDelta  = Vector2.zero;
             }
+        }
+
+        private void StartAutoScroll ()
+        {
+            scrollCancel?.Cancel();
+            scrollCancel?.Dispose();
+            scrollCancel = new CancellationTokenSource();
+            AutoScrollAsync(scrollCancel.Token).Forget();
+        }
+
+        private async UniTaskVoid AutoScrollAsync (CancellationToken token)
+        {
+            // 稍等一下再開始滾（讓圖片先顯示完）
+            await UniTask.Delay(System.TimeSpan.FromSeconds(0.5f), cancellationToken: token);
+
+            var elapsed = 0f;
+            while (elapsed < autoScrollDuration)
+            {
+                if (token.IsCancellationRequested || scrollRect == null) return;
+                elapsed += Time.deltaTime;
+                scrollRect.horizontalNormalizedPosition = Mathf.Clamp01(elapsed / autoScrollDuration);
+                await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken: token);
+            }
+
+            if (scrollRect != null)
+                scrollRect.horizontalNormalizedPosition = 1f;
         }
     }
 }
