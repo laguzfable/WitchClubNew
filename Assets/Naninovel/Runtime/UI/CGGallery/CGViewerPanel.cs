@@ -172,7 +172,8 @@ namespace Naninovel.UI
                 if (token.IsCancellationRequested || scrollRect == null) return;
                 elapsed += Time.deltaTime;
                 scrollRect.horizontalNormalizedPosition = Mathf.Clamp01(elapsed / autoScrollDuration);
-                await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken: token);
+                await UniTask.Yield(PlayerLoopTiming.Update);
+                if (token.IsCancellationRequested) return;
             }
 
             if (scrollRect != null)
