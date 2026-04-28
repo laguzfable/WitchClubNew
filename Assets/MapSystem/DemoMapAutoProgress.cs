@@ -60,9 +60,26 @@ public class DemoMapAutoProgress : MonoBehaviour
             {
                 if (iconName.Contains(kv.Key))
                 {
-                    c911.劇本名 = kv.Value;
+                    var script = kv.Value;
+                    var btn = c911.GetComponent<UnityEngine.UI.Button>();
+                    if (btn != null)
+                    {
+                        // 完全替換 onClick，繞過 call911 的 fallback 路徑
+                        btn.onClick.RemoveAllListeners();
+                        btn.onClick.AddListener(() =>
+                        {
+                            Debug.Log($"[DemoMap] 點擊小人 → {script}");
+                            var ds = DataService.Instance;
+                            if (ds != null)
+                            {
+                                ds.startScript     = script;
+                                ds.scriptParameter = new ScriptParameter { scriptName = script };
+                            }
+                            UnityEngine.SceneManagement.SceneManager.LoadScene("NaniDialogTest");
+                        });
+                    }
                     overridden++;
-                    Debug.Log($"[DemoMap] {iconName} → {kv.Value}");
+                    Debug.Log($"[DemoMap] {iconName} → {script}");
                     break;
                 }
             }
