@@ -27,34 +27,20 @@ public class GotoMapDemo : Command, Command.IForceWait
     {
         Debug.Log("[GotoMapDemo] ▶ ExecuteAsync 開始");
 
-        // 1. 隱藏繼續輸入提示
-        var continueUI = GameObject.FindObjectOfType<ContinueInputUI>();
-        if (continueUI != null) continueUI.Visible = false;
-        Debug.Log($"[GotoMapDemo] ContinueUI: {(continueUI != null ? "找到並隱藏" : "null，跳過")}");
+        // 1. 把返回點存到 PlayerPrefs（Reset 後 Naninovel 變數會清掉，改用 PlayerPrefs 保留）
+        if (Assigned(ReturnScript)) PlayerPrefs.SetString("DemoNextScript", ReturnScript.Value);
+        if (Assigned(ReturnLabel))  PlayerPrefs.SetString("DemoNextLabel",  ReturnLabel.Value);
+        PlayerPrefs.SetInt("MapIsDay", 1); // Demo 固定白天
+        PlayerPrefs.Save();
+        Debug.Log($"[GotoMapDemo] PlayerPrefs 儲存：DemoNextScript={ReturnScript?.Value}  DemoNextLabel={ReturnLabel?.Value}");
 
-        // 2. 停止腳本播放
-        var scriptPlayer = Engine.GetService<IScriptPlayer>();
-        if (scriptPlayer == null) { Debug.LogError("[GotoMapDemo] IScriptPlayer 為 null！"); return; }
-        scriptPlayer.Stop();
-        Debug.Log("[GotoMapDemo] ScriptPlayer.Stop() 完成");
+        // 2. Reset Naninovel 狀態（讓地圖相機能正常運作，與 @GotoUnityScene 一致）
+        var stateManager = Engine.GetService<IStateManager>();
+        await stateManager.ResetStateAsync();
+        Debug.Log("[GotoMapDemo] ResetStateAsync 完成");
 
-        // 3. 寫入返回點變數
-        var vars = Engine.GetService<ICustomVariableManager>();
-        if (vars == null) { Debug.LogError("[GotoMapDemo] ICustomVariableManager 為 null！"); }
-        else
-        {
-            if (Assigned(ReturnScript)) vars.SetVariableValue("NextScript", ReturnScript.Value);
-            if (Assigned(ReturnLabel))  vars.SetVariableValue("NextLabel",  ReturnLabel.Value);
-            Debug.Log($"[GotoMapDemo] 變數寫入：NextScript={ReturnScript?.Value}  NextLabel={ReturnLabel?.Value}");
-        }
-
-        // 4. 關閉 Naninovel 相機
-        var naniCamera = Engine.GetService<ICameraManager>()?.Camera;
-        if (naniCamera != null) naniCamera.enabled = false;
-        Debug.Log($"[GotoMapDemo] NaniCamera: {(naniCamera != null ? "已關閉" : "null，跳過")}");
-
-        // 5. 載入地圖場景
-        var targetScene = Assigned(SceneName) ? SceneName.Value : "DemoMap";
+        // 3. 載入地圖場景
+        var targetScene = Assigned(SceneName) ? SceneName.Value : "MapTest";
         Debug.Log($"[GotoMapDemo] 即將載入場景：'{targetScene}'");
         await SceneManager.LoadSceneAsync(targetScene);
         Debug.Log("[GotoMapDemo] 場景載入完成");

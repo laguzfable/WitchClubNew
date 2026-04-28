@@ -190,6 +190,11 @@ public class DemoMapAutoProgress : MonoBehaviour
             frameImg.DOColor(Color.white, 0.1f).OnComplete(() =>
                 frameImg.DOColor(frameImg.color, 0.2f));
 
+        // 清除 PlayerPrefs 返回點（已選定角色，不再需要）
+        PlayerPrefs.DeleteKey("DemoNextScript");
+        PlayerPrefs.DeleteKey("DemoNextLabel");
+        PlayerPrefs.Save();
+
         if (SceneLoader.Instance != null)
         {
             SceneLoader.Instance.GotoScript(scriptName);
