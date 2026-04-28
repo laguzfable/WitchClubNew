@@ -38,12 +38,17 @@ public class DemoMapAutoProgress : MonoBehaviour
 
     IEnumerator OverrideCharacterScripts()
     {
-        // MapCharacterSpawner 用 coroutine 生成，等兩幀確保完成
+        // call911 是在 CreateCharacterIcon 的 yield return null 之後才 AddComponent，
+        // 多等幾幀確保全部 4 個圖示都掛好 call911
         yield return null;
         yield return null;
+        yield return null;
+        yield return new WaitForSeconds(0.2f);
 
+        var all911 = FindObjectsOfType<call911>();
+        Debug.Log($"[DemoMap] 找到 {all911.Length} 個 call911 元件");
         int overridden = 0;
-        foreach (var c911 in FindObjectsOfType<call911>())
+        foreach (var c911 in all911)
         {
             // 往上找到 Icon_{characterName}_{eventName} 的節點
             string iconName = "";
