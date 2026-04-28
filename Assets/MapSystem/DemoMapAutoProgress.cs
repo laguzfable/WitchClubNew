@@ -40,8 +40,16 @@ public class DemoMapAutoProgress : MonoBehaviour
         int overridden = 0;
         foreach (var c911 in FindObjectsOfType<call911>())
         {
-            // icon 名稱格式：Icon_{characterName}_{eventName}
-            string iconName = c911.transform.parent?.parent?.name ?? "";
+            // 往上找到 Icon_{characterName}_{eventName} 的節點
+            string iconName = "";
+            var t = c911.transform;
+            while (t != null)
+            {
+                if (t.name.StartsWith("Icon_")) { iconName = t.name; break; }
+                t = t.parent;
+            }
+
+            Debug.Log($"[DemoMap] call911 找到 icon：'{iconName}'");
 
             foreach (var kv in DemoScripts)
             {
