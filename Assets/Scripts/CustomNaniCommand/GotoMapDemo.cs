@@ -34,7 +34,16 @@ public class GotoMapDemo : Command, Command.IForceWait
         PlayerPrefs.Save();
         Debug.Log($"[GotoMapDemo] PlayerPrefs 儲存：DemoNextScript={ReturnScript?.Value}  DemoNextLabel={ReturnLabel?.Value}");
 
-        // 2. Reset Naninovel 狀態（讓地圖相機能正常運作，與 @GotoUnityScene 一致）
+        // 2. 重置所有角色進度為 0（確保 Demo 地圖上 4 個小人全部出現）
+        var spMgr = Object.FindObjectOfType<StoryProgressManager>();
+        if (spMgr != null)
+        {
+            foreach (var name in new[] { "Mei", "Vivia", "Euphie", "Nelly" })
+                spMgr.ResetProgress(name);
+            Debug.Log("[GotoMapDemo] 角色進度已重置");
+        }
+
+        // 3. Reset Naninovel 狀態（讓地圖相機能正常運作，與 @GotoUnityScene 一致）
         var stateManager = Engine.GetService<IStateManager>();
         await stateManager.ResetStateAsync();
         Debug.Log("[GotoMapDemo] ResetStateAsync 完成");
