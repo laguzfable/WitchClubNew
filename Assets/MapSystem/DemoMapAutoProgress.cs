@@ -62,11 +62,11 @@ public class DemoMapAutoProgress : MonoBehaviour
         scaler.referenceResolution = new Vector2(1920, 1080);
         canvasGO.AddComponent<GraphicRaycaster>();
 
-        // ── 全螢幕背景 ──
-        var bgImg = MakeImage(canvasGO.transform, "Background",
-            Vector2.zero, Vector2.one, backgroundColor);
+        // ── 全螢幕背景（只在有指定 sprite 時才蓋上，否則讓地圖場景自己顯示）──
         if (backgroundSprite != null)
         {
+            var bgImg = MakeImage(canvasGO.transform, "Background",
+                Vector2.zero, Vector2.one, Color.white);
             bgImg.sprite = backgroundSprite;
             bgImg.type   = Image.Type.Simple;
             bgImg.preserveAspect = false;
