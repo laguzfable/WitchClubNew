@@ -12,8 +12,11 @@ public class DemoMapAutoProgress : MonoBehaviour
     static readonly Dictionary<string, string> DemoScripts = new Dictionary<string, string>
     {
         { "Mei",    "demo_mei"    },
+        { "Mel",    "demo_mei"    },
         { "Vivia",  "demo_vivia"  },
+        { "Vedia",  "demo_vivia"  },
         { "Euphie", "demo_euphie" },
+        { "Eupie",  "demo_euphie" },
         { "Nelly",  "demo_nelly"  },
         // 中文備用
         { "魅兒",   "demo_mei"    },
