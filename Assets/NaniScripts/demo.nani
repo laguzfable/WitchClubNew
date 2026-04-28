@@ -41,11 +41,8 @@
 
 @hide 涅莉,優菲,魅兒,薇狄亞
 
-; ── 選擇挑戰對象 ──────────────────────────────────
-@choice "⚔ 挑戰魅兒（血系強攻）" goto:demo_mei
-@choice "💚 挑戰薇狄亞（自然治癒）" goto:demo_vivia
-@choice "🛡 挑戰優菲（奧術護盾）" goto:demo_euphie
-@choice "🔮 挑戰涅莉（精靈符文）" goto:demo_nelly
+; ── 前往地圖 ─────────────────────────────────────
+@GotoMapDemo ReturnScript:demo ReturnLabel:aftermap Scene:MapTest
 @stop
 
 
