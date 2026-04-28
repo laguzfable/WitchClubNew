@@ -29,7 +29,9 @@ public static class CreateDemoMapScene
 
         // 4. DemoMapAutoProgress 掛載點
         var demoGO = new GameObject("DemoMapController");
-        demoGO.AddComponent<DemoMapAutoProgress>();
+        var demoType = System.Type.GetType("DemoMapAutoProgress");
+        if (demoType != null) demoGO.AddComponent(demoType);
+        else Debug.LogWarning("[CreateDemoMapScene] 找不到 DemoMapAutoProgress，請手動加上腳本。");
 
         // 5. 儲存場景
         string path = "Assets/Scenes/DemoMap.unity";

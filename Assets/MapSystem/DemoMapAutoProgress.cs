@@ -190,15 +190,20 @@ public class DemoMapAutoProgress : MonoBehaviour
             frameImg.DOColor(Color.white, 0.1f).OnComplete(() =>
                 frameImg.DOColor(frameImg.color, 0.2f));
 
-        var loader = SceneLoader.Instance;
-        if (loader != null)
+        if (SceneLoader.Instance != null)
         {
-            loader.GotoScript(scriptName);
+            SceneLoader.Instance.GotoScript(scriptName);
+            return;
         }
-        else
+
+        // fallback：直接設 DataService 再切換到 Nani 場景
+        var ds = DataService.Instance;
+        if (ds != null)
         {
-            Debug.LogError("[DemoMapAutoProgress] 找不到 SceneLoader.Instance！");
+            ds.startScript     = scriptName;
+            ds.scriptParameter = new ScriptParameter { scriptName = scriptName };
         }
+        UnityEngine.SceneManagement.SceneManager.LoadScene("NaniDialogTest");
     }
 
     // ── Utilities ────────────────────────────────────────────────
