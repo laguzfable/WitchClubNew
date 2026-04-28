@@ -11,10 +11,15 @@ public class DemoMapAutoProgress : MonoBehaviour
     // 角色名稱 → demo 腳本對應表（配合 MapCharacterSpawner 的 characterName）
     static readonly Dictionary<string, string> DemoScripts = new Dictionary<string, string>
     {
-        { "魅兒",  "demo_mei"    },
-        { "薇狄亞", "demo_vivia"  },
-        { "優菲",  "demo_euphie" },
-        { "涅莉",  "demo_nelly"  },
+        { "Mei",    "demo_mei"    },
+        { "Vivia",  "demo_vivia"  },
+        { "Euphie", "demo_euphie" },
+        { "Nelly",  "demo_nelly"  },
+        // 中文備用
+        { "魅兒",   "demo_mei"    },
+        { "薇狄亞",  "demo_vivia"  },
+        { "優菲",   "demo_euphie" },
+        { "涅莉",   "demo_nelly"  },
     };
 
     void Start()
