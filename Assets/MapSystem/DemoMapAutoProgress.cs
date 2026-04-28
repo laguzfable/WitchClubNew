@@ -4,12 +4,15 @@ using TMPro;
 using DG.Tweening;
 
 /// <summary>
-/// 放在 MapTest 場景的任意 GameObject 上。
-/// 在地圖下方顯示 4 個角色的挑戰按鈕，
-/// 各自帶到不同的 nani 腳本 → 不同怪物 → 不同戰鬥情境。
+/// 放在 DemoMap 場景的任意 GameObject 上。
+/// 顯示背景圖 + 4 個角色挑戰按鈕，不依賴地圖系統。
 /// </summary>
 public class DemoMapAutoProgress : MonoBehaviour
 {
+    [Header("背景圖（選填，留空則用純色）")]
+    [SerializeField] Sprite backgroundSprite;
+    [SerializeField] Color  backgroundColor = new Color(0.08f, 0.05f, 0.12f, 1f);
+
     // ── 4 角色設定 ────────────────────────────────────────────────
 
     readonly CharacterEntry[] characters = new CharacterEntry[]
@@ -58,6 +61,16 @@ public class DemoMapAutoProgress : MonoBehaviour
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920, 1080);
         canvasGO.AddComponent<GraphicRaycaster>();
+
+        // ── 全螢幕背景 ──
+        var bgImg = MakeImage(canvasGO.transform, "Background",
+            Vector2.zero, Vector2.one, backgroundColor);
+        if (backgroundSprite != null)
+        {
+            bgImg.sprite = backgroundSprite;
+            bgImg.type   = Image.Type.Simple;
+            bgImg.preserveAspect = false;
+        }
 
         // ── 底部半透明深色面板 ──
         MakeImage(canvasGO.transform, "BG",

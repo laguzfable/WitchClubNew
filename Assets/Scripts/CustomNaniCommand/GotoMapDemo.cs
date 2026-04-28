@@ -21,7 +21,7 @@ public class GotoMapDemo : Command, Command.IForceWait
     public StringParameter ReturnLabel;
 
     [ParameterAlias("Scene")]
-    public StringParameter SceneName = "MapTest";
+    public StringParameter SceneName = "DemoMap";
 
     public async override UniTask ExecuteAsync(AsyncToken asyncToken = default)
     {

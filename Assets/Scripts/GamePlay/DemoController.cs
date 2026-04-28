@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using TMPro;
-using Cysharp.Threading.Tasks;
+using Naninovel;
 
 /// <summary>
 /// 自動化展示 Demo 控制器。
