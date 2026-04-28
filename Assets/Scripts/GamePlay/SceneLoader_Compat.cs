@@ -23,6 +23,10 @@ public class SceneLoader : MonoBehaviour
     public string newGameScript = "chapter0";
     public string newGameLabel  = "";
 
+    [Header("Demo (optional)")]
+    public string demoScript = "demo";
+    public string demoLabel  = "";
+
     private void Awake ()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -30,6 +34,8 @@ public class SceneLoader : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         Debug.Log($"[SL*] Awake. title='{titleSceneName}', nani='{naniSceneName}'");
     }
+
+    public void StartDemo() => GotoScript(demoScript, string.IsNullOrEmpty(demoLabel) ? null : demoLabel);
 
     public void GotoScript (string scriptName, string label = null)
     {

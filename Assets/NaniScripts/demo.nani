@@ -1,0 +1,108 @@
+; ═══════════════════════════════════════════════════
+;   HEXE  ──  DEMO  腳本
+;   展示順序：劇情  →  地圖  →  戰鬥  →  結尾
+; ═══════════════════════════════════════════════════
+
+; 若玩家還沒命名，給個預設值
+@set PlayerName="旅人"
+
+@stopBgm
+@bgm happy
+@back bg01 time:0.5
+
+; ── 劇情篇 ───────────────────────────────────────
+
+@char 涅莉 pos:50 time:0
+涅莉.happy: 嘿，{PlayerName}！歡迎來到《魔女俱樂部》的世界──
+
+@choice 這裡……是哪裡？
+@stop
+
+@char 優菲 pos:70 time:0.3
+@char 魅兒 pos:30 time:0.3
+
+涅莉: 這是三位女巫剛剛重新掛牌的秘密基地！
+優菲.smile: 我是象牙塔的優菲，讀了太多魔法書，現在有點……怪。
+魅兒.idle: 血巫結社，魅兒。直接說我是個沒錢的窮女巫就好了。
+涅莉.yummy: 我是精靈涅莉，被裝在瓶子裡幾百年──現在終於自由啦！
+
+@choice 你們個個看起來都很危險……
+@stop
+
+優菲.angry: 危險沒錯！我的奧術衝擊可以讓妳頭髮全豎起來。
+魅兒.rage: 我的血咒術隨時可以讓你後悔說出這句話。
+涅莉: 哈哈，別怕別怕，她們兩個平常就這樣啦。
+
+@spawn Dust
+@char 薇狄亞 pos:87 time:0.5
+薇狄亞.love: 要不要先去外面逛逛，看看今天地圖上有誰在附近活動呢？
+
+@choice 好，一起去吧！
+@stop
+
+@hide 涅莉,優菲,魅兒,薇狄亞
+
+; ── 前往地圖 ─────────────────────────────────────
+; 保留 Naninovel 狀態，設定返回點後切換到地圖場景
+@GotoMapDemo ReturnScript:demo ReturnLabel:aftermap
+@stop
+
+
+; ─────────────────────────────────────────────────
+# aftermap
+; ─────────────────────────────────────────────────
+
+@stopBgm
+@bgm intense
+@back bg03 time:0.3
+@char 涅莉 pos:50 time:0
+
+涅莉.exc: 剛才在地圖上看到的那傢伙就在前面！要不要試試我們的合技？
+
+@char 優菲 pos:70 time:0.3
+@char 魅兒 pos:28 time:0.3
+
+優菲.angry: 交給我們的卡牌！四元素同時出擊的威力妳見識過嗎？
+魅兒.talking: 先讓我的血咒術打出空缺，再靠四色合技清場──
+涅莉: 把力量借給妳們咯──{PlayerName}，準備好了嗎？
+
+@choice 準備好！
+@stop
+
+@hide 涅莉,優菲,魅兒,薇狄亞
+
+; ── 戰鬥篇 ── DemoController 將自動演示所有戰鬥功能
+@Battle Background:bg03 Target:demoMob ScriptName:demo Label:afterbattle
+@stop
+
+
+; ─────────────────────────────────────────────────
+# afterbattle
+; ─────────────────────────────────────────────────
+
+@stopBgm
+@bgm happy
+@back bg01 time:0.5
+@char 涅莉 pos:50 time:0
+@char 優菲 pos:70 time:0
+@char 魅兒 pos:30 time:0
+
+優菲.bling: 我——們——贏！了！
+魅兒.idle: 理所當然，她就那點本事而已。
+涅莉.happy: 不愧是我挑選的旅人，合技配合得超漂亮！
+
+@spawn Dust
+@char 薇狄亞 pos:87 time:0.3
+薇狄亞.love: 這就是 HEXE 的戰鬥系統──卡牌、元素、符文，一切都在妳的掌握之中。
+
+@choice 我還想繼續冒險！
+@stop
+
+@hide 涅莉,優菲,魅兒,薇狄亞
+@stopBgm
+@bgm stardust
+@back bg02 time:1
+
+涅莉: 太好了！那麼……魔女俱樂部的正式冒險，現在才要開始呢。
+
+@stop

@@ -1,0 +1,19 @@
+; ── 魅兒・血系女巫 ────────────────────────────────────────────
+; 戰鬥重點：紅系強攻  ＋  絳紅之夜（攻擊翻倍）＋  四色合技
+
+@stopBgm
+@bgm intense
+@back bg03 time:0.3
+@char 魅兒 pos:50 time:0
+
+魅兒.rage: 妳找上我了嗎？有膽的話——血咒術！
+
+@choice 接受挑戰！
+@stop
+
+魅兒.talking: 哼，別小看血系魔法，我能用自己的鮮血讓妳嘗嘗苦頭。
+魅兒.idle: 不過……如果妳能把我打趴，我就承認妳還有點本事。
+
+@hide 魅兒
+@battle background:bg03 target:mobMei scriptName:demo label:afterbattle
+@stop

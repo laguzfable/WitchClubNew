@@ -97,6 +97,9 @@ public class PlayerController : MonoBehaviour
         cardContriner.DOMoveY(isDown ? downPos.position.y : upPos.position.y, 0.2f);
     }
 
+    public ElementCard[] GetCards() => cards;
+    public UIWitchAbility[] GetWitchCards() => witchCards;
+
     public PlayerUnit GetPlayerUnit()
     {
         if (null == playerUnit)

@@ -1,0 +1,19 @@
+; ── 優菲・象牙塔女巫 ─────────────────────────────────────────
+; 戰鬥重點：藍系護盾  ＋  高塔之暮（防禦翻倍）＋  符文技能
+
+@stopBgm
+@bgm energetic
+@back bg02 time:0.3
+@char 優菲 pos:50 time:0
+
+優菲.angry: 妳居然敢單挑我？象牙塔的奧術可不是鬧著玩的！
+
+@choice 就試試看嘛！
+@stop
+
+優菲.smile: 哼哼，有勇氣，我喜歡！不過要有心理準備，我的奧術衝擊可是讓很多人吃過虧的。
+優菲.talk: 先讓妳見識見識象牙塔的防禦陣式——奧術護盾，展開！
+
+@hide 優菲
+@battle background:bg02 target:mobEuphie scriptName:demo label:afterbattle
+@stop

@@ -1,0 +1,19 @@
+; ── 薇狄亞・自然系女巫 ───────────────────────────────────────
+; 戰鬥重點：綠系治癒  ＋  生命之雨（治癒翻倍）＋  藍系防禦
+
+@stopBgm
+@bgm white
+@back bg04 time:0.3
+@char 薇狄亞 pos:50 time:0
+
+薇狄亞.smile: 哎呀，有新朋友來了呢～要和我切磋一下嗎？
+
+@choice 好呀，奉陪到底！
+@stop
+
+薇狄亞.love: 自然系魔法的真諦不只是攻擊，生命力才是最強的武器唷。
+薇狄亞: 希望妳能親身感受到大自然的溫柔與堅韌……那我們開始吧！
+
+@hide 薇狄亞
+@battle background:bg04 target:mobVivia scriptName:demo label:afterbattle
+@stop
