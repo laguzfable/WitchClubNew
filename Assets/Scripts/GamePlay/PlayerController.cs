@@ -246,13 +246,10 @@ public class PlayerController : MonoBehaviour
             AddEN(totalAttr.EN);
         }
 
-        /*
-        if(result?.state == EElementState.Combination)
+        if (result?.state == EElementState.Combination)
         {
-            var targetCG = combinationCGArr[comboSprIndex];
-            //do something
+            combatSystem.ShowComboImage(GetCompboSpr());
         }
-        */
 
         audioSource.clip = sfx[0];
         audioSource.Play();
@@ -658,7 +655,20 @@ public class PlayerController : MonoBehaviour
 
     public Sprite GetCompboSpr()
     {
-        return combinationCGArr[result.GetComboID()-1];
+        if (result == null || !result.IsCombo())
+        {
+            Debug.LogWarning("[Combo] GetCompboSpr called, but current result is not a combo.");
+            return null;
+        }
+
+        int index = result.GetComboID() - 1;
+        if (index < 0 || index >= combinationCGArr.Length)
+        {
+            Debug.LogWarning($"[Combo] Combo sprite index out of range: {index}");
+            return null;
+        }
+
+        return combinationCGArr[index];
     }
 }
 

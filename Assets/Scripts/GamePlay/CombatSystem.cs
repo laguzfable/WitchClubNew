@@ -230,6 +230,8 @@ public class MobRuneUnlockData
 
     [SerializeField] CGFadeHelper blackScreen;
     [SerializeField] Image comboSpecialImg;
+    [SerializeField] float comboImageDisplayTime = 1.2f;
+    Tween comboImageTween;
 
 public async UniTask PlayCardAsync()
 {
@@ -336,6 +338,37 @@ public async UniTask PlayCardAsync()
             resultOrder.action = action;
             orderList.Add(resultOrder);
         }
+    }
+
+    public void ShowComboImage(Sprite sprite)
+    {
+        if (comboSpecialImg == null)
+        {
+            Debug.LogWarning("[Combo] comboSpecialImg is not assigned on CombatSystem.");
+            return;
+        }
+
+        if (sprite == null)
+        {
+            Debug.LogWarning("[Combo] combo sprite is null.");
+            return;
+        }
+
+        comboImageTween?.Kill();
+
+        comboSpecialImg.sprite = sprite;
+        comboSpecialImg.gameObject.SetActive(true);
+        comboSpecialImg.color = new Color(
+            comboSpecialImg.color.r,
+            comboSpecialImg.color.g,
+            comboSpecialImg.color.b,
+            1f
+        );
+
+        comboImageTween = comboSpecialImg
+            .DOFade(0f, 0.25f)
+            .SetDelay(comboImageDisplayTime)
+            .OnComplete(() => comboSpecialImg.gameObject.SetActive(false));
     }
 
     public void PrepareBeginTurn()
