@@ -61,8 +61,9 @@ public class DemoController : MonoBehaviour
     {
         if (debugAlwaysRun) return true;
         var t = DataService.Instance?.scriptParameter?.combatTarget?.Value;
-        return t == "demoMob"   || t == "mobMei" ||
-               t == "mobVivia"  || t == "mobEuphie" || t == "mobNelly";
+        // mobMei / mobVivia / mobEuphie 由 DemoCombatController 處理（教學樣式）
+        // mobNelly 自由遊玩，不需要 overlay
+        return t == "demoMob";
     }
 
     // ═════════════════════════════════════════════════════════════
