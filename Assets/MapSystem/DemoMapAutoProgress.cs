@@ -41,9 +41,28 @@ public class DemoMapAutoProgress : MonoBehaviour
 
     IEnumerator OverrideCharacterScripts()
     {
-        // call911 是在 CreateCharacterIcon 的 yield return null 之後才 AddComponent，
-        // 多等幾幀確保全部 4 個圖示都掛好 call911
+        // Icon GameObject 在 CreateCharacterIcon 的第一個 yield return null 後存在，
+        // 但 call911 是在那之後才 AddComponent。
+        // → 第 1 幀後先隱藏不需要的角色（不必等 call911）
+        // → 再多等幾幀讓 call911 掛好，然後覆寫 onClick
+
+        // ── 第一步：1 幀後立刻隱藏 Vedia/Nelly ─────────────────
         yield return null;
+
+        foreach (Transform child in GetAllIconRoots())
+        {
+            foreach (var hide in HideCharacters)
+            {
+                if (child.name.Contains(hide))
+                {
+                    child.gameObject.SetActive(false);
+                    Debug.Log($"[DemoMap] 立即隱藏：{child.name}");
+                    break;
+                }
+            }
+        }
+
+        // ── 第二步：再等幾幀讓 call911 全部掛好 ────────────────
         yield return null;
         yield return null;
         yield return new WaitForSeconds(0.2f);
@@ -53,29 +72,12 @@ public class DemoMapAutoProgress : MonoBehaviour
         int overridden = 0;
         foreach (var c911 in all911)
         {
-            // 往上找到 Icon_{characterName}_{eventName} 的節點
             string iconName = "";
-            Transform iconRoot = null;
             var t = c911.transform;
             while (t != null)
             {
-                if (t.name.StartsWith("Icon_")) { iconName = t.name; iconRoot = t; break; }
+                if (t.name.StartsWith("Icon_")) { iconName = t.name; break; }
                 t = t.parent;
-            }
-
-            Debug.Log($"[DemoMap] call911 找到 icon：'{iconName}'");
-
-            // 先檢查是否為需要隱藏的角色
-            bool shouldHide = false;
-            foreach (var hide in HideCharacters)
-            {
-                if (iconName.Contains(hide)) { shouldHide = true; break; }
-            }
-            if (shouldHide)
-            {
-                if (iconRoot != null) iconRoot.gameObject.SetActive(false);
-                Debug.Log($"[DemoMap] 隱藏非demo角色：{iconName}");
-                continue;
             }
 
             foreach (var kv in DemoScripts)
@@ -86,7 +88,6 @@ public class DemoMapAutoProgress : MonoBehaviour
                     var btn = c911.GetComponent<UnityEngine.UI.Button>();
                     if (btn != null)
                     {
-                        // 完全替換 onClick，繞過 call911 的 fallback 路徑
                         btn.onClick.RemoveAllListeners();
                         btn.onClick.AddListener(() =>
                         {
@@ -107,6 +108,15 @@ public class DemoMapAutoProgress : MonoBehaviour
             }
         }
 
-        Debug.Log($"[DemoMap] 共覆寫 {overridden} 個小人腳本；隱藏非demo角色完畢");
+        Debug.Log($"[DemoMap] 共覆寫 {overridden} 個小人腳本");
+    }
+
+    // iconParent 下所有直接子物件（即 Icon_* 根節點）
+    IEnumerable<Transform> GetAllIconRoots()
+    {
+        var spawner = FindObjectOfType<MapCharacterSpawner>();
+        if (spawner == null || spawner.iconParent == null) yield break;
+        foreach (Transform child in spawner.iconParent)
+            yield return child;
     }
 }
