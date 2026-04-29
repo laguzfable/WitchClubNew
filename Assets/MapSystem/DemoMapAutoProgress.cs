@@ -30,11 +30,18 @@ public class DemoMapAutoProgress : MonoBehaviour
     void Awake()
     {
         _spawners = FindObjectsOfType<MapCharacterSpawner>();
-        Debug.Log($"[DemoMap] Awake ── 找到 {_spawners.Length} 個 MapCharacterSpawner，全部停用");
+        Debug.Log($"[DemoMap] Awake ── 找到 {_spawners.Length} 個 Spawner");
+
+        // Spawner は止めない（iconParent が自身と同じ可能性があるため）
+        // 代わりに CanvasGroup で視覚的に隱す
         foreach (var s in _spawners)
         {
-            Debug.Log($"[DemoMap]   停用：{s.gameObject.name}  iconParent={(s.iconParent != null ? s.iconParent.name : "null")}");
-            s.gameObject.SetActive(false);
+            var container = s.iconParent != null ? s.iconParent.gameObject : s.gameObject;
+            var cg = container.GetComponent<CanvasGroup>() ?? container.AddComponent<CanvasGroup>();
+            cg.alpha = 0f;
+            cg.blocksRaycasts = false;
+            cg.interactable = false;
+            Debug.Log($"[DemoMap]   隱藏 container：{container.name}");
         }
     }
 
@@ -48,28 +55,16 @@ public class DemoMapAutoProgress : MonoBehaviour
 
     IEnumerator Setup()
     {
-        // ── 1. 重新啟動所有 Spawner，同幀先把容器藏起來
-        foreach (var s in _spawners)
-        {
-            if (s == null) continue;
-            s.gameObject.SetActive(true);
-            if (s.iconParent != null)
-                s.iconParent.gameObject.SetActive(false);
-        }
-
-        // ── 2. 等 Spawner.Start() 跑完、call911.Start() 也跑完
+        // Spawner.Start() → CreateCharacterIcon → call911.Start() が全部終わるまで待つ
         yield return null;
         yield return null;
         yield return null;
         yield return null;
         yield return new WaitForSeconds(0.3f);
 
-        // ── 3. 逐 Spawner 處理
         foreach (var s in _spawners)
         {
             if (s == null) continue;
-
-            // iconParent が null なら Spawner.transform 自体を親として扱う
             Transform container = s.iconParent != null ? s.iconParent : s.transform;
             Debug.Log($"[DemoMap] Spawner={s.gameObject.name}  container={container.name}  子={container.childCount}");
 
@@ -78,6 +73,13 @@ public class DemoMapAutoProgress : MonoBehaviour
 
             foreach (var child in children)
             {
+                // 動的生成された Icon_* だけ処理（CharacterIcon / MapBG 等はスキップ）
+                if (!child.name.StartsWith("Icon_"))
+                {
+                    Debug.Log($"[DemoMap]   スキップ（Icon_ 以外）：{child.name}");
+                    continue;
+                }
+
                 string name = child.name;
                 Debug.Log($"[DemoMap]   icon: '{name}'");
 
@@ -101,10 +103,8 @@ public class DemoMapAutoProgress : MonoBehaviour
                     matched = true;
                     var script = kv.Value;
 
-                    // call911 停用（Stop() が AddListener を再追加するのを防ぐ）
                     var c911 = child.GetComponentInChildren<call911>(true);
-                    if (c911 != null) { c911.enabled = false; Debug.Log($"[DemoMap]   call911 停用"); }
-                    else Debug.LogWarning($"[DemoMap]   call911 が見つかりません: {name}");
+                    if (c911 != null) c911.enabled = false;
 
                     var btn = child.GetComponentInChildren<Button>(true);
                     if (btn != null)
@@ -123,17 +123,23 @@ public class DemoMapAutoProgress : MonoBehaviour
                         });
                         Debug.Log($"[DemoMap]   → {script}");
                     }
-                    else Debug.LogWarning($"[DemoMap]   Button が見つかりません: {name}");
+                    else Debug.LogWarning($"[DemoMap]   Button 找不到：{name}");
                     break;
                 }
 
                 if (!matched)
-                    Debug.LogWarning($"[DemoMap]   '{name}' は DemoScripts にも HideCharacters にも一致しない");
+                    Debug.LogWarning($"[DemoMap]   '{name}' 沒有對應的腳本");
             }
 
-            // 容器を再表示
-            if (s.iconParent != null)
-                s.iconParent.gameObject.SetActive(true);
+            // CanvasGroup を戻す（Vedia/Nelly は SetActive=false 済なので見えない）
+            var containerGO = s.iconParent != null ? s.iconParent.gameObject : s.gameObject;
+            var cg = containerGO.GetComponent<CanvasGroup>();
+            if (cg != null)
+            {
+                cg.alpha = 1f;
+                cg.blocksRaycasts = true;
+                cg.interactable = true;
+            }
         }
 
         Debug.Log("[DemoMap] Setup 完了");
