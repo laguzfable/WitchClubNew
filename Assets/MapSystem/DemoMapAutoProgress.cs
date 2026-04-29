@@ -25,6 +25,19 @@ public class DemoMapAutoProgress : MonoBehaviour
         "Vivia", "Vedia", "薇狄亞", "Nelly", "涅莉",
     };
 
+    MapCharacterSpawner _spawner;
+
+    void Awake()
+    {
+        // 在小人生成前就把 iconParent 整個關掉，完全避免任何閃爍
+        _spawner = FindObjectOfType<MapCharacterSpawner>();
+        if (_spawner != null && _spawner.iconParent != null)
+        {
+            _spawner.iconParent.gameObject.SetActive(false);
+            Debug.Log("[DemoMap] iconParent 預先隱藏");
+        }
+    }
+
     void Start()
     {
         // 隱藏 MapEventManager 的按鈕列
@@ -35,37 +48,37 @@ public class DemoMapAutoProgress : MonoBehaviour
             Debug.Log("[DemoMap] MapEventManager 已隱藏");
         }
 
-        // 等小人生成完再覆寫腳本
         StartCoroutine(OverrideCharacterScripts());
     }
 
     IEnumerator OverrideCharacterScripts()
     {
-        // Icon GameObject 在 CreateCharacterIcon 的第一個 yield return null 後存在，
-        // 但 call911 是在那之後才 AddComponent。
-        // → 第 1 幀後先隱藏不需要的角色（不必等 call911）
-        // → 再多等幾幀讓 call911 掛好，然後覆寫 onClick
-
-        // ── 第一步：1 幀後立刻隱藏 Vedia/Nelly ─────────────────
+        // 等幾幀讓 MapCharacterSpawner 生成完、call911 全部掛好
         yield return null;
+        yield return null;
+        yield return null;
+        yield return new WaitForSeconds(0.2f);
 
-        foreach (Transform child in GetAllIconRoots())
+        // 隱藏不需要的角色 icon
+        if (_spawner != null && _spawner.iconParent != null)
         {
-            foreach (var hide in HideCharacters)
+            foreach (Transform child in _spawner.iconParent)
             {
-                if (child.name.Contains(hide))
+                foreach (var hide in HideCharacters)
                 {
-                    child.gameObject.SetActive(false);
-                    Debug.Log($"[DemoMap] 立即隱藏：{child.name}");
-                    break;
+                    if (child.name.Contains(hide))
+                    {
+                        child.gameObject.SetActive(false);
+                        Debug.Log($"[DemoMap] 隱藏：{child.name}");
+                        break;
+                    }
                 }
             }
         }
 
-        // ── 第二步：再等幾幀讓 call911 全部掛好 ────────────────
-        yield return null;
-        yield return null;
-        yield return new WaitForSeconds(0.2f);
+        // iconParent 重新顯示（Mel/Eupie 的 icon 會跟著出現）
+        if (_spawner != null && _spawner.iconParent != null)
+            _spawner.iconParent.gameObject.SetActive(true);
 
         var all911 = FindObjectsOfType<call911>();
         Debug.Log($"[DemoMap] 找到 {all911.Length} 個 call911 元件");
@@ -111,12 +124,4 @@ public class DemoMapAutoProgress : MonoBehaviour
         Debug.Log($"[DemoMap] 共覆寫 {overridden} 個小人腳本");
     }
 
-    // iconParent 下所有直接子物件（即 Icon_* 根節點）
-    IEnumerable<Transform> GetAllIconRoots()
-    {
-        var spawner = FindObjectOfType<MapCharacterSpawner>();
-        if (spawner == null || spawner.iconParent == null) yield break;
-        foreach (Transform child in spawner.iconParent)
-            yield return child;
-    }
 }
