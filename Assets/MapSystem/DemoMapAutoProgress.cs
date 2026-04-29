@@ -99,17 +99,17 @@ public class DemoMapAutoProgress : MonoBehaviour
 
                 var script = matchedScript;
 
-                // call911 直接 Destroy（比 enabled=false 更確實，Start() 如果還沒跑就不會跑）
+                // call911 と同じ GO の Button を取得（call911 は GirlButton に AddComponent される）
                 var c911 = child.GetComponentInChildren<call911>(true);
+                Button btn = null;
                 if (c911 != null)
                 {
-                    Destroy(c911);
-                    Debug.Log($"[DemoMap]   call911 Destroy");
+                    btn = c911.GetComponent<Button>();
+                    Debug.Log($"[DemoMap]   call911 場所：{c911.gameObject.name}  Button={btn != null}");
                 }
-                else Debug.LogWarning($"[DemoMap]   call911 找不到");
+                // fallback
+                if (btn == null) btn = child.GetComponentInChildren<Button>(true);
 
-                // 替換 Button onClick
-                var btn = child.GetComponentInChildren<Button>(true);
                 if (btn != null)
                 {
                     btn.onClick.RemoveAllListeners();
