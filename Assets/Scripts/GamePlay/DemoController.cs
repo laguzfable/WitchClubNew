@@ -352,20 +352,20 @@ public class DemoController : MonoBehaviour
         overlayRoot.alpha = 0f;
         overlayRoot.blocksRaycasts = false;
 
-        // Dark panel (bottom 28%)
+        // Floating panel — upper-right, beside the monster, does not cover cards
         var panelGO = new GameObject("DarkPanel");
         panelGO.transform.SetParent(rootGO.transform, false);
-        panelGO.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.72f);
-        SetAnchors(panelGO, new Vector2(0f, 0f), new Vector2(1f, 0.28f));
+        panelGO.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.78f);
+        SetAnchors(panelGO, new Vector2(0.52f, 0.60f), new Vector2(0.98f, 0.88f));
 
-        // Gold accent line
+        // Gold accent line (top edge of panel)
         var lineGO = new GameObject("AccentLine");
         lineGO.transform.SetParent(rootGO.transform, false);
         accentLine = lineGO.AddComponent<Image>();
         accentLine.color = new Color(1f, 0.85f, 0.3f, 1f);
         var lineRT = lineGO.GetComponent<RectTransform>();
-        lineRT.anchorMin = new Vector2(0f, 0.277f);
-        lineRT.anchorMax = new Vector2(1f, 0.282f);
+        lineRT.anchorMin = new Vector2(0.52f, 0.878f);
+        lineRT.anchorMax = new Vector2(0.98f, 0.883f);
         lineRT.offsetMin = lineRT.offsetMax = Vector2.zero;
 
         // Title
@@ -373,21 +373,21 @@ public class DemoController : MonoBehaviour
         titleGO.transform.SetParent(rootGO.transform, false);
         titleTMP = titleGO.AddComponent<TextMeshProUGUI>();
         titleTMP.alignment = TextAlignmentOptions.Center;
-        titleTMP.fontSize  = 58;
+        titleTMP.fontSize  = 42;
         titleTMP.fontStyle = FontStyles.Bold;
         titleTMP.color     = Color.white;
         if (chineseFont != null) titleTMP.font = chineseFont;
-        SetAnchors(titleGO, new Vector2(0.05f, 0.15f), new Vector2(0.95f, 0.27f));
+        SetAnchors(titleGO, new Vector2(0.53f, 0.74f), new Vector2(0.97f, 0.87f));
 
         // Description
         var descGO = new GameObject("DescText");
         descGO.transform.SetParent(rootGO.transform, false);
         descTMP = descGO.AddComponent<TextMeshProUGUI>();
         descTMP.alignment = TextAlignmentOptions.Center;
-        descTMP.fontSize  = 30;
+        descTMP.fontSize  = 24;
         descTMP.color     = new Color(1f, 0.92f, 0.6f, 1f);
         if (chineseFont != null) descTMP.font = chineseFont;
-        SetAnchors(descGO, new Vector2(0.05f, 0.04f), new Vector2(0.95f, 0.15f));
+        SetAnchors(descGO, new Vector2(0.53f, 0.61f), new Vector2(0.97f, 0.74f));
 
         // Watermark
         BuildWatermark(canvasGO.transform);
@@ -400,9 +400,9 @@ public class DemoController : MonoBehaviour
         var tmp = go.AddComponent<TextMeshProUGUI>();
         tmp.text      = "HEXE  ·  Card Combat Demo";
         tmp.alignment = TextAlignmentOptions.Right;
-        tmp.fontSize  = 22;
+        tmp.fontSize  = 20;
         tmp.color     = Color.white;
-        SetAnchors(go, new Vector2(0.72f, 0.92f), new Vector2(0.98f, 0.99f));
+        SetAnchors(go, new Vector2(0.52f, 0.88f), new Vector2(0.98f, 0.94f));
         var cg = go.AddComponent<CanvasGroup>();
         cg.alpha = 0.55f;
         cg.blocksRaycasts = false;
