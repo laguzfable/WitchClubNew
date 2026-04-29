@@ -116,12 +116,18 @@ public class DemoMapAutoProgress : MonoBehaviour
                     btn.onClick.AddListener(() =>
                     {
                         Debug.Log($"[DemoMap] 點擊 → {script}");
+
+                        // 覆寫 MapReturnPoint，防止 NSL-KICK11 讀到舊的主線位置
+                        MapReturnPoint.Set(script, "");
+
                         var ds = DataService.Instance;
                         if (ds != null)
                         {
                             ds.startScript     = script;
                             ds.scriptParameter = new ScriptParameter { scriptName = script };
                         }
+                        else Debug.LogWarning("[DemoMap] DataService.Instance 為 null");
+
                         UnityEngine.SceneManagement.SceneManager.LoadScene("NaniDialogTest");
                     });
                     Debug.Log($"[DemoMap]   Button '{btn.gameObject.name}' onClick 替換完成 → {script}");
