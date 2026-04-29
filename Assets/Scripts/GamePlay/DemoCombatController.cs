@@ -34,6 +34,11 @@ public class DemoCombatController : MonoBehaviour
 
         if (steps == null || steps.Length == 0 || tutorialController == null) return;
 
+        // 至少一個步驟有對話文字才啟動，防止 Inspector 留空元素導致白屏
+        bool hasContent = false;
+        foreach (var s in steps) if (s != null && !string.IsNullOrEmpty(s.dialog)) { hasContent = true; break; }
+        if (!hasContent) return;
+
         // 有步驟才設旗標並注入，避免空步驟時卡住 PrepareBeginTurn
         TutorialController.isDemoMode = true;
         var cs = FindObjectOfType<CombatSystem>();

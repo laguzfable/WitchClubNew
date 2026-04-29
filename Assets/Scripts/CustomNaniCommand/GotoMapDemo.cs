@@ -34,24 +34,27 @@ public class GotoMapDemo : Command, Command.IForceWait
         PlayerPrefs.Save();
         Debug.Log($"[GotoMapDemo] PlayerPrefs 儲存：DemoNextScript={ReturnScript?.Value}  DemoNextLabel={ReturnLabel?.Value}");
 
-        // 2. 只讓 Mel 和 Eupie 出現：重置她們的進度，把其他角色進度設成 99
+        // 2. 只讓 Mel 和 Eupie 出現
+        // 直接寫 PlayerPrefs（不依賴 StoryProgressManager 是否存在）
+        PlayerPrefs.DeleteKey("Mel_Event_Day");
+        PlayerPrefs.DeleteKey("Eupie_Event_Day");
+        PlayerPrefs.SetInt("Vedia_Event_Day", 99);
+        PlayerPrefs.SetInt("Nelly_Event_Day", 99);
+        PlayerPrefs.Save();
+
+        // 若 StoryProgressManager 存在，清掉 Mel/Eupie 的記憶體快取
         var spMgr = Object.FindObjectOfType<StoryProgressManager>();
         if (spMgr != null)
         {
-            // 出現的角色
-            foreach (var name in new[] { "Mel", "Eupie", "Mei", "Euphie" })
-                spMgr.ResetProgress(name);
-            // 不出現的角色（進度設 99，超過事件數量就不生成）
-            foreach (var name in new[] { "Vedia", "Nelly", "Vivia" })
-            {
-                PlayerPrefs.SetInt(name + "_Event_Day", 99);
-                spMgr.ResetProgress(name); // 先清快取
-                // 再手動塞入高進度（讓 GetDayProgress 讀到 99）
-                PlayerPrefs.SetInt(name + "_Event_Day", 99);
-            }
-            PlayerPrefs.Save();
-            Debug.Log("[GotoMapDemo] 角色進度設定完成：Mel/Eupie=0, Vedia/Nelly=99");
+            spMgr.ResetProgress("Mel");
+            spMgr.ResetProgress("Eupie");
+            // 注意：不對 Vedia/Nelly 呼叫 ResetProgress，避免把 99 從 PlayerPrefs 刪掉
         }
+        // 再次確保 Vedia/Nelly 是 99（以防萬一）
+        PlayerPrefs.SetInt("Vedia_Event_Day", 99);
+        PlayerPrefs.SetInt("Nelly_Event_Day", 99);
+        PlayerPrefs.Save();
+        Debug.Log("[GotoMapDemo] 角色進度：Mel/Eupie=0, Vedia/Nelly=99");
 
         // 3. Reset Naninovel 狀態（讓地圖相機能正常運作，與 @GotoUnityScene 一致）
         var stateManager = Engine.GetService<IStateManager>();
