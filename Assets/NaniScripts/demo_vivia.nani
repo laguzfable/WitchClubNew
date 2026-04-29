@@ -15,5 +15,23 @@
 薇狄亞: 希望妳能親身感受到大自然的溫柔與堅韌……那我們開始吧！
 
 @hide 薇狄亞
-@battle background:bg04 target:mobVivia scriptName:demo label:afterbattle
+@set RuneActive=true
+@battle background:bg04 target:mobVivia scriptName:demo_vivia label:afterbattle
+@stop
+
+
+; ─────────────────────────────────────────────────
+# afterbattle
+; ─────────────────────────────────────────────────
+
+@stopBgm
+@bgm white
+@back bg04 time:0.3
+@char 薇狄亞 pos:50 time:0
+
+薇狄亞.idle: 嗯……還算不錯，有感受到自然魔法的節奏了嗎？
+薇狄亞.talking: 去換個新符文吧，把今天學到的力量帶走。
+
+@hide 薇狄亞
+@GotoChangeRune scriptName:demo label:aftermap
 @stop
