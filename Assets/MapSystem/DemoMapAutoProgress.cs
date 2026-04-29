@@ -8,21 +8,21 @@ using UnityEngine;
 /// </summary>
 public class DemoMapAutoProgress : MonoBehaviour
 {
-    // 角色名稱 → demo 腳本對應表（配合 MapCharacterSpawner 的 characterName）
+    // Demo 只顯示這兩位角色
     static readonly Dictionary<string, string> DemoScripts = new Dictionary<string, string>
     {
         { "Mei",    "demo_mei"    },
         { "Mel",    "demo_mei"    },
-        { "Vivia",  "demo_vivia"  },
-        { "Vedia",  "demo_vivia"  },
         { "Euphie", "demo_euphie" },
         { "Eupie",  "demo_euphie" },
-        { "Nelly",  "demo_nelly"  },
-        // 中文備用
         { "魅兒",   "demo_mei"    },
-        { "薇狄亞",  "demo_vivia"  },
         { "優菲",   "demo_euphie" },
-        { "涅莉",   "demo_nelly"  },
+    };
+
+    // 非 demo 角色（生成後直接隱藏）
+    static readonly HashSet<string> HideCharacters = new HashSet<string>
+    {
+        "Vivia", "Vedia", "薇狄亞", "Nelly", "涅莉",
     };
 
     void Start()
@@ -55,14 +55,28 @@ public class DemoMapAutoProgress : MonoBehaviour
         {
             // 往上找到 Icon_{characterName}_{eventName} 的節點
             string iconName = "";
+            Transform iconRoot = null;
             var t = c911.transform;
             while (t != null)
             {
-                if (t.name.StartsWith("Icon_")) { iconName = t.name; break; }
+                if (t.name.StartsWith("Icon_")) { iconName = t.name; iconRoot = t; break; }
                 t = t.parent;
             }
 
             Debug.Log($"[DemoMap] call911 找到 icon：'{iconName}'");
+
+            // 先檢查是否為需要隱藏的角色
+            bool shouldHide = false;
+            foreach (var hide in HideCharacters)
+            {
+                if (iconName.Contains(hide)) { shouldHide = true; break; }
+            }
+            if (shouldHide)
+            {
+                if (iconRoot != null) iconRoot.gameObject.SetActive(false);
+                Debug.Log($"[DemoMap] 隱藏非demo角色：{iconName}");
+                continue;
+            }
 
             foreach (var kv in DemoScripts)
             {
@@ -93,6 +107,6 @@ public class DemoMapAutoProgress : MonoBehaviour
             }
         }
 
-        Debug.Log($"[DemoMap] 共覆寫 {overridden} 個小人腳本");
+        Debug.Log($"[DemoMap] 共覆寫 {overridden} 個小人腳本；隱藏非demo角色完畢");
     }
 }
