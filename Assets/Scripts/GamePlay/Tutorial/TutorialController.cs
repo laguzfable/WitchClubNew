@@ -21,6 +21,7 @@ public class TutorialController : MonoBehaviour
 
     static public bool isTutorial;
     static public bool isTutorial2;
+    static public bool isDemoMode;
 
     [SerializeField] TutorialObject[] tutorialArr;
 

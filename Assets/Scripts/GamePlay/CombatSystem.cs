@@ -55,6 +55,8 @@ public class CombatSystem : MonoBehaviour
     [SerializeField] TutorialController tutorController1;
     [SerializeField] TutorialController tutorController2;
 
+    public void SetTutorController(TutorialController tc) { tutorController = tc; }
+
     [SerializeField] GameObject localEventSystem;
     public bool IsTestMode => localEventSystem.activeSelf;
 
@@ -318,9 +320,9 @@ public async UniTask PlayCardAsync()
         if (!isContinue) return;
     }
 
-    if (TutorialController.isTutorial || TutorialController.isTutorial2)
+    if (TutorialController.isTutorial || TutorialController.isTutorial2 || TutorialController.isDemoMode)
     {
-        tutorController.canGoNext = true;
+        if (tutorController != null) tutorController.canGoNext = true;
         return;
     }
 
