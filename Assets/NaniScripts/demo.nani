@@ -1,53 +1,44 @@
 ; ═══════════════════════════════════════════════════
-;   HEXE  ──  DEMO  腳本
-;   展示順序：劇情  →  地圖  →  戰鬥  →  結尾
+;   HEXE  ──  DEMO  腳本  v2
+;   開場閒聊  →  出牌教學  →  地圖（Mel / Eupie）
+;   Mel 結果：攻擊力增加  ／  Eupie 結果：防禦力增加
 ; ═══════════════════════════════════════════════════
 
-; 若玩家還沒命名，給個預設值
 @set PlayerName="旅人"
 
 @stopBgm
 @bgm happy
 @back bg01 time:0.5
 
-; ── 劇情篇 ───────────────────────────────────────
+; ── 開場閒聊 ─────────────────────────────────────
 
 @char 涅莉 pos:50 time:0
-涅莉.happy: 嘿，{PlayerName}！歡迎來到《魔女俱樂部》的世界──
+涅莉.happy: 嘿，{PlayerName}！歡迎來到《魔女俱樂部》！
 
-@choice 這裡……是哪裡？
+@choice 這裡是哪裡？
 @stop
 
-@char 優菲 pos:70 time:0.3
 @char 魅兒 pos:30 time:0.3
+@char 優菲 pos:70 time:0.3
 
-涅莉: 這是三位女巫剛剛重新掛牌的秘密基地！
-優菲.smile: 我是象牙塔的優菲，讀了太多魔法書，現在有點……怪。
-魅兒.idle: 血巫結社，魅兒。直接說我是個沒錢的窮女巫就好了。
-涅莉.yummy: 我是精靈涅莉，被裝在瓶子裡幾百年──現在終於自由啦！
+魅兒.idle: 血巫結社，魅兒。我的魔法可不是吃素的。
+優菲.smile: 象牙塔的優菲。防禦就交給我！
 
-@choice 你們個個看起來都很危險……
+涅莉.yummy: 想知道怎麼跟我們一起戰鬥嗎？
+
+@choice 想！教我！
 @stop
 
-優菲.angry: 危險沒錯！我的奧術衝擊可以讓妳頭髮全豎起來。
-魅兒.rage: 我的血咒術隨時可以讓你後悔說出這句話。
-涅莉: 哈哈，別怕別怕，她們兩個平常就這樣啦。
+@hide 涅莉,魅兒,優菲
 
-@char 薇狄亞 pos:87 time:0.5
-薇狄亞.love: 要不要先去外面逛逛，看看今天地圖上有誰在附近活動呢？
-
-@choice 好，一起去吧！
-@stop
-
-@hide 涅莉,優菲,魅兒,薇狄亞
-
-; ── 基本出牌教學 ──────────────────────────────────
+; ── 出牌教學 ──────────────────────────────────────
 @bgm tutorial
-@tutorial scriptName:demo label:afterbattle_tutorial background:bg01
+@tutorial scriptName:demo label:after_tutorial background:bg01
 @stop
+
 
 ; ─────────────────────────────────────────────────
-# afterbattle_tutorial
+# after_tutorial
 ; ─────────────────────────────────────────────────
 
 @stopBgm
@@ -55,15 +46,53 @@
 @back bg01 time:0.5
 @char 涅莉 pos:50 time:0
 
-涅莉.happy: 看！你已經學會基本的出牌方式了，接下來去地圖上找找看有誰在活動吧！
+涅莉.exc: 很好！現在去地圖上找魅兒或優菲挑戰看看吧！
 
 @choice 出發！
 @stop
 
 @hide 涅莉
 
-; ── 前往地圖 ─────────────────────────────────────
+; ── 前往地圖（只有 Mel 和 Eupie）────────────────────
 @GotoMapDemo ReturnScript:demo ReturnLabel:aftermap Scene:MapTest
+@stop
+
+
+; ─────────────────────────────────────────────────
+# result_mei
+; ─────────────────────────────────────────────────
+
+@stopBgm
+@bgm happy
+@back bg01 time:0.5
+@char 魅兒 pos:50 time:0
+
+魅兒.idle: 不錯嘛，你打出了血系魔法的精髓。
+魅兒.talking: 同色卡牌越多，傷害就越強——這就是攻擊力增加的秘訣。
+
+@choice 我學會了！
+@stop
+
+@hide 魅兒
+@stop
+
+
+; ─────────────────────────────────────────────────
+# result_euphie
+; ─────────────────────────────────────────────────
+
+@stopBgm
+@bgm happy
+@back bg02 time:0.5
+@char 優菲 pos:50 time:0
+
+優菲.smile: 看到了嗎？藍牌疊越多，護盾就越厚。
+優菲.talk: 防禦力增加的關鍵就在於——同色牌數量。
+
+@choice 原來如此！
+@stop
+
+@hide 優菲
 @stop
 
 
@@ -72,55 +101,15 @@
 ; ─────────────────────────────────────────────────
 
 @stopBgm
-@bgm intense
-@back bg03 time:0.3
-@char 涅莉 pos:50 time:0
-
-涅莉.exc: 剛才在地圖上看到的那傢伙就在前面！要不要試試我們的合技？
-
-@char 優菲 pos:70 time:0.3
-@char 魅兒 pos:28 time:0.3
-
-優菲.angry: 交給我們的卡牌！四元素同時出擊的威力妳見識過嗎？
-魅兒.talking: 先讓我的血咒術打出空缺，再靠四色合技清場──
-涅莉: 把力量借給妳們咯──{PlayerName}，準備好了嗎？
-
-@choice 準備好！
-@stop
-
-@hide 涅莉,優菲,魅兒,薇狄亞
-
-; ── 戰鬥篇 ── DemoController 將自動演示所有戰鬥功能
-@Battle Background:bg03 Target:demoMob ScriptName:demo Label:afterbattle
-@stop
-
-
-; ─────────────────────────────────────────────────
-# afterbattle
-; ─────────────────────────────────────────────────
-
-@stopBgm
-@bgm happy
-@back bg01 time:0.5
-@char 涅莉 pos:50 time:0
-@char 優菲 pos:70 time:0
-@char 魅兒 pos:30 time:0
-
-優菲.bling: 我——們——贏！了！
-魅兒.idle: 理所當然，她就那點本事而已。
-涅莉.happy: 不愧是我挑選的旅人，合技配合得超漂亮！
-
-@char 薇狄亞 pos:87 time:0.3
-薇狄亞.love: 這就是 HEXE 的戰鬥系統──卡牌、元素、符文，一切都在妳的掌握之中。
-
-@choice 我還想繼續冒險！
-@stop
-
-@hide 涅莉,優菲,魅兒,薇狄亞
-@stopBgm
 @bgm stardust
 @back bg02 time:1
+@char 涅莉 pos:50 time:0
 
-涅莉: 太好了！那麼……魔女俱樂部的正式冒險，現在才要開始呢。
+涅莉.happy: 怎麼樣？HEXE 的戰鬥系統，有感覺了嗎？
 
+@choice 想繼續冒險！
+@stop
+
+@hide 涅莉
+@stopBgm
 @stop

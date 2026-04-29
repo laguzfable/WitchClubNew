@@ -34,13 +34,23 @@ public class GotoMapDemo : Command, Command.IForceWait
         PlayerPrefs.Save();
         Debug.Log($"[GotoMapDemo] PlayerPrefs 儲存：DemoNextScript={ReturnScript?.Value}  DemoNextLabel={ReturnLabel?.Value}");
 
-        // 2. 重置所有角色進度為 0（確保 Demo 地圖上 4 個小人全部出現）
+        // 2. 只讓 Mel 和 Eupie 出現：重置她們的進度，把其他角色進度設成 99
         var spMgr = Object.FindObjectOfType<StoryProgressManager>();
         if (spMgr != null)
         {
-            foreach (var name in new[] { "Mei", "Vivia", "Euphie", "Nelly" })
+            // 出現的角色
+            foreach (var name in new[] { "Mel", "Eupie", "Mei", "Euphie" })
                 spMgr.ResetProgress(name);
-            Debug.Log("[GotoMapDemo] 角色進度已重置");
+            // 不出現的角色（進度設 99，超過事件數量就不生成）
+            foreach (var name in new[] { "Vedia", "Nelly", "Vivia" })
+            {
+                PlayerPrefs.SetInt(name + "_Event_Day", 99);
+                spMgr.ResetProgress(name); // 先清快取
+                // 再手動塞入高進度（讓 GetDayProgress 讀到 99）
+                PlayerPrefs.SetInt(name + "_Event_Day", 99);
+            }
+            PlayerPrefs.Save();
+            Debug.Log("[GotoMapDemo] 角色進度設定完成：Mel/Eupie=0, Vedia/Nelly=99");
         }
 
         // 3. Reset Naninovel 狀態（讓地圖相機能正常運作，與 @GotoUnityScene 一致）
