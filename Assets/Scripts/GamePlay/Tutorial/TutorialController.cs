@@ -47,7 +47,13 @@ public class TutorialController : MonoBehaviour
     public void Begin()
     {
         uICollection.TurnOffAll();
+        RunTutorialSequenceAsync().Forget();
+    }
 
+    public void BeginWithSteps(TutorialObject[] steps)
+    {
+        tutorialArr = steps;
+        uICollection.TurnOffAll();
         RunTutorialSequenceAsync().Forget();
     }
 
