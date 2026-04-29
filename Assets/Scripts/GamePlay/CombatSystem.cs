@@ -322,8 +322,11 @@ public async UniTask PlayCardAsync()
 
     if (TutorialController.isTutorial || TutorialController.isTutorial2 || TutorialController.isDemoMode)
     {
-        if (tutorController != null) tutorController.canGoNext = true;
-        return;
+        if (tutorController != null)
+        {
+            tutorController.canGoNext = true;
+            return;
+        }
     }
 
     PrepareBeginTurn();

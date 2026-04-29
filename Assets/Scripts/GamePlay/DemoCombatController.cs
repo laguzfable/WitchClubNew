@@ -23,10 +23,6 @@ public class DemoCombatController : MonoBehaviour
     void Awake()
     {
         _target = DataService.Instance?.scriptParameter?.combatTarget?.Value ?? "";
-
-        // 讓 CombatSystem 的 canGoNext 判斷能進入 demo 分支
-        if (_target == "mobMei" || _target == "mobVivia" || _target == "mobEuphie")
-            TutorialController.isDemoMode = true;
     }
 
     void Start()
@@ -38,7 +34,8 @@ public class DemoCombatController : MonoBehaviour
 
         if (steps == null || steps.Length == 0 || tutorialController == null) return;
 
-        // 把 tutorController 注入 CombatSystem，讓 canGoNext 能正確傳回來
+        // 有步驟才設旗標並注入，避免空步驟時卡住 PrepareBeginTurn
+        TutorialController.isDemoMode = true;
         var cs = FindObjectOfType<CombatSystem>();
         if (cs != null) cs.SetTutorController(tutorialController);
 
