@@ -63,7 +63,7 @@ public class DemoController : MonoBehaviour
         var t = DataService.Instance?.scriptParameter?.combatTarget?.Value;
         // mobMei / mobVivia / mobEuphie 由 DemoCombatController 處理（教學樣式）
         // mobNelly 自由遊玩，不需要 overlay
-        return t == "demoMob";
+        return t == "demoMob" || t == "mobFinal";
     }
 
     // ═════════════════════════════════════════════════════════════
@@ -77,11 +77,12 @@ public class DemoController : MonoBehaviour
 
         switch (target)
         {
-            case "mobMei":    await RunMeiScenario();    break;
-            case "mobVivia":  await RunViviaScenario();  break;
-            case "mobEuphie": await RunEuphieScenario(); break;
-            case "mobNelly":  await RunNellyScenario();  break;
-            default:          await RunFullDemo();       break;
+            case "mobMei":    await RunMeiScenario();       break;
+            case "mobVivia":  await RunViviaScenario();     break;
+            case "mobEuphie": await RunEuphieScenario();    break;
+            case "mobNelly":  await RunNellyScenario();     break;
+            case "mobFinal":  await RunFinalDemoScenario(); break;
+            default:          await RunFullDemo();          break;
         }
     }
 
@@ -203,6 +204,47 @@ public class DemoController : MonoBehaviour
         await Delay(0.5f); pc.PlayAction(); await Delay(postPlayWait + 2f); await Delay(actGap);
 
         await ShowOutro("Nelly's Challenge Complete!", "Spirit Rune Showcase — END");
+    }
+
+    // ═════════════════════════════════════════════════════════════
+    // 最終戰鬥（mobFinal）  ─  回合 1-4 自由遊玩，第 5 回合強制四色合技
+    // ═════════════════════════════════════════════════════════════
+    async UniTask RunFinalDemoScenario()
+    {
+        // 等待戰鬥初始化
+        await Delay(initDelay);
+
+        // 回合 1-4：玩家自由練習，等待玩家每回合出牌
+        for (int i = 0; i < 4; i++)
+        {
+            if (this == null || pc == null) return;
+            // 等玩家回合開始（出牌按鈕可按）
+            await UniTask.WaitUntil(() => this == null || pc == null ||
+                                         (pc.playBtn != null && pc.playBtn.interactable));
+            if (this == null || pc == null) return;
+            // 等玩家按下出牌（按鈕變為不可按）
+            await UniTask.WaitUntil(() => this == null || pc == null ||
+                                         pc.playBtn == null || !pc.playBtn.interactable);
+            // 等本回合結算完成
+            await Delay(2f);
+        }
+
+        if (this == null || pc == null) return;
+
+        // 第 5 回合：強制四色合技
+        await UniTask.WaitUntil(() => this == null || pc == null ||
+                                     (pc.playBtn != null && pc.playBtn.interactable));
+        if (this == null || pc == null) return;
+
+        await ShowLabel("四色合技！", "集結四女之力——最強必殺技！");
+        ForceHand(new[] { 1, 2, 4, 8, 101 });
+        await SelectBaseCards();
+        await Delay(0.5f);
+        pc.PlayAction();
+        await Delay(postPlayWait + 3f);
+
+        // 戰鬥結束後 CombatSystem 會自動切回 NaniDialogTest，
+        // demo.nani#finalending 負責收尾對話
     }
 
     // ═════════════════════════════════════════════════════════════

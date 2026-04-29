@@ -19,7 +19,7 @@ public class DemoMapAutoProgress : MonoBehaviour
     };
     static readonly HashSet<string> DayHideChars = new HashSet<string>
     {
-        "Vivia", "Vedia", "薇狄亞", "Nelly", "涅莉",
+        "Vivia", "Vedia", "薇狄亞", "Nelly", "涅莉", "Lilina", "莉莉娜",
     };
 
     // 晚上：Nelly / Vedia 出現
@@ -30,19 +30,74 @@ public class DemoMapAutoProgress : MonoBehaviour
     };
     static readonly HashSet<string> NightHideChars = new HashSet<string>
     {
-        "Mel", "Mei", "魅兒", "Euphie", "Eupie", "優菲",
+        "Mel", "Mei", "魅兒", "Euphie", "Eupie", "優菲", "Lilina", "莉莉娜",
     };
 
     Dictionary<string, string> CharToScript;
     HashSet<string> HideChars;
 
-    void Start()
+    void Awake()
     {
         bool isDay = PlayerPrefs.GetInt("MapIsDay", 1) == 1;
         CharToScript = isDay ? DayCharToScript : NightCharToScript;
         HideChars    = isDay ? DayHideChars    : NightHideChars;
-        Debug.Log($"[DemoMap] 時段：{(isDay ? "白天(Mel/Eupie)" : "晚上(Nelly/Vedia)")}");
+        Debug.Log($"[DemoMap] Awake 時段：{(isDay ? "白天(Mel/Eupie)" : "晚上(Nelly/Vedia)")}");
 
+        // 1. 在 Spawner.Start() 之前清掉不需要角色的事件清單
+        //    → Spawner 找不到 evt，直接跳過，不 Instantiate，完全不閃
+        foreach (var sp in FindObjectsOfType<MapCharacterSpawner>())
+        {
+            foreach (var entry in sp.characterEventTable)
+            {
+                bool isHide = false;
+                foreach (var h in HideChars)
+                    if (entry.characterName.Contains(h)) { isHide = true; break; }
+
+                if (isHide)
+                {
+                    entry.dayEvents.Clear();
+                    entry.nightEvents.Clear();
+                    Debug.Log($"[DemoMap] Awake 清除 Spawner 事件：{entry.characterName}");
+                    continue;
+                }
+
+                // Demo 出場角色：確保當前時段有事件
+                // 若 nightEvents 為空但 dayEvents 有資料（或反之），互相補充
+                if (!isDay && (entry.nightEvents == null || entry.nightEvents.Count == 0)
+                           &&  entry.dayEvents  != null  && entry.dayEvents.Count  > 0)
+                {
+                    entry.nightEvents = new List<MapCharacterSpawner.CharacterEvent>(entry.dayEvents);
+                    Debug.Log($"[DemoMap] Awake 補充 nightEvents←dayEvents：{entry.characterName}");
+                }
+                else if (isDay && (entry.dayEvents == null || entry.dayEvents.Count == 0)
+                               &&  entry.nightEvents != null && entry.nightEvents.Count > 0)
+                {
+                    entry.dayEvents = new List<MapCharacterSpawner.CharacterEvent>(entry.nightEvents);
+                    Debug.Log($"[DemoMap] Awake 補充 dayEvents←nightEvents：{entry.characterName}");
+                }
+            }
+        }
+
+        // 2. 場景預置的 CharacterIcon（非 Spawner 生成）→ 同樣在 Awake 立即隱藏
+        //    此時 Spawner 還沒跑，所以 FindObjectsOfType<call911> 只找到預置物件
+        foreach (var c911 in FindObjectsOfType<call911>())
+        {
+            string charName = FindCharInHierarchy(c911.transform, CharToScript, HideChars);
+            if (string.IsNullOrEmpty(charName)) continue;
+            if (!CharToScript.ContainsKey(charName))
+            {
+                var iconRoot = FindIconRoot(c911.transform);
+                if (iconRoot != null)
+                {
+                    iconRoot.gameObject.SetActive(false);
+                    Debug.Log($"[DemoMap] Awake 隱藏預置 icon：{iconRoot.name}");
+                }
+            }
+        }
+    }
+
+    void Start()
+    {
         var mgr = FindObjectOfType<MapEventManager>();
         if (mgr != null) { mgr.gameObject.SetActive(false); Debug.Log("[DemoMap] MapEventManager 隱藏"); }
         StartCoroutine(Setup());
@@ -50,14 +105,8 @@ public class DemoMapAutoProgress : MonoBehaviour
 
     IEnumerator Setup()
     {
-        // ── Phase 1：1 幀後立刻隱藏 Vedia/Nelly 的 Icon_* ──────────
-        // Spawner 的 Instantiate 在 frame 0 Update 裡就完成，
-        // 所以 1 幀後 Icon_* 已存在，不需要等 call911
-        yield return null;
-        HideNonDemoIcons();
-
-        // ── Phase 2：等 call911.Start() 全部跑完再替換 onClick ──────
-        yield return null; yield return null; yield return null;
+        // 等 call911.Start() 全部跑完再替換 onClick
+        yield return null; yield return null; yield return null; yield return null;
         yield return new WaitForSeconds(0.3f);
 
         // ── Step 1：從 Spawner 的 characterEventTable 建立 naniScript → 角色名 逆引き ──
@@ -85,7 +134,7 @@ public class DemoMapAutoProgress : MonoBehaviour
         foreach (var c911 in all911)
         {
             // 角色名を特定：階層名 → naniToChar の順
-            string charName = FindCharInHierarchy(c911.transform);
+            string charName = FindCharInHierarchy(c911.transform, CharToScript, HideChars);
             if (string.IsNullOrEmpty(charName))
                 naniToChar.TryGetValue(c911.劇本名, out charName);
 
@@ -139,38 +188,15 @@ public class DemoMapAutoProgress : MonoBehaviour
         Debug.Log("[DemoMap] 完成");
     }
 
-    // Phase 1：Spawner 容器の Icon_* 子物件を走査して非 Demo 角色を即時隱藏
-    void HideNonDemoIcons()
-    {
-        var spawners = FindObjectsOfType<MapCharacterSpawner>();
-        foreach (var sp in spawners)
-        {
-            var container = sp.iconParent != null ? sp.iconParent : sp.transform;
-            foreach (Transform child in container)
-            {
-                if (!child.name.StartsWith("Icon_")) continue;
-                foreach (var h in HideChars)
-                {
-                    if (child.name.Contains(h))
-                    {
-                        child.gameObject.SetActive(false);
-                        Debug.Log($"[DemoMap] Phase1 即時隱藏：{child.name}");
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
     // 階層を上に向かって走査し、CharToScript / HideChars に一致する名前を探す
-    static string FindCharInHierarchy(Transform t)
+    static string FindCharInHierarchy(Transform t, Dictionary<string, string> charToScript, HashSet<string> hideChars)
     {
         while (t != null)
         {
             string n = t.name;
-            foreach (var key in CharToScript.Keys)
+            foreach (var key in charToScript.Keys)
                 if (n.Contains(key)) return key;
-            foreach (var key in HideChars)
+            foreach (var key in hideChars)
                 if (n.Contains(key)) return key;
             t = t.parent;
         }

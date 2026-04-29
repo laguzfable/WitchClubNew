@@ -18,5 +18,23 @@
 涅莉: 呐，見識一下什麼叫做真正的合技！
 
 @hide 涅莉
-@RuneTutorial background:bg01 scriptName:demo label:aftermap
+@set RuneActive=true
+@battle background:bg01 target:mobNelly scriptName:demo_nelly label:afterbattle
+@stop
+
+
+; ─────────────────────────────────────────────────
+# afterbattle
+; ─────────────────────────────────────────────────
+
+@stopBgm
+@bgm happy
+@back bg01 time:0.3
+@char 涅莉 pos:50 time:0
+
+涅莉.happy: 怎麼樣？精靈符文的威力，感受到了嗎？
+涅莉.yummy: 辛苦了，先去休息一下吧！
+
+@hide 涅莉
+@GotoChangeRune scriptName:demo label:aftermap
 @stop

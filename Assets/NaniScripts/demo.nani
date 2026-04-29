@@ -108,15 +108,61 @@
 ; ─────────────────────────────────────────────────
 
 @stopBgm
-@bgm stardust
-@back bg02 time:1
+@bgm happy
+@back bg01 time:0.5
 @char 涅莉 pos:50 time:0
 
-涅莉.happy: 怎麼樣？HEXE 的戰鬥系統，有感覺了嗎？
-
-@choice 想繼續冒險！
-@stop
+涅莉.happy: 怎麼樣？新符文的感覺不錯吧！
+涅莉.yummy: 趁現在——就用這個組合試試看！
 
 @hide 涅莉
+@set RuneActive=true
+@battle background:bg01 target:mobNelly scriptName:demo label:afterpractice
+@stop
+
+
+; ─────────────────────────────────────────────────
+# afterpractice
+; ─────────────────────────────────────────────────
+
+@stopBgm
+@bgm stardust
+@back bg02 time:0.5
+@char 魅兒 pos:20 time:0.3
+@char 優菲 pos:40 time:0.3
+@char 涅莉 pos:60 time:0.3
+@char 薇狄亞 pos:80 time:0.3
+
+魅兒.idle: 不錯嘛，有進步了。
+優菲.smile: 不過……一個人的力量終究有限。
+涅莉.exc: 合在一起才是真正的強大！
+薇狄亞.talking: 我們四個聯手——才是魔女俱樂部。
+
+@hide 魅兒,優菲,涅莉,薇狄亞
+
+@set RuneActive=true
+@battle background:bg03 target:mobFinal scriptName:demo label:finalending
+@stop
+
+
+; ─────────────────────────────────────────────────
+# finalending
+; ─────────────────────────────────────────────────
+
+@stopBgm
+@bgm stardust
+@back bg02 time:1
+@char 魅兒 pos:20 time:0.3
+@char 優菲 pos:40 time:0.3
+@char 涅莉 pos:60 time:0.3
+@char 薇狄亞 pos:80 time:0.3
+
+魅兒.talking: 這就是我們的力量。
+優菲.smile: 謝謝你願意來到魔女俱樂部。
+涅莉.happy: 正式版還有更多冒險在等著你喔！
+薇狄亞.idle: 記住這份感覺。旅人。
+
+@hide 魅兒,優菲,涅莉,薇狄亞
+
 @stopBgm
 @stop

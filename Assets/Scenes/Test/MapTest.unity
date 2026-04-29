@@ -733,16 +733,21 @@ PrefabInstance:
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
       propertyPath: characterEventTable.Array.data[0].dayEvents.Array.size
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
       propertyPath: characterEventTable.Array.data[1].dayEvents.Array.size
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
       propertyPath: characterEventTable.Array.data[2].dayEvents.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[3].dayEvents.Array.size
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
@@ -843,7 +848,7 @@ PrefabInstance:
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
       propertyPath: characterEventTable.Array.data[1].dayEvents.Array.data[0].eventName
-      value: chapter0
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
@@ -1048,7 +1053,7 @@ PrefabInstance:
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
       propertyPath: characterEventTable.Array.data[1].dayEvents.Array.data[0].naninovelScript
-      value: chapter0
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
@@ -1169,7 +1174,7 @@ PrefabInstance:
         type: 3}
       propertyPath: characterEventTable.Array.data[0].dayEvents.Array.data[0].animatorController
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 9100000, guid: b4e0438aba7b45141b3cde565a748b90, type: 2}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
       propertyPath: characterEventTable.Array.data[1].dayEvents.Array.data[0].animatorController
@@ -1179,7 +1184,12 @@ PrefabInstance:
         type: 3}
       propertyPath: characterEventTable.Array.data[2].dayEvents.Array.data[0].animatorController
       value: 
-      objectReference: {fileID: 9100000, guid: e42ea99ddf87926439d6b19d92550e36, type: 2}
+      objectReference: {fileID: 9100000, guid: 0be64c0412d4eac47a8d55e824209813, type: 2}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[3].dayEvents.Array.data[0].animatorController
+      value: 
+      objectReference: {fileID: 9100000, guid: 4d98bcd6ad5ffcf419637a489616a4aa, type: 2}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
       propertyPath: characterEventTable.Array.data[5].dayEvents.Array.data[0].animatorController
@@ -1592,6 +1602,49 @@ MonoBehaviour:
   nightSprite: {fileID: 21300000, guid: 7da1903547af86e4a86e5141022e4bca, type: 3}
   buildingImage: {fileID: 634402780}
   buildingSprite: {fileID: 21300000, guid: 92ebbe0ab1d6f404c8757b335796e48b, type: 3}
+--- !u!1 &1248196130
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1248196132}
+  - component: {fileID: 1248196131}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1248196131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1248196130}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd380702ecc9d2b4ca87021ccb6c4244, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1248196132
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1248196130}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 129.49168, y: 98.5556, z: -98.739456}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1732801599
 GameObject:
   m_ObjectHideFlags: 0
