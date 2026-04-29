@@ -5,9 +5,9 @@ using UnityEngine.UI;
 
 /// <summary>
 /// 掛在 MapTest 場景任意 GameObject 上。
-/// Demo 模式：隱藏 MapEventManager 按鈕，把所有小人的 call911 腳本改成 demo 專用。
+/// Demo 模式：只顯示 Mel / Eupie，其餘隱藏，並把 onClick 導向 demo 腳本。
 /// </summary>
-[DefaultExecutionOrder(-100)]
+[DefaultExecutionOrder(-200)]
 public class DemoMapAutoProgress : MonoBehaviour
 {
     static readonly Dictionary<string, string> DemoScripts = new Dictionary<string, string>
@@ -29,11 +29,13 @@ public class DemoMapAutoProgress : MonoBehaviour
 
     void Awake()
     {
-        // 全ての MapCharacterSpawner を無効化して icon 生成をブロック
         _spawners = FindObjectsOfType<MapCharacterSpawner>();
-        Debug.Log($"[DemoMap] Awake: {_spawners.Length} 個の Spawner を停用");
+        Debug.Log($"[DemoMap] Awake ── 找到 {_spawners.Length} 個 MapCharacterSpawner，全部停用");
         foreach (var s in _spawners)
+        {
+            Debug.Log($"[DemoMap]   停用：{s.gameObject.name}  iconParent={(s.iconParent != null ? s.iconParent.name : "null")}");
             s.gameObject.SetActive(false);
+        }
     }
 
     void Start()
@@ -46,57 +48,63 @@ public class DemoMapAutoProgress : MonoBehaviour
 
     IEnumerator Setup()
     {
-        // 全 Spawner を再有効化、同フレームで iconParent を非表示
+        // ── 1. 重新啟動所有 Spawner，同幀先把容器藏起來
         foreach (var s in _spawners)
         {
             if (s == null) continue;
-            var ip = s.iconParent;
-            s.gameObject.SetActive(true);               // Start() は次フレーム以降
-            if (ip != null) ip.gameObject.SetActive(false);
+            s.gameObject.SetActive(true);
+            if (s.iconParent != null)
+                s.iconParent.gameObject.SetActive(false);
         }
 
-        // Spawner の Start() + CreateCharacterIcon coroutine + call911.Start() が全部終わるまで待つ
+        // ── 2. 等 Spawner.Start() 跑完、call911.Start() 也跑完
         yield return null;
         yield return null;
         yield return null;
         yield return null;
         yield return new WaitForSeconds(0.3f);
 
-        // --- iconParent の子を直接走査して処理 ---
+        // ── 3. 逐 Spawner 處理
         foreach (var s in _spawners)
         {
-            if (s == null || s.iconParent == null) continue;
+            if (s == null) continue;
 
-            // 子の Transform リストをコピー（走査中に変更されても安全）
+            // iconParent が null なら Spawner.transform 自体を親として扱う
+            Transform container = s.iconParent != null ? s.iconParent : s.transform;
+            Debug.Log($"[DemoMap] Spawner={s.gameObject.name}  container={container.name}  子={container.childCount}");
+
             var children = new List<Transform>();
-            foreach (Transform child in s.iconParent) children.Add(child);
+            foreach (Transform c in container) children.Add(c);
 
             foreach (var child in children)
             {
-                string iconName = child.name;
-                Debug.Log($"[DemoMap] 處理 icon：'{iconName}'");
+                string name = child.name;
+                Debug.Log($"[DemoMap]   icon: '{name}'");
 
-                // 非 demo 角色 → 隱藏
-                bool hide = false;
+                // 隱藏判定
+                bool shouldHide = false;
                 foreach (var h in HideCharacters)
-                {
-                    if (iconName.Contains(h)) { hide = true; break; }
-                }
-                if (hide)
+                    if (name.Contains(h)) { shouldHide = true; break; }
+
+                if (shouldHide)
                 {
                     child.gameObject.SetActive(false);
-                    Debug.Log($"[DemoMap] 隱藏：{iconName}");
+                    Debug.Log($"[DemoMap]   → 隱藏");
                     continue;
                 }
 
-                // demo 角色 → call911 停用 + onClick 替換
+                // demo 腳本替換
+                bool matched = false;
                 foreach (var kv in DemoScripts)
                 {
-                    if (!iconName.Contains(kv.Key)) continue;
-
+                    if (!name.Contains(kv.Key)) continue;
+                    matched = true;
                     var script = kv.Value;
+
+                    // call911 停用（Stop() が AddListener を再追加するのを防ぐ）
                     var c911 = child.GetComponentInChildren<call911>(true);
-                    if (c911 != null) c911.enabled = false;
+                    if (c911 != null) { c911.enabled = false; Debug.Log($"[DemoMap]   call911 停用"); }
+                    else Debug.LogWarning($"[DemoMap]   call911 が見つかりません: {name}");
 
                     var btn = child.GetComponentInChildren<Button>(true);
                     if (btn != null)
@@ -113,17 +121,21 @@ public class DemoMapAutoProgress : MonoBehaviour
                             }
                             UnityEngine.SceneManagement.SceneManager.LoadScene("NaniDialogTest");
                         });
-                        Debug.Log($"[DemoMap] {iconName} → {script}");
+                        Debug.Log($"[DemoMap]   → {script}");
                     }
+                    else Debug.LogWarning($"[DemoMap]   Button が見つかりません: {name}");
                     break;
                 }
+
+                if (!matched)
+                    Debug.LogWarning($"[DemoMap]   '{name}' は DemoScripts にも HideCharacters にも一致しない");
             }
 
-            // iconParent 再顯示
-            s.iconParent.gameObject.SetActive(true);
+            // 容器を再表示
+            if (s.iconParent != null)
+                s.iconParent.gameObject.SetActive(true);
         }
 
         Debug.Log("[DemoMap] Setup 完了");
     }
-
 }
