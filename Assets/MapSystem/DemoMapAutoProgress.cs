@@ -25,87 +25,68 @@ public class DemoMapAutoProgress : MonoBehaviour
         "Vivia", "Vedia", "薇狄亞", "Nelly", "涅莉",
     };
 
-    MapCharacterSpawner[] _spawners;
-
-    void Awake()
-    {
-        _spawners = FindObjectsOfType<MapCharacterSpawner>();
-        Debug.Log($"[DemoMap] Awake ── 找到 {_spawners.Length} 個 Spawner");
-
-        // Spawner は止めない（iconParent が自身と同じ可能性があるため）
-        // 代わりに CanvasGroup で視覚的に隱す
-        foreach (var s in _spawners)
-        {
-            var container = s.iconParent != null ? s.iconParent.gameObject : s.gameObject;
-            var cg = container.GetComponent<CanvasGroup>() ?? container.AddComponent<CanvasGroup>();
-            cg.alpha = 0f;
-            cg.blocksRaycasts = false;
-            cg.interactable = false;
-            Debug.Log($"[DemoMap]   隱藏 container：{container.name}");
-        }
-    }
-
     void Start()
     {
         var mgr = FindObjectOfType<MapEventManager>();
-        if (mgr != null) { mgr.gameObject.SetActive(false); Debug.Log("[DemoMap] MapEventManager 隱藏"); }
+        if (mgr != null) { mgr.gameObject.SetActive(false); }
 
         StartCoroutine(Setup());
     }
 
     IEnumerator Setup()
     {
-        // Spawner.Start() → CreateCharacterIcon → call911.Start() が全部終わるまで待つ
+        // 等 Spawner.Start() + CreateCharacterIcon coroutine + call911.Start() 全部跑完
         yield return null;
         yield return null;
         yield return null;
         yield return null;
         yield return new WaitForSeconds(0.3f);
 
-        foreach (var s in _spawners)
+        var spawners = FindObjectsOfType<MapCharacterSpawner>();
+        Debug.Log($"[DemoMap] 找到 {spawners.Length} 個 Spawner");
+
+        foreach (var s in spawners)
         {
-            if (s == null) continue;
             Transform container = s.iconParent != null ? s.iconParent : s.transform;
-            Debug.Log($"[DemoMap] Spawner={s.gameObject.name}  container={container.name}  子={container.childCount}");
+            Debug.Log($"[DemoMap] container={container.name} 子={container.childCount}");
 
             var children = new List<Transform>();
             foreach (Transform c in container) children.Add(c);
 
             foreach (var child in children)
             {
-                // 動的生成された Icon_* だけ処理（CharacterIcon / MapBG 等はスキップ）
                 if (!child.name.StartsWith("Icon_"))
                 {
-                    Debug.Log($"[DemoMap]   スキップ（Icon_ 以外）：{child.name}");
+                    Debug.Log($"[DemoMap] 跳過：{child.name}");
                     continue;
                 }
 
-                string name = child.name;
-                Debug.Log($"[DemoMap]   icon: '{name}'");
+                string iconName = child.name;
+                Debug.Log($"[DemoMap] 處理：{iconName}");
 
-                // 隱藏判定
+                // 需要隱藏的角色
                 bool shouldHide = false;
                 foreach (var h in HideCharacters)
-                    if (name.Contains(h)) { shouldHide = true; break; }
+                    if (iconName.Contains(h)) { shouldHide = true; break; }
 
                 if (shouldHide)
                 {
                     child.gameObject.SetActive(false);
-                    Debug.Log($"[DemoMap]   → 隱藏");
+                    Debug.Log($"[DemoMap] → 隱藏");
                     continue;
                 }
 
-                // demo 腳本替換
-                bool matched = false;
+                // Demo 角色：替換腳本
                 foreach (var kv in DemoScripts)
                 {
-                    if (!name.Contains(kv.Key)) continue;
-                    matched = true;
+                    if (!iconName.Contains(kv.Key)) continue;
                     var script = kv.Value;
 
+                    // 停用 call911，避免它再次觸發主線
                     var c911 = child.GetComponentInChildren<call911>(true);
                     if (c911 != null) c911.enabled = false;
 
+                    // 替換 Button 的 onClick
                     var btn = child.GetComponentInChildren<Button>(true);
                     if (btn != null)
                     {
@@ -121,27 +102,13 @@ public class DemoMapAutoProgress : MonoBehaviour
                             }
                             UnityEngine.SceneManagement.SceneManager.LoadScene("NaniDialogTest");
                         });
-                        Debug.Log($"[DemoMap]   → {script}");
+                        Debug.Log($"[DemoMap] → {script}");
                     }
-                    else Debug.LogWarning($"[DemoMap]   Button 找不到：{name}");
                     break;
                 }
-
-                if (!matched)
-                    Debug.LogWarning($"[DemoMap]   '{name}' 沒有對應的腳本");
-            }
-
-            // CanvasGroup を戻す（Vedia/Nelly は SetActive=false 済なので見えない）
-            var containerGO = s.iconParent != null ? s.iconParent.gameObject : s.gameObject;
-            var cg = containerGO.GetComponent<CanvasGroup>();
-            if (cg != null)
-            {
-                cg.alpha = 1f;
-                cg.blocksRaycasts = true;
-                cg.interactable = true;
             }
         }
 
-        Debug.Log("[DemoMap] Setup 完了");
+        Debug.Log("[DemoMap] 完成");
     }
 }
