@@ -10,22 +10,39 @@ using UnityEngine.UI;
 [DefaultExecutionOrder(-200)]
 public class DemoMapAutoProgress : MonoBehaviour
 {
-    // 角色名稱 → demo 腳本
-    static readonly Dictionary<string, string> CharToScript = new Dictionary<string, string>
+    // 白天：Mel / Eupie 出現
+    static readonly Dictionary<string, string> DayCharToScript = new Dictionary<string, string>
     {
         { "Mei",    "demo_mei"    }, { "Mel",    "demo_mei"    },
         { "Euphie", "demo_euphie" }, { "Eupie",  "demo_euphie" },
         { "魅兒",   "demo_mei"    }, { "優菲",   "demo_euphie" },
     };
-
-    // 隱藏角色
-    static readonly HashSet<string> HideChars = new HashSet<string>
+    static readonly HashSet<string> DayHideChars = new HashSet<string>
     {
         "Vivia", "Vedia", "薇狄亞", "Nelly", "涅莉",
     };
 
+    // 晚上：Nelly / Vedia 出現
+    static readonly Dictionary<string, string> NightCharToScript = new Dictionary<string, string>
+    {
+        { "Nelly",  "demo_nelly" }, { "涅莉",   "demo_nelly" },
+        { "Vivia",  "demo_vedia" }, { "Vedia",  "demo_vedia" }, { "薇狄亞", "demo_vedia" },
+    };
+    static readonly HashSet<string> NightHideChars = new HashSet<string>
+    {
+        "Mel", "Mei", "魅兒", "Euphie", "Eupie", "優菲",
+    };
+
+    Dictionary<string, string> CharToScript;
+    HashSet<string> HideChars;
+
     void Start()
     {
+        bool isDay = PlayerPrefs.GetInt("MapIsDay", 1) == 1;
+        CharToScript = isDay ? DayCharToScript : NightCharToScript;
+        HideChars    = isDay ? DayHideChars    : NightHideChars;
+        Debug.Log($"[DemoMap] 時段：{(isDay ? "白天(Mel/Eupie)" : "晚上(Nelly/Vedia)")}");
+
         var mgr = FindObjectOfType<MapEventManager>();
         if (mgr != null) { mgr.gameObject.SetActive(false); Debug.Log("[DemoMap] MapEventManager 隱藏"); }
         StartCoroutine(Setup());

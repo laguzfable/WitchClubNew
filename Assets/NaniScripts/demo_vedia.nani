@@ -1,0 +1,20 @@
+; ── 薇狄亞・血月女巫 ─────────────────────────────────────────
+; Demo 晚上地圖事件
+
+@stopBgm
+@bgm stardust
+@back bg02 time:0.3
+@char 薇狄亞 pos:50 time:0
+
+薇狄亞.idle: 夜晚才是我的舞台。你來找我，是想看看真正的魔法嗎？
+
+@choice 想看看！
+@stop
+
+薇狄亞.talking: 血月之力，不是誰都能承受的。但既然你來了，就讓你見識一下吧。
+
+@hide 薇狄亞
+
+; 事件內容待補，目前先接結局
+@GotoMapDemo ReturnScript:demo ReturnLabel:aftermap Scene:MapTest IsDay:0
+@stop
