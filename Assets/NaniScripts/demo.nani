@@ -41,6 +41,27 @@
 
 @hide 涅莉,優菲,魅兒,薇狄亞
 
+; ── 基本出牌教學 ──────────────────────────────────
+@bgm tutorial
+@tutorial scriptName:demo label:afterbattle_tutorial background:bg01
+@stop
+
+; ─────────────────────────────────────────────────
+# afterbattle_tutorial
+; ─────────────────────────────────────────────────
+
+@stopBgm
+@bgm happy
+@back bg01 time:0.5
+@char 涅莉 pos:50 time:0
+
+涅莉.happy: 看！你已經學會基本的出牌方式了，接下來去地圖上找找看有誰在活動吧！
+
+@choice 出發！
+@stop
+
+@hide 涅莉
+
 ; ── 前往地圖 ─────────────────────────────────────
 @GotoMapDemo ReturnScript:demo ReturnLabel:aftermap Scene:MapTest
 @stop
