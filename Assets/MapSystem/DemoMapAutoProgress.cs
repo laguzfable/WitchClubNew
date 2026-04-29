@@ -5,22 +5,21 @@ using UnityEngine.UI;
 
 /// <summary>
 /// 掛在 MapTest 場景任意 GameObject 上。
-/// Demo 模式：只顯示 Mel / Eupie，其餘隱藏，並把 onClick 導向 demo 腳本。
+/// Demo 模式：Mel / Eupie だけ表示、全ての call911 を処理。
 /// </summary>
 [DefaultExecutionOrder(-200)]
 public class DemoMapAutoProgress : MonoBehaviour
 {
-    static readonly Dictionary<string, string> DemoScripts = new Dictionary<string, string>
+    // 角色名稱 → demo 腳本
+    static readonly Dictionary<string, string> CharToScript = new Dictionary<string, string>
     {
-        { "Mei",    "demo_mei"    },
-        { "Mel",    "demo_mei"    },
-        { "Euphie", "demo_euphie" },
-        { "Eupie",  "demo_euphie" },
-        { "魅兒",   "demo_mei"    },
-        { "優菲",   "demo_euphie" },
+        { "Mei",    "demo_mei"    }, { "Mel",    "demo_mei"    },
+        { "Euphie", "demo_euphie" }, { "Eupie",  "demo_euphie" },
+        { "魅兒",   "demo_mei"    }, { "優菲",   "demo_euphie" },
     };
 
-    static readonly HashSet<string> HideCharacters = new HashSet<string>
+    // 隱藏角色
+    static readonly HashSet<string> HideChars = new HashSet<string>
     {
         "Vivia", "Vedia", "薇狄亞", "Nelly", "涅莉",
     };
@@ -28,114 +27,121 @@ public class DemoMapAutoProgress : MonoBehaviour
     void Start()
     {
         var mgr = FindObjectOfType<MapEventManager>();
-        if (mgr != null) { mgr.gameObject.SetActive(false); }
-
+        if (mgr != null) { mgr.gameObject.SetActive(false); Debug.Log("[DemoMap] MapEventManager 隱藏"); }
         StartCoroutine(Setup());
     }
 
     IEnumerator Setup()
     {
-        // 等 Spawner.Start() + CreateCharacterIcon coroutine + call911.Start() 全部跑完
-        yield return null;
-        yield return null;
-        yield return null;
-        yield return null;
+        // 等 Spawner.Start → 生成 icon → call911.Start 全部跑完
+        yield return null; yield return null;
+        yield return null; yield return null;
         yield return new WaitForSeconds(0.3f);
 
+        // ── Step 1：從 Spawner 的 characterEventTable 建立 naniScript → 角色名 逆引き ──
+        var naniToChar = new Dictionary<string, string>();
         var spawners = FindObjectsOfType<MapCharacterSpawner>();
         Debug.Log($"[DemoMap] 找到 {spawners.Length} 個 Spawner");
-
-        foreach (var s in spawners)
+        foreach (var sp in spawners)
         {
-            Transform container = s.iconParent != null ? s.iconParent : s.transform;
-            Debug.Log($"[DemoMap] container={container.name} 子={container.childCount}");
-
-            var children = new List<Transform>();
-            foreach (Transform c in container) children.Add(c);
-
-            foreach (var child in children)
+            foreach (var entry in sp.characterEventTable)
             {
-                string rawName = child.name;
+                foreach (var evt in entry.dayEvents)
+                    if (!string.IsNullOrEmpty(evt.naninovelScript))
+                        naniToChar[evt.naninovelScript] = entry.characterName;
+                foreach (var evt in entry.nightEvents)
+                    if (!string.IsNullOrEmpty(evt.naninovelScript))
+                        naniToChar[evt.naninovelScript] = entry.characterName;
+            }
+        }
+        Debug.Log($"[DemoMap] naniToChar 表：{string.Join(", ", naniToChar.Count > 0 ? new List<string>(naniToChar.Keys) : new List<string>{"(空)"} )}");
 
-                if (!rawName.StartsWith("Icon_"))
-                {
-                    Debug.Log($"[DemoMap] 跳過（非Icon）：'{rawName}'");
-                    continue;
-                }
+        // ── Step 2：全シーンの call911 を処理 ──
+        var all911 = FindObjectsOfType<call911>();
+        Debug.Log($"[DemoMap] 全シーンの call911：{all911.Length} 個");
 
-                Debug.Log($"[DemoMap] ── icon 名稱：'{rawName}'");
+        foreach (var c911 in all911)
+        {
+            // 角色名を特定：階層名 → naniToChar の順
+            string charName = FindCharInHierarchy(c911.transform);
+            if (string.IsNullOrEmpty(charName))
+                naniToChar.TryGetValue(c911.劇本名, out charName);
 
-                // ── 隱藏判定 ──
-                string matchedHide = null;
-                foreach (var h in HideCharacters)
-                    if (rawName.Contains(h)) { matchedHide = h; break; }
+            Debug.Log($"[DemoMap] call911 on '{c911.gameObject.name}'  劇本='{c911.劇本名}'  → 角色='{charName}'");
 
-                if (matchedHide != null)
-                {
-                    child.gameObject.SetActive(false);
-                    Debug.Log($"[DemoMap]   HideCharacters 命中 '{matchedHide}' → SetActive(false)");
-                    continue;
-                }
-
-                // ── Demo 腳本替換 ──
-                string matchedKey = null;
-                string matchedScript = null;
-                foreach (var kv in DemoScripts)
-                {
-                    if (rawName.Contains(kv.Key))
-                    {
-                        matchedKey    = kv.Key;
-                        matchedScript = kv.Value;
-                        break;
-                    }
-                }
-                Debug.Log($"[DemoMap]   DemoScripts 命中：key='{matchedKey}' script='{matchedScript}'");
-
-                if (matchedScript == null)
-                {
-                    Debug.LogWarning($"[DemoMap]   未命中任何規則，保持原樣：'{rawName}'");
-                    continue;
-                }
-
-                var script = matchedScript;
-
-                // call911 と同じ GO の Button を取得（call911 は GirlButton に AddComponent される）
-                var c911 = child.GetComponentInChildren<call911>(true);
-                Button btn = null;
-                if (c911 != null)
-                {
-                    btn = c911.GetComponent<Button>();
-                    Debug.Log($"[DemoMap]   call911 場所：{c911.gameObject.name}  Button={btn != null}");
-                }
-                // fallback
-                if (btn == null) btn = child.GetComponentInChildren<Button>(true);
-
+            // Demo 角色 → 替換 onClick
+            if (!string.IsNullOrEmpty(charName) && CharToScript.TryGetValue(charName, out var demoScript))
+            {
+                var btn = c911.GetComponent<Button>();
+                if (btn == null) btn = c911.GetComponentInParent<Button>();
                 if (btn != null)
                 {
                     btn.onClick.RemoveAllListeners();
+                    var script = demoScript;
                     btn.onClick.AddListener(() =>
                     {
                         Debug.Log($"[DemoMap] 點擊 → {script}");
-
-                        // 覆寫 MapReturnPoint，防止 NSL-KICK11 讀到舊的主線位置
                         MapReturnPoint.Set(script, "");
-
                         var ds = DataService.Instance;
                         if (ds != null)
                         {
                             ds.startScript     = script;
                             ds.scriptParameter = new ScriptParameter { scriptName = script };
                         }
-                        else Debug.LogWarning("[DemoMap] DataService.Instance 為 null");
-
                         UnityEngine.SceneManagement.SceneManager.LoadScene("NaniDialogTest");
                     });
-                    Debug.Log($"[DemoMap]   Button '{btn.gameObject.name}' onClick 替換完成 → {script}");
+                    c911.enabled = false;
+                    Debug.Log($"[DemoMap]   → demo 腳本替換：{demoScript}  Button='{btn.gameObject.name}'");
                 }
-                else Debug.LogWarning($"[DemoMap]   Button 找不到");
+                else Debug.LogWarning($"[DemoMap]   Button 找不到（call911 on {c911.gameObject.name}）");
+                continue;
+            }
+
+            // 非 Demo 角色 or 不明 → icon root を非表示
+            var iconRoot = FindIconRoot(c911.transform);
+            if (iconRoot != null)
+            {
+                iconRoot.gameObject.SetActive(false);
+                Debug.Log($"[DemoMap]   → 隱藏 icon root：'{iconRoot.name}'");
+            }
+            else
+            {
+                // icon root が見つからない場合は call911 自体を無効化
+                c911.enabled = false;
+                var btn = c911.GetComponent<Button>();
+                if (btn != null) btn.onClick.RemoveAllListeners();
+                Debug.LogWarning($"[DemoMap]   icon root 找不到、call911 停用：{c911.gameObject.name}");
             }
         }
 
         Debug.Log("[DemoMap] 完成");
+    }
+
+    // 階層を上に向かって走査し、CharToScript / HideChars に一致する名前を探す
+    static string FindCharInHierarchy(Transform t)
+    {
+        while (t != null)
+        {
+            string n = t.name;
+            foreach (var key in CharToScript.Keys)
+                if (n.Contains(key)) return key;
+            foreach (var key in HideChars)
+                if (n.Contains(key)) return key;
+            t = t.parent;
+        }
+        return "";
+    }
+
+    // 「Icon_」で始まる最初の祖先を返す。なければ call911 の一つ上の親を返す
+    static Transform FindIconRoot(Transform t)
+    {
+        var orig = t;
+        while (t != null)
+        {
+            if (t.name.StartsWith("Icon_")) return t;
+            t = t.parent;
+        }
+        // fallback：call911 の直接の親
+        return orig.parent;
     }
 }
