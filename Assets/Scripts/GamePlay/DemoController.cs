@@ -89,27 +89,27 @@ public class DemoController : MonoBehaviour
     // ═════════════════════════════════════════════════════════════
     async UniTask RunMeiScenario()
     {
-        await ShowLabel("【血系強攻】", "RED ASSAULT — 魅兒的血咒術，同色卡牌堆疊傷害");
+        await ShowLabel("RED ASSAULT", "Same-element cards stack damage — the more RED, the harder it hits");
         await WaitTurn();
         ForceHand(new[] { 101, 101, 101, 102, 103 });
         await SelectByElement(ECardElement.Red, 3);
         await Delay(0.4f); pc.PlayAction(); await Delay(postPlayWait); await Delay(actGap);
 
-        await ShowLabel("【絳紅之夜】", "ENVIRONMENT EFFECT — 攻擊翻倍！血系傷害爆炸");
+        await ShowLabel("CRIMSON NIGHT", "ENVIRONMENT EFFECT — Attack x2! Blood magic goes critical");
         cs.envEffect.SetCurrentEffect(EEnvEffectType.Attack, 2);
         await WaitTurn();
         ForceHand(new[] { 101, 101, 102, 103, 104 });
         await SelectByElement(ECardElement.Red, 2);
         await Delay(0.4f); pc.PlayAction(); await Delay(postPlayWait); await Delay(actGap);
 
-        await ShowLabel("【四色合技】", "COMBINATION — 四元素同出，傷害 x4！");
+        await ShowLabel("4-COLOR COMBO", "All four elements at once — damage x4!");
         cs.envEffect.SetCurrentEffect(EEnvEffectType.None);
         await WaitTurn();
         ForceHand(new[] { 1, 2, 4, 8, 101 });
         await SelectBaseCards();
         await Delay(0.5f); pc.PlayAction(); await Delay(postPlayWait + 2f); await Delay(actGap);
 
-        await ShowOutro("魅兒的挑戰結束！", "血系魔法特輯  完");
+        await ShowOutro("Mei's Challenge Complete!", "Blood Magic Showcase — END");
     }
 
     // ═════════════════════════════════════════════════════════════
@@ -117,27 +117,27 @@ public class DemoController : MonoBehaviour
     // ═════════════════════════════════════════════════════════════
     async UniTask RunViviaScenario()
     {
-        await ShowLabel("【自然治癒】", "HEALING — 薇狄亞的綠色魔法，回復 HP");
+        await ShowLabel("NATURE HEALING", "Green cards restore HP — stack them for big recovery");
         await WaitTurn();
         ForceHand(new[] { 103, 103, 103, 101, 102 });
         await SelectByElement(ECardElement.Green, 3);
         await Delay(0.4f); pc.PlayAction(); await Delay(postPlayWait); await Delay(actGap);
 
-        await ShowLabel("【生命之雨】", "ENVIRONMENT EFFECT — 治癒翻倍！");
+        await ShowLabel("LIFE RAIN", "ENVIRONMENT EFFECT — Healing x2! Rain washes all wounds");
         cs.envEffect.SetCurrentEffect(EEnvEffectType.Heal, 2);
         await WaitTurn();
         ForceHand(new[] { 103, 103, 103, 101, 102 });
         await SelectByElement(ECardElement.Green, 3);
         await Delay(0.4f); pc.PlayAction(); await Delay(postPlayWait); await Delay(actGap);
 
-        await ShowLabel("【守護防禦】", "DEFENSE — 藍色牌堆起護盾，格擋傷害");
+        await ShowLabel("GUARDIAN SHIELD", "DEFENSE — Blue cards build a shield, blocking incoming damage");
         cs.envEffect.SetCurrentEffect(EEnvEffectType.None);
         await WaitTurn();
         ForceHand(new[] { 102, 102, 102, 101, 103 });
         await SelectByElement(ECardElement.Blue, 3);
         await Delay(0.4f); pc.PlayAction(); await Delay(postPlayWait); await Delay(actGap);
 
-        await ShowOutro("薇狄亞的挑戰結束！", "自然系魔法特輯  完");
+        await ShowOutro("Vivia's Challenge Complete!", "Nature Magic Showcase — END");
     }
 
     // ═════════════════════════════════════════════════════════════
@@ -145,20 +145,20 @@ public class DemoController : MonoBehaviour
     // ═════════════════════════════════════════════════════════════
     async UniTask RunEuphieScenario()
     {
-        await ShowLabel("【奧術護盾】", "DEFENSE — 優菲的象牙塔防禦陣，藍牌越多越硬");
+        await ShowLabel("ARCANE SHIELD", "DEFENSE — Ivory Tower formation, more blue cards = harder wall");
         await WaitTurn();
         ForceHand(new[] { 102, 102, 102, 101, 103 });
         await SelectByElement(ECardElement.Blue, 3);
         await Delay(0.4f); pc.PlayAction(); await Delay(postPlayWait); await Delay(actGap);
 
-        await ShowLabel("【高塔之暮】", "ENVIRONMENT EFFECT — 防禦翻倍！鋼鐵之壁");
+        await ShowLabel("TOWER DUSK", "ENVIRONMENT EFFECT — Defense x2! Iron wall activated");
         cs.envEffect.SetCurrentEffect(EEnvEffectType.Defense, 2);
         await WaitTurn();
         ForceHand(new[] { 102, 102, 102, 101, 103 });
         await SelectByElement(ECardElement.Blue, 3);
         await Delay(0.4f); pc.PlayAction(); await Delay(postPlayWait); await Delay(actGap);
 
-        await ShowLabel("【符文技能】", "RUNE ABILITY — 奧術充能完畢，釋放特殊技能！");
+        await ShowLabel("RUNE ABILITY", "Arcane energy fully charged — unleash the special skill!");
         cs.envEffect.SetCurrentEffect(EEnvEffectType.None);
         await WaitTurn();
         pc.AddEN(9999f);
@@ -169,7 +169,7 @@ public class DemoController : MonoBehaviour
         await SelectByElement(ECardElement.Red, 1);
         await Delay(0.4f); pc.PlayAction(); await Delay(postPlayWait); await Delay(actGap);
 
-        await ShowOutro("優菲的挑戰結束！", "象牙塔魔法特輯  完");
+        await ShowOutro("Euphie's Challenge Complete!", "Ivory Tower Magic Showcase — END");
     }
 
     // ═════════════════════════════════════════════════════════════
@@ -177,7 +177,7 @@ public class DemoController : MonoBehaviour
     // ═════════════════════════════════════════════════════════════
     async UniTask RunNellyScenario()
     {
-        await ShowLabel("【精靈符文】", "RUNE ABILITY — 涅莉封印百年的精靈之力！");
+        await ShowLabel("SPIRIT RUNE", "RUNE ABILITY — Nelly's fairy power sealed for centuries, unleashed!");
         await WaitTurn();
         pc.AddEN(9999f);
         await Delay(0.6f);
@@ -187,21 +187,21 @@ public class DemoController : MonoBehaviour
         await SelectByElement(ECardElement.Yellow, 1);
         await Delay(0.4f); pc.PlayAction(); await Delay(postPlayWait); await Delay(actGap);
 
-        await ShowLabel("【魔力狂潮】", "ENVIRONMENT EFFECT — 獲得能量翻倍！符文再次蓄滿");
+        await ShowLabel("MANA SURGE", "ENVIRONMENT EFFECT — Energy gain x2! Rune charges again instantly");
         cs.envEffect.SetCurrentEffect(EEnvEffectType.Energy, 2);
         await WaitTurn();
         ForceHand(new[] { 8, 8, 104, 101, 102 });
         await SelectByElement(ECardElement.Yellow, 3);
         await Delay(0.4f); pc.PlayAction(); await Delay(postPlayWait); await Delay(actGap);
 
-        await ShowLabel("【四色合技】", "COMBINATION — 四元素同出，傷害 x4！精靈最強合技！");
+        await ShowLabel("4-COLOR COMBO", "All four elements — damage x4! Fairy's ultimate combination!");
         cs.envEffect.SetCurrentEffect(EEnvEffectType.None);
         await WaitTurn();
         ForceHand(new[] { 1, 2, 4, 8, 101 });
         await SelectBaseCards();
         await Delay(0.5f); pc.PlayAction(); await Delay(postPlayWait + 2f); await Delay(actGap);
 
-        await ShowOutro("涅莉的挑戰結束！", "精靈符文特輯  完");
+        await ShowOutro("Nelly's Challenge Complete!", "Spirit Rune Showcase — END");
     }
 
     // ═════════════════════════════════════════════════════════════
@@ -209,33 +209,33 @@ public class DemoController : MonoBehaviour
     // ═════════════════════════════════════════════════════════════
     async UniTask RunFullDemo()
     {
-        await ShowLabel("【基礎攻擊】", "BASIC ATTACK — 選擇同色卡牌累積攻擊力，同色越多越強");
+        await ShowLabel("BASIC ATTACK", "Same-color cards stack power — more RED = more damage");
         await WaitTurn();
         ForceHand(new[] { 101, 101, 101, 102, 103 });
         await SelectByElement(ECardElement.Red, 3);
         await Delay(0.4f); pc.PlayAction(); await Delay(postPlayWait); await Delay(actGap);
 
-        await ShowLabel("【防禦反制】", "DEFENSE — 藍色牌提供護盾，格擋敵方傷害");
+        await ShowLabel("DEFENSE", "Blue cards build a shield — block incoming enemy damage");
         await WaitTurn();
         ForceHand(new[] { 102, 102, 102, 101, 103 });
         await SelectByElement(ECardElement.Blue, 3);
         await Delay(0.4f); pc.PlayAction(); await Delay(postPlayWait); await Delay(actGap);
 
-        await ShowLabel("【絳紅之夜】", "ENVIRONMENT EFFECT — 攻擊力翻倍！戰場規則每回合動態變化");
+        await ShowLabel("CRIMSON NIGHT", "ENVIRONMENT EFFECT — Attack x2! The battlefield changes every turn");
         cs.envEffect.SetCurrentEffect(EEnvEffectType.Attack, 2);
         await WaitTurn();
         ForceHand(new[] { 101, 101, 102, 103, 104 });
         await SelectByElement(ECardElement.Red, 2);
         await Delay(0.4f); pc.PlayAction(); await Delay(postPlayWait); await Delay(actGap);
 
-        await ShowLabel("【生命之雨】", "HEALING — 綠色牌回復 HP，配合環境效果治癒翻倍！");
+        await ShowLabel("LIFE RAIN", "HEALING — Green cards restore HP, doubled by environment effect!");
         cs.envEffect.SetCurrentEffect(EEnvEffectType.Heal, 2);
         await WaitTurn();
         ForceHand(new[] { 103, 103, 103, 101, 102 });
         await SelectByElement(ECardElement.Green, 3);
         await Delay(0.4f); pc.PlayAction(); await Delay(postPlayWait); await Delay(actGap);
 
-        await ShowLabel("【符文技能】", "RUNE ABILITY — 蓄積能量後釋放，觸發強力特殊效果！");
+        await ShowLabel("RUNE ABILITY", "Charge energy then release — trigger a powerful special effect!");
         cs.envEffect.SetCurrentEffect(EEnvEffectType.None);
         await WaitTurn();
         pc.AddEN(9999f);
@@ -246,14 +246,14 @@ public class DemoController : MonoBehaviour
         await SelectByElement(ECardElement.Red, 1);
         await Delay(0.4f); pc.PlayAction(); await Delay(postPlayWait); await Delay(actGap);
 
-        await ShowLabel("【四色合技  COMBO】", "COMBINATION — 四元素同時出擊，傷害 x4，觸發合技演出！");
+        await ShowLabel("4-COLOR COMBO", "All four elements at once — damage x4, combo animation!");
         cs.envEffect.SetCurrentEffect(EEnvEffectType.None);
         await WaitTurn();
         ForceHand(new[] { 1, 2, 4, 8, 101 });
         await SelectBaseCards();
         await Delay(0.5f); pc.PlayAction(); await Delay(postPlayWait + 2f); await Delay(actGap);
 
-        await ShowOutro("感謝觀賞！", "HEXE — Where strategy meets magic  ✦");
+        await ShowOutro("Thank you for watching!", "HEXE — Where strategy meets magic");
     }
 
     // ═════════════════════════════════════════════════════════════
