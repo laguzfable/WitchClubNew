@@ -6,6 +6,7 @@ using UnityEngine;
 /// 掛在 MapTest 場景任意 GameObject 上。
 /// Demo 模式：隱藏 MapEventManager 按鈕，把所有小人的 call911 腳本改成 demo 專用。
 /// </summary>
+[DefaultExecutionOrder(-100)]   // 確保在 MapCharacterSpawner 之前執行
 public class DemoMapAutoProgress : MonoBehaviour
 {
     // Demo 只顯示這兩位角色
@@ -29,40 +30,51 @@ public class DemoMapAutoProgress : MonoBehaviour
 
     void Awake()
     {
-        // 在小人生成前就把 iconParent 整個關掉，完全避免任何閃爍
+        // Spawner の GameObject ごと非活性化 → Start() が走らないので icon が生成されない
         _spawner = FindObjectOfType<MapCharacterSpawner>();
-        if (_spawner != null && _spawner.iconParent != null)
+        if (_spawner != null)
         {
-            _spawner.iconParent.gameObject.SetActive(false);
-            Debug.Log("[DemoMap] iconParent 預先隱藏");
+            _spawner.gameObject.SetActive(false);
+            Debug.Log("[DemoMap] MapCharacterSpawner 停用（icon 生成防止）");
+        }
+        else
+        {
+            Debug.LogError("[DemoMap] MapCharacterSpawner が見つかりません");
         }
     }
 
     void Start()
     {
-        // 隱藏 MapEventManager 的按鈕列
         var mgr = FindObjectOfType<MapEventManager>();
-        if (mgr != null)
-        {
-            mgr.gameObject.SetActive(false);
-            Debug.Log("[DemoMap] MapEventManager 已隱藏");
-        }
+        if (mgr != null) { mgr.gameObject.SetActive(false); Debug.Log("[DemoMap] MapEventManager 已隱藏"); }
 
         StartCoroutine(OverrideCharacterScripts());
     }
 
     IEnumerator OverrideCharacterScripts()
     {
-        // 等幾幀讓 MapCharacterSpawner 生成完、call911 全部掛好
+        if (_spawner == null) yield break;
+
+        // 1. Spawner 再活性化 → Start() は次フレームに予約される
+        _spawner.gameObject.SetActive(true);
+
+        // 2. iconParent をその場で非表示（Start() より先に実行される）
+        var iconParent = _spawner.iconParent;
+        if (iconParent != null)
+            iconParent.gameObject.SetActive(false);
+        else
+            Debug.LogError("[DemoMap] iconParent が null です。MapCharacterSpawner の iconParent を Inspector で設定してください");
+
+        // 3. Spawner Start() が走り、call911 が掛かるまで待つ
         yield return null;
         yield return null;
         yield return null;
         yield return new WaitForSeconds(0.2f);
 
-        // 隱藏不需要的角色 icon
-        if (_spawner != null && _spawner.iconParent != null)
+        // 4. 不要な icon を非表示
+        if (iconParent != null)
         {
-            foreach (Transform child in _spawner.iconParent)
+            foreach (Transform child in iconParent)
             {
                 foreach (var hide in HideCharacters)
                 {
@@ -74,11 +86,10 @@ public class DemoMapAutoProgress : MonoBehaviour
                     }
                 }
             }
-        }
 
-        // iconParent 重新顯示（Mel/Eupie 的 icon 會跟著出現）
-        if (_spawner != null && _spawner.iconParent != null)
-            _spawner.iconParent.gameObject.SetActive(true);
+            // 5. iconParent を再表示（Mel/Eupie のみ見える）
+            iconParent.gameObject.SetActive(true);
+        }
 
         var all911 = FindObjectsOfType<call911>();
         Debug.Log($"[DemoMap] 找到 {all911.Length} 個 call911 元件");
