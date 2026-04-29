@@ -43,13 +43,11 @@ public class DemoCombatController : MonoBehaviour
     {
         var target = DataService.Instance?.scriptParameter?.combatTarget?.Value;
 
-        TutorialObject[] steps = target switch
-        {
-            "mobMei"    => meiSteps,
-            "mobVivia"  => viviaSteps,
-            "mobEuphie" => euphieSteps,
-            _           => null   // mobNelly 或其他 → 自由遊玩
-        };
+        TutorialObject[] steps = null;
+        if      (target == "mobMei")    steps = meiSteps;
+        else if (target == "mobVivia")  steps = viviaSteps;
+        else if (target == "mobEuphie") steps = euphieSteps;
+        // mobNelly 或其他 → steps 維持 null → 自由遊玩
 
         if (steps != null && steps.Length > 0)
         {
