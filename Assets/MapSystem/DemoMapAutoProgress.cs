@@ -55,57 +55,78 @@ public class DemoMapAutoProgress : MonoBehaviour
 
             foreach (var child in children)
             {
-                if (!child.name.StartsWith("Icon_"))
+                string rawName = child.name;
+
+                if (!rawName.StartsWith("Icon_"))
                 {
-                    Debug.Log($"[DemoMap] 跳過：{child.name}");
+                    Debug.Log($"[DemoMap] 跳過（非Icon）：'{rawName}'");
                     continue;
                 }
 
-                string iconName = child.name;
-                Debug.Log($"[DemoMap] 處理：{iconName}");
+                Debug.Log($"[DemoMap] ── icon 名稱：'{rawName}'");
 
-                // 需要隱藏的角色
-                bool shouldHide = false;
+                // ── 隱藏判定 ──
+                string matchedHide = null;
                 foreach (var h in HideCharacters)
-                    if (iconName.Contains(h)) { shouldHide = true; break; }
+                    if (rawName.Contains(h)) { matchedHide = h; break; }
 
-                if (shouldHide)
+                if (matchedHide != null)
                 {
                     child.gameObject.SetActive(false);
-                    Debug.Log($"[DemoMap] → 隱藏");
+                    Debug.Log($"[DemoMap]   HideCharacters 命中 '{matchedHide}' → SetActive(false)");
                     continue;
                 }
 
-                // Demo 角色：替換腳本
+                // ── Demo 腳本替換 ──
+                string matchedKey = null;
+                string matchedScript = null;
                 foreach (var kv in DemoScripts)
                 {
-                    if (!iconName.Contains(kv.Key)) continue;
-                    var script = kv.Value;
-
-                    // 停用 call911，避免它再次觸發主線
-                    var c911 = child.GetComponentInChildren<call911>(true);
-                    if (c911 != null) c911.enabled = false;
-
-                    // 替換 Button 的 onClick
-                    var btn = child.GetComponentInChildren<Button>(true);
-                    if (btn != null)
+                    if (rawName.Contains(kv.Key))
                     {
-                        btn.onClick.RemoveAllListeners();
-                        btn.onClick.AddListener(() =>
-                        {
-                            Debug.Log($"[DemoMap] 點擊 → {script}");
-                            var ds = DataService.Instance;
-                            if (ds != null)
-                            {
-                                ds.startScript     = script;
-                                ds.scriptParameter = new ScriptParameter { scriptName = script };
-                            }
-                            UnityEngine.SceneManagement.SceneManager.LoadScene("NaniDialogTest");
-                        });
-                        Debug.Log($"[DemoMap] → {script}");
+                        matchedKey    = kv.Key;
+                        matchedScript = kv.Value;
+                        break;
                     }
-                    break;
                 }
+                Debug.Log($"[DemoMap]   DemoScripts 命中：key='{matchedKey}' script='{matchedScript}'");
+
+                if (matchedScript == null)
+                {
+                    Debug.LogWarning($"[DemoMap]   未命中任何規則，保持原樣：'{rawName}'");
+                    continue;
+                }
+
+                var script = matchedScript;
+
+                // call911 直接 Destroy（比 enabled=false 更確實，Start() 如果還沒跑就不會跑）
+                var c911 = child.GetComponentInChildren<call911>(true);
+                if (c911 != null)
+                {
+                    Destroy(c911);
+                    Debug.Log($"[DemoMap]   call911 Destroy");
+                }
+                else Debug.LogWarning($"[DemoMap]   call911 找不到");
+
+                // 替換 Button onClick
+                var btn = child.GetComponentInChildren<Button>(true);
+                if (btn != null)
+                {
+                    btn.onClick.RemoveAllListeners();
+                    btn.onClick.AddListener(() =>
+                    {
+                        Debug.Log($"[DemoMap] 點擊 → {script}");
+                        var ds = DataService.Instance;
+                        if (ds != null)
+                        {
+                            ds.startScript     = script;
+                            ds.scriptParameter = new ScriptParameter { scriptName = script };
+                        }
+                        UnityEngine.SceneManagement.SceneManager.LoadScene("NaniDialogTest");
+                    });
+                    Debug.Log($"[DemoMap]   Button '{btn.gameObject.name}' onClick 替換完成 → {script}");
+                }
+                else Debug.LogWarning($"[DemoMap]   Button 找不到");
             }
         }
 
