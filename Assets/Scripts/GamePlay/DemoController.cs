@@ -25,6 +25,10 @@ public class DemoController : MonoBehaviour
     [Tooltip("勾選後無視 Target，強制執行完整 Demo（編輯器測試用）")]
     [SerializeField] bool debugAlwaysRun = false;
 
+    [Header("Font")]
+    [Tooltip("支援中文的 TMP Font Asset，拖入 NotoSansCJKtc-Regular SDF")]
+    [SerializeField] TMP_FontAsset chineseFont;
+
     [Header("Timing (seconds)")]
     [SerializeField] float initDelay       = 3.5f;
     [SerializeField] float labelShowTime   = 2.0f;
@@ -372,6 +376,7 @@ public class DemoController : MonoBehaviour
         titleTMP.fontSize  = 58;
         titleTMP.fontStyle = FontStyles.Bold;
         titleTMP.color     = Color.white;
+        if (chineseFont != null) titleTMP.font = chineseFont;
         SetAnchors(titleGO, new Vector2(0.05f, 0.15f), new Vector2(0.95f, 0.27f));
 
         // Description
@@ -381,6 +386,7 @@ public class DemoController : MonoBehaviour
         descTMP.alignment = TextAlignmentOptions.Center;
         descTMP.fontSize  = 30;
         descTMP.color     = new Color(1f, 0.92f, 0.6f, 1f);
+        if (chineseFont != null) descTMP.font = chineseFont;
         SetAnchors(descGO, new Vector2(0.05f, 0.04f), new Vector2(0.95f, 0.15f));
 
         // Watermark
