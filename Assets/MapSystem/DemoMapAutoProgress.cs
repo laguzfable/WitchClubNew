@@ -33,9 +33,14 @@ public class DemoMapAutoProgress : MonoBehaviour
 
     IEnumerator Setup()
     {
-        // 等 Spawner.Start → 生成 icon → call911.Start 全部跑完
-        yield return null; yield return null;
-        yield return null; yield return null;
+        // ── Phase 1：1 幀後立刻隱藏 Vedia/Nelly 的 Icon_* ──────────
+        // Spawner 的 Instantiate 在 frame 0 Update 裡就完成，
+        // 所以 1 幀後 Icon_* 已存在，不需要等 call911
+        yield return null;
+        HideNonDemoIcons();
+
+        // ── Phase 2：等 call911.Start() 全部跑完再替換 onClick ──────
+        yield return null; yield return null; yield return null;
         yield return new WaitForSeconds(0.3f);
 
         // ── Step 1：從 Spawner 的 characterEventTable 建立 naniScript → 角色名 逆引き ──
@@ -115,6 +120,29 @@ public class DemoMapAutoProgress : MonoBehaviour
         }
 
         Debug.Log("[DemoMap] 完成");
+    }
+
+    // Phase 1：Spawner 容器の Icon_* 子物件を走査して非 Demo 角色を即時隱藏
+    void HideNonDemoIcons()
+    {
+        var spawners = FindObjectsOfType<MapCharacterSpawner>();
+        foreach (var sp in spawners)
+        {
+            var container = sp.iconParent != null ? sp.iconParent : sp.transform;
+            foreach (Transform child in container)
+            {
+                if (!child.name.StartsWith("Icon_")) continue;
+                foreach (var h in HideChars)
+                {
+                    if (child.name.Contains(h))
+                    {
+                        child.gameObject.SetActive(false);
+                        Debug.Log($"[DemoMap] Phase1 即時隱藏：{child.name}");
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     // 階層を上に向かって走査し、CharToScript / HideChars に一致する名前を探す
