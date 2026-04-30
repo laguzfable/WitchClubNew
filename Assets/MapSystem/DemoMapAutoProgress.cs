@@ -22,16 +22,19 @@ public class DemoMapAutoProgress : MonoBehaviour
         "Vivia", "Vedia", "薇狄亞", "Nelly", "涅莉", "Lilina", "莉莉娜",
     };
 
-    // 晚上：Nelly / Vedia 出現
+    // 晚上：Nelly / Vedia / Lilina（一次性）出現
     static readonly Dictionary<string, string> NightCharToScript = new Dictionary<string, string>
     {
-        { "Nelly",  "demo_nelly" }, { "涅莉",   "demo_nelly" },
-        { "Vivia",  "demo_vedia" }, { "Vedia",  "demo_vedia" }, { "薇狄亞", "demo_vedia" },
+        { "Nelly",  "demo_nelly"   }, { "涅莉",  "demo_nelly"   },
+        { "Vivia",  "demo_vedia"   }, { "Vedia", "demo_vedia"   }, { "薇狄亞", "demo_vedia"   },
+        { "Lilina", "demo_lilina"  }, { "莉莉娜","demo_lilina"  },
     };
     static readonly HashSet<string> NightHideChars = new HashSet<string>
     {
-        "Mel", "Mei", "魅兒", "Euphie", "Eupie", "優菲", "Lilina", "莉莉娜",
+        "Mel", "Mei", "魅兒", "Euphie", "Eupie", "優菲",  // Lilina 從這裡移除，由下方邏輯控制
     };
+
+    public static bool LilinaSpokenThisSession = false;
 
     Dictionary<string, string> CharToScript;
     HashSet<string> HideChars;
@@ -58,6 +61,16 @@ public class DemoMapAutoProgress : MonoBehaviour
                     entry.dayEvents.Clear();
                     entry.nightEvents.Clear();
                     Debug.Log($"[DemoMap] Awake 清除 Spawner 事件：{entry.characterName}");
+                    continue;
+                }
+
+                // 莉莉娜：已拜訪過則隱藏（一次性事件）
+                bool isLilina = entry.characterName.Contains("Lilina") || entry.characterName.Contains("莉莉娜");
+                if (isLilina && LilinaSpokenThisSession)
+                {
+                    entry.dayEvents.Clear();
+                    entry.nightEvents.Clear();
+                    Debug.Log($"[DemoMap] Awake 莉莉娜已拜訪，隱藏圖示");
                     continue;
                 }
 

@@ -27,6 +27,10 @@ public class DemoCombatController : MonoBehaviour
 
     void Start()
     {
+        // Demo 地圖事件（demo_vedia / demo_vivia / demo_mei …）→ 自由遊玩，不啟動教學
+        var returnScript = DataService.Instance?.scriptParameter?.scriptName?.ToString() ?? "";
+        if (returnScript.StartsWith("demo_")) return;
+
         TutorialObject[] steps = null;
         if      (_target == "mobMei")    steps = meiSteps;
         else if (_target == "mobVivia")  steps = viviaSteps;

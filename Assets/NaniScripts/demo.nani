@@ -13,20 +13,21 @@
 ; ── 開場閒聊 ─────────────────────────────────────
 
 @char 涅莉 pos:50 time:0
-涅莉.happy: 嘿，{PlayerName}！歡迎來到《魔女俱樂部》！
+涅莉.happy: 嘿，{PlayerName}！歡迎來到《女巫俱樂部》！
+涅莉.happy: 這是為了東京電玩展SELECTED INDIE 80審查所製作的特別版本。
+涅莉.happy: 《女巫俱樂部》是訴說一群巫術戰爭後重新找回自我的，少女們的故事。
 
-@choice 這裡是哪裡？
-@stop
 
 @char 魅兒 pos:30 time:0.3
 @char 優菲 pos:70 time:0.3
 
-魅兒.idle: 血巫結社，魅兒。我的魔法可不是吃素的。
-優菲.smile: 象牙塔的優菲。防禦就交給我！
 
-涅莉.yummy: 想知道怎麼跟我們一起戰鬥嗎？
+優菲.smile: 而你，是被我買下的骷髏，擁有神秘的異世界力量。
+魅兒.idle: 我們四個既是好朋友，卻也是不同派系的敵人，要拿那股力量幫助誰，就是你的選擇了。
 
-@choice 想！教我！
+涅莉.yummy: 好，時間有限，先來解釋戰鬥吧！
+
+@choice 開始吧！
 @stop
 
 @hide 涅莉,魅兒,優菲
@@ -47,7 +48,7 @@
 @back bg01 time:0.5
 @char 涅莉 pos:50 time:0
 
-涅莉.exc: 很好！現在去地圖上找魅兒或優菲挑戰看看吧！
+涅莉.exc: 有點概念了呢。
 
 @choice 出發！
 @stop
@@ -76,8 +77,8 @@
 
 @hide 魅兒
 
-; ── 前往夜晚地圖（Nelly / Vedia）────────────────────
-@GotoMapDemo ReturnScript:demo ReturnLabel:aftermap Scene:MapTest IsDay:0
+; ── 先去符文台換符文，再前往夜晚地圖 ────────────────
+@GotoChangeRune scriptName:demo label:rune_tutorial
 @stop
 
 
@@ -98,7 +99,30 @@
 
 @hide 優菲
 
-; ── 前往夜晚地圖（Nelly / Vedia）────────────────────
+; ── 先去符文台換符文，再前往夜晚地圖 ────────────────
+@GotoChangeRune scriptName:demo label:rune_tutorial
+@stop
+
+
+; ─────────────────────────────────────────────────
+# rune_tutorial
+; ─────────────────────────────────────────────────
+
+@stopBgm
+@bgm happy
+@back bg01 time:0.5
+@char 涅莉 pos:50 time:0
+
+涅莉.yummy: 換了新符文的感覺怎麼樣？
+涅莉.exc: 符文不同，戰鬥風格也會完全改變唷！帶著這份力量——
+涅莉.happy: 去夜晚的地圖，挑戰更強的對手吧！
+
+@choice 出發！
+@stop
+
+@hide 涅莉
+
+; ── 前往夜晚地圖（Nelly / Vedia / Lilina）────────────────────
 @GotoMapDemo ReturnScript:demo ReturnLabel:aftermap Scene:MapTest IsDay:0
 @stop
 
@@ -136,7 +160,7 @@
 魅兒.idle: 不錯嘛，有進步了。
 優菲.smile: 不過……一個人的力量終究有限。
 涅莉.exc: 合在一起才是真正的強大！
-薇狄亞.talking: 我們四個聯手——才是魔女俱樂部。
+薇狄亞.talking: 我們四個聯手——才是女巫俱樂部。
 
 @hide 魅兒,優菲,涅莉,薇狄亞
 
@@ -158,9 +182,9 @@
 @char 薇狄亞 pos:80 time:0.3
 
 魅兒.talking: 這就是我們的力量。
-優菲.smile: 謝謝你願意來到魔女俱樂部。
+優菲.smile: 謝謝你願意來到女巫俱樂部。
 涅莉.happy: 正式版還有更多冒險在等著你喔！
-薇狄亞.idle: 記住這份感覺。旅人。
+薇狄亞.idle: 別忘了我唷，我們一定還會再見面的。
 
 @hide 魅兒,優菲,涅莉,薇狄亞
 

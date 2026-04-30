@@ -158,7 +158,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -150, y: -36.54}
+  m_AnchoredPosition: {x: 398, y: -61.494}
   m_SizeDelta: {x: 233.2196, y: 83.25061}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &72782850
@@ -371,7 +371,6 @@ GameObject:
   - component: {fileID: 972542006}
   - component: {fileID: 972542005}
   - component: {fileID: 972542004}
-  - component: {fileID: 972542007}
   m_Layer: 5
   m_Name: Button (1)
   m_TagString: Untagged
@@ -396,7 +395,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 150, y: -36.54}
+  m_AnchoredPosition: {x: 398, y: -194}
   m_SizeDelta: {x: 233.2196, y: 83.25061}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &972542004
@@ -441,7 +440,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 972542005}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &972542005
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -479,19 +489,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 972542002}
   m_CullTransparentMesh: 0
---- !u!114 &972542007
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 972542002}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e05f482d263349543b1678ef05dc2303, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  language: en
 --- !u!1 &1279858305
 GameObject:
   m_ObjectHideFlags: 0
@@ -661,7 +658,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u7E41\u9AD4\u4E2D\u6587"
+  m_Text: Start
 --- !u!222 &1329942969
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -705,7 +702,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 20.426636, y: 106.7016}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1374483880
 MonoBehaviour:
@@ -720,13 +717,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.2264151, g: 0.2264151, b: 0.2264151, a: 1}
+  m_Color: {r: 0.7264151, g: 0.7024297, b: 0.7024297, a: 1}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 4ac561adf0bf8d54497a91d801786367, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -813,7 +810,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: English
+  m_Text: Exit
 --- !u!222 &1473159276
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -944,7 +941,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 105.87}
+  m_AnchoredPosition: {x: 398, y: 86}
   m_SizeDelta: {x: 488.1355, y: 211.73651}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1596142953
@@ -968,10 +965,10 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 336c51dac3b1a314aac3335337653f9b, type: 3}
-    m_FontSize: 40
+    m_FontSize: 25
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 4
+    m_MinSize: 2
     m_MaxSize: 40
     m_Alignment: 4
     m_AlignByGeometry: 0
@@ -979,7 +976,10 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u9078\u64C7\u8A9E\u8A00\nSelect Language"
+  m_Text: 'Witch Club
+
+    Special Demo Version for SELECTED INDIE 80 Jury Review
+    (2026)'
 --- !u!222 &1596142954
 CanvasRenderer:
   m_ObjectHideFlags: 0
