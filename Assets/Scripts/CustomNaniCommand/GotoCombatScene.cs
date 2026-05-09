@@ -108,15 +108,14 @@ catch (System.Exception ex)
         try { TutorialController.isTutorial = false; TutorialController.isTutorial2 = false; }
         catch (System.Exception ex) { Debug.LogWarning($"[{AliasName}] 重置教學旗標失敗（可忽略）：{ex.Message}"); }
 
-        // 6) 切換場景（先檢查 Build Settings）
+        // 6) 切換場景
+        // NOTE: Application.CanStreamedLevelBeLoaded is a legacy Web-Player API that
+        //       always returns false for normal scenes in Unity 2019+. Do NOT use it.
+        //       Just call LoadSceneAsync directly and handle null / exceptions.
         Debug.Log($"[{AliasName}] 準備切換到 CombatScene ...");
         try {
-            bool canLoad = false;
-            try { canLoad = Application.CanStreamedLevelBeLoaded("CombatScene"); } catch { /* 舊版沒有此 API 亦可 */ }
-            if (!canLoad) { Debug.LogError($"[{AliasName}] CombatScene 不在 Build Settings 或不可載入。"); return; }
-
             var op = SceneManager.LoadSceneAsync("CombatScene", LoadSceneMode.Single);
-            if (op == null) { Debug.LogError($"[{AliasName}] LoadSceneAsync 回傳 null。"); return; }
+            if (op == null) { Debug.LogError($"[{AliasName}] LoadSceneAsync 回傳 null — 請確認 CombatScene 已加入 Build Settings。"); return; }
 
             try { await op; } catch { while (!op.isDone) await UniTask.Yield(); }
 

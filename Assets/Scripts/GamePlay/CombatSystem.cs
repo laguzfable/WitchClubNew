@@ -62,19 +62,23 @@ public class CombatSystem : MonoBehaviour
 
 void Awake()
 {
+    Debug.Log($"[CombatSystem.Awake] ▶ Engine.Initialized={Engine.Initialized}");
     localEventSystem.SetActive(!Engine.Initialized);
 
-    pc = GameObject.FindWithTag("Player").GetComponent<PlayerController>();
-    combatTxtPanel = GameObject.FindWithTag("Respawn").GetComponent<UICombatTextPanel>();
+    pc = GameObject.FindWithTag("Player")?.GetComponent<PlayerController>();
+    combatTxtPanel = GameObject.FindWithTag("Respawn")?.GetComponent<UICombatTextPanel>();
     envEffect = new EnvironmentEffect(this);
+    Debug.Log($"[CombatSystem.Awake] ✓ envEffect 建立完成");
 
     monsterID = PlayerPrefs.GetString("enemyName");
+    Debug.Log($"[CombatSystem.Awake] enemyName='{monsterID}'  IsTestMode={IsTestMode}");
     bossName.text = monsterID;
 
     audioSource = gameObject.GetComponent<AudioSource>();
-    dialogText = dialogObj.transform.Find("Image/Text").GetComponent<Text>();
-    mobUnit = GameObject.FindGameObjectWithTag("Enemy").GetComponent<EnemyUnit>();
+    dialogText = dialogObj?.transform.Find("Image/Text")?.GetComponent<Text>();
+    mobUnit = GameObject.FindGameObjectWithTag("Enemy")?.GetComponent<EnemyUnit>();
     visualResource = GetComponent<CombatVisualResources>();
+    Debug.Log($"[CombatSystem.Awake] ✓ pc={(pc==null?"null":"ok")}  mobUnit={(mobUnit==null?"null":"ok")}  visualResource={(visualResource==null?"null":"ok")}");
 
     Init();
 
@@ -105,14 +109,28 @@ private void LoadEquippedRunes()
 
     void Init()
     {
+        Debug.Log($"[CombatSystem.Init] ▶ IsTestMode={IsTestMode}  monsterID='{monsterID}'  isTutorial={TutorialController.isTutorial}  isTutorial2={TutorialController.isTutorial2}");
         if (!IsTestMode)
         {
             SwitchStateToCombatMode();
 
-            BG.sprite = visualResource.GetBGByName(DataService.Instance.scriptParameter.background);
+            var bgName = DataService.Instance?.scriptParameter?.background ?? "(null)";
+            Debug.Log($"[CombatSystem.Init] BG name='{bgName}'  visualResource={(visualResource==null?"null":"ok")}  BG={(BG==null?"null":"ok")}");
+            if (visualResource != null && BG != null)
+                BG.sprite = visualResource.GetBGByName(bgName);
+            else
+                Debug.LogWarning("[CombatSystem.Init] visualResource 或 BG 為空，跳過背景設定");
 
             var runeActive = false;
-            Engine.GetService<ICustomVariableManager>().TryGetVariableValue<bool>("RuneActive", out runeActive);
+            try
+            {
+                var varMgr = Engine.GetService<ICustomVariableManager>();
+                if (varMgr != null)
+                    varMgr.TryGetVariableValue<bool>("RuneActive", out runeActive);
+                else
+                    Debug.LogWarning("[CombatSystem.Init] ICustomVariableManager 為空，runeActive 保持 false");
+            }
+            catch (Exception ex) { Debug.LogWarning($"[CombatSystem.Init] 讀取 RuneActive 失敗：{ex.Message}"); }
 
             if (TutorialController.isTutorial)
             {
@@ -124,15 +142,27 @@ private void LoadEquippedRunes()
                 tutorController = tutorController2;
                 tutorController.Begin();
             }
-            tutorController1.uICollection.SetRunesEnabled(runeActive);
+            if (tutorController1 != null && tutorController1.uICollection != null)
+                tutorController1.uICollection.SetRunesEnabled(runeActive);
+            else
+                Debug.LogWarning("[CombatSystem.Init] tutorController1 或 uICollection 為空，跳過 SetRunesEnabled");
         }
 
-        BG.gameObject.SetActive(true);
+        if (BG != null) BG.gameObject.SetActive(true);
+        Debug.Log($"[CombatSystem.Init] ✓ BG 已啟用  BG={(BG==null?"null":"ok")}");
 
         TryEnableEnergySystemFromNaninovel(); // ✅ 能量啟動改這裡
+        Debug.Log($"[CombatSystem.Init] ✓ TryEnableEnergy 完成");
 
+        if (blackMask == null)
+        {
+            Debug.LogError("[CombatSystem.Init] ❌ blackMask 為 null！無法執行淡入，戰鬥場景將永久黑畫面");
+            return;
+        }
+        Debug.Log($"[CombatSystem.Init] ★ 執行 blackMask.DOFade(0→0.3s)  目前 alpha={blackMask.color.a:F2}");
         blackMask.DOFade(0f, 0.3f).OnComplete(() =>
         {
+            Debug.Log("[CombatSystem.Init] ★ blackMask 淡入完成，顯示 startBattleUI");
             startBattleUI.SetActive(true);
             DOVirtual.DelayedCall(1f, () => startBattleUI.SetActive(false));
         });
@@ -188,28 +218,68 @@ public class MobRuneUnlockData
 
     void Start()
     {
+        Debug.Log($"[CombatSystem.Start] ▶ isTutorial={TutorialController.isTutorial}  isTutorial2={TutorialController.isTutorial2}");
         if (envEffect.curType == EEnvEffectType.None)
             envEffect.SetCurrentEffect(EEnvEffectType.None);
 
         if (!TutorialController.isTutorial && !TutorialController.isTutorial2)
         {
+            Debug.Log("[CombatSystem.Start] → PrepareBeginTurn()");
             PrepareBeginTurn();
         }
     }
 
     public void SwitchStateToCombatMode()
     {
-        GameObject.FindObjectOfType<ContinueInputUI>().Visible = false;
-        var scriptPlayer = Engine.GetService<IScriptPlayer>();
-        scriptPlayer.Stop();
+        Debug.Log("[SwitchStateToCombatMode] ▶ 開始");
 
-        var advCamera = GameObject.Find("CombatCamera").GetComponent<Camera>();
-        advCamera.enabled = true;
-        var naniCamera = Engine.GetService<ICameraManager>().Camera;
-        naniCamera.enabled = false;
+        // ContinueInputUI
+        try
+        {
+            var cui = GameObject.FindObjectOfType<ContinueInputUI>();
+            if (cui != null) cui.Visible = false;
+            else Debug.LogWarning("[SwitchStateToCombatMode] ContinueInputUI 找不到（略過）");
+        }
+        catch (Exception ex) { Debug.LogWarning($"[SwitchStateToCombatMode] ContinueInputUI 例外：{ex.Message}"); }
 
-         var audioManager = Engine.GetService<IAudioManager>();
-         audioManager.PlayBgmAsync("你的戰鬥BGM檔名", volume: 1f, fadeTime: 0.5f, loop: true).Forget();
+        // 停止劇本播放
+        try
+        {
+            var scriptPlayer = Engine.GetService<IScriptPlayer>();
+            if (scriptPlayer != null) scriptPlayer.Stop();
+        }
+        catch (Exception ex) { Debug.LogWarning($"[SwitchStateToCombatMode] ScriptPlayer.Stop 例外：{ex.Message}"); }
+
+        // 相機切換
+        try
+        {
+            var advCameraObj = GameObject.Find("CombatCamera");
+            if (advCameraObj != null)
+            {
+                var cam = advCameraObj.GetComponent<Camera>();
+                if (cam != null) cam.enabled = true;
+            }
+            else Debug.LogWarning("[SwitchStateToCombatMode] CombatCamera 找不到（略過）");
+        }
+        catch (Exception ex) { Debug.LogWarning($"[SwitchStateToCombatMode] CombatCamera 例外：{ex.Message}"); }
+
+        try
+        {
+            var naniCamera = Engine.GetService<ICameraManager>()?.Camera;
+            if (naniCamera != null) naniCamera.enabled = false;
+        }
+        catch (Exception ex) { Debug.LogWarning($"[SwitchStateToCombatMode] NaniCamera 例外：{ex.Message}"); }
+
+        // BGM（找不到資源時只 Log，不崩潰）
+        try
+        {
+            var audioManager = Engine.GetService<IAudioManager>();
+            if (audioManager != null)
+                audioManager.PlayBgmAsync("battle01", volume: 1f, fadeTime: 0.5f, loop: true).Forget();
+        }
+        catch (Exception ex) { Debug.LogWarning($"[SwitchStateToCombatMode] BGM 例外：{ex.Message}"); }
+
+        Debug.Log("[SwitchStateToCombatMode] ✓ 完成");
     }
 
     private void Update()
@@ -420,16 +490,20 @@ public async UniTask PlayCardAsync()
 
 public void GameOver(bool isLose)
 {
-    Debug.Log($"isLose?: {isLose}");
+    Debug.Log($"[GameOver] isLose={isLose}  呼叫者：\n{new System.Diagnostics.StackTrace(true)}");
 
     // ✅ 把勝敗結果寫進 Naninovel 變數（給 @if CombatResult 用）
     if (!IsTestMode)
     {
-var vars = Engine.GetService<ICustomVariableManager>();
-vars.SetVariableValue("CombatWin", isLose ? "False" : "True");
-
-
-
+        try
+        {
+            var vars = Engine.GetService<ICustomVariableManager>();
+            if (vars != null)
+                vars.SetVariableValue("CombatWin", isLose ? "False" : "True");
+            else
+                Debug.LogWarning("[GameOver] ICustomVariableManager 為空，CombatWin 無法設定");
+        }
+        catch (Exception ex) { Debug.LogWarning($"[GameOver] 設定 CombatWin 失敗：{ex.Message}"); }
     }
 
     // ✅ 清洗 monsterID
@@ -461,29 +535,75 @@ if (isLose)
 
 public void BackToNani()
 {
+    Debug.Log("[BackToNani] ▶ 開始 BackToNani");
+
     // ✅ 確保能量狀態不延續到下一場戰鬥
-    var vars = Engine.GetService<ICustomVariableManager>();
-    if (vars != null)
-        vars.SetVariableValue("YellowActive", "false");
+    try
+    {
+        var vars = Engine.GetService<ICustomVariableManager>();
+        if (vars != null)
+            vars.SetVariableValue("YellowActive", "false");
+    }
+    catch (Exception ex) { Debug.LogWarning($"[BackToNani] YellowActive 重置失敗：{ex.Message}"); }
 
     if (IsTestMode)
     {
+        Debug.Log("[BackToNani] IsTestMode → ReloadScene");
         ReloadScene();
         return;
     }
 
-    string mobListStr = "";
-    Engine.GetService<ICustomVariableManager>().TryGetVariableValue<string>("MobList", out mobListStr);
-    mobListStr += DataService.Instance.scriptParameter.combatTarget + ",";
-    Engine.GetService<ICustomVariableManager>().SetVariableValue("MobList", mobListStr);
+    // ── 更新 MobList ──────────────────────────────────────────
+    try
+    {
+        var varMgr = Engine.GetService<ICustomVariableManager>();
+        if (varMgr != null)
+        {
+            string mobListStr = "";
+            varMgr.TryGetVariableValue<string>("MobList", out mobListStr);
+            var target = DataService.Instance?.scriptParameter?.combatTarget ?? "";
+            mobListStr += target + ",";
+            varMgr.SetVariableValue("MobList", mobListStr);
+            Debug.Log($"[BackToNani] MobList 更新完成，target='{target}'");
+        }
+    }
+    catch (Exception ex) { Debug.LogWarning($"[BackToNani] MobList 更新失敗：{ex.Message}"); }
 
-    var advCamera = GameObject.Find("CombatCamera").GetComponent<Camera>();
-    advCamera.enabled = false;
-    var naniCamera = Engine.GetService<ICameraManager>().Camera;
-    naniCamera.enabled = true;
-    GameObject.FindObjectOfType<ContinueInputUI>().Visible = true;
+    // ── 相機切換 ──────────────────────────────────────────────
+    try
+    {
+        var advCameraObj = GameObject.Find("CombatCamera");
+        if (advCameraObj != null)
+        {
+            var advCamera = advCameraObj.GetComponent<Camera>();
+            if (advCamera != null) advCamera.enabled = false;
+            Debug.Log("[BackToNani] CombatCamera 已關閉");
+        }
+        else Debug.LogWarning("[BackToNani] 找不到 CombatCamera（略過）");
+    }
+    catch (Exception ex) { Debug.LogWarning($"[BackToNani] CombatCamera 操作失敗：{ex.Message}"); }
 
+    try
+    {
+        var naniCamera = Engine.GetService<ICameraManager>()?.Camera;
+        if (naniCamera != null) { naniCamera.enabled = true; Debug.Log("[BackToNani] NaniCamera 已啟用"); }
+        else Debug.LogWarning("[BackToNani] NaniCamera 為空（略過）");
+    }
+    catch (Exception ex) { Debug.LogWarning($"[BackToNani] NaniCamera 操作失敗：{ex.Message}"); }
+
+    // ── ContinueInputUI ───────────────────────────────────────
+    try
+    {
+        var continueUI = GameObject.FindObjectOfType<ContinueInputUI>();
+        if (continueUI != null) { continueUI.Visible = true; Debug.Log("[BackToNani] ContinueInputUI 顯示"); }
+        else Debug.LogWarning("[BackToNani] ContinueInputUI 找不到（略過）");
+    }
+    catch (Exception ex) { Debug.LogWarning($"[BackToNani] ContinueInputUI 操作失敗：{ex.Message}"); }
+
+    // ── 載入 NaniDialogTest ────────────────────────────────────
+    Debug.Log("[BackToNani] ★ 準備載入 NaniDialogTest ...");
     SceneManager.LoadSceneAsync("NaniDialogTest");
+    Debug.Log("[BackToNani] LoadSceneAsync 已發出");
 }
 
 

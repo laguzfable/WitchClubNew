@@ -59,18 +59,16 @@ public class CombatSceneLocalization : MonoBehaviour
             {
                 if (Engine.Initialized)
                 {
-                    // if(!map.ContainsKey(Engine.GetService<ILocalizationManager>().SelectedLocale))
-                    // {
-                    //     foreach(var kvp in map)
-                    //     {
-                    //         Debug.Log($"{kvp.Key}, {kvp.Value}");
-                    //     }
-                    // }
-                    return map[Engine.GetService<ILocalizationManager>().SelectedLocale];
+                    var locale = Engine.GetService<ILocalizationManager>().SelectedLocale;
+                    if (map.TryGetValue(locale, out var localized))
+                        return localized;
+                    if (map.TryGetValue("zh-TW", out var fallback))
+                        return fallback;
                 }
                 else
                 {
-                    return map["zh-TW"];
+                    if (map.TryGetValue("zh-TW", out var fallback))
+                        return fallback;
                 }
             }
         }

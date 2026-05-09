@@ -29,13 +29,17 @@ public class GotoChangeRune : Command, Command.IForceWait
         var scriptPlayer = Engine.GetService<IScriptPlayer>();
         scriptPlayer?.SetSkipEnabled(false);
 
-        if (!Application.CanStreamedLevelBeLoaded("ChangeRuneScene"))
+        // NOTE: Application.CanStreamedLevelBeLoaded is a legacy Web-Player API that
+        // always returns false for regular scenes in Unity 2019+. Use LoadSceneAsync
+        // directly; if the scene is missing from Build Settings it returns null.
+        var _op = SceneManager.LoadSceneAsync("ChangeRuneScene");
+        if (_op == null)
         {
             Debug.LogWarning("[GotoChangeRune] ChangeRuneScene 不在 Build Settings，直接返回劇本");
             NaniBridgeUtility.GoBackToSavedStory();
             return;
         }
 
-        await SceneManager.LoadSceneAsync("ChangeRuneScene");
+        await _op;
     }
 }

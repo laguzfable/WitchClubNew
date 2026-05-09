@@ -32,7 +32,13 @@ public class UIShowInfoScreen : MonoBehaviour
         if(!string.IsNullOrEmpty(abilityID))
         {
             Ability cardAbility = DataService.Instance.GetAbilityById(GetComponent<UIWitchAbility>().abilityID);
-            infoStr = cardAbility.description;
+
+            var localization = GameObject.FindWithTag("GameController")
+                               ?.GetComponent<CombatSceneLocalization>();
+            string localeKey = $"ABILITY_{cardAbility.id}_DESC";
+            infoStr = localization != null
+                ? localization.GetLocalizedContent(localeKey, cardAbility.description)
+                : cardAbility.description;
         }
     }
 

@@ -35,15 +35,14 @@ public class TutorialController : MonoBehaviour
 
     [SerializeField] Sprite[] localeSprArr;//從0開始 0=白板 1=藍 2=綠 以此類推 語言0:中文 3:英文
 
-    //private void Start()
-    //{
-    //    if(isTutorial || isTutorial2)
-    //    {
-    //        uICollection.TurnOffAll();
-
-    //        RunTutorialSequenceAsync().Forget();
-    //    }
-    //}
+    private void Start()
+    {
+        // ⚠️ 不在這裡自動啟動。
+        // 場景中有兩個 TutorialController（tutorController1 / tutorController2），
+        // Unity 會對兩個都呼叫 Start()，若在這裡判斷 static flag 會導致
+        // 「另一個」controller 也跟著跑，造成對話框重疊。
+        // 啟動統一由 CombatSystem.Init() 明確呼叫 Begin() 處理。
+    }
 
     public void Begin()
     {
@@ -78,24 +77,39 @@ public class TutorialController : MonoBehaviour
 
     async UniTaskVoid RunTutorialSequenceAsync()
     {
-        //var startIndex = GetIndexFromLanguage(localization.GetCurLanguage());
-        //if(startIndex > 0)//不是中文 切換對應語言圖片
-        //{
-        //    for(var i =0; i < localeImgArr.Length; i++)
-        //    {
-        //        localeImgArr[i].sprite = localeSprArr[startIndex+i];
-        //    }
-        //}
+        var startIndex = GetIndexFromLanguage(localization.GetCurLanguage());
+        if(startIndex > 0 && localeImgArr != null && localeSprArr != null)//不是中文 切換對應語言圖片
+        {
+            for(var i = 0; i < localeImgArr.Length; i++)
+            {
+                int sprIdx = startIndex + i;
+                if(localeImgArr[i] != null && sprIdx < localeSprArr.Length)
+                    localeImgArr[i].sprite = localeSprArr[sprIdx];
+            }
+        }
+
+        // ── ensure all dialog panels start hidden ──────────────────────
+        leftDialog.SetActive(false);
+        rightDialog.SetActive(false);
+        if (leftUpDialog  != null) leftUpDialog.SetActive(false);
+        if (rightDownDialog != null) rightDownDialog.SetActive(false);
+        // ────────────────────────────────────────────────────────────
 
         bool isDialogFinish = false;
         seq = DOTween.Sequence();
         foreach(var tutorial in tutorialArr)
         {
             seq.Kill();
-            
+
             curTutorialObj = tutorial;
             canGoNext = false;
             isDialogFinish = false;
+
+            // Hide ALL dialogs before showing the current step's one
+            leftDialog.SetActive(false);
+            rightDialog.SetActive(false);
+            if (leftUpDialog   != null) leftUpDialog.SetActive(false);
+            if (rightDownDialog != null) rightDownDialog.SetActive(false);
 
             if(tutorial.isMobUnit)
             {
@@ -133,6 +147,14 @@ public class TutorialController : MonoBehaviour
             dialog.transform.localScale = Vector3.zero;
             dialog.GetComponentInChildren<Text>().text = "";
             var dialogContent = localization.GetLocalizedContent(tutorial.dialogLocaleId, tutorial.dialog);
+            Debug.Log($"[Tutorial] localeId='{tutorial.dialogLocaleId}' | lang='{localization.GetCurLanguage()}' | raw='{dialogContent}'");
+            // If the ID lookup returned the raw Chinese (empty ID or no locale key), translate directly
+            if (localization.GetCurLanguage() != "zh-TW")
+            {
+                var translated = TutorialEnTranslation.Translate(dialogContent);
+                Debug.Log($"[Tutorial] translated='{translated}'");
+                dialogContent = translated;
+            }
             if (dialogContent.Contains("P"))
             {
                 dialogContent = dialogContent.Replace("P", Engine.GetService<ICustomVariableManager>().GetVariableValue("PlayerName"));
@@ -141,7 +163,7 @@ public class TutorialController : MonoBehaviour
                 .OnComplete(()=>
                 {
                     isDialogFinish = true;
-                    arrow.SetActive(true);
+                    if (arrow != null) arrow.SetActive(true); // null guard：Inspector 未設定時略過
                 })
             );
             seq.Join(dialog.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack));

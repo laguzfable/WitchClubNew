@@ -1,4 +1,3 @@
-﻿Column1,Column2,Column3
 ID,zh-TW,en
 ATK,攻擊力,Attack
 DEF,防禦力,Defense
@@ -80,3 +79,29 @@ ENV_EFFECT_14_DESC,防禦無效,Defense nullified
 ENV_EFFECT_15_DESC,玩家防禦無效,Defense nullified (Player)
 ENV_EFFECT_16_DESC,敵人減免傷害,Receive less damage (Enemy)
 ENV_EFFECT_17_DESC,玩家每回合受到傷害,Receive damage (Player)
+ABILITY_blue01_DESC,提升防禦30點,Raise Defense by 30
+ABILITY_blue02_DESC,提升防禦50點,Raise Defense by 50
+ABILITY_blue03_DESC,將對方防禦降至0,Reduce enemy Defense to 0
+ABILITY_blue04_DESC,打斷對方行動,Interrupt enemy's action
+ABILITY_blue05_DESC,出牌不受顏色限制,Play cards regardless of color
+ABILITY_red01_DESC,本回合攻擊力增加20%,Increase Attack by 20% this turn
+ABILITY_red02_DESC,造成20~50點傷害,Deal 20~50 damage
+ABILITY_red03_DESC,造成20點傷害（持續3回合）,Deal 20 damage (3 turns)
+ABILITY_red04_DESC,將所有牌換成鮮血系,Convert all cards to Blood
+ABILITY_red05_DESC,反彈敵人的下個攻擊（無視防禦）,Reflect enemy's next attack (ignores Defense)
+ABILITY_green01_DESC,恢復20點HP 持續3回合,Restore 20 HP (3 turns)
+ABILITY_green02_DESC,恢復60點HP,Restore 60 HP
+ABILITY_green03_DESC,洗掉手上所有手牌,Discard all cards in hand
+ABILITY_green04_DESC,治療同時給予敵人傷害,Heal and deal equal damage to enemy
+ABILITY_green05_DESC,改變環境效果（治療加倍）,Change Env Effect (Double Healing)
+ABILITY_yellow01_DESC,改變環境效果（隨機）,Change Env Effect (Random)
+ABILITY_yellow02_DESC,造成20點傷害 恢復20點生命,Deal 20 damage / Restore 20 HP
+ABILITY_yellow03_DESC,所有卡片提升至最高等級,Max-level all cards
+ABILITY_yellow04_DESC,吸取生命 治療同等於攻擊力的傷害,Drain life equal to damage dealt
+ABILITY_yellow05_DESC,HP上限改為200（並回滿血）,Set max HP to 200 (fully restored)
+ABILITY_mon02_DESC,"受到傷害降低30% 選擇隨機一個元素 若玩家使用該元素牌4張則解除並陷入昏迷","Reduce damage taken 30%. Picks a random element; if player plays 4 cards of that element, effect ends and player is stunned."
+ABILITY_mon04_DESC,環境效果：隨機禁止一種元素卡牌,Env Effect: Randomly disable one element
+ABILITY_mon08_DESC,"受到傷害降低30% 傷害及治療提升20% 若玩家使用指定元素牌4張則解除並昏迷","Reduce damage taken 30%, boost damage & healing 20%. Ends if player plays 4 cards of the chosen element."
+ABILITY_mon09_DESC,環境效果：玩家防禦無效,Env Effect: Player Defense nullified
+ABILITY_mon10_DESC,環境效果：敵人受到傷害降低30%,Env Effect: Enemy receives 30% less damage
+ABILITY_mon12_DESC,環境效果：玩家每回合受到傷害,Env Effect: Player takes damage each turn

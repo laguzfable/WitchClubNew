@@ -1,0 +1,37 @@
+; ── Mei · Blood Witch ──────────────────────────────────────────────
+; Battle focus: Red-color assault  +  Crimson Night (ATK x2)  +  Four-color combo
+
+@stopBgm
+@bgm intense
+@back bg03 time:0.3
+@char 魅兒 pos:50 time:0
+
+魅兒.rage: You're challenging me? If you dare — Blood Curse!
+
+@choice "Challenge accepted!"
+@stop
+
+魅兒.talking: Hmph. Don't underestimate blood magic — I can make you regret this with my own blood.
+魅兒.idle: But... if you can knock me down, I'll admit you've got some real skill.
+
+@hide 魅兒
+@set RuneActive=true
+@battle background:bg03 target:monster01 scriptName:demo_mei label:afterbattle
+@stop
+
+
+; ─────────────────────────────────────────────────
+# afterbattle
+; ─────────────────────────────────────────────────
+
+@stopBgm
+@bgm sad
+@back bg03 time:0.3
+@char 魅兒 pos:50 time:0
+
+魅兒.idle: ...Fine. You've earned it.
+魅兒.talking: Go grab a new rune. Blood magic rewards those who push through.
+
+@hide 魅兒
+@GotoChangeRune scriptName:demo label:aftermap
+@stop

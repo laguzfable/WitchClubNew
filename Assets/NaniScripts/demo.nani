@@ -1,38 +1,38 @@
 ; ═══════════════════════════════════════════════════
-;   HEXE  ──  DEMO  腳本  v2
-;   開場閒聊  →  出牌教學  →  地圖（Mel / Eupie）
-;   Mel 結果：攻擊力增加  ／  Eupie 結果：防禦力增加
+;   HEXE  ──  DEMO  Script  v2
+;   Opening chat  →  Tutorial  →  Map (Mel / Eupie)
+;   Mel result: ATK up  ／  Eupie result: DEF up
 ; ═══════════════════════════════════════════════════
 
-@set PlayerName="旅人"
+@set PlayerName="Traveler"
 
 @stopBgm
 @bgm happy
 @back bg01 time:0.5
 
-; ── 開場閒聊 ─────────────────────────────────────
+; ── Opening ─────────────────────────────────────
 
 @char 涅莉 pos:50 time:0
-涅莉.happy: 嘿，{PlayerName}！歡迎來到《女巫俱樂部》！
-涅莉.happy: 這是為了東京電玩展SELECTED INDIE 80審查所製作的特別版本。
-涅莉.happy: 《女巫俱樂部》是訴說一群巫術戰爭後重新找回自我的，少女們的故事。
+涅莉.happy: Hey, {PlayerName}! Welcome to Witch Club!
+涅莉.happy: This is a special demo version made for the TGS SELECTED INDIE 80 review.
+涅莉.happy: Witch Club is a story of girls rediscovering themselves after a great witch war.
 
 
 @char 魅兒 pos:30 time:0.3
 @char 優菲 pos:70 time:0.3
 
 
-優菲.smile: 而你，是被我買下的骷髏，擁有神秘的異世界力量。
-魅兒.idle: 我們四個既是好朋友，卻也是不同派系的敵人，要拿那股力量幫助誰，就是你的選擇了。
+優菲.smile: And you — the skull I purchased — carry a mysterious power from another world.
+魅兒.idle: The four of us are close friends, yet rivals from different factions. Whose side you lend your strength to — that's your choice.
 
-涅莉.yummy: 好，時間有限，先來解釋戰鬥吧！
+涅莉.yummy: Alright, time is short. Let's go over how battles work first!
 
-@choice 開始吧！
+@choice Start!
 @stop
 
 @hide 涅莉,魅兒,優菲
 
-; ── 出牌教學 ──────────────────────────────────────
+; ── Tutorial ──────────────────────────────────────
 @stopBgm
 @bgm tutorial
 @tutorial scriptName:demo label:after_tutorial background:bg01
@@ -48,14 +48,14 @@
 @back bg01 time:0.5
 @char 涅莉 pos:50 time:0
 
-涅莉.exc: 有點概念了呢。
+涅莉.exc: Starting to get the hang of it!
 
-@choice 出發！
+@choice Go!
 @stop
 
 @hide 涅莉
 
-; ── 前往地圖（只有 Mel 和 Eupie）────────────────────
+; ── Day map (Mel and Eupie only) ────────────────────
 @GotoMapDemo ReturnScript:demo ReturnLabel:aftermap Scene:MapTest
 @stop
 
@@ -65,19 +65,19 @@
 ; ─────────────────────────────────────────────────
 
 @stopBgm
-@bgm happy
+@bgm sad
 @back bg01 time:0.5
 @char 魅兒 pos:50 time:0
 
-魅兒.idle: 不錯嘛，你打出了血系魔法的精髓。
-魅兒.talking: 同色卡牌越多，傷害就越強——這就是攻擊力增加的秘訣。
+魅兒.idle: Not bad — you've grasped the essence of blood magic.
+魅兒.talking: The more cards of the same color, the harder the hit. That's the secret to boosting attack power.
 
-@choice 我學會了！
+@choice Understood!
 @stop
 
 @hide 魅兒
 
-; ── 先去符文台換符文，再前往夜晚地圖 ────────────────
+; ── Rune station, then night map ────────────────
 @GotoChangeRune scriptName:demo label:rune_tutorial
 @stop
 
@@ -87,19 +87,19 @@
 ; ─────────────────────────────────────────────────
 
 @stopBgm
-@bgm happy
+@bgm peace
 @back bg02 time:0.5
 @char 優菲 pos:50 time:0
 
-優菲.smile: 看到了嗎？藍牌疊越多，護盾就越厚。
-優菲.talk: 防禦力增加的關鍵就在於——同色牌數量。
+優菲.smile: See that? The more blue cards you stack, the thicker the shield.
+優菲.talk: The key to boosting defense is the same — matching card colors.
 
-@choice 原來如此！
+@choice "Now I see!"
 @stop
 
 @hide 優菲
 
-; ── 先去符文台換符文，再前往夜晚地圖 ────────────────
+; ── Rune station, then night map ────────────────
 @GotoChangeRune scriptName:demo label:rune_tutorial
 @stop
 
@@ -109,20 +109,20 @@
 ; ─────────────────────────────────────────────────
 
 @stopBgm
-@bgm happy
+@bgm chill
 @back bg01 time:0.5
 @char 涅莉 pos:50 time:0
 
-涅莉.yummy: 換了新符文的感覺怎麼樣？
-涅莉.exc: 符文不同，戰鬥風格也會完全改變唷！帶著這份力量——
-涅莉.happy: 去夜晚的地圖，挑戰更強的對手吧！
+涅莉.yummy: How does the new rune feel?
+涅莉.exc: Different runes completely change your battle style! Take this power with you —
+涅莉.happy: Head to the night map and challenge even stronger foes!
 
-@choice 出發！
+@choice Onward!
 @stop
 
 @hide 涅莉
 
-; ── 前往夜晚地圖（Nelly / Vedia / Lilina）────────────────────
+; ── Night map (Nelly / Vedia / Lilina) ────────────────────
 @GotoMapDemo ReturnScript:demo ReturnLabel:aftermap Scene:MapTest IsDay:0
 @stop
 
@@ -132,16 +132,16 @@
 ; ─────────────────────────────────────────────────
 
 @stopBgm
-@bgm happy
+@bgm intense
 @back bg01 time:0.5
 @char 涅莉 pos:50 time:0
 
-涅莉.happy: 怎麼樣？新符文的感覺不錯吧！
-涅莉.yummy: 趁現在——就用這個組合試試看！
+涅莉.happy: How was it? The new rune feels great, right!
+涅莉.yummy: Now's your chance — give this combination a try!
 
 @hide 涅莉
 @set RuneActive=true
-@battle background:bg01 target:mobNelly scriptName:demo label:afterpractice
+@battle background:bg01 target:monster03 scriptName:demo label:afterpractice
 @stop
 
 
@@ -157,15 +157,15 @@
 @char 涅莉 pos:60 time:0.3
 @char 薇狄亞 pos:80 time:0.3
 
-魅兒.idle: 不錯嘛，有進步了。
-優菲.smile: 不過……一個人的力量終究有限。
-涅莉.exc: 合在一起才是真正的強大！
-薇狄亞.talking: 我們四個聯手——才是女巫俱樂部。
+魅兒.idle: Not bad — you've improved.
+優菲.smile: But... the strength of one person can only go so far.
+涅莉.exc: Together is where true power lives!
+薇狄亞.talking: The four of us united — that's what Witch Club is.
 
 @hide 魅兒,優菲,涅莉,薇狄亞
 
 @set RuneActive=true
-@battle background:bg03 target:mobFinal scriptName:demo label:finalending
+@battle background:bg03 target:monster03 scriptName:demo label:finalending
 @stop
 
 
@@ -174,19 +174,20 @@
 ; ─────────────────────────────────────────────────
 
 @stopBgm
-@bgm stardust
+@bgm fantasy
 @back bg02 time:1
 @char 魅兒 pos:20 time:0.3
 @char 優菲 pos:40 time:0.3
 @char 涅莉 pos:60 time:0.3
 @char 薇狄亞 pos:80 time:0.3
 
-魅兒.talking: 這就是我們的力量。
-優菲.smile: 謝謝你願意來到女巫俱樂部。
-涅莉.happy: 正式版還有更多冒險在等著你喔！
-薇狄亞.idle: 別忘了我唷，我們一定還會再見面的。
+魅兒.talking: This is our power.
+優菲.smile: Thank you for coming to Witch Club.
+涅莉.happy: The full game has even more adventures waiting for you!
+薇狄亞.idle: Don't forget us — I know we'll meet again.
 
 @hide 魅兒,優菲,涅莉,薇狄亞
 
 @stopBgm
+@GotoUnityScene SceneName:SelectLanguage
 @stop

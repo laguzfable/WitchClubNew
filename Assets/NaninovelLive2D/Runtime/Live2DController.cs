@@ -41,7 +41,21 @@ namespace Naninovel
 
         public virtual void SetAppearance (string appearance)
         {
-            animator.SetTrigger(appearance);
+            // Guard: only set the trigger if the Animator Controller actually has it,
+            // to avoid "Parameter does not exist" spam for unused appearance names.
+            if (HasAnimatorTrigger(appearance))
+                animator.SetTrigger(appearance);
+            else
+                Debug.LogWarning($"[Live2DController] Appearance trigger '{appearance}' not found on {gameObject.name} — skipping.");
+        }
+
+        private bool HasAnimatorTrigger (string paramName)
+        {
+            if (animator == null) return false;
+            foreach (var p in animator.parameters)
+                if (p.type == AnimatorControllerParameterType.Trigger && p.name == paramName)
+                    return true;
+            return false;
         }
 
         public virtual void SetLookDirection (CharacterLookDirection lookDirection)

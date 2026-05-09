@@ -1,19 +1,20 @@
-; ── 魅兒・血系女巫 ────────────────────────────────────────────
-; 戰鬥重點：紅系強攻  ＋  絳紅之夜（攻擊翻倍）＋  四色合技
+; ── Mei · Blood Witch ────────────────────────────────────────────
+; Battle focus: Red-color power  ＋  Crimson Night (ATK x2)  ＋  Four-color combo
 
 @stopBgm
 @bgm intense
 @back bg03 time:0.3
 @char 魅兒 pos:50 time:0
 
-魅兒.rage: 妳找上我了嗎？有膽的話——血咒術！
+魅兒.rage: You're challenging me? If you dare — Blood Curse!
 
-@choice 接受挑戰！
+@choice "Challenge accepted!" goto:.battle_intro
 @stop
 
-魅兒.talking: 哼，別小看血系魔法，我能用自己的鮮血讓妳嘗嘗苦頭。
-魅兒.idle: 不過……如果妳能把我打趴，我就承認妳還有點本事。
+# battle_intro
+魅兒.talking: Hmph, don't underestimate blood magic — I can make you suffer with my own blood.
+魅兒.idle: But... if you can knock me down, I'll admit you have some real skill.
 
 @hide 魅兒
-@battle background:bg03 target:mobMei scriptName:demo label:result_mei
+@battle background:bg03 target:monster01 scriptName:demo label:result_mei
 @stop

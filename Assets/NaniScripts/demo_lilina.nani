@@ -1,31 +1,32 @@
-; ── 莉莉娜・創作者的話 ───────────────────────────────────────
-; 一次性特殊事件，對話結束後莉莉娜消失、再也不出現
+; ── Lilina · A Message from the Creator ───────────────────────────────────────
+; One-time special event — Lilina disappears after this dialogue (resets on game restart)
 
 @stopBgm
 @bgm stardust
 @back bg02 time:0.5
 @char 莉莉娜 pos:50 time:0
 
-莉莉娜: ……嗯，你找到我了。
+莉莉娜: ...Mm. You found me.
 
-@choice 你……是誰？
+@choice "You... who are you?" goto:.intro_chat
 @stop
 
-莉莉娜: 我是這個故事背後的人。
+# intro_chat
+莉莉娜: I am the one behind this story.
 
 ; ════════════════════════════════
-; ▼ 在這裡撰寫你的創作者的話 ▼
+; ▼ Write your creator's message below ▼
 ; ════════════════════════════════
 
-莉莉娜: 謝謝你願意來到這個世界。
+莉莉娜: Thank you for coming to this world.
 
-莉莉娜: 【請在此處填入你想說的話】
+莉莉娜: -- Please fill in your message here --
 
 ; ════════════════════════════════
-; ▲ 創作者的話結束 ▲
+; ▲ Creator's message ends ▲
 ; ════════════════════════════════
 
-莉莉娜: ……我要走了。希望你能記住這裡的溫度。
+莉莉娜: ...I must go. I hope this warmth stays with you.
 
 @hide 莉莉娜
 @setLilinaDone

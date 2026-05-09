@@ -153,15 +153,22 @@ public class EnemyUnit : BaseCombatUnit
         orgY = transform.position.y;
         if(!TutorialController.isTutorial && !TutorialController.isTutorial2 && !combatSystem.IsTestMode)
         {
-            var mobName = DataService.Instance.scriptParameter.combatTarget;
-            Debug.Log($"Toolbox.Instance.GetOrAddComponent<DataService>().paramArr[1] : {mobName}");
+            var sp = DataService.Instance?.scriptParameter;
+            var mobName = sp?.combatTarget?.Value ?? "";
+            Debug.Log($"[EnemyUnit.Init] combatTarget='{mobName}'  scriptParameter={(sp==null?"null":"ok")}");
 
-            var data = Resources.Load<MobData>($"MobData/{mobName}");
+            var data = string.IsNullOrEmpty(mobName) ? null : Resources.Load<MobData>($"MobData/{mobName}");
             mobData = data != null? data : Resources.Load<MobData>($"MobData/{testMobName}");
-            Debug.Log($"mobData : {mobData.name}");
+            Debug.Log($"mobData : {(mobData==null?"null":mobData.name)}");
+            if (mobData == null)
+            {
+                Debug.LogError($"[EnemyUnit.Init] 找不到 MobData！mobName='{mobName}'  testMobName='{testMobName}'  → 強制使用預設值");
+                base.Init();
+                return;
+            }
             HP.SetBaseValue(mobData.HP);
             EN.SetBaseValue(mobData.EN);
-            
+
             sprRend.sprite = mobData.sprite;//combatSystem.visualResource.GetMobByName(mobName);
             sprRend.enabled = true;
         }

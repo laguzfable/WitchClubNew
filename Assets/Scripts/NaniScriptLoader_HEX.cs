@@ -32,6 +32,26 @@ public class NaniScriptLoader_HEX : MonoBehaviour
         Debug.Log($"★HEXE★ waiting services...");
         await WaitServicesReadyAsync();
         Debug.Log($"★HEXE★ services ready");
+
+        // Apply language preference to Naninovel locale
+        var langPref = PlayerPrefs.GetString("Language", "");
+        if (!string.IsNullOrEmpty(langPref))
+        {
+            try
+            {
+                var locMgr = Engine.GetService<ILocalizationManager>();
+                if (locMgr != null)
+                {
+                    var locale = langPref.ToLower().StartsWith("en") ? "en"
+                               : langPref.ToLower().StartsWith("zh") ? "zh-TW"
+                               : langPref;
+                    if (locMgr.LocaleAvailable(locale))
+                        await locMgr.SelectLocaleAsync(locale);
+                    Debug.Log($"★HEXE★ locale set to '{locale}' (from Language='{langPref}')");
+                }
+            }
+            catch (Exception e) { Debug.LogWarning($"★HEXE★ locale error: {e.Message}"); }
+        }
         HideLoadingIfAny();
 
         // MapTest 會把 naniCamera 關掉，回到對話場景時必須重新打開
@@ -46,6 +66,30 @@ public class NaniScriptLoader_HEX : MonoBehaviour
             else Debug.Log($"★HEXE★ naniCamera cam={(cam==null?"null":"ok")} enabled={(cam?.enabled)}");
         }
         catch (Exception e) { Debug.LogWarning($"★HEXE★ camera ex: {e.Message}"); }
+
+        // ── CombatScene guard ──────────────────────────────────────────────────
+        // NaniScriptLoader_HEX lives in both NaniDialogTest AND CombatScene.
+        // We must NEVER start playing a script while inside CombatScene — that
+        // would overlay Naninovel dialogue on top of live combat.
+        //   • Tutorial mode   → TutorialController.Start() calls Begin() itself.
+        //   • Regular battle  → CombatSystem runs the fight, BackToNani() loads
+        //                       NaniDialogTest afterwards, where the script resumes.
+        // ──────────────────────────────────────────────────────────────────────
+        var _sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        if (_sceneName == "CombatScene")
+        {
+            Debug.Log($"★HEXE★ inside CombatScene — skipping Naninovel script play (isTutorial={TutorialController.isTutorial})");
+            return;
+        }
+
+        // Story scene after tutorial: clear the static flags so the next scene
+        // load (if any) doesn't mistakenly skip again.
+        if (TutorialController.isTutorial || TutorialController.isTutorial2)
+        {
+            Debug.Log($"★HEXE★ tutorial flags set in story scene '{_sceneName}' — clearing and resuming");
+            TutorialController.isTutorial  = false;
+            TutorialController.isTutorial2 = false;
+        }
 
         var ds = DataService.Instance;
         Debug.Log($"★HEXE★ DataService={(ds==null?"NULL":"OK")}  scriptParameter={(ds?.scriptParameter==null?"null":ds.scriptParameter.scriptName.ToString())}");
@@ -290,11 +334,11 @@ public class NaniScriptLoader_HEX : MonoBehaviour
             {
                 var ps = m.GetParameters();
                 if (ps.Length != args.Length) continue;
-                if (!ArgsMatch(ps, args)) continue;
+                if (!ArgsMatch(ps, args, out var invokeArgs)) continue;
                 try
                 {
                     Debug.Log($"{TAG} invoke {targetName}.{m.Name}({string.Join(", ", args.Select(FormatArg))}) [{(m.IsPublic ? "public" : "non-public")}]");
-                    var ret = m.Invoke(target, args);
+                    var ret = m.Invoke(target, invokeArgs);
                     if (ret is Task task) await task;
                     return true;
                 }
@@ -378,8 +422,14 @@ public class NaniScriptLoader_HEX : MonoBehaviour
         }
     }
 
-    private bool ArgsMatch(ParameterInfo[] ps, object[] args)
+    // Returns true if args can be adapted to the parameter list.
+    // Fills invokeArgs with the final values to pass (null struct args become default(T)).
+    private bool ArgsMatch(ParameterInfo[] ps, object[] args, out object[] invokeArgs)
     {
+        invokeArgs = null;
+        if (ps.Length != args.Length) return false;
+
+        var result = new object[ps.Length];
         for (int i = 0; i < ps.Length; i++)
         {
             var pT = ps[i].ParameterType;
@@ -387,22 +437,33 @@ public class NaniScriptLoader_HEX : MonoBehaviour
 
             if (a == null)
             {
-                if (pT.IsValueType && Nullable.GetUnderlyingType(pT) == null) return false;
+                if (pT.IsValueType && Nullable.GetUnderlyingType(pT) == null)
+                    result[i] = Activator.CreateInstance(pT); // default(T) for structs like AsyncToken
+                else
+                    result[i] = null;
                 continue;
             }
 
             var aT = a.GetType();
-            if (pT == typeof(int?) && aT == typeof(int)) continue;
+            if (pT == typeof(int?) && aT == typeof(int)) { result[i] = a; continue; }
 
             if (pT == typeof(int) || pT == typeof(int?))
-            { if (aT != typeof(int)) return false; continue; }
+            { if (aT != typeof(int)) return false; result[i] = a; continue; }
 
             if (pT == typeof(string))
-            { if (aT != typeof(string)) return false; continue; }
+            { if (aT != typeof(string)) return false; result[i] = a; continue; }
 
             if (!pT.IsAssignableFrom(aT)) return false;
+            result[i] = a;
         }
+        invokeArgs = result;
         return true;
+    }
+
+    // Backward-compat overload for callers that don't need the adapted args
+    private bool ArgsMatch(ParameterInfo[] ps, object[] args)
+    {
+        return ArgsMatch(ps, args, out _);
     }
 
     private string FormatArg(object o) => o is string s ? $"\"{s}\"" : (o?.ToString() ?? "null");

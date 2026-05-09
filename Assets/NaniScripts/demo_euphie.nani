@@ -1,19 +1,20 @@
-; ── 優菲・象牙塔女巫 ─────────────────────────────────────────
-; 戰鬥重點：藍系護盾  ＋  高塔之暮（防禦翻倍）＋  符文技能
+; ── Eupie · Ivory Tower Witch ─────────────────────────────────────────
+; Battle focus: Blue-color shield  ＋  Tower Twilight (DEF x2)  ＋  Rune skill
 
 @stopBgm
 @bgm energetic
 @back bg02 time:0.3
 @char 優菲 pos:50 time:0
 
-優菲.angry: 妳居然敢單挑我？象牙塔的奧術可不是鬧著玩的！
+優菲.angry: You actually dare to challenge me one-on-one? Ivory Tower arcane arts are no joke!
 
-@choice 就試試看嘛！
+@choice "Just give it a try!" goto:.battle_intro
 @stop
 
-優菲.smile: 哼哼，有勇氣，我喜歡！不過要有心理準備，我的奧術衝擊可是讓很多人吃過虧的。
-優菲.talk: 先讓妳見識見識象牙塔的防禦陣式——奧術護盾，展開！
+# battle_intro
+優菲.smile: Heh heh, you've got guts — I like that! But be prepared, my Arcane Blast has humbled many before.
+優菲.talk: First, witness the Ivory Tower's defensive formation — Arcane Shield, deploy!
 
 @hide 優菲
-@battle background:bg02 target:mobEuphie scriptName:demo label:result_euphie
+@battle background:bg02 target:monster02 scriptName:demo label:result_euphie
 @stop

@@ -26,8 +26,8 @@ public class SelectRuneCard : MonoBehaviour
         else
             Debug.LogWarning($"[RuneCard] {abilityID} 沒有指定圖片!");
 
-        abilityName.text = ability.name;
-        abilityDesc.text = ability.description;
+        abilityName.text = RuneEnTranslation.TranslateName(ability.name);
+        abilityDesc.text = RuneEnTranslation.TranslateDesc(ability.description);
 
         // ✅ 解鎖狀態
         bool isUnlocked = IsRuneUnlocked();
@@ -45,10 +45,11 @@ public class SelectRuneCard : MonoBehaviour
 
 bool IsRuneUnlocked()
 {
+    // 預設符文（xx00）永遠可選，不需解鎖
+    if (abilityID.EndsWith("00")) return true;
+
     string key = $"UnlockedRunes_{ability.element}";
     string list = PlayerPrefs.GetString(key, "");
-
-    // ✅ list contains abilityID 才算解鎖
     return list.Split(',').Contains(abilityID);
 }
 
