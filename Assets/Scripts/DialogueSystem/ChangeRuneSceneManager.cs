@@ -39,21 +39,16 @@ public class ChangeRuneSceneManager : MonoBehaviour
         NaniBridgeUtility.GoBackToSavedStory();
     }
 
-    // Unlock demo runes: all except the last 2 of each faction
+    // Unlock all demo runes every time (always overwrite for demo)
+    // Key format must match SelectRuneCard: $"UnlockedRunes_{ability.element}" → enum name
     static void UnlockDemoRunes()
     {
-        // element 0 = Academy (blue), 1 = Blood (red), 2 = Demon (yellow), 3 = Nature (green), 4 = Other (mon)
-        SetIfEmpty("UnlockedRunes_0", "blue01,blue02,blue03");
-        SetIfEmpty("UnlockedRunes_1", "red01,red02,red03");
-        SetIfEmpty("UnlockedRunes_2", "yellow01,yellow02,yellow03");
-        SetIfEmpty("UnlockedRunes_3", "green01,green02,green03");
-        SetIfEmpty("UnlockedRunes_4", "mon02,mon08,mon09,mon10,mon12");
+        PlayerPrefs.SetString("UnlockedRunes_Blue",   "blue01,blue02,blue03,blue04,blue05");
+        PlayerPrefs.SetString("UnlockedRunes_Red",    "red01,red02,red03,red04,red05");
+        PlayerPrefs.SetString("UnlockedRunes_Yellow", "yellow01,yellow02,yellow03,yellow04,yellow05");
+        PlayerPrefs.SetString("UnlockedRunes_Green",  "green01,green02,green03,green04,green05");
+        PlayerPrefs.SetString("UnlockedRunes_None",   "mon02,mon04,mon08,mon09,mon10,mon12");
         PlayerPrefs.Save();
-    }
-
-    static void SetIfEmpty(string key, string value)
-    {
-        if (string.IsNullOrEmpty(PlayerPrefs.GetString(key, "")))
-            PlayerPrefs.SetString(key, value);
+        Debug.Log("[ChangeRuneScene] 全部符文已解鎖 (Blue/Red/Yellow/Green/None)");
     }
 }

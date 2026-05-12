@@ -1,18 +1,19 @@
-; ── Vedia · Blood Moon Witch ─────────────────────────────────────────
-; Demo night map event
+; ── 薇狄亞・血月版 ─────────────────────────────────────────
+; Demo 夜晚地圖事件
+; Source locale: zh-TW
 
 @stopBgm
 @bgm stardust
 @back bg02 time:0.3
 @char 薇狄亞 pos:50 time:0
 
-薇狄亞.idle: Night is my stage. You came looking for me — do you want to witness true magic?
+薇狄亞.idle: 夜晚是我的舞台。你來找我——是想見識真正的魔法嗎？
 
-@choice "Show me!" goto:.battle_intro
+@choice "讓我看看！" goto:.battle_intro
 @stop
 
 # battle_intro
-薇狄亞.talking: The power of the Blood Moon is not something just anyone can handle. But since you are here — let me give you a taste.
+薇狄亞.talking: 血月之力不是任何人都能承受的。但既然你來了——讓我讓你嘗嘗。
 
 @hide 薇狄亞
 @set RuneActive=true
@@ -29,8 +30,8 @@
 @back bg02 time:0.3
 @char 薇狄亞 pos:50 time:0
 
-薇狄亞.idle: Mm... not bad at all.
-薇狄亞.talking: Go and rest. The echo of Blood Moon magic can still be felt in dreams.
+薇狄亞.idle: 嗯……相當不錯。
+薇狄亞.talking: 去休息吧。血月魔法的迴響在夢中仍可感受到。
 
 @hide 薇狄亞
 @GotoChangeRune scriptName:demo label:aftermap

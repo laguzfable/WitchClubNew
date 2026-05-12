@@ -29,17 +29,32 @@ public class UIShowInfoScreen : MonoBehaviour
 
     private void Start()
     {
-        if(!string.IsNullOrEmpty(abilityID))
-        {
-            Ability cardAbility = DataService.Instance.GetAbilityById(GetComponent<UIWitchAbility>().abilityID);
+        // 不在 Start 設定 infoStr，改為每次顯示時即時取得（確保語言正確）
+    }
 
-            var localization = GameObject.FindWithTag("GameController")
+    private string GetLocalizedDesc()
+    {
+        if (string.IsNullOrEmpty(abilityID)) return "";
+
+        var witchAbility = GetComponent<UIWitchAbility>();
+        if (witchAbility == null) return "";
+
+        Ability cardAbility = DataService.Instance.GetAbilityById(witchAbility.abilityID);
+
+        // 先用 Tag 找，找不到改用 FindObjectOfType（場景結構不同時仍可運作）
+        var localization = GameObject.FindWithTag("GameController")
                                ?.GetComponent<CombatSceneLocalization>();
-            string localeKey = $"ABILITY_{cardAbility.id}_DESC";
-            infoStr = localization != null
-                ? localization.GetLocalizedContent(localeKey, cardAbility.description)
-                : cardAbility.description;
-        }
+        if (localization == null)
+            localization = FindObjectOfType<CombatSceneLocalization>();
+
+        string localeKey = $"ABILITY_{cardAbility.id}_DESC";
+        string result = localization != null
+            ? localization.GetLocalizedContent(localeKey, cardAbility.description)
+            : cardAbility.description;
+
+        string playerPrefsLang = PlayerPrefs.GetString("Language", "(none)");
+        Debug.Log($"[InfoScreen] id={cardAbility.id} | key={localeKey} | PlayerPrefs.Language={playerPrefsLang} | naniLocale={localization?.GetCurLanguage()} | result={result} | localizationNull={localization==null}");
+        return result;
     }
 
     public void ShowInfoScreen()
@@ -48,6 +63,7 @@ public class UIShowInfoScreen : MonoBehaviour
         {
             return;
         }
+        infoStr = GetLocalizedDesc();
         infoScreenObj.SetActive(true);
         infoScreenObj.GetComponent<RectTransform>().localPosition = pos;
         infoText.text = infoStr;

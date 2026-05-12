@@ -110,7 +110,7 @@ namespace Naninovel
         /// Finds a <see cref="Command"/> that was created from a <see cref="CommandScriptLine"/> located at or after the provided line and inline indexes; null if not found.
         /// </summary>
         [CollectionAccess(CollectionAccessType.Read)]
-        public Command GetCommandAfterLine (int lineIndex, int inlineIndex) => this.FirstOrDefault(a => a.PlaybackSpot.LineIndex >= lineIndex && a.PlaybackSpot.InlineIndex >= inlineIndex);
+        public Command GetCommandAfterLine (int lineIndex, int inlineIndex) => this.FirstOrDefault(a => a != null && a.PlaybackSpot.LineIndex >= lineIndex && a.PlaybackSpot.InlineIndex >= inlineIndex);
 
         /// <summary>
         /// Finds a <see cref="Command"/> that was created from a <see cref="CommandScriptLine"/> located at or before the provided line and inline indexes; null if not found.

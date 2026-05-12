@@ -1,19 +1,20 @@
-; ── Mei · Blood Witch ────────────────────────────────────────────
-; Battle focus: Red-color power  ＋  Crimson Night (ATK x2)  ＋  Four-color combo
+; ── 魅兒・血系女巫 ────────────────────────────────────────────
+; 戰鬥重點：紅系強攻 ＋ 絳紅之夜（攻擊×2）＋ 四色合技
+; Source locale: zh-TW
 
 @stopBgm
 @bgm intense
 @back bg03 time:0.3
 @char 魅兒 pos:50 time:0
 
-魅兒.rage: You're challenging me? If you dare — Blood Curse!
+魅兒.rage: 你要挑戰我？如果你敢——血咒！
 
-@choice "Challenge accepted!" goto:.battle_intro
+@choice "接受挑戰！" goto:.battle_intro
 @stop
 
 # battle_intro
-魅兒.talking: Hmph, don't underestimate blood magic — I can make you suffer with my own blood.
-魅兒.idle: But... if you can knock me down, I'll admit you have some real skill.
+魅兒.talking: 哼，別小看血系魔法——我可以用自己的血讓你痛苦。
+魅兒.idle: 但是……如果你能把我打倒，我會承認你確實有兩把刷子。
 
 @hide 魅兒
 @battle background:bg03 target:monster01 scriptName:demo label:result_mei

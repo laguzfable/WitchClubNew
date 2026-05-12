@@ -1,22 +1,23 @@
-; ── Nelly · Bottle Fairy ───────────────────────────────────────
-; Battle focus: Rune skill  ＋  Magic Surge (energy x2)  ＋  Four-color combo
+; ── 涅莉・瓶中精靈 ──────────────────────────────────────────────
+; 戰鬥重點：符文技能 ＋ 魔力狂潮（能量×2）＋ 四色合技
+; Source locale: zh-TW
 
 @stopBgm
 @bgm happy
 @back bg01 time:0.3
 @char 涅莉 pos:50 time:0
 
-涅莉.yummy: Oh oh~ Someone came to play with me! I haven't used my fairy rune in ages — perfect timing!
+涅莉.yummy: 哦哦～有人來找我玩了！我好久沒用精靈符文了——來得正是時候！
 
-@choice "Bring it on!" goto:.battle_intro
+@choice "來吧！" goto:.battle_intro
 @stop
 
 # battle_intro
-涅莉.exc: Fairy power is nothing like witch magic — this is energy stored for hundreds of years!
-涅莉.happy: Ready? I'm going to release all of my rune power —
+涅莉.exc: 精靈的力量和女巫魔法完全不同——這是封存了數百年的能量！
+涅莉.happy: 準備好了嗎？我要釋放全部的符文力量——
 
 @sfx bling loop:false
-涅莉: Now witness what a true combo move really looks like!
+涅莉: 現在親眼見識什麼才是真正的連擊！
 
 @hide 涅莉
 @set RuneActive=true
@@ -33,8 +34,8 @@
 @back bg01 time:0.3
 @char 涅莉 pos:50 time:0
 
-涅莉.happy: How was it? Could you feel the power of the fairy rune?
-涅莉.yummy: Good effort! Now go swap for a new rune and get even stronger!
+涅莉.happy: 怎麼樣？感受到精靈符文的力量了嗎？
+涅莉.yummy: 做得很好！去換一個新符文，讓自己變得更強！
 
 @hide 涅莉
 @GotoChangeRune scriptName:demo label:aftermap

@@ -13,8 +13,25 @@ public class LocaleUIText : MonoBehaviour
     void Start()
     {
         txt = GetComponent<Text>();
+        ApplyLocale();
+    }
 
-        var localization = GameObject.FindWithTag("GameController").GetComponent<CombatSceneLocalization>();
+    public void ApplyLocale()
+    {
+        if (txt == null) txt = GetComponent<Text>();
+
+        // 先用 Tag 找，找不到改用 FindObjectOfType（場景結構不同時仍可運作）
+        var localization = GameObject.FindWithTag("GameController")
+                               ?.GetComponent<CombatSceneLocalization>();
+        if (localization == null)
+            localization = FindObjectOfType<CombatSceneLocalization>();
+
+        if (localization == null)
+        {
+            Debug.LogWarning($"[LocaleUIText] CombatSceneLocalization not found for id={localeID}");
+            return;
+        }
+
         txt.text = localization.GetLocalizedContent(localeID, txt.text);
     }
 }

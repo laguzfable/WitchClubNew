@@ -1,10 +1,10 @@
 ; ═══════════════════════════════════════════════════
 ;   HEXE  ──  DEMO  Script  v2
+;   Source locale: zh-TW
 ;   Opening chat  →  Tutorial  →  Map (Mel / Eupie)
-;   Mel result: ATK up  ／  Eupie result: DEF up
 ; ═══════════════════════════════════════════════════
 
-@set PlayerName="Traveler"
+@set PlayerName="旅人"
 
 @stopBgm
 @bgm happy
@@ -13,21 +13,21 @@
 ; ── Opening ─────────────────────────────────────
 
 @char 涅莉 pos:50 time:0
-涅莉.happy: Hey, {PlayerName}! Welcome to Witch Club!
-涅莉.happy: This is a special demo version made for the TGS SELECTED INDIE 80 review.
-涅莉.happy: Witch Club is a story of girls rediscovering themselves after a great witch war.
+涅莉.happy: 嘿，{PlayerName}！歡迎來到女巫俱樂部！
+涅莉.happy: 這是為 TGS SELECTED INDIE 80 評審特別製作的試玩版本。
+涅莉.happy: 女巫俱樂部是一個女孩們在大女巫戰爭後重新找回自我的故事。
 
 
 @char 魅兒 pos:30 time:0.3
 @char 優菲 pos:70 time:0.3
 
 
-優菲.smile: And you — the skull I purchased — carry a mysterious power from another world.
-魅兒.idle: The four of us are close friends, yet rivals from different factions. Whose side you lend your strength to — that's your choice.
+優菲.smile: 而你——我購買的那個頭骨——攜帶著來自異界的神秘力量。
+魅兒.idle: 我們四人是來自不同派系的親密好友，也是對手。你的力量借給誰——那是你的選擇。
 
-涅莉.yummy: Alright, time is short. Let's go over how battles work first!
+涅莉.yummy: 好了，時間不多。讓我們先了解一下戰鬥規則吧！
 
-@choice Start!
+@choice 開始！
 @stop
 
 @hide 涅莉,魅兒,優菲
@@ -48,9 +48,9 @@
 @back bg01 time:0.5
 @char 涅莉 pos:50 time:0
 
-涅莉.exc: Starting to get the hang of it!
+涅莉.exc: 開始有感覺了！
 
-@choice Go!
+@choice 出發！
 @stop
 
 @hide 涅莉
@@ -69,10 +69,10 @@
 @back bg01 time:0.5
 @char 魅兒 pos:50 time:0
 
-魅兒.idle: Not bad — you've grasped the essence of blood magic.
-魅兒.talking: The more cards of the same color, the harder the hit. That's the secret to boosting attack power.
+魅兒.idle: 不錯——你已經掌握了血系魔法的精髓。
+魅兒.talking: 同色卡疊加越多，傷害越高。這就是提升攻擊力的秘訣。
 
-@choice Understood!
+@choice 明白了！
 @stop
 
 @hide 魅兒
@@ -91,10 +91,10 @@
 @back bg02 time:0.5
 @char 優菲 pos:50 time:0
 
-優菲.smile: See that? The more blue cards you stack, the thicker the shield.
-優菲.talk: The key to boosting defense is the same — matching card colors.
+優菲.smile: 看到了嗎？藍色卡堆疊越多，護盾越厚。
+優菲.talk: 提升防禦的關鍵也一樣——配對卡片顏色。
 
-@choice "Now I see!"
+@choice 原來如此！
 @stop
 
 @hide 優菲
@@ -113,11 +113,11 @@
 @back bg01 time:0.5
 @char 涅莉 pos:50 time:0
 
-涅莉.yummy: How does the new rune feel?
-涅莉.exc: Different runes completely change your battle style! Take this power with you —
-涅莉.happy: Head to the night map and challenge even stronger foes!
+涅莉.yummy: 新符文感覺怎麼樣？
+涅莉.exc: 不同的符文完全改變你的戰鬥風格！帶著這份力量——
+涅莉.happy: 前往夜晚地圖，挑戰更強大的敵人！
 
-@choice Onward!
+@choice 前進！
 @stop
 
 @hide 涅莉
@@ -136,8 +136,8 @@
 @back bg01 time:0.5
 @char 涅莉 pos:50 time:0
 
-涅莉.happy: How was it? The new rune feels great, right!
-涅莉.yummy: Now's your chance — give this combination a try!
+涅莉.happy: 怎麼樣？新符文感覺很棒吧！
+涅莉.yummy: 現在是你的機會——試試這個組合！
 
 @hide 涅莉
 @set RuneActive=true
@@ -157,10 +157,10 @@
 @char 涅莉 pos:60 time:0.3
 @char 薇狄亞 pos:80 time:0.3
 
-魅兒.idle: Not bad — you've improved.
-優菲.smile: But... the strength of one person can only go so far.
-涅莉.exc: Together is where true power lives!
-薇狄亞.talking: The four of us united — that's what Witch Club is.
+魅兒.idle: 不錯——你進步了。
+優菲.smile: 但是……一個人的力量終究有限。
+涅莉.exc: 在一起才是真正的力量所在！
+薇狄亞.talking: 我們四人合一——這就是女巫俱樂部。
 
 @hide 魅兒,優菲,涅莉,薇狄亞
 
@@ -181,10 +181,10 @@
 @char 涅莉 pos:60 time:0.3
 @char 薇狄亞 pos:80 time:0.3
 
-魅兒.talking: This is our power.
-優菲.smile: Thank you for coming to Witch Club.
-涅莉.happy: The full game has even more adventures waiting for you!
-薇狄亞.idle: Don't forget us — I know we'll meet again.
+魅兒.talking: 這是我們的力量。
+優菲.smile: 感謝你來到女巫俱樂部。
+涅莉.happy: 完整版有更多冒險等著你！
+薇狄亞.idle: 別忘了我們——我知道我們還會再見面。
 
 @hide 魅兒,優菲,涅莉,薇狄亞
 

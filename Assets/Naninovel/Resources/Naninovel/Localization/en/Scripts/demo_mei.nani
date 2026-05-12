@@ -1,13 +1,17 @@
 ; Chinese (T) <zh-TW> to English <en> localization document for `demo_mei` naninovel script
 
-# 1c6d73cd
-; 魅兒.rage: 妳找上我了嗎？有膽的話——血咒術！
+# 22d06ec3
+; 魅兒.rage: 你要挑戰我？如果你敢——血咒！
+魅兒.rage: You're challenging me? If you dare — Blood Curse!
 
-# edeedcd
-; @choice 接受挑戰！
+# 24f41d2
+; @choice "接受挑戰！" goto:.battle_intro
+@choice "Challenge accepted!" goto:.battle_intro
 
-# dccd03f6
-; 魅兒.talking: 哼，別小看血系魔法，我能用自己的鮮血讓妳嘗嘗苦頭。
+# bc73d604
+; 魅兒.talking: 哼，別小看血系魔法——我可以用自己的血讓你痛苦。
+魅兒.talking: Hmph, don't underestimate blood magic — I can make you suffer with my own blood.
 
-# 24d1a0fa
-; 魅兒.idle: 不過……如果妳能把我打趴，我就承認妳還有點本事。
+# 4e20ffde
+; 魅兒.idle: 但是……如果你能把我打倒，我會承認你確實有兩把刷子。
+魅兒.idle: But... if you can knock me down, I'll admit you have some real skill.

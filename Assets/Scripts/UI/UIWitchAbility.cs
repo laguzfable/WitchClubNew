@@ -153,6 +153,18 @@ private void Awake()
     {
         if (specialFX != null)
         {
+            // 嘗試載入符文專屬圖片（monsters/{abilityID}）
+            Sprite abilitySprite = Resources.Load<Sprite>($"monsters/{abilityID}");
+            if (abilitySprite != null)
+            {
+                var img = specialFX.GetComponent<UnityEngine.UI.Image>();
+                if (img != null)
+                {
+                    img.sprite = abilitySprite;
+                    img.preserveAspect = true;
+                }
+            }
+
             CameraPlay.Shockwave(0.9f, 0.5f, 1.25f, 2f);
             CameraPlay.WidescreenH_ON(0.2f);
             blackScreen.FadeIn(0.15f);

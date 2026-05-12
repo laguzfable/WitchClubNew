@@ -1,0 +1,51 @@
+; ══════════════════════════════════════════════════
+; demo.nani  →  zh-TW 翻譯對照表
+; 在 Unity 跑 Naninovel > Tools > Localization
+; 產生 Localization/zh-TW/Scripts/demo.nani 後，
+; 對照此表將下方句子填入對應 hash 後面。
+; ══════════════════════════════════════════════════
+
+[Opening]
+涅莉.happy: 嘿，{PlayerName}！歡迎來到女巫俱樂部！
+涅莉.happy: 這是為 TGS SELECTED INDIE 80 評審特別製作的試玩版本。
+涅莉.happy: 女巫俱樂部是一個女孩們在大女巫戰爭後重新找回自我的故事。
+優菲.smile: 而你——我購買的那個頭骨——攜帶著來自異界的神秘力量。
+魅兒.idle: 我們四人是來自不同派系的親密好友，也是對手。你的力量借給誰——那是你的選擇。
+涅莉.yummy: 好了，時間不多。讓我們先了解一下戰鬥規則吧！
+@choice 開始！
+
+[after_tutorial]
+涅莉.exc: 開始有感覺了！
+@choice 出發！
+
+[result_mei]
+魅兒.idle: 不錯——你已經掌握了血系魔法的精髓。
+魅兒.talking: 同色卡疊加越多，傷害越高。這就是提升攻擊力的秘訣。
+@choice 明白了！
+
+[result_euphie]
+優菲.smile: 看到了嗎？藍色卡堆疊越多，護盾越厚。
+優菲.talk: 提升防禦的關鍵也一樣——配對卡片顏色。
+@choice 原來如此！
+
+[rune_tutorial]
+涅莉.yummy: 新符文感覺怎麼樣？
+涅莉.exc: 不同的符文完全改變你的戰鬥風格！帶著這份力量——
+涅莉.happy: 前往夜晚地圖，挑戰更強大的敵人！
+@choice 前進！
+
+[aftermap]
+涅莉.happy: 怎麼樣？新符文感覺很棒吧！
+涅莉.yummy: 現在是你的機會——試試這個組合！
+
+[afterpractice]
+魅兒.idle: 不錯——你進步了。
+優菲.smile: 但是……一個人的力量終究有限。
+涅莉.exc: 在一起才是真正的力量所在！
+薇狄亞.talking: 我們四人合一——這就是女巫俱樂部。
+
+[finalending]
+魅兒.talking: 這是我們的力量。
+優菲.smile: 感謝你來到女巫俱樂部。
+涅莉.happy: 完整版有更多冒險等著你！
+薇狄亞.idle: 別忘了我們——我知道我們還會再見面。

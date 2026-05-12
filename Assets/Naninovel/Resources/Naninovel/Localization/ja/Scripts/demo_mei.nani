@@ -1,0 +1,17 @@
+; Chinese (T) <zh-TW> to Japanese <ja> localization document for `demo_mei` naninovel script
+
+# 22d06ec3
+; 魅兒.rage: 你要挑戰我？如果你敢——血咒！
+魅兒.rage: 私に挑戦するの？その勇気があるなら——血の呪い！
+
+# 24f41d2
+; @choice "接受挑戰！" goto:.battle_intro
+@choice "挑戦を受けて立つ！" goto:.battle_intro
+
+# bc73d604
+; 魅兒.talking: 哼，別小看血系魔法——我可以用自己的血讓你痛苦。
+魅兒.talking: ふん、血魔法を甘く見るな——私は自分の血で相手を苦しめることができるの。
+
+# 4e20ffde
+; 魅兒.idle: 但是……如果你能把我打倒，我會承認你確實有兩把刷子。
+魅兒.idle: でも……私を倒せるなら、あなたに本物の腕があることを認めてあげるわ。

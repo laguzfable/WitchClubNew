@@ -1,19 +1,20 @@
-; ── Vedia · Nature Witch ───────────────────────────────────────
-; Battle focus: Green-color healing  ＋  Life Rain (heal x2)  ＋  Blue-color defense
+; ── 薇狄亞・自然系女巫 ─────────────────────────────────────
+; 戰鬥重點：綠系治癒 ＋ 生命之雨（治療×2）＋ 藍系防禦
+; Source locale: zh-TW
 
 @stopBgm
 @bgm white
 @back bg04 time:0.3
 @char 薇狄亞 pos:50 time:0
 
-薇狄亞.smile: Oh my, a new friend~ Care to have a little match with me?
+薇狄亞.smile: 哦，是新朋友～要跟我切磋一下嗎？
 
-@choice "Sure, count me in!" goto:.battle_intro
+@choice "當然，算我一個！" goto:.battle_intro
 @stop
 
 # battle_intro
-薇狄亞.love: The true nature of natural magic isn't just offense — vitality is the mightiest weapon.
-薇狄亞: I hope you feel the gentleness and resilience of nature for yourself... Let's begin!
+薇狄亞.love: 自然魔法的真諦不只是進攻——生命力才是最強大的武器。
+薇狄亞: 希望你能親身感受自然的溫柔與韌性……讓我們開始吧！
 
 @hide 薇狄亞
 @set RuneActive=true
@@ -30,8 +31,8 @@
 @back bg04 time:0.3
 @char 薇狄亞 pos:50 time:0
 
-薇狄亞.idle: Mm... not bad. Could you feel the rhythm of natural magic?
-薇狄亞.talking: Go swap for a new rune and take the strength you learned today with you.
+薇狄亞.idle: 嗯……不錯。感受到自然魔法的節奏了嗎？
+薇狄亞.talking: 去換一個新符文，把今天學到的力量帶走吧。
 
 @hide 薇狄亞
 @GotoChangeRune scriptName:demo label:aftermap
