@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using System.Linq;
 
-public class SelectRuneCard : MonoBehaviour
+public class SelectRuneCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     public string abilityID;
     public int runeIndex; // 僅用於 UI 排序，不參與解鎖判斷
@@ -28,6 +29,10 @@ public class SelectRuneCard : MonoBehaviour
 
         abilityName.text = RuneEnTranslation.TranslateName(ability.name);
         abilityDesc.text = RuneEnTranslation.TranslateDesc(ability.description);
+
+        // 效果說明已移至右側 DetailPanel，小卡上不顯示
+        if (abilityDesc != null)
+            abilityDesc.gameObject.SetActive(false);
 
         // ✅ 解鎖狀態
         bool isUnlocked = IsRuneUnlocked();
@@ -78,11 +83,22 @@ public void OnClick()
         card.SetEquippedVisual(equip);
     }
 
-    // ✅ ✅ ✅ 核心 Fix：戰鬥符文立即更新
+    // ✅ 核心 Fix：戰鬥符文立即更新
     foreach (var w in FindObjectsOfType<UIWitchAbility>())
         w.RefreshRune();
 }
 
+
+    // ── Hover → 顯示詳情 ────────────────────────────────
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        RuneDetailPanel.Instance?.Show(ability);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        RuneDetailPanel.Instance?.Hide();
+    }
 
     private void DebugLog()
     {

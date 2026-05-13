@@ -42,22 +42,21 @@ namespace Naninovel.UI
 
         protected override async void OnButtonClick ()
         {
-            // --- 🔧 關掉你自訂的 Title Canvas ---
-            foreach (var obj in UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects())
-            {
-                if (obj == null) continue;
-                if (obj.name.Contains("Title") || obj.name.Contains("Canvas"))
-                {
-                    Debug.Log("[CustomTitle] Hide: " + obj.name);
-                    obj.SetActive(false);
-                }
-            }
-
-            // --- 原始 Naninovel 流程 ---
             if (string.IsNullOrEmpty(startScriptName))
             {
                 Debug.LogError("Can't start new game: specify start script name in the settings.");
                 return;
+            }
+
+            // 立刻強制隱藏 TitleMenu，不等任何 async 流程
+            titleMenu.gameObject.SetActive(false);
+
+            // 同時關掉場景中所有帶有 "Title" 或 "Canvas" 名稱的物件
+            foreach (var obj in UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects())
+            {
+                if (obj == null) continue;
+                if (obj.name.Contains("Title") || obj.name.Contains("Canvas"))
+                    obj.SetActive(false);
             }
 
             if (!string.IsNullOrEmpty(titleScriptName))
@@ -66,17 +65,16 @@ namespace Naninovel.UI
                 if (titleScript != null && titleScript.LabelExists(titleLabel))
                 {
                     scriptPlayer.ResetService();
-                    // 直接啟動，不等待
                     scriptPlayer.PreloadAndPlayAsync(titleScript, label: titleLabel);
                 }
             }
 
-            // 關掉內建 Title UI
-            titleMenu.Hide();
-
-            // 重置狀態並開始遊戲
-            stateManager.ResetStateAsync(excludeFromReset,
-                () => scriptPlayer.PreloadAndPlayAsync(startScriptName));
+            stateManager.ResetStateAsync(excludeFromReset, () =>
+            {
+                // Reset 後再確認一次，防止 Naninovel 的 title state restore 重新啟用
+                titleMenu.gameObject.SetActive(false);
+                return scriptPlayer.PreloadAndPlayAsync(startScriptName);
+            });
         }
     }
 }
