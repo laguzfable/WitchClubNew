@@ -10,6 +10,7 @@ public class SelectRuneCard : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     public Image img;
     public Button btn;
+    public GameObject selectedFrame; // 選中時顯示的框框
 
     private Ability ability;
     public Text abilityName;
@@ -33,6 +34,21 @@ public class SelectRuneCard : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         // 效果說明已移至右側 DetailPanel，小卡上不顯示
         if (abilityDesc != null)
             abilityDesc.gameObject.SetActive(false);
+
+        // 名稱置中（撐滿卡片高度讓上下也置中）
+        if (abilityName != null)
+        {
+            abilityName.alignment = TextAnchor.MiddleCenter;
+            var rt = abilityName.GetComponent<RectTransform>();
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+        }
+
+        // 自動找 SelectedFrame 子物件（不需要手動拖接線）
+        if (selectedFrame == null)
+            selectedFrame = transform.Find("SelectedFrame")?.gameObject;
 
         // ✅ 解鎖狀態
         bool isUnlocked = IsRuneUnlocked();
@@ -62,6 +78,8 @@ bool IsRuneUnlocked()
     void SetEquippedVisual(bool equip)
     {
         transform.localScale = equip ? new Vector3(1.2f, 1.2f, 1.2f) : Vector3.one;
+        if (selectedFrame != null)
+            selectedFrame.SetActive(equip);
     }
 
 public void OnClick()
