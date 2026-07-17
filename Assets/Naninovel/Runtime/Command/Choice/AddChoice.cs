@@ -139,6 +139,8 @@ namespace Naninovel.Commands
             var buttonPos = Assigned(ButtonPosition) ? (Vector2?)ArrayUtils.ToVector2(ButtonPosition) : null;
             var autoPlay = AutoPlay && !Assigned(GotoPath) && !Assigned(GosubPath);
 
+            UnityEngine.Debug.Log($"[GOTODIAG] @choice added: summary='{ChoiceSummary}', gotoAssigned={Assigned(GotoPath)}, gotoName='{GotoPath?.Name}', gotoNamedValue='{GotoPath?.NamedValue}', generatedScript=\"{onSelectScript.Replace("\n", "\\n")}\"");
+
             var choice = new ChoiceState(ChoiceSummary, ButtonPath, buttonPos, onSelectScript, autoPlay);
             choiceHandler.AddChoice(choice);
         }

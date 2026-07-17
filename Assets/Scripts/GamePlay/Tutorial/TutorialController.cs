@@ -183,6 +183,8 @@ public class TutorialController : MonoBehaviour
 
             foreach(var displayObj in tutorial.displayObjecArr)
             {
+                if (displayObj == null) continue; // 物件可能已被戰鬥系統銷毀（例如卡牌被打出）
+
                 displayObj.SetActive(true);
 
                 if(tutorial.isClearDisplay)
@@ -231,6 +233,7 @@ public class TutorialController : MonoBehaviour
             {
                 foreach(var displayObj in tutorial.displayObjecArr)
                 {
+                    if (displayObj == null) continue; // 物件可能已被戰鬥系統銷毀（例如卡牌被打出），避免 MissingReferenceException 中斷整個教學流程
                     displayObj.SetActive(false);
                 }
             }

@@ -1,3 +1,4 @@
+@visitNode id:chapter3
 @set affinity_Mel=0
 @set affinity_Ved=0
 @set affinity_Eup=0
@@ -81,7 +82,8 @@ may: 至於符文的用法嘛……
 @RuneTutorial background:bg05 scriptName:chapter3 label:afterbattle3
 @stop
 # afterbattle3
-@stopbgm 
+@set RuneActive=true
+@stopbgm
 @back bg05
 @bgm peace
 @char may pos:50

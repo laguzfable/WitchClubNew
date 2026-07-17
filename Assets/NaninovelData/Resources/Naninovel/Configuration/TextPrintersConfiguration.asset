@@ -12,13 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 610509a41f8e448419a7e1a6122c05c0, type: 3}
   m_Name: TextPrintersConfiguration
   m_EditorClassIdentifier: 
+  DefaultDuration: 0.35
   DefaultEasing: 0
   AutoShowOnModify: 0
   SceneOrigin: {x: 0.5, y: 0}
   ZOffset: 100
   ZStep: 0.1
   DefaultPrinterId: Dialogue
-  MaxRevealDelay: 0.06
+  DefaultBaseRevealSpeed: 1
+  DefaultBaseAutoDelay: 0.5
+  MaxRevealDelay: 0.01
   MaxAutoWaitDelay: 0.02
   ScaleAutoWait: 1
   DefaultMetadata:
@@ -38,17 +41,25 @@ MonoBehaviour:
     PixelsPerUnit: 100
     EnableDepthPass: 1
     DepthAlphaCutoff: 0.5
-    CustomShader: {fileID: 0}
+    CustomTextureShader: {fileID: 0}
+    CustomSpriteShader: {fileID: 0}
     RenderTexture: {fileID: 0}
-    CorrectRenderAspect: 1
+    RenderRectangle:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 1
+      height: 1
     AutoReset: 1
     AutoDefault: 1
     AutoWait: 1
     AutoLineBreak: 0
     AddToBacklog: 1
     SplitBacklogMessages: 0
+    StopVoice: 0
     ChangeVisibilityDuration: 0.3
     PrintFrameDelay: 1
+    AuthoredTemplate: 
   Metadata:
     ids:
     - Dialogue
@@ -77,17 +88,25 @@ MonoBehaviour:
       PixelsPerUnit: 100
       EnableDepthPass: 1
       DepthAlphaCutoff: 0.5
-      CustomShader: {fileID: 0}
+      CustomTextureShader: {fileID: 0}
+      CustomSpriteShader: {fileID: 0}
       RenderTexture: {fileID: 0}
-      CorrectRenderAspect: 1
+      RenderRectangle:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1
+        height: 1
       AutoReset: 1
       AutoDefault: 1
       AutoWait: 1
       AutoLineBreak: 0
       AddToBacklog: 1
       SplitBacklogMessages: 0
+      StopVoice: 0
       ChangeVisibilityDuration: 0.3
       PrintFrameDelay: 1
+      AuthoredTemplate: 
     - Implementation: Naninovel.UITextPrinter, Elringus.Naninovel.Runtime, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
       Loader:
@@ -104,17 +123,25 @@ MonoBehaviour:
       PixelsPerUnit: 100
       EnableDepthPass: 1
       DepthAlphaCutoff: 0.5
-      CustomShader: {fileID: 0}
+      CustomTextureShader: {fileID: 0}
+      CustomSpriteShader: {fileID: 0}
       RenderTexture: {fileID: 0}
-      CorrectRenderAspect: 1
+      RenderRectangle:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1
+        height: 1
       AutoReset: 0
       AutoDefault: 1
       AutoWait: 1
       AutoLineBreak: 2
       AddToBacklog: 1
       SplitBacklogMessages: 0
+      StopVoice: 0
       ChangeVisibilityDuration: 0.3
       PrintFrameDelay: 1
+      AuthoredTemplate: 
     - Implementation: Naninovel.UITextPrinter, Elringus.Naninovel.Runtime, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
       Loader:
@@ -131,17 +158,25 @@ MonoBehaviour:
       PixelsPerUnit: 100
       EnableDepthPass: 1
       DepthAlphaCutoff: 0.5
-      CustomShader: {fileID: 0}
+      CustomTextureShader: {fileID: 0}
+      CustomSpriteShader: {fileID: 0}
       RenderTexture: {fileID: 0}
-      CorrectRenderAspect: 1
+      RenderRectangle:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1
+        height: 1
       AutoReset: 1
       AutoDefault: 1
       AutoWait: 1
       AutoLineBreak: 0
       AddToBacklog: 1
       SplitBacklogMessages: 0
+      StopVoice: 0
       ChangeVisibilityDuration: 0.3
       PrintFrameDelay: 1
+      AuthoredTemplate: 
     - Implementation: Naninovel.UITextPrinter, Elringus.Naninovel.Runtime, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
       Loader:
@@ -158,17 +193,25 @@ MonoBehaviour:
       PixelsPerUnit: 100
       EnableDepthPass: 1
       DepthAlphaCutoff: 0.5
-      CustomShader: {fileID: 0}
+      CustomTextureShader: {fileID: 0}
+      CustomSpriteShader: {fileID: 0}
       RenderTexture: {fileID: 0}
-      CorrectRenderAspect: 1
+      RenderRectangle:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1
+        height: 1
       AutoReset: 0
       AutoDefault: 1
       AutoWait: 1
       AutoLineBreak: 0
       AddToBacklog: 1
       SplitBacklogMessages: 1
+      StopVoice: 0
       ChangeVisibilityDuration: 0.3
       PrintFrameDelay: 1
+      AuthoredTemplate: 
     - Implementation: Naninovel.UITextPrinter, Elringus.Naninovel.Runtime, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
       Loader:
@@ -185,17 +228,25 @@ MonoBehaviour:
       PixelsPerUnit: 100
       EnableDepthPass: 1
       DepthAlphaCutoff: 0.5
-      CustomShader: {fileID: 0}
+      CustomTextureShader: {fileID: 0}
+      CustomSpriteShader: {fileID: 0}
       RenderTexture: {fileID: 0}
-      CorrectRenderAspect: 1
+      RenderRectangle:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1
+        height: 1
       AutoReset: 1
       AutoDefault: 1
       AutoWait: 1
       AutoLineBreak: 0
       AddToBacklog: 1
       SplitBacklogMessages: 0
+      StopVoice: 0
       ChangeVisibilityDuration: 0.3
       PrintFrameDelay: 1
+      AuthoredTemplate: 
     - Implementation: Naninovel.UITextPrinter, Elringus.Naninovel.Runtime, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
       Loader:
@@ -212,17 +263,25 @@ MonoBehaviour:
       PixelsPerUnit: 100
       EnableDepthPass: 1
       DepthAlphaCutoff: 0.5
-      CustomShader: {fileID: 0}
+      CustomTextureShader: {fileID: 0}
+      CustomSpriteShader: {fileID: 0}
       RenderTexture: {fileID: 0}
-      CorrectRenderAspect: 1
+      RenderRectangle:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1
+        height: 1
       AutoReset: 1
       AutoDefault: 1
       AutoWait: 1
       AutoLineBreak: 0
       AddToBacklog: 1
       SplitBacklogMessages: 0
+      StopVoice: 0
       ChangeVisibilityDuration: 0.3
       PrintFrameDelay: 1
+      AuthoredTemplate: 
     - Implementation: Naninovel.UITextPrinter, Elringus.Naninovel.Runtime, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
       Loader:
@@ -239,17 +298,25 @@ MonoBehaviour:
       PixelsPerUnit: 100
       EnableDepthPass: 1
       DepthAlphaCutoff: 0.5
-      CustomShader: {fileID: 0}
+      CustomTextureShader: {fileID: 0}
+      CustomSpriteShader: {fileID: 0}
       RenderTexture: {fileID: 0}
-      CorrectRenderAspect: 1
+      RenderRectangle:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1
+        height: 1
       AutoReset: 0
       AutoDefault: 1
       AutoWait: 1
       AutoLineBreak: 2
       AddToBacklog: 1
       SplitBacklogMessages: 0
+      StopVoice: 0
       ChangeVisibilityDuration: 0.3
       PrintFrameDelay: 1
+      AuthoredTemplate: 
     - Implementation: Naninovel.UITextPrinter, Elringus.Naninovel.Runtime, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
       Loader:
@@ -266,17 +333,25 @@ MonoBehaviour:
       PixelsPerUnit: 100
       EnableDepthPass: 1
       DepthAlphaCutoff: 0.5
-      CustomShader: {fileID: 0}
+      CustomTextureShader: {fileID: 0}
+      CustomSpriteShader: {fileID: 0}
       RenderTexture: {fileID: 0}
-      CorrectRenderAspect: 1
+      RenderRectangle:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1
+        height: 1
       AutoReset: 1
       AutoDefault: 1
       AutoWait: 1
       AutoLineBreak: 0
       AddToBacklog: 1
       SplitBacklogMessages: 0
+      StopVoice: 0
       ChangeVisibilityDuration: 0.3
       PrintFrameDelay: 1
+      AuthoredTemplate: 
     - Implementation: Naninovel.UITextPrinter, Elringus.Naninovel.Runtime, Version=0.0.0.0,
         Culture=neutral, PublicKeyToken=null
       Loader:
@@ -293,17 +368,25 @@ MonoBehaviour:
       PixelsPerUnit: 100
       EnableDepthPass: 1
       DepthAlphaCutoff: 0.5
-      CustomShader: {fileID: 0}
+      CustomTextureShader: {fileID: 0}
+      CustomSpriteShader: {fileID: 0}
       RenderTexture: {fileID: 0}
-      CorrectRenderAspect: 1
+      RenderRectangle:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1
+        height: 1
       AutoReset: 1
       AutoDefault: 1
       AutoWait: 1
       AutoLineBreak: 0
       AddToBacklog: 1
       SplitBacklogMessages: 0
+      StopVoice: 0
       ChangeVisibilityDuration: 0.3
       PrintFrameDelay: 1
+      AuthoredTemplate: 
   references:
     version: 1
     00000000:

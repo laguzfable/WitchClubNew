@@ -63,6 +63,8 @@ namespace Naninovel.Commands
             var scriptName = Path.Name;
             var label = Path.NamedValue;
 
+            UnityEngine.Debug.Log($"[GOTODIAG] @goto ExecuteAsync: scriptName='{scriptName}', label='{label}', PlayedScript='{(ObjectUtils.IsValid(player.PlayedScript) ? player.PlayedScript.Name : "<null>")}'");
+
             if (string.IsNullOrWhiteSpace(scriptName) && !ObjectUtils.IsValid(player.PlayedScript))
             {
                 LogErrorWithPosition("Failed to execute `@goto` command: script name is not specified and no script is currently played.");
@@ -72,12 +74,15 @@ namespace Naninovel.Commands
             // Just navigate to a label inside current script.
             if (string.IsNullOrWhiteSpace(scriptName) || (ObjectUtils.IsValid(player.PlayedScript) && scriptName.EqualsFastIgnoreCase(player.PlayedScript.Name)))
             {
-                if (!player.PlayedScript.LabelExists(label))
+                var labelExists = player.PlayedScript.LabelExists(label);
+                UnityEngine.Debug.Log($"[GOTODIAG] local label lookup: label='{label}' exists={labelExists} in script='{player.PlayedScript.Name}'");
+                if (!labelExists)
                 {
                     LogErrorWithPosition($"Failed navigating script playback to `{label}` label: label not found in `{player.PlayedScript.Name}` script.");
                     return;
                 }
                 var startLineIndex = player.PlayedScript.GetLineIndexForLabel(label);
+                UnityEngine.Debug.Log($"[GOTODIAG] resolved startLineIndex={startLineIndex} for label='{label}', calling player.Play(...)");
                 player.Play(player.PlayedScript, startLineIndex);
                 return;
             }

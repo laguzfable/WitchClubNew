@@ -16985,56 +16985,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 910615245}
   m_CullTransparentMesh: 0
---- !u!1 &911240364
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 911240366}
-  - component: {fileID: 911240365}
-  m_Layer: 0
-  m_Name: DemoController
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &911240365
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 911240364}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 094fbf336a22c484aab00cb616c92eaf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  debugAlwaysRun: 0
-  chineseFont: {fileID: 11400000, guid: 51a1225bf929b8d458c3a91455471449, type: 2}
-  initDelay: 3.5
-  labelShowTime: 2
-  cardSelectDelay: 0.28
-  postPlayWait: 3.2
-  actGap: 0.8
---- !u!4 &911240366
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 911240364}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 718.47156, y: 300.8796, z: -188.56671}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 21
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &919663215
 GameObject:
   m_ObjectHideFlags: 0
@@ -19637,7 +19587,6 @@ GameObject:
   - component: {fileID: 1171440380}
   - component: {fileID: 1171440379}
   - component: {fileID: 1171440378}
-  - component: {fileID: 1171440383}
   m_Layer: 5
   m_Name: TutorialCanvas
   m_TagString: Untagged
@@ -20063,36 +20012,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &1171440383
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1171440377}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c5e1ad9d918bd4044958c8ed5dc01c8f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  tutorialController: {fileID: 1171440378}
-  meiSteps:
-  - dialogLocaleId: 
-    dialog: 
-    isRight: 0
-    isLeftUp: 0
-    isRightDown: 0
-    displayImg: {fileID: 0}
-    unitPos: {x: 0, y: 0}
-    isMobUnit: 0
-    displayObjecArr: []
-    isClearDisplay: 0
-    customActionID: 
-    isChangeEnv: 0
-    changeEnv: 0
-    displayBG: {fileID: 0}
-  viviaSteps: []
-  euphieSteps: []
 --- !u!1 &1180930057
 GameObject:
   m_ObjectHideFlags: 0
@@ -30001,7 +29920,6 @@ GameObject:
   - component: {fileID: 1276502792}
   - component: {fileID: 1276502791}
   - component: {fileID: 1276502790}
-  - component: {fileID: 1276502795}
   m_Layer: 5
   m_Name: Tutorial2Canvas
   m_TagString: Untagged
@@ -30334,22 +30252,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &1276502795
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1276502789}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c5e1ad9d918bd4044958c8ed5dc01c8f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  tutorialController: {fileID: 1276502790}
-  meiSteps: []
-  viviaSteps: []
-  euphieSteps: []
 --- !u!1 &1282618266
 GameObject:
   m_ObjectHideFlags: 0
@@ -36868,7 +36770,6 @@ MonoBehaviour:
     runeID: yellow00
   blackScreen: {fileID: 1446948777}
   comboSpecialImg: {fileID: 311553827}
-  comboImageDisplayTime: 1.2
 --- !u!4 &1959616811
 Transform:
   m_ObjectHideFlags: 0

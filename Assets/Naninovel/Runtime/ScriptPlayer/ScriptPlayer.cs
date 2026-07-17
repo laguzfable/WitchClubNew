@@ -303,17 +303,21 @@ namespace Naninovel
         {
             PlayedScript = script;
 
-            if (Playlist is null || Playlist.ScriptName != script.Name)
+            var rebuiltPlaylist = Playlist is null || Playlist.ScriptName != script.Name;
+            if (rebuiltPlaylist)
             {
                 Playlist?.ReleaseResources();
                 Playlist = new ScriptPlaylist(script, scriptManager);
             }
+
+            Debug.Log($"[GOTODIAG] Play(Script,int,int): script='{script.Name}', startLineIndex={startLineIndex}, startInlineIndex={startInlineIndex}, rebuiltPlaylist={rebuiltPlaylist}, Playlist.Count={Playlist.Count}");
 
             if (startLineIndex > 0 || startInlineIndex > 0)
             {
                 var startCommand = Playlist.GetCommandAfterLine(startLineIndex, startInlineIndex);
                 if (startCommand is null) throw new Exception($"Script player failed to start: no commands found in script `{PlayedScript.Name}` at line #{startLineIndex}.{startInlineIndex}.");
                 PlayedIndex = Playlist.IndexOf(startCommand);
+                Debug.Log($"[GOTODIAG] Play(Script,int,int): startCommand type={startCommand.GetType().Name}, PlayedIndex={PlayedIndex}");
             }
             else PlayedIndex = 0;
 
@@ -530,6 +534,7 @@ namespace Naninovel
 
         private async UniTask ExecutePlayedCommandAsync (AsyncToken asyncToken)
         {
+            Debug.Log($"[GOTODIAG] ExecutePlayedCommandAsync: PlayedIndex={PlayedIndex}, PlayedCommand={(PlayedCommand is null ? "<null>" : PlayedCommand.GetType().Name)}, ShouldExecute={PlayedCommand?.ShouldExecute}");
             if (PlayedCommand is null || !PlayedCommand.ShouldExecute) return;
 
             OnCommandExecutionStart?.Invoke(PlayedCommand);
@@ -662,7 +667,9 @@ namespace Naninovel
         /// <returns>Whether next command is available and was selected.</returns>
         private bool SelectNextCommand ()
         {
+            var prevIndex = PlayedIndex;
             PlayedIndex++;
+            Debug.Log($"[GOTODIAG] SelectNextCommand: {prevIndex} -> {PlayedIndex}, Playlist.Count={Playlist?.Count}, valid={Playlist?.IsIndexValid(PlayedIndex)}");
             if (Playlist.IsIndexValid(PlayedIndex))
             {
                 executedPlayedCommand = false;

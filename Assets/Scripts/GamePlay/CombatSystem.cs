@@ -25,7 +25,7 @@ public class CombatSystem : MonoBehaviour
     Button dialogBtn;
 
     readonly float waitBattleTime = 3f;
-    [SerializeField] float waitTurnTime = 0.5f;
+    [SerializeField] float waitTurnTime = 0.25f;
 
     string monsterID;
     bool halfHpBlean = false;
