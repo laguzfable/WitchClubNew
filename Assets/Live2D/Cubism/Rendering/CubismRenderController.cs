@@ -352,6 +352,13 @@ namespace Live2D.Cubism.Rendering
             {
                 if (_renderers== null)
                 {
+                    // Model may not have finished initializing (Drawables cache not yet
+                    // populated) when this is accessed on a runtime-instantiated model.
+                    if (Model == null || Model.Drawables == null)
+                    {
+                        return new CubismRenderer[0];
+                    }
+
                     _renderers = Model.Drawables.GetComponentsMany<CubismRenderer>();
                 }
 
@@ -384,8 +391,14 @@ namespace Live2D.Cubism.Rendering
                 // Create renders and apply it to backing field...
                 var drawables = this
                 .FindCubismModel()
-                .Drawables;
+                ?.Drawables;
 
+                // Model still isn't ready (or has been destroyed) - bail out quietly,
+                // this will be retried the next time TryInitializeRenderers() runs.
+                if (drawables == null)
+                {
+                    return;
+                }
 
                 renderers = drawables.AddComponentEach<CubismRenderer>();
 
@@ -394,6 +407,10 @@ namespace Live2D.Cubism.Rendering
 
             }
 
+            if (renderers == null || renderers.Length == 0)
+            {
+                return;
+            }
 
             // Make sure renderers are initialized.
             for (var i = 0; i < renderers.Length; ++i)

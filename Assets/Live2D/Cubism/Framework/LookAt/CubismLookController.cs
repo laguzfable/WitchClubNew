@@ -118,6 +118,16 @@ namespace Live2D.Cubism.Framework.LookAt
             var model = this.FindCubismModel();
 
 
+            // Model may not have finished initializing (Parameters cache not yet populated)
+            // when Start() runs on a runtime-instantiated model; bail out quietly and let a
+            // later explicit Refresh() call (e.g. when look target changes) pick it up.
+            if (model == null || model.Parameters == null)
+            {
+                Sources = new CubismLookParameter[0];
+                Destinations = new CubismParameter[0];
+                return;
+            }
+
             // Catch sources and destinations.
             Sources = model
                 .Parameters

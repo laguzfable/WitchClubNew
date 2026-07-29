@@ -62,6 +62,15 @@ namespace Live2D.Cubism.Framework.HarmonicMotion
             var model = this.FindCubismModel();
 
 
+            // Fail silently...
+            if (model == null || model.Parameters == null)
+            {
+                Sources = new CubismHarmonicMotionParameter[0];
+                Destinations = new CubismParameter[0];
+                return;
+            }
+
+
             // Catch sources and destinations.
             Sources = model
                 .Parameters

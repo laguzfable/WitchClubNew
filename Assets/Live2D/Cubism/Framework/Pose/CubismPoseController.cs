@@ -58,7 +58,7 @@ namespace Live2D.Cubism.Framework.Pose
             _model = this.FindCubismModel();
 
             // Fail silently...
-            if (_model == null)
+            if (_model == null || _model.Parts == null)
             {
                 return;
             }

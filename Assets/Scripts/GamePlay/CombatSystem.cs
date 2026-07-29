@@ -520,6 +520,18 @@ public void GameOver(bool isLose)
     if (!isLose)
         TryUnlockRune(monsterID);
 
+    // ✅ 各路線「第五關／夜晚儀式」擊敗成就
+    if (!isLose)
+    {
+        switch (monsterID)
+        {
+            case "blue05":   AchievementManager.Instance.Unlock(AchievementManager.ACH_RITUAL_BLUE);   break;
+            case "red05":    AchievementManager.Instance.Unlock(AchievementManager.ACH_RITUAL_RED);    break;
+            case "yellow05": AchievementManager.Instance.Unlock(AchievementManager.ACH_RITUAL_YELLOW); break;
+            case "green05":  AchievementManager.Instance.Unlock(AchievementManager.ACH_RITUAL_GREEN);  break;
+        }
+    }
+
 if (isLose)
 {
     var go = GameObject.FindGameObjectWithTag("Finish");

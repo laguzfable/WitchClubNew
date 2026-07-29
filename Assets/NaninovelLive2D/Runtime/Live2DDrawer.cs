@@ -70,7 +70,16 @@ namespace Naninovel
                 return (renderCanvas.Size, renderCanvas.Offset);
             else
             {
-                var bounds = controller.RenderController.Renderers.GetMeshRendererBounds();
+                var renderers = controller.RenderController.Renderers;
+                // Model has no renderers (eg its Cubism Moc failed to load/revive) — skip instead
+                // of crashing, which used to take down the whole script player with it.
+                if (renderers == null || renderers.Length == 0)
+                {
+                    Debug.LogError($"[Live2DDrawer] '{controller.name}' has no CubismRenderers — its Live2D model likely failed to initialize (check the Moc reference on the model prefab). Rendering will be skipped for this actor.");
+                    return (Vector2.zero, Vector2.zero);
+                }
+
+                var bounds = renderers.GetMeshRendererBounds();
                 var size = new Vector2(bounds.size.x, bounds.size.y);
                 return (size, Vector2.zero);
             }

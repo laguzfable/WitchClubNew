@@ -53,7 +53,7 @@ namespace Live2D.Cubism.Framework.MouthMovement
 
 
             // Fail silently...
-            if (model == null)
+            if (model == null || model.Parameters == null)
             {
                 return;
             }

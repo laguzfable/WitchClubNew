@@ -238,6 +238,10 @@ public class TutorialController : MonoBehaviour
                 }
             }
 
+            // 場景可能在上面 await 期間已被切換（例如中途離開戰鬥），這裡的物件參考會變成已銷毀。
+            // 直接 return，避免 MissingReferenceException 中斷流程、讓 SetControllable(false) 卡住玩家操作。
+            if (this == null || leftDialog == null || rightDialog == null) return;
+
             leftDialog.SetActive(false);
             rightDialog.SetActive(false);
             if(leftUpDialog != null)
@@ -252,6 +256,8 @@ public class TutorialController : MonoBehaviour
                 tutorial.displayBG.SetActive(false);
             }
         }
+
+        if (this == null || playerController == null || playerController.combatSystem == null) return;
         playerController.combatSystem.GameOver(false);
     }
 

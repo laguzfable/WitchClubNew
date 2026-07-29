@@ -52,7 +52,7 @@ namespace Live2D.Cubism.Framework
 
 
             // Fail silently...
-            if (model == null)
+            if (model == null || model.Parameters == null)
             {
                 return;
             }

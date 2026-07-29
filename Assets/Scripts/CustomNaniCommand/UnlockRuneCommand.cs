@@ -43,6 +43,7 @@ public class UnlockRuneCommand : Command
             PlayerPrefs.SetString("UnlockedRunes_None",   "mon02,mon04,mon08,mon09,mon10,mon12");
             PlayerPrefs.Save();
             Debug.Log("[unlockRune] 全部符文已解鎖");
+            AchievementManager.Instance.Unlock(AchievementManager.ACH_ALL_RUNES);
             return UniTask.CompletedTask;
         }
 
@@ -88,6 +89,10 @@ public class UnlockRuneCommand : Command
         }
 
         PlayerPrefs.Save();
+
+        if (RuneUnlockState.AreAllUnlocked())
+            AchievementManager.Instance.Unlock(AchievementManager.ACH_ALL_RUNES);
+
         return UniTask.CompletedTask;
     }
 
