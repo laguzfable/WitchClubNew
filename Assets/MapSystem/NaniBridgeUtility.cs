@@ -1,6 +1,7 @@
 ﻿using Naninovel;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Hexe.TowerMode;
 
 public static class NaniBridgeUtility
 {
@@ -10,6 +11,13 @@ public static class NaniBridgeUtility
     /// </summary>
     public static void GoBackToSavedStory (string targetSceneName = "NaniDialogTest")
     {
+        // 高塔模式跑到一半來換符文，返回按鈕要接著往下一層走，不能回劇本
+        if (TowerModeManager.IsActive)
+        {
+            TowerModeManager.ContinueToNextFloor();
+            return;
+        }
+
         var ds = DataService.Instance;
 
         // A) 最高優先：MapReturnPoint（來自 @SaveReturnPoint）

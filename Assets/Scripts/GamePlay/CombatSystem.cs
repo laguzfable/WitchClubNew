@@ -8,6 +8,7 @@ using System.Linq;
 using Naninovel;
 using Naninovel.UI;
 using System;
+using Hexe.TowerMode;
 
 public class CombatSystem : MonoBehaviour
 {
@@ -72,7 +73,12 @@ void Awake()
 
     monsterID = PlayerPrefs.GetString("enemyName");
     Debug.Log($"[CombatSystem.Awake] enemyName='{monsterID}'  IsTestMode={IsTestMode}");
-    bossName.text = monsterID;
+    bossName.text = TowerModeManager.IsActive
+        ? $"{monsterID}（第{TowerModeManager.CurrentFloor}層）"
+        : monsterID;
+
+    if (TowerModeManager.IsActive)
+        TowerModeManager.ShowFloorHud();
 
     audioSource = gameObject.GetComponent<AudioSource>();
     dialogText = dialogObj?.transform.Find("Image/Text")?.GetComponent<Text>();
@@ -523,14 +529,22 @@ if (isLose)
     finishImage.SetActive(false); // 暫時不顯示結算遮罩
 
         // ✅ 戰敗也回 Nani（不然 Nani 永遠不會知道輸贏）
-        blackMask.DOFade(1f, 0.5f).SetDelay(0.8f).OnComplete(BackToNani);
+        blackMask.DOFade(1f, 0.5f).SetDelay(0.8f).OnComplete(() => FinishBattle(isLose));
     }
     else
     {
         var go = GameObject.FindGameObjectWithTag("Finish");
         go.transform.Find("Image/Text").GetComponent<Text>().text = "贏惹!";
-        blackMask.DOFade(1f, 0.5f).SetDelay(0.3f).OnComplete(BackToNani);
+        blackMask.DOFade(1f, 0.5f).SetDelay(0.3f).OnComplete(() => FinishBattle(isLose));
     }
+}
+
+void FinishBattle(bool isLose)
+{
+    if (TowerModeManager.IsActive)
+        TowerModeManager.HandleBattleResult(isLose);
+    else
+        BackToNani();
 }
 
 public void BackToNani()

@@ -127,6 +127,11 @@ private async void OnNodeClick()
     // ★★★ 核心解決方案：安全播放方法 ★★★
     private async UniTask LoadAndPlaySafe(IScriptPlayer player, string scriptName, string label)
     {
+        // 劇情地圖是全破後給玩家收結局用的機制，從這裡進入戰鬥時符文系統直接全開，
+        // 不需要照劇情腳本原本的順序判斷（場景重載會讓 RuneActive 被重置成預設值 false）
+        var vars = Engine.GetService<ICustomVariableManager>();
+        vars?.SetVariableValue("RuneActive", "True");
+
         // 1. 先預載腳本
         await player.PreloadAndPlayAsync(scriptName, label: label);
 

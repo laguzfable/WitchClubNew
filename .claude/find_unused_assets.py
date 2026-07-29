@@ -178,11 +178,55 @@ def main():
         if not found_elsewhere:
             still_unused_cs.append(cs_path)
 
+    # Naninovel (the visual novel framework used in this project) loads
+    # character/background/audio/movie resources by string id (filename stem or
+    # containing folder name, e.g. a Live2D character folder "broom" or a bgm
+    # file referenced as "@bgm ambient1" in a .nani script) via its own resource
+    # provider, never through a Unity guid reference. Those never show up in the
+    # guid-reference pass above, so do a separate name-token pass over .nani
+    # script text and the Naninovel Configuration assets before calling
+    # something "unused".
+    name_scan_exts = {".nani", ".asset", ".json"}
+    name_scan_files = [f for f in all_files if os.path.splitext(f)[1].lower() in name_scan_exts]
+    print(f"Name-token scan: tokenizing {len(name_scan_files)} .nani/.asset/.json files...", file=sys.stderr)
+
+    WORD_RE = re.compile(r"[^\W_]+", re.UNICODE)
+    name_tokens = set()
+    for fp in name_scan_files:
+        try:
+            with open(fp, "r", encoding="utf-8", errors="ignore") as f:
+                content = f.read()
+        except Exception:
+            continue
+        for w in WORD_RE.findall(content):
+            name_tokens.add(w.lower())
+
+    print(f"  {len(name_tokens)} distinct tokens; checking {len(other_candidates)} orphan assets against them...", file=sys.stderr)
+
+    def name_referenced(asset_path):
+        stem = os.path.splitext(os.path.basename(asset_path))[0]
+        parent = os.path.basename(os.path.dirname(asset_path))
+        for token in {stem, parent}:
+            if not token or len(token) < 3:
+                continue
+            if token.lower() in name_tokens:
+                return True
+        return False
+
+    high_confidence_assets = []
+    name_referenced_assets = []
+    for p in other_candidates:
+        if name_referenced(p):
+            name_referenced_assets.append(p)
+        else:
+            high_confidence_assets.append(p)
+
     def rel(p):
         return norm(os.path.relpath(p, ROOT))
 
     result = {
-        "unused_assets": [rel(p) for p in other_candidates],
+        "unused_assets_high_confidence": [rel(p) for p in high_confidence_assets],
+        "unused_assets_name_found_in_nani_or_config__verify_manually": [rel(p) for p in name_referenced_assets],
         "unused_scripts_high_confidence": [rel(p) for p in still_unused_cs],
         "scripts_orphan_by_guid_but_class_name_found_elsewhere": [
             rel(p) for p in cs_candidates if p not in still_unused_cs
@@ -193,7 +237,8 @@ def main():
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
 
-    print(f"\nDone. {len(result['unused_assets'])} non-script assets, "
+    print(f"\nDone. {len(result['unused_assets_high_confidence'])} high-confidence unused assets, "
+          f"{len(result['unused_assets_name_found_in_nani_or_config__verify_manually'])} assets orphan-by-guid but name found in .nani/config, "
           f"{len(result['unused_scripts_high_confidence'])} high-confidence unused scripts, "
           f"{len(result['scripts_orphan_by_guid_but_class_name_found_elsewhere'])} scripts orphan-by-guid but name found elsewhere.",
           file=sys.stderr)

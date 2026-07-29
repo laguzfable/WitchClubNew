@@ -6,6 +6,7 @@ using System.Text;
 using System.Linq;
 using Kenaz;
 using Naninovel;
+using Hexe.TowerMode;
 
 public class EnemyUnit : BaseCombatUnit
 {
@@ -171,6 +172,13 @@ public class EnemyUnit : BaseCombatUnit
 
             sprRend.sprite = mobData.sprite;//combatSystem.visualResource.GetMobByName(mobName);
             sprRend.enabled = true;
+
+            if (TowerModeManager.IsActive)
+            {
+                HP.SetBaseValue(TowerModeManager.RollMonsterHP(mobData.HP));
+                var towerSprite = TowerModeManager.RollMonsterSprite();
+                if (towerSprite != null) sprRend.sprite = towerSprite;
+            }
         }
         else
         {   // 測試用

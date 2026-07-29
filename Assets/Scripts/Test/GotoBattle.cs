@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Naninovel.UI;
 using Naninovel;
+using Hexe.TowerMode;
 
 public class GotoBattle : MonoBehaviour
 {
@@ -37,6 +38,8 @@ public class GotoBattle : MonoBehaviour
     {
         GetComponent<Button>().onClick.AddListener(()=>
         {
+            // 高塔模式期間換符文完不用回休息室，交給 ChangeRuneSceneManager 接手往下一層走
+            if (TowerModeManager.IsActive) return;
             SceneManager.LoadScene("RestRoom");
         });
     }
