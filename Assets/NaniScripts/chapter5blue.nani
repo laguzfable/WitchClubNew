@@ -7,7 +7,6 @@
 優菲:{PlayerName}－－不要啊－－
 @hide 優菲
 @stopBGM
-@despawn Dust
 @back black
 @stopBgm
 @bgm bluedream
@@ -564,20 +563,34 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 優菲: 那那那，我和{PlayerName}就下次再去吧！
 妮可: 好的，我會好好爭取金援的！
 (轉場)
-優菲: 說起來，還好{PlayerName}拒絕，其實我一直都不太想去。
-優菲: 
-
-
-
-
-
-
-
-
-(然後可能可以選要不要去)
-(反正不管去不去優菲都會跟玩家很好)
-
+優菲: 說起來，還好{PlayerName}拒絕，其實我一直都不太想去那飯局。
+優菲: 比起跟不認識的人聊天，研究奧術還有趣得多呢。
+優菲: 我們去後巷找點小吃，然後回我房間研究魔法吧～
+(再次轉場 可能接夜晚事件)
 (這邊應該是也要有個夢境穿插)
+第一次見到梅爾的時候，我的心裡好激動喔。
+她大概是我見過，這個世界上最純真的人了。
+她的眼裡似乎只容得下，火焰。
+是的，那令人目眩神迷的，紅色光芒……
+到底是為什麼可以那麼專注呢？
+我啊，根本沒辦法跟她一樣。
+我自己是清楚的。
+隨便一點星塵閃耀都能令我分心。
+吶，{PlayerName}的出現也是啊。
+從商店的邂逅，到後來，一直一直都是。
+還以為只是個新鮮的玩具呢。
+想不到現在已經是我人生的一部份了。
+可是這只是暫時的吧。
+我總有一種預感。
+{PlayerName}就快要離開我了。
+我知道梅爾會離開我。
+但{PlayerName}呢？
+不離開可以嗎？
+一直留在我身邊可以嗎？
+請牽起我的手。
+無論發生什麼事。
+……
+一起毀滅的話，可以嗎？
 @back bg06
 ？？？: 呀啊啊啊啊啊－－
 @char 涅莉 pos:50
@@ -664,14 +677,14 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 優菲: 這股氣息是……
 薇狄亞: 西碧兒身上出現……新的脈搏……
 梅爾: 所以我說，要結束了嘛。
-優菲: ……
-優菲: 是我的錯……
-優菲: 都是我、都是我的錯……
-優菲: 都是因為我不相信妳……
-梅爾: 算了啦，就當我欠妳的。
+優菲: 妳想怪我嗎？
+優菲: 就因為我不相信妳，是嗎？
+優菲: 但是啊，到底又憑什麼？
+優菲: 明明一手將命運推向末日的－－是妳。
+梅爾: 對不起。
 梅爾: 誰叫我那個時候，背叛了妳還有象牙塔呢。
-梅爾: 妳現在……原諒我了嗎？
-優菲: 我……
+梅爾: 妳現在……可以原諒我嗎？
+優菲: ……
 @hide chl,薇狄亞,優菲,魅兒
 轟隆隆隆隆－－
 @stopBgm
@@ -771,6 +784,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 優菲: 謝謝你，{PlayerName}。
 
 （END：緋紅替身）
+@achieve id:ACH_END_01
 @wait input:true
 @exitToTitle
 @stop
@@ -791,6 +805,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 妮可: 學姊！我就知道！
 
 （END：純藍之冠）
+@achieve id:ACH_END_02
 @wait input:true
 @exitToTitle
 @stop
