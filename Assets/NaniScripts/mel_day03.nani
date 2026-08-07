@@ -1,0 +1,20 @@
+@back bg02
+@stopBgm
+@bgm peace
+@char 魅兒 pos:50
+
+魅兒: {PlayerName}……我跟你說件事，你別笑我。
+魅兒: 小黏其實是我用自己的血養大的，某種意義上，牠跟我是同一種存在。
+魅兒: 我以前一直不敢讓別人知道，怕被當成怪物。
+魅兒: 但你每次都好好對待牠，也沒把我當回事地嫌棄過……
+魅兒: 算了，反正你都看到這種程度了，我也沒什麼好藏的。
+魅兒: 小黏，把你會的那招也教教{PlayerName}的卡吧。
+
+@set affinity_Mel=affinity_Mel+20
+
+魅兒: 這是能一邊戰鬥一邊回血的訣竅，跟小黏一樣，傷了也能自己養回來。
+
+@unlockCardVariant ids:RedB
+
+@hide 魅兒
+@restroom

@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Linq;
+using Hexe.TowerMode;
 
 public class SelectRuneCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
@@ -66,8 +67,10 @@ public class SelectRuneCard : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
 bool IsRuneUnlocked()
 {
-    // 預設符文（xx00）永遠可選，不需解鎖
-    if (abilityID.EndsWith("00")) return true;
+    // 高塔模式不能選 xx00 空殼佔位符（沒效果、0 費，會讓戰鬥畫面符文欄位壞掉），
+    // 高塔一開始就會強制換成 01 等級符文，這裡順便擋掉手動選回 00 的路徑
+    if (abilityID.EndsWith("00"))
+        return !TowerModeManager.IsActive;
 
     string key = $"UnlockedRunes_{ability.element}";
     string list = PlayerPrefs.GetString(key, "");

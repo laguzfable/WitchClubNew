@@ -29,6 +29,8 @@ public class RestRoom : MonoBehaviour
 
     private void Start()
     {
+        AffinityDebugOverlay.Show();
+
         // 根據變數決定是否可聊天
         bool canChat = false;
         Engine.GetService<ICustomVariableManager>().TryGetVariableValue("CanChat", out canChat);
@@ -39,6 +41,11 @@ public class RestRoom : MonoBehaviour
     public void ChangeSkill()
     {
         SceneManager.LoadScene("ChangeRuneScene");
+    }
+
+    public void ChangeCardType()
+    {
+        SceneManager.LoadScene("ChangeCardTypeScene");
     }
 
     public void Sleep()

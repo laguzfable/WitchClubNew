@@ -244,6 +244,13 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 @GotoUnityScene sceneName:MapTest
 @stop
 # afterdate20
+
+@saveMapDayNight isDay:true
+@SaveReturnPoint script:"chapter5blue" label:"afterpetday_blue"
+@GotoUnityScene sceneName:MapTest
+@stop
+# afterpetday_blue
+
 (翌日)
 @back bg06
 轟隆隆－－
@@ -689,7 +696,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 轟隆隆隆隆－－
 @stopBgm
 @bgm energetic
-@battle background:bg03 target:monster03 label:ch5bt_micha
+@battle background:bg03 target:micha_final label:ch5bt_micha
 @stop
 # ch5bt_micha
 @stopBgm
@@ -774,7 +781,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 # end_crimson
 @stopBgm
 @bgm title
-@back stardust1
+@back ed01
 
 優菲: ……嗯。
 優菲: 你說得對。
@@ -792,7 +799,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 # end_blue_crown
 @stopBgm
 @bgm title
-@back stardust1
+@back ed02
 
 優菲: ……
 優菲: 也許你說得對。

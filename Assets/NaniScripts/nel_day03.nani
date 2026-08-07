@@ -1,0 +1,20 @@
+@back bg04
+@stopBgm
+@bgm lilina
+@char 涅莉 pos:50
+
+涅莉: {PlayerName}，說真的，被關在瓶子裡的那段日子，我什麼朋友都沒有。
+涅莉: 骷髏羊是我出來之後第一個「養」的東西，雖然嘴巴上都在開玩笑……
+涅莉: 但其實我很怕牠有一天也會離開我。
+涅莉: 不過看牠這麼黏你，我反而放心了，代表你是自己人。
+涅莉: 好啦，別露出那種認真的表情，怪不習慣的。
+涅莉: 骷髏羊，把你最猛的那招，也教給{PlayerName}的卡吧！
+
+@set affinity_Nel=affinity_Nel+20
+
+涅莉: 這次是純粹的戰鬥力，讓你想怎麼打就怎麼打！
+
+@unlockCardVariant ids:YellowB
+
+@hide 涅莉
+@restroom

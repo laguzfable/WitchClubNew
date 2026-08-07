@@ -48,6 +48,8 @@ public class UIWitchAbility : MonoBehaviour
 
 private void Awake()
 {
+    Debug.Log($"🔮🔮🔮 [RUNEDBG] UIWitchAbility.Awake() 執行了！element={element}, gameObject={gameObject.name}, scene={gameObject.scene.name}");
+
     //slider = GetComponent<Slider>();
     cost.OnValueChanged += (value) =>
     {
@@ -86,7 +88,10 @@ private void Awake()
 
     // ✅ 設定符文能量
     cost.SetBaseValue(ability.requireEnergy);
-    cost.Value = 0; // ✅ 避免繼承舊能量
+    // 高塔模式裝了「起始能量全滿護符」的話，一開場符文就是充好的
+    cost.Value = Hexe.TowerMode.TowerModeManager.ShouldStartWithFullRuneEnergy ? cost.GetTotalValue() : 0;
+
+    Debug.Log($"🔮🔮🔮 [RUNEDBG2] element={element} abilityID='{abilityID}' ability.id='{ability.id}' ability.requireEnergy={ability.requireEnergy} cost.GetTotalValue()={cost.GetTotalValue()} cost.GetPercent()={cost.GetPercent()} fillImage.sprite={(fillImage.sprite == null ? "NULL" : fillImage.sprite.name)} fillImage.color={fillImage.color}");
 
     fullChargedImage.DOFade(0f, 0.15f);
 }

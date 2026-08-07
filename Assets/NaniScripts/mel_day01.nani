@@ -1,0 +1,17 @@
+@back bg01
+@stopBgm
+@bgm energetic
+@char 魅兒 pos:50
+
+魅兒: 喂，{PlayerName}，過來一下，我給你看個東西，別大驚小怪喔。
+魅兒: 這是我最近用血系魔法養出來的小觸手，叫牠小黏就好。
+魅兒: 別用那種眼神看我！牠很乾淨的，而且意外地聰明。
+魅兒: 小黏，跟{PlayerName}打個招呼。
+魅兒: ……你看牠纏上你手臂了，牠這是喜歡你的意思啦。
+
+@set affinity_Mel=affinity_Mel+10
+
+魅兒: 哼，算你識相，沒有一副嫌棄的樣子。
+
+@hide 魅兒
+@restroom

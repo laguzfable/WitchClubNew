@@ -738,17 +738,22 @@ PrefabInstance:
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
       propertyPath: characterEventTable.Array.data[0].dayEvents.Array.size
-      value: 0
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
       propertyPath: characterEventTable.Array.data[1].dayEvents.Array.size
-      value: 0
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
       propertyPath: characterEventTable.Array.data[2].dayEvents.Array.size
-      value: 1
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[3].dayEvents.Array.size
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
@@ -843,17 +848,62 @@ PrefabInstance:
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
       propertyPath: characterEventTable.Array.data[0].dayEvents.Array.data[0].eventName
-      value: 
+      value: eup_day01
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[0].dayEvents.Array.data[1].eventName
+      value: eup_day02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[0].dayEvents.Array.data[2].eventName
+      value: eup_day03
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
       propertyPath: characterEventTable.Array.data[1].dayEvents.Array.data[0].eventName
-      value: chapter0
+      value: mel_day01
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[1].dayEvents.Array.data[1].eventName
+      value: mel_day02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[1].dayEvents.Array.data[2].eventName
+      value: mel_day03
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
       propertyPath: characterEventTable.Array.data[2].dayEvents.Array.data[0].eventName
-      value: chapter0
+      value: nel_day01
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[2].dayEvents.Array.data[1].eventName
+      value: nel_day02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[2].dayEvents.Array.data[2].eventName
+      value: nel_day03
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[3].dayEvents.Array.data[0].eventName
+      value: ved_day01
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[3].dayEvents.Array.data[1].eventName
+      value: ved_day02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[3].dayEvents.Array.data[2].eventName
+      value: ved_day03
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
@@ -1048,17 +1098,62 @@ PrefabInstance:
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
       propertyPath: characterEventTable.Array.data[0].dayEvents.Array.data[0].naninovelScript
-      value: 
+      value: eup_day01
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[0].dayEvents.Array.data[1].naninovelScript
+      value: eup_day02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[0].dayEvents.Array.data[2].naninovelScript
+      value: eup_day03
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
       propertyPath: characterEventTable.Array.data[1].dayEvents.Array.data[0].naninovelScript
-      value: chapter0
+      value: mel_day01
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[1].dayEvents.Array.data[1].naninovelScript
+      value: mel_day02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[1].dayEvents.Array.data[2].naninovelScript
+      value: mel_day03
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
       propertyPath: characterEventTable.Array.data[2].dayEvents.Array.data[0].naninovelScript
-      value: chapter0
+      value: nel_day01
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[2].dayEvents.Array.data[1].naninovelScript
+      value: nel_day02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[2].dayEvents.Array.data[2].naninovelScript
+      value: nel_day03
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[3].dayEvents.Array.data[0].naninovelScript
+      value: ved_day01
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[3].dayEvents.Array.data[1].naninovelScript
+      value: ved_day02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
+        type: 3}
+      propertyPath: characterEventTable.Array.data[3].dayEvents.Array.data[2].naninovelScript
+      value: ved_day03
       objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
@@ -1179,7 +1274,7 @@ PrefabInstance:
         type: 3}
       propertyPath: characterEventTable.Array.data[1].dayEvents.Array.data[0].animatorController
       value: 
-      objectReference: {fileID: 9100000, guid: e42ea99ddf87926439d6b19d92550e36, type: 2}
+      objectReference: {fileID: 0}
     - target: {fileID: 1323429588750195979, guid: f1c7837f53b1b2346849e1c8df09f222,
         type: 3}
       propertyPath: characterEventTable.Array.data[2].dayEvents.Array.data[0].animatorController

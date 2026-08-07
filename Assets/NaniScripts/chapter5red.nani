@@ -171,6 +171,13 @@
 @GotoUnityScene sceneName:MapTest
 @stop
 #afterdate1
+
+@saveMapDayNight isDay:true
+@SaveReturnPoint script:"chapter5red" label:"afterpetday_red"
+@GotoUnityScene sceneName:MapTest
+@stop
+#afterpetday_red
+
 （白天地圖在梅爾房間觸發）
 @back mel_night
 （轟隆隆隆－－）

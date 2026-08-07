@@ -2,6 +2,7 @@
 #define DISABLESTEAMWORKS
 #endif
 
+using System.Collections.Generic;
 using UnityEngine;
 #if !DISABLESTEAMWORKS
 using Steamworks;
@@ -30,6 +31,44 @@ public class AchievementManager : MonoSingleton<AchievementManager>
     // 全符文收集（UnlockRuneCommand / UnlockAllRunesCommand 自動觸發）
     public const string ACH_ALL_RUNES = "ACH_ALL_RUNES";
 
+    // 元素組合成就（PlayerController 首次打出對應元素組合牌時，透過 UnlockComboAchievement 自動觸發）
+    public const string ACH_COMBO_RED_BLUE          = "ACH_COMBO_RED_BLUE";
+    public const string ACH_COMBO_RED_GREEN         = "ACH_COMBO_RED_GREEN";
+    public const string ACH_COMBO_RED_YELLOW        = "ACH_COMBO_RED_YELLOW";
+    public const string ACH_COMBO_BLUE_GREEN        = "ACH_COMBO_BLUE_GREEN";
+    public const string ACH_COMBO_BLUE_YELLOW       = "ACH_COMBO_BLUE_YELLOW";
+    public const string ACH_COMBO_GREEN_YELLOW      = "ACH_COMBO_GREEN_YELLOW";
+    public const string ACH_COMBO_RED_BLUE_GREEN    = "ACH_COMBO_RED_BLUE_GREEN";
+    public const string ACH_COMBO_RED_BLUE_YELLOW   = "ACH_COMBO_RED_BLUE_YELLOW";
+    public const string ACH_COMBO_RED_GREEN_YELLOW  = "ACH_COMBO_RED_GREEN_YELLOW";
+    public const string ACH_COMBO_BLUE_GREEN_YELLOW = "ACH_COMBO_BLUE_GREEN_YELLOW";
+    public const string ACH_COMBO_ALL_FOUR          = "ACH_COMBO_ALL_FOUR";
+
+    // comboID = 組合中各卡牌 ID 加總（Red=1, Blue=2, Green=4, Yellow=8，對應 PlayerController.GetCardElement）
+    private static readonly Dictionary<int, string> ComboAchievementMap = new Dictionary<int, string>
+    {
+        { 3,  ACH_COMBO_RED_BLUE },
+        { 5,  ACH_COMBO_RED_GREEN },
+        { 9,  ACH_COMBO_RED_YELLOW },
+        { 6,  ACH_COMBO_BLUE_GREEN },
+        { 10, ACH_COMBO_BLUE_YELLOW },
+        { 12, ACH_COMBO_GREEN_YELLOW },
+        { 7,  ACH_COMBO_RED_BLUE_GREEN },
+        { 11, ACH_COMBO_RED_BLUE_YELLOW },
+        { 13, ACH_COMBO_RED_GREEN_YELLOW },
+        { 14, ACH_COMBO_BLUE_GREEN_YELLOW },
+        { 15, ACH_COMBO_ALL_FOUR },
+    };
+
+    // 依 PlayedCardResult.GetComboID() 的結果解鎖對應的組合成就
+    public void UnlockComboAchievement(int comboID)
+    {
+        if (ComboAchievementMap.TryGetValue(comboID, out string achId))
+        {
+            Unlock(achId);
+        }
+    }
+
     // 結局成就（由各 .nani 檔用 @achieve id:ACH_END_XX 觸發，編號對應結局清單）
     public const string ACH_END_01 = "ACH_END_01"; // 緋紅替身（chapter5blue #end_crimson）
     public const string ACH_END_02 = "ACH_END_02"; // 純藍之冠（chapter5blue #end_blue_crown）
@@ -49,6 +88,8 @@ public class AchievementManager : MonoSingleton<AchievementManager>
     public const string ACH_END_16 = "ACH_END_16"; // 魔蝕（badend16）
     public const string ACH_END_17 = "ACH_END_17"; // 蘇生（badend17）
     public const string ACH_END_18 = "ACH_END_18"; // 終焉／失敗終焉（chapter5common #end 及子分支）
+    public const string ACH_END_19 = "ACH_END_19"; // 墮星之主（chapter6red #mel_stands → mel_end #end1）
+    public const string ACH_END_20 = "ACH_END_20"; // 私奔（syb_day05 / chapter4green #greennight_s2 → syb_end #end1）
 
 #if !DISABLESTEAMWORKS
     private bool m_StatsValid;

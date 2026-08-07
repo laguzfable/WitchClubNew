@@ -15,6 +15,9 @@
 @set affinity_Syb=affinity_Syb+10
 
 @hide syb
+@if affinity_Syb>=50
+@goto syb_end label:end1
+@endif
 @if affinity_Syb>=30
 @goto badend13
 @endif

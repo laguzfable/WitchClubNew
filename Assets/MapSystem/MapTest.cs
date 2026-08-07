@@ -43,4 +43,14 @@ public class MapTest : MonoBehaviour
         else
             Debug.LogWarning("找不到 MapBackgroundController！");
     }
+
+    // 除錯熱鍵：不管日夜，數字鍵盤的 . 直接跳過這次地圖，回到暫存的劇本位置
+    void Update()
+    {
+        if (Input.GetKeyUp(KeyCode.KeypadPeriod))
+        {
+            Debug.Log("[MapTest] KeypadPeriod → 跳過地圖，回劇本");
+            NaniBridgeUtility.GoBackToSavedStory();
+        }
+    }
 }

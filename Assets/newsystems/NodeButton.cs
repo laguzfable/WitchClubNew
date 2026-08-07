@@ -60,6 +60,12 @@ private async void OnNodeClick()
     {
         Debug.Log($"[NodeButton] Click nodeId={nodeId}, script={scriptName}, label={label}");
 
+        // 清掉舊的返回點/一次性參數，避免場景載入時 NaniScriptLoader_HEX
+        // 撿到之前測試留下的 MapReturnPoint/scriptParameter，蓋掉這裡指定的目標章節。
+        MapReturnPoint.Clear();
+        if (DataService.Instance != null)
+            DataService.Instance.scriptParameter = null;
+
         // 1. 關閉 UI (保持不變)
         var uiManager = Engine.GetService<IUIManager>();
         if (uiManager != null)

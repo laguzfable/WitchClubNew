@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using DG.Tweening;
 using TMPro;
 using Naninovel;
+using Hexe.TowerMode;
 
 public class PlayerController : MonoBehaviour
 {
@@ -252,6 +253,7 @@ public class PlayerController : MonoBehaviour
         if (result?.state == EElementState.Combination)
         {
             combatSystem.ShowComboImage(GetCompboSpr());
+            AchievementManager.Instance.UnlockComboAchievement(result.GetComboID());
         }
 
         audioSource.clip = sfx[0];
@@ -347,6 +349,16 @@ public class PlayerController : MonoBehaviour
         foreach (var card in result.cardList)
         {
             var cardAttr =  card.curAttr;  //dataService.GetAbilityById(card.ID.ToString());
+
+            // 高塔模式：裝備了同色護身符的話，這張卡的數值直接 x2
+            if (TowerModeManager.IsAmuletBoosted(card.element))
+            {
+                cardAttr.ATK *= 2;
+                cardAttr.DEF *= 2;
+                cardAttr.HEAL *= 2;
+                cardAttr.EN *= 2;
+            }
+
             totalAttr.ATK += cardAttr.ATK;
             totalAttr.DEF += cardAttr.DEF;
             totalAttr.HEAL += cardAttr.HEAL;

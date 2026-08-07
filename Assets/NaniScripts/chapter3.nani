@@ -250,6 +250,13 @@ witchc: 我也要！
 @GotoUnityScene sceneName:MapTest
 @stop
 # afterdate1
+
+@saveMapDayNight isDay:true
+@SaveReturnPoint script:"chapter3" label:"afterpetday_ch3"
+@GotoUnityScene sceneName:MapTest
+@stop
+# afterpetday_ch3
+
 @back bg06
 (背景 二樓走廊)
 (隔天)

@@ -193,6 +193,13 @@
 @GotoUnityScene sceneName:MapTest
 @stop
 #greennight1
+
+@saveMapDayNight isDay:true
+@SaveReturnPoint script:"chapter4green" label:"afterpetday_green"
+@GotoUnityScene sceneName:MapTest
+@stop
+#afterpetday_green
+
 （晚餐　梅爾形跡可疑地離開）
 （於是優菲　薇狄亞預備展開調查）
 @saveMapDayNight isDay:false
@@ -293,7 +300,7 @@
 薇狄亞: {PlayerName}，跟我來。
 薇狄亞: 至高秘林的深處，有個沒人知道的地方。
 
-@back bg01
+@back ed05
 
 薇狄亞: 妳看，連月光都照不到的地方。
 薇狄亞: 這裡，只有我和{PlayerName}知道。
@@ -362,6 +369,9 @@
 @GotoUnityScene sceneName:MapTest
 @stop
 # greennight_s2
+@if affinity_Syb>=50
+@goto syb_end label:end1
+@endif
 @if affinity_Syb>=30
 @goto badend13
 @endif
@@ -386,6 +396,7 @@
 （白色的火焰從西碧兒身上蔓延開來）
 （特效：火焰逐漸吞噬一切）
 
+@back ed06
 @hide 薇狄亞
 @char syb pos:50
 

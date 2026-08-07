@@ -11,7 +11,7 @@ public class SetPlayerNameCommand : Command
 {
     public override UniTask ExecuteAsync(AsyncToken asyncToken = default)
     {
-        var lang = PlayerPrefs.GetString("Language", "").ToLower();
+        var lang = PlayerPrefs.GetString("Language", "zh-TW").ToLower();
 
         string name;
         if (lang.StartsWith("ja"))       name = "旅人";      // 日文：旅人（たびびと）

@@ -339,6 +339,13 @@ broom: 我先！
 @GotoUnityScene sceneName:MapTest
 
 # afterdate5
+
+@saveMapDayNight isDay:true
+@SaveReturnPoint script:chapter4 label:afterpetday_ch4
+@GotoUnityScene sceneName:MapTest
+
+# afterpetday_ch4
+
 隔天
 (女巫俱樂部 大廳)
 
@@ -705,6 +712,9 @@ nic: 終於走了，我們繼續吧……學姊？
 
 #ch4mel
 @goto chapter4red    if:affinity_Mel>=50
+
+梅爾的背影很快消失在轉角，只留下空氣中淡淡的香味。
+
 @goto .ch4eupie      if:affinity_Eup>=50
 @goto .ch4nelly      if:affinity_Nel>=50
 @goto chapter5common

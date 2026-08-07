@@ -20,6 +20,38 @@ public static class RuneEnTranslation
         { "自然",   "Nature"  },
         { "返回",   "Back"    },
 
+        // ── Tower hub screen ──────────────────────────────
+        { "更換符文",   "Change Rune" },
+        { "更換卡片",   "Change Card" },
+        { "護身符",     "Amulet"      },
+        { "進入下一層", "Next Floor"  },
+        { "退出",       "Retreat"     },
+        { "回標題",     "Back to Title" },
+        { "放棄本次挑戰", "Abandon Run" },
+        { "藍護身符",   "Blue Amulet"   },
+        { "紅護身符",   "Red Amulet"    },
+        { "黃護身符",   "Yellow Amulet" },
+        { "綠護身符",   "Green Amulet"  },
+        { "次元護符",   "Dimension Amulet" },
+        { "護符轉接頭", "Amulet Adapter" },
+        { "起始能量全滿護符", "Full Energy Amulet" },
+
+        // ── Card names (originals) ────────────────────────
+        { "血巫觸手",   "Blood Tentacle" },
+        { "雪色魔杖",   "Snow Wand"      },
+        { "秘林樹精",   "Forest Spirit"  },
+        { "安息日羊",   "Sabbath Sheep"  },
+
+        // ── Card names (A/B variants) ─────────────────────
+        { "燃血爆發",     "Blood Burst"  },
+        { "血契回饋",     "Blood Pact"   },
+        { "堡壘魔梟",     "Bulwark Owl"  },
+        { "魔力貓頭鷹",   "Arcane Owl"   },
+        { "純真治療",     "Pure Healing" },
+        { "樹精衛士",     "Guardian Spirit" },
+        { "骸羊電池",     "Bone Battery" },
+        { "惡魔搏鬥",     "Devil Brawl"  },
+
         // ── Default rune names ────────────────────────────
         { "學院預設",   "Academy Default" },
         { "血系預設",   "Blood Default"   },
@@ -93,6 +125,38 @@ public static class RuneEnTranslation
         { "自然",   "自然"           },
         { "返回",   "戻る"           },
 
+        // ── Tower hub screen ──────────────────────────────
+        { "更換符文",   "ルーン変更" },
+        { "更換卡片",   "カード変更" },
+        { "護身符",     "護符"       },
+        { "進入下一層", "次の階へ"   },
+        { "退出",       "撤退"       },
+        { "回標題",     "タイトルへ戻る" },
+        { "放棄本次挑戰", "挑戦を放棄" },
+        { "藍護身符",   "青の護符"   },
+        { "紅護身符",   "赤の護符"   },
+        { "黃護身符",   "黄の護符"   },
+        { "綠護身符",   "緑の護符"   },
+        { "次元護符",   "次元の護符" },
+        { "護符轉接頭", "護符アダプター" },
+        { "起始能量全滿護符", "開幕満タン護符" },
+
+        // ── Card names (originals) ────────────────────────
+        { "血巫觸手",   "血巫の触手"   },
+        { "雪色魔杖",   "雪色の魔杖"   },
+        { "秘林樹精",   "秘林の樹精"   },
+        { "安息日羊",   "安息日の羊"   },
+
+        // ── Card names (A/B variants) ─────────────────────
+        { "燃血爆發",     "燃血爆発"       },
+        { "血契回饋",     "血契の恵み"     },
+        { "堡壘魔梟",     "堡塁のフクロウ" },
+        { "魔力貓頭鷹",   "魔力のフクロウ" },
+        { "純真治療",     "純真な治癒"     },
+        { "樹精衛士",     "樹精の守護者"   },
+        { "骸羊電池",     "骸羊バッテリー" },
+        { "惡魔搏鬥",     "悪魔の格闘"     },
+
         // ── Default rune names ────────────────────────────
         { "學院預設",   "アカデミー デフォルト" },
         { "血系預設",   "血系 デフォルト"       },
@@ -159,6 +223,10 @@ public static class RuneEnTranslation
     // ════════════════════════════════════════════════════════════════
     static readonly Dictionary<string, string> DescsEn = new Dictionary<string, string>
     {
+        // ── Tower hub screen ──────────────────────────────
+        { "確定要放棄本次高塔挑戰嗎？\n目前樓層進度將無法接續，只會保留最高紀錄。",
+          "Abandon this Tower run?\nYour current floor progress cannot be resumed — only your best floor record will be kept." },
+
         // ── Common ────────────────────────────────────────
         { "洗掉手上所有手牌",                     "Discard all cards in hand."                      },
         { "提升50點防禦",                          "Increase DEF by 50."                             },
@@ -222,6 +290,10 @@ public static class RuneEnTranslation
     // ════════════════════════════════════════════════════════════════
     static readonly Dictionary<string, string> DescsJa = new Dictionary<string, string>
     {
+        // ── Tower hub screen ──────────────────────────────
+        { "確定要放棄本次高塔挑戰嗎？\n目前樓層進度將無法接續，只會保留最高紀錄。",
+          "今回の塔への挑戦を放棄しますか？\n現在の階の進行状況は引き継げません。最高到達階のみ記録されます。" },
+
         // ── Common ────────────────────────────────────────
         { "洗掉手上所有手牌",                     "手札をすべて捨てる。"                            },
         { "提升50點防禦",                          "防御力+50。"                                     },
@@ -284,7 +356,9 @@ public static class RuneEnTranslation
     //  Public API
     // ════════════════════════════════════════════════════════════════
 
-    static string GetLang() => PlayerPrefs.GetString("Language", "").ToLower();
+    // 沒有存過語言偏好時（例如剛清過 PlayerPrefs、或第一次啟動還沒選語言）要當作中文，
+    // 不能落到空字串——空字串不是 "zh" 開頭，會被英文分支誤判成「非中文」。
+    static string GetLang() => PlayerPrefs.GetString("Language", "zh-TW").ToLower();
 
     public static string TranslateName(string zh)
     {

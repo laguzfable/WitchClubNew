@@ -1,0 +1,19 @@
+@back bg03
+@stopBgm
+@bgm lilina
+@char 薇狄亞 pos:50
+
+薇狄亞: {PlayerName}，我小時候，其實也是像牠這樣，什麼都不懂地被丟在森林裡。
+薇狄亞: 是西碧兒撿到我、養大我，我才變成現在這個樣子。
+薇狄亞: 所以看著小樹精一天天長大，我總會想起那段日子。
+薇狄亞: 謝謝你陪著我們，讓我不用再一個人面對這些回憶。
+薇狄亞: 小樹精，把你最溫柔的那份力量，也交給{PlayerName}的卡吧。
+
+@set affinity_Ved=affinity_Ved+20
+
+薇狄亞: 這下子，不管是攻擊還是守護，你都能兩者兼顧了。
+
+@unlockCardVariant ids:GreenB
+
+@hide 薇狄亞
+@restroom

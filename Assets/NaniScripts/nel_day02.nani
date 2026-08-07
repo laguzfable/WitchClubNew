@@ -1,0 +1,19 @@
+@back bg03
+@stopBgm
+@bgm strange
+@char 涅莉 pos:50
+
+涅莉: {PlayerName}，不好了不好了，骷髏羊把我封印精靈用的瓶子撞破了！
+涅莉: 裡面的魔力到處亂飄，快幫我一起把它們收回去！
+涅莉: ……呼，總算搞定。牠其實不是搗蛋，是想把那些魔力吃掉幫我保管啦。
+涅莉: 你看，牠現在乖乖窩在你腳邊了，這傢伙看人很準的。
+涅莉: 姊姊我大方一點，把牠吸收的那些魔力，勻一點給你的卡片吧。
+
+@set affinity_Nel=affinity_Nel+15
+
+涅莉: 收好囉，這可是骷髏羊親自認證的力量。
+
+@unlockCardVariant ids:YellowA
+
+@hide 涅莉
+@restroom

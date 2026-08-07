@@ -449,7 +449,7 @@ public class DemoController : MonoBehaviour
     /// <summary>根據 PlayerPrefs Language 選擇對應語言字串，不支援的語系 fallback 到 en。</summary>
     static string Loc(string en, string zhTW, string ja)
     {
-        var lang = PlayerPrefs.GetString("Language", "").ToLower();
+        var lang = PlayerPrefs.GetString("Language", "zh-TW").ToLower();
         if (lang.StartsWith("zh")) return zhTW;
         if (lang.StartsWith("ja")) return ja;
         return en;

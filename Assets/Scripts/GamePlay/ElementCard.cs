@@ -9,6 +9,7 @@ using TMPro;
 using System.Threading;
 using System;
 using Naninovel;
+using Hexe.TowerMode;
 
 public enum ECardElement { Blue, Red, Yellow, Green, None }
 
@@ -61,7 +62,7 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
             id = value;
             // ClearChildren();
             // cardInst = visualResource.GetBaseCard(id, transform);
-            cardData = pc.cardDataCollection.cardDict[id];
+            cardData = pc.cardDataCollection.GetCardData(id);
             cardPic.sprite = cardData.image;
             nameTxt.text = localization.GetLocalizedContent(cardData.localeID, cardData.displayName);
 
@@ -118,7 +119,7 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
     public void LevelUp()
     {
         // Debug.LogWarning("Level Up ???");
-        if (level < 5)
+        if (level < TowerModeManager.CardLevelCap)
         {
             level++;
         }
@@ -141,7 +142,31 @@ public class ElementCard : MonoBehaviour, IPointerClickHandler
         atkTxt.enabled = !healTxt.enabled;
     }
 
-    public CardAttribute curAttr => cardData.cardAttr[level-1];
+    // 卡片資料表設計上就是 5 級；不要用陣列實際長度來判斷，
+    // 有些資產在 Inspector 裡不小心多存了一筆全 0 的尾巴，陣列長度會比 5 大。
+    const int BaseMaxCardLevel = 5;
+
+    public CardAttribute curAttr
+    {
+        get
+        {
+            if (level <= BaseMaxCardLevel)
+                return cardData.cardAttr[level - 1];
+
+            // 次元護符把上限拉到 7 級，超出表格的部分，照第4→5級的成長幅度往上推算
+            var last = cardData.cardAttr[BaseMaxCardLevel - 1]; // 第5級
+            var prev = cardData.cardAttr[BaseMaxCardLevel - 2]; // 第4級
+            int extraLevels = level - BaseMaxCardLevel;
+
+            return new CardAttribute
+            {
+                ATK = last.ATK + (last.ATK - prev.ATK) * extraLevels,
+                DEF = last.DEF + (last.DEF - prev.DEF) * extraLevels,
+                HEAL = last.HEAL + (last.HEAL - prev.HEAL) * extraLevels,
+                EN = last.EN + (last.EN - prev.EN) * extraLevels,
+            };
+        }
+    }
 
     public void ChangeBtnEvent(bool isEnabled)
     {

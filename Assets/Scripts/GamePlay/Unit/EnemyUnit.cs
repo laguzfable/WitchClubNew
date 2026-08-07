@@ -628,6 +628,9 @@ public class EnemyUnit : BaseCombatUnit
         //    attr.ATK = Mathf.FloorToInt((float)attr.HEAL * 1.2f);
         //}
 
+        if (TowerModeManager.IsActive)
+            attr.ATK = Mathf.FloorToInt(attr.ATK * TowerModeManager.GetMonsterAtkScale());
+
         return attr;
     }
 

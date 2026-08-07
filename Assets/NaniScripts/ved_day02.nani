@@ -1,0 +1,19 @@
+@back bg04
+@stopBgm
+@bgm peace
+@char 薇狄亞 pos:50
+
+薇狄亞: {PlayerName}，小樹精這陣子長高了不少，你看，都快到我膝蓋了。
+薇狄亞: 牠今天還幫忙把後院那些枯掉的花全部救回來了，真的很厲害呢。
+薇狄亞: 我在想，牠會不會其實比我更適合待在自然之中……
+薇狄亞: 不過看牠這麼黏著你，應該也捨不得離開這裡吧。
+薇狄亞: 牠好像想把身上那種「守護」的力量分給你的卡片。
+
+@set affinity_Ved=affinity_Ved+15
+
+薇狄亞: 收下吧，這是牠想表達謝意的方式。
+
+@unlockCardVariant ids:GreenA
+
+@hide 薇狄亞
+@restroom

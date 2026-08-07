@@ -67,6 +67,18 @@ public class NaniScriptLoader_HEX : MonoBehaviour
         }
         catch (Exception e) { Debug.LogWarning($"★HEXE★ camera ex: {e.Message}"); }
 
+        // MapTest 進場時呼叫過 SetUIVisibleWithToggle(false)，這個狀態是掛在 Naninovel 的
+        // CameraManager 服務上、跨場景不會自動重置。原本要靠玩家點一下滑鼠（Submit 輸入）
+        // 觸發殘留的 ClickThroughPanel 才會補救性地打開，在那之前 Ctrl 快轉之類的輸入
+        // 都會像沒反應一樣卡住。這裡直接主動恢復，不要依賴玩家手動點一下。
+        try
+        {
+            var uiManager = Engine.GetService<IUIManager>();
+            uiManager?.SetUIVisibleWithToggle(true, false);
+            Debug.Log($"★HEXE★ restored UI visibility (SetUIVisibleWithToggle(true))");
+        }
+        catch (Exception e) { Debug.LogWarning($"★HEXE★ UI visibility restore ex: {e.Message}"); }
+
         // ── CombatScene guard ──────────────────────────────────────────────────
         // NaniScriptLoader_HEX lives in both NaniDialogTest AND CombatScene.
         // We must NEVER start playing a script while inside CombatScene — that
@@ -98,18 +110,22 @@ public class NaniScriptLoader_HEX : MonoBehaviour
         string scriptName = null;
         string label = null;
 
-        if (sp != null && !string.IsNullOrEmpty(sp.scriptName))
-        {
-            scriptName = sp.scriptName;
-            label      = string.IsNullOrEmpty(sp.scriptLabel) ? null : sp.scriptLabel;
-            Debug.Log($"★HEXE★ scriptParameter name='{scriptName}' label='{(label ?? "<null>")}'");
-        }
-        else if (MapReturnPoint.HasValid())
+        // MapReturnPoint 是 @SaveReturnPoint 明確設下的一次性返回點，用完會自我清除；
+        // ds.scriptParameter 常常是舊的戰鬥/場景切換殘留（預設不會自動清掉），
+        // 兩者都有值時，代表玩家剛剛才明確指定要去哪，MapReturnPoint 才是真正該聽的那個，
+        // 所以優先順序要反過來，不然 scriptParameter 的舊值會一直卡住蓋過新指定的返回點。
+        if (MapReturnPoint.HasValid())
         {
             scriptName = MapReturnPoint.ScriptName;
             label      = string.IsNullOrEmpty(MapReturnPoint.Label) ? null : MapReturnPoint.Label;
             MapReturnPoint.Clear();
             Debug.Log($"★HEXE★ MapReturnPoint name='{scriptName}' label='{(label ?? "<null>")}'");
+        }
+        else if (sp != null && !string.IsNullOrEmpty(sp.scriptName))
+        {
+            scriptName = sp.scriptName;
+            label      = string.IsNullOrEmpty(sp.scriptLabel) ? null : sp.scriptLabel;
+            Debug.Log($"★HEXE★ scriptParameter name='{scriptName}' label='{(label ?? "<null>")}'");
         }
         else if (ds != null && !string.IsNullOrEmpty(ds.startScript))
         {

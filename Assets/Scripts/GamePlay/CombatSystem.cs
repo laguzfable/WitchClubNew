@@ -17,6 +17,7 @@ public class CombatSystem : MonoBehaviour
     UICombatTextPanel combatTxtPanel;
 
     public bool isContinue = true;
+    bool hasGameEnded = false;
     public GameObject startBattleUI;
     public GameObject dialogObj;
     public GameObject enemyTurnUI;
@@ -115,6 +116,7 @@ private void LoadEquippedRunes()
 
     void Init()
     {
+        hasGameEnded = false;
         Debug.Log($"[CombatSystem.Init] ▶ IsTestMode={IsTestMode}  monsterID='{monsterID}'  isTutorial={TutorialController.isTutorial}  isTutorial2={TutorialController.isTutorial2}");
         if (!IsTestMode)
         {
@@ -290,6 +292,7 @@ public class MobRuneUnlockData
 
     private void Update()
     {
+        // 除錯熱鍵：數字鍵盤的 . 直接判定戰鬥勝利
         if (Input.GetKeyUp(KeyCode.KeypadPeriod))
         {
             GameOver(false);
@@ -496,6 +499,15 @@ public async UniTask PlayCardAsync()
 
 public void GameOver(bool isLose)
 {
+    // ✅ 防止重複結算（例如玩家陣亡與敵人死亡動畫幾乎同時觸發時，
+    //    後到的那次呼叫會把先前正確的勝負結果蓋掉）：只採用第一次呼叫的結果。
+    if (hasGameEnded)
+    {
+        Debug.LogWarning($"[GameOver] 已經結算過一次，忽略這次的呼叫（isLose={isLose}）");
+        return;
+    }
+    hasGameEnded = true;
+
     Debug.Log($"[GameOver] isLose={isLose}  呼叫者：\n{new System.Diagnostics.StackTrace(true)}");
 
     // ✅ 把勝敗結果寫進 Naninovel 變數（給 @if CombatResult 用）
@@ -702,6 +714,10 @@ void TryUnlockRune(string mobID)
         await UniTask.Delay(TimeSpan.FromSeconds(2.5f));
         mainCanvas.FadeIn(0.15f);
 
+        // FadeIn() 內部用 Coroutine 跑動畫，要等它真的跑完才會把 InteractiveCanvas
+        // 的 interactable/blocksRaycasts 設回 true；這裡多等一下，確保下一場戰鬥
+        // 開始（切場景）前，這個淡入動畫已經真正完成，不會被場景卸載中途砍斷。
+        await UniTask.Delay(TimeSpan.FromSeconds(0.2f));
 
         GameOver(false);
     }

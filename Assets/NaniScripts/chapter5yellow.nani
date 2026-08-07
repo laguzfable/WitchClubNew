@@ -122,6 +122,13 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 @GotoUnityScene sceneName:MapTest
 @stop
 # afterdate1
+
+@saveMapDayNight isDay:true
+@SaveReturnPoint script:"chapter5yellow" label:"afterpetday_yellow"
+@GotoUnityScene sceneName:MapTest
+@stop
+# afterpetday_yellow
+
 @back bg03
 @stopBgm
 @bgm chill
@@ -193,7 +200,7 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 @choice 累了的話就和我走吧。 goto:.realworld
 @stop
 # eclipse
-@back black
+@back ed07
 @stopBgm
 @bgm white
 
@@ -215,7 +222,10 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 @stop
 
 # realworld
-@back bg01
+@if affinity_Nel<50
+@goto .eclipse
+@endif
+@back ed08
 @stopBgm
 @bgm white
 

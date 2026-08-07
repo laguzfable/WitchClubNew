@@ -170,7 +170,7 @@ public static class TutorialEnTranslation
     {
         if (string.IsNullOrEmpty(zh)) return zh;
 
-        var lang = PlayerPrefs.GetString("Language", "").ToLower();
+        var lang = PlayerPrefs.GetString("Language", "zh-TW").ToLower();
         bool isJa = lang.StartsWith("ja");
         bool isZh = lang.StartsWith("zh");
 

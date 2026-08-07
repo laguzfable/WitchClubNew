@@ -1,0 +1,19 @@
+@back bg03
+@stopBgm
+@bgm strange
+@char 魅兒 pos:50
+
+魅兒: {PlayerName}，剛好你在，幫我一下。
+魅兒: 小黏今天不知道吃錯什麼，血氣亂竄，快要控制不住了。
+魅兒: 你過來，握住牠——對，就是這樣，把你的氣息分給牠一點。
+魅兒: ……呼，穩下來了。謝謝，真的幫了大忙。
+魅兒: 話說回來，牠好像因為這樣跟你更親近了，纏著你都不肯下來。
+
+@set affinity_Mel=affinity_Mel+15
+
+魅兒: 既然牠都認你了，這份「爆發」的力量也分你一點吧，別浪費了。
+
+@unlockCardVariant ids:RedA
+
+@hide 魅兒
+@restroom

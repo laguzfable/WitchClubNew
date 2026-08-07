@@ -25,6 +25,8 @@
 @choice "魔蝕（badend16）" goto:.goto_badend16
 @choice "蘇生（badend17）" goto:.goto_badend17
 @choice "終焉（ch5common）" goto:.goto_ch5end
+@choice "墮星之主（ch6red・mel_end）" goto:.goto_mel_end
+@choice "私奔（syb_end）" goto:.goto_syb_end
 @choice "▲ 上一頁" goto:.page1
 @stop
 
@@ -58,6 +60,7 @@
 @GotoUnityScene sceneName:NaniDialogTest
 
 # goto_realworld
+@set affinity_Nel=50
 @SaveReturnPoint script:"chapter5yellow" label:"realworld"
 @GotoUnityScene sceneName:NaniDialogTest
 
@@ -100,4 +103,12 @@
 
 # goto_ch5end
 @SaveReturnPoint script:"chapter5common" label:"end"
+@GotoUnityScene sceneName:NaniDialogTest
+
+# goto_mel_end
+@SaveReturnPoint script:"mel_end" label:"end1"
+@GotoUnityScene sceneName:NaniDialogTest
+
+# goto_syb_end
+@SaveReturnPoint script:"syb_end" label:"end1"
 @GotoUnityScene sceneName:NaniDialogTest

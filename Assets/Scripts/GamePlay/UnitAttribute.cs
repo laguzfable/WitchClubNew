@@ -102,7 +102,8 @@ namespace Kenaz
 
         public float GetPercent()
         {
-            return curValue / GetTotalValue();
+            var total = GetTotalValue();
+            return total <= 0f ? 1f : curValue / total;
         }
 
         static public UnitAttribute operator +(UnitAttribute attr, float value)
