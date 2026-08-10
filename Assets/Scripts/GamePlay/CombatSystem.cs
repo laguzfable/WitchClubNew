@@ -639,6 +639,9 @@ public void BackToNani()
     catch (Exception ex) { Debug.LogWarning($"[BackToNani] ContinueInputUI 操作失敗：{ex.Message}"); }
 
     // ── 載入 NaniDialogTest ────────────────────────────────────
+    // scriptParameter 是開戰前指定好的續播點，回去時要明確優先於 MapReturnPoint，
+    // 不然地圖事件裡打完仗會被還沒用掉的主線返回點拉走，事件後半直接被跳過
+    SceneLoader.ExplicitGotoPending = true;
     Debug.Log("[BackToNani] ★ 準備載入 NaniDialogTest ...");
     SceneManager.LoadSceneAsync("NaniDialogTest");
     Debug.Log("[BackToNani] LoadSceneAsync 已發出");

@@ -101,6 +101,10 @@
 薇狄亞: 妳沒有任何逃脫命運的可能。
 克蘿伊: 這很難講喔。
 @hide 薇狄亞,syb,chl
+
+; 女巫獵人戰的勝敗分歧（打贏續劇情／打輸→ 肅清）※ 壞結局不開放地圖捷徑
+# branch_chl
+
 @stopBgm
 @bgm energetic
 @battle background:bg04 target:monster02 label:ch4g_chl
@@ -210,6 +214,13 @@
 （踩地圖）
 （觸發事件，梅爾告訴玩家事情始末）
 （玩家可以選擇）
+; 劇情分歧地圖節點：綠線的主要路線分歧（薇狄亞線→深春／西碧兒線→私奔・唯一・火中の幻影）
+# branch_green_tell
+@visitNode id:chapter4green label:branch_green_tell
+@back bg03
+@stopBgm
+@bgm chill
+
 把這件事……
 @choice 告訴薇狄亞 goto:.vedia
 @choice 告訴西碧兒 goto:.sybil
@@ -310,7 +321,7 @@
 
 （END：深春）
 @achieve id:ACH_END_05
-@wait input:true
+@wait i
 @exitToTitle
 @stop
 
@@ -368,13 +379,9 @@
 @SaveReturnPoint script:"chapter4green" label:"greennight_s2"
 @GotoUnityScene sceneName:MapTest
 @stop
+; 劇情分歧地圖節點：西碧兒線的最終抉擇（動手／收手，再依 affinity_Syb 分歧到 唯一／私奔／火中の幻影）
 # greennight_s2
-@if affinity_Syb>=50
-@goto syb_end label:end1
-@endif
-@if affinity_Syb>=30
-@goto badend13
-@endif
+@visitNode id:chapter4green label:greennight_s2
 （暗殺當天）
 @back bg04
 @char chl pos:25
@@ -391,22 +398,147 @@
 西碧兒: 小狐狸……
 薇狄亞: 我不允許這樣，就算是妳的命令也不行！
 
+@char chl pos:20
+@char 魅兒 pos:40
+@char syb pos:60
+@char 薇狄亞 pos:80
+
+西碧兒: ……{PlayerName}。
+西碧兒: 妳答應過我的。
+
+（所有人都在看著你）
+（克蘿伊沒有拔劍，梅爾也沒有後退）
+（她們在等你的決定）
+
+@choice 動手 goto:.syb_strike
+@choice 收手 goto:.syb_refuse
+@stop
+
+; ── 動手：為她殺人。薇狄亞看見了，也認定了你是她真正的對手 ──
+#syb_strike
+@hide chl,魅兒,薇狄亞
+@char syb pos:50
+
+（你動了。）
+
+西碧兒: ……啊啊。
+西碧兒: 妳真的，願意為我做到這個地步。
+
+@char syb pos:35
+@char 薇狄亞 pos:65
+
+薇狄亞: ……
+薇狄亞: 我都看到了。
+西碧兒: 小狐狸？
+薇狄亞: 沒事的，大人。
+薇狄亞: 什麼事都沒有。
+
+（薇狄亞笑著，但那個笑容沒有到達眼睛）
+
+@hide syb,薇狄亞
+
+@goto badend13 if:affinity_Syb>=30
+@goto .syb_ritual
+
+; ── 收手：違背她，但那是為了她。她若在乎你，就會停下來 ──
+#syb_refuse
+@hide chl,魅兒,薇狄亞
+@char syb pos:50
+
+（你放下了手。）
+
+西碧兒: ……為什麼。
+西碧兒: 妳明明答應過我的。
+
+（你告訴她，你不想看她變成連自己都認不得的東西）
+
+西碧兒: ……
+西碧兒: 妳這個人，真的很奇怪。
+西碧兒: 到現在還在替我著想。
+
+@hide syb
+
+@goto syb_end.end1 if:affinity_Syb>=50
+
+; 好感度不足：她沒有停下來，只是不再需要你了
+@char syb pos:50
+西碧兒: 算了。
+西碧兒: 沒有妳，我也做得到。
+@hide syb
+
+; ══════════════════════════════════════════════════════════════
+;  共通結局：儀式照常完成 → 06 火中的幻影
+;
+;  設定書寫的是「梅爾被處決、其他人一一被燒死，最後薇狄亞在火中看到
+;  所有人幸福生活的幻覺」。ed06.jpg 畫的正是那個幻覺，所以這裡補上
+;  處決與火刑，並且讓薇狄亞留在場上——最後那幾句西碧兒是對她說的
+;  （「小狐狸」），原本卻在講話前一行就把她 @hide 掉了。
+;  （草稿，待潤飾）
+; ══════════════════════════════════════════════════════════════
+#syb_ritual
+@back bg04
+@char chl pos:25
+@char 魅兒 pos:50
+@char syb pos:75
+
+西碧兒: 那麼，把她們帶下去吧。
+梅爾: ……妳真的做得出來啊，異鄉人。
+梅爾: 算了。反正我早就不該相信任何人。
+克蘿伊: 血法師，別看。
+
+（梅爾沒有再說話）
+（火焰很安靜，安靜得不像在燒人）
+
 @hide chl,魅兒
+@char syb pos:35
+@char 薇狄亞 pos:65
+
+薇狄亞: 大人……她們是我們的同伴啊。
+西碧兒: 是嗎。
+西碧兒: 那小狐狸妳說，同伴是什麼？
+西碧兒: 是會在妳最需要的時候，站到妳面前的人嗎？
+西碧兒: 還是……會在妳背後，等著看妳倒下的人？
+
+薇狄亞: 我……
+
+（一個接著一個，女巫俱樂部的燈熄了）
+（優菲、涅莉、妮可、蘇菲亞——誰都沒有逃掉）
+
+@hide 薇狄亞
+
+; ── 儀式完成，西碧兒自己也燒了起來 ──
+@char syb pos:50
 
 （白色的火焰從西碧兒身上蔓延開來）
 （特效：火焰逐漸吞噬一切）
 
+@char syb pos:35
+@char 薇狄亞 pos:65
+
+薇狄亞: 大人！不要——
+
+; ── 薇狄亞在火裡看見的東西（ed06：所有人在俱樂部裡舉杯歡笑）──
 @back ed06
-@hide 薇狄亞
-@char syb pos:50
+
+（火焰的另一頭，薇狄亞看見了。）
+（燈是亮的，酒是溫的。）
+（優菲在笑，涅莉在鬧，梅爾難得地沒有擺臉色。）
+（每一個人都好好地活著，坐在她們原本應該坐的位子上。）
+（那裡沒有儀式，沒有神，也沒有火。）
+
+薇狄亞: ……啊。
+薇狄亞: 原來是這樣啊。
+薇狄亞: 我要的，一直都只是這個而已。
 
 西碧兒: ……沒關係，小狐狸。
 西碧兒: 我只剩下你們了，我的信徒。
 西碧兒: 但是妳看，妳的願望實現了呢。
 西碧兒: 大家的願望，也都實現了。
 
+（火滅了以後，那個幻影還留在她眼底很久很久）
+
 （火中的幻影 END）
 @achieve id:ACH_END_06
-@wait input:true
+@wait i
 @exitToTitle
 @stop

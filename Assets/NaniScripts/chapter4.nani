@@ -220,6 +220,9 @@ nic:  我來抄寫降靈術的咒語，在這同時，學姐，請把邪靈給�
 
 @hide nic,優菲,涅莉
 
+; 魅兒戰的勝敗分歧（打贏續劇情／打輸→ 壞滅 or 魔蝕）※ 壞結局不開放地圖捷徑
+# branch_ch4bt2
+
 @battle background:bg02 target:monster02 label:ch4bt2
 @stop
 
@@ -690,6 +693,11 @@ nic: 是她先挑釁的。
 @char nic pos:50
 nic: 終於走了，我們繼續吧……學姊？
 
+; 劇情分歧地圖節點：第四章最後的分線抉擇（安慰優菲→藍／追梅爾→紅／跟著涅莉→黃／都不夠→共通）
+; 綠線是 Ved>=50 自動判定，所以地圖上的第四章節點會把 affinity_Ved 覆寫成 0，讓三個選項出得來
+# branch_ch4route
+@visitNode id:chapter4 label:branch_ch4route
+
 @stopBgm
 @bgm sad
 @hide nic,優菲
@@ -699,30 +707,137 @@ nic: 終於走了，我們繼續吧……學姊？
 優菲: 沒事，繼續開會吧。
 
 @print [Eup:{affinity_Eup} Nel:{affinity_Nel} Ved:{affinity_Ved} Mel:{affinity_Mel}]
-@if affinity_Ved>=50
-@goto chapter4green
-@else
 
+; 薇狄亞刻意不放進選單：跟她夠好的話她自己會來攔你（見下面的攔截段），
+; 不夠好的話你也不會想去找她。放進選單的話，達標時它是多餘的（選別人一樣會被攔
+; 進綠線），沒達標時它是陷阱（撲空 → 落單 → 失敗終焉），兩邊都不划算。
 @choice 安慰優菲 goto:.ch4eupie
-@choice 追梅爾 (好感度不足會追不到) goto:.ch4mel
+@choice 追梅爾 goto:.ch4mel
 @choice 跟著涅莉 goto:.ch4nelly
 @stop
 
-@endif
+; ══════════════════════════════════════════════════════════════
+;  薇狄亞攔截
+;  跟她夠好的話，你走向別人時她會拉住你，但推得開——攔截是演出，不是判定。
+;  三個入口各自導向自己的攔截段，推開之後回到各自的 _go，所以不需要記錄
+;  「本來要去哪」的變數。條件一律只用 if:affinity_Ved>=50 這種單一比較：
+;  NCalc 對未定義變數和引號都很敏感，不碰 && 和字串比較最安全。
+; ══════════════════════════════════════════════════════════════
+
+#ch4eupie
+@goto .ved_stop_eupie if:affinity_Ved>=50
+@goto .ch4eupie_go
 
 #ch4mel
+@goto .ved_stop_mel   if:affinity_Ved>=50
+@goto .ch4mel_go
+
+#ch4nelly
+@goto .ved_stop_nelly if:affinity_Ved>=50
+@goto .ch4nelly_go
+
+; ── 攔截：要去陪優菲 ──（草稿，待潤飾）
+#ved_stop_eupie
+@back bg06
+@char 薇狄亞 pos:50
+
+（有人從後面輕輕拉住了你的袖子）
+
+薇狄亞: 等一下。
+薇狄亞: ……你要去陪優菲嗎？
+薇狄亞: 也是啦，她現在那個樣子，總得有人在旁邊。
+薇狄亞: 可是……
+薇狄亞: 我也在這裡啊。
+
+@choice 跟薇狄亞走 goto:.ch4vedia_go
+@choice 抱歉，她現在不能一個人 goto:.ch4eupie_go
+@stop
+
+; ── 攔截：要去追梅爾 ──（草稿，待潤飾）
+#ved_stop_mel
+@back bg06
+@char 薇狄亞 pos:50
+
+（有人從後面輕輕拉住了你的袖子）
+
+薇狄亞: 等一下。
+薇狄亞: ……你要去追梅爾？
+薇狄亞: 她不會為了誰停下來的，這你比我清楚吧。
+薇狄亞: 我不一樣喔。
+薇狄亞: 我一直都在這裡。
+
+@choice 跟薇狄亞走 goto:.ch4vedia_go
+@choice 抱歉，我得追上她 goto:.ch4mel_go
+@stop
+
+; ── 攔截：要跟涅莉走 ──（草稿，待潤飾）
+#ved_stop_nelly
+@back bg06
+@char 薇狄亞 pos:50
+
+（有人從後面輕輕拉住了你的袖子）
+
+薇狄亞: 等一下。
+薇狄亞: ……你要跟涅莉走喔？
+薇狄亞: 那個人啊，走到哪裡都不會回頭看的。
+薇狄亞: 我會回頭喔。
+薇狄亞: 每一次我都會回頭。
+
+@choice 跟薇狄亞走 goto:.ch4vedia_go
+@choice 抱歉，我跟涅莉約好了 goto:.ch4nelly_go
+@stop
+
+; 底下的 @hide 薇狄亞 一律加上跟攔截同一個條件：
+; 沒攔截過的話她根本沒被 @char 生成，直接 @hide 會噴
+; 「Failed to hide `薇狄亞` actor」的紅字錯誤。
+; （ch4vedia_go 不用 hide —— 從選單直接來的話她也沒生成過，
+;   而且 chapter4green 開頭本來就會把她 @char 出來。）
+
+#ch4vedia_go
+@goto chapter4green
+
+#ch4mel_go
+@hide 薇狄亞         if:affinity_Ved>=50
 @goto chapter4red    if:affinity_Mel>=50
 
 梅爾的背影很快消失在轉角，只留下空氣中淡淡的香味。
 
-@goto .ch4eupie      if:affinity_Eup>=50
-@goto .ch4nelly      if:affinity_Nel>=50
+@goto .ch4eupie_go   if:affinity_Eup>=50
+@goto .ch4nelly_go   if:affinity_Nel>=50
+
+; （草稿，待潤飾）誰的羈絆都不夠深 → 獨自留下 → 異變開始 → 接失敗終焉（chapter5common）
+#ch4alone
+
+@back bg03
+
+走廊上只剩下我一個人。
+
+優菲、涅莉、薇狄亞、魅兒……每個人的身影，都離我好遠。
+明明就在身邊，卻覺得誰都搆不著。
+
+（說到底，我又算是她們的什麼呢？）
+
+@stopBgm
+
+天色不知不覺暗了下來。
+奇怪的是，今晚沒有月亮，也沒有星星。
+
+遠處的天空，滲出了一絲不祥的紅色。
+
+（那是……晚霞嗎？不對，太陽早就下山了……）
+
+紅色慢慢地漫開來，像是要把整個世界浸透。
+腳下的影子開始搖曳——明明我根本沒有動。
+
+（不妙……得叫大家來——）
+
+回過神來，我已經站在一片黑暗之中。
+
 @goto chapter5common
 
-#ch4nelly
-@goto chapter5yellow
-
-#ch4eupie
+#ch4nelly_go
+@hide 薇狄亞 if:affinity_Ved>=50
+; ── 跟著涅莉：出門看魅兒 → 迷霧草發表會 → 煙霧混亂 → 接 chapter5yellow（開頭就是會合場景） ──
 @back bg01
 
 @char 涅莉 pos:50
@@ -811,6 +926,63 @@ witchc: 迷霧草是最棒的！
 (煙霧特效)
 
 @hide witcha,witchb
+
+; （草稿，待潤飾）現場失控 → 涅莉回神 → 找不到魅兒 → 接 chapter5yellow 開頭的會合場景
+
+遠處突然傳來尖叫聲，歡呼聲瞬間變了調。
+
+@char 涅莉 pos:50
+
+涅莉: ……！
+涅莉: 我、我剛剛在做什麼……
+
+煙霧越來越濃，人群像瘋了一樣互相推擠，魅兒的身影早已不見蹤跡。
+
+涅莉: 咳咳……不行，這裡太危險了！
+涅莉: 魅兒——魅兒！妳在哪裡！
+涅莉: 可惡，什麼都看不到……
+涅莉: {PlayerName}，我們得先找到優菲她們才行！
+涅莉: 抓緊我的手，這次千萬別鬆開！
+
+@hide 涅莉
+
+@goto chapter5yellow
+
+#ch4eupie_go
+@hide 薇狄亞 if:affinity_Ved>=50
+; ── 安慰優菲：留在優菲身邊 → 傳來發表會失控的消息 → 隨優菲趕往鎮壓 → 戰鬥 → 原有後續（→ chapter5blue） ──
+
+; （草稿，待潤飾）安慰優菲
+@back cg30
+@char 優菲 pos:50
+
+會議結束後，其他人陸續散去，我留了下來。
+
+優菲: ……{PlayerName}？大家都走了喔。
+優菲: ……我看起來，有那麼糟嗎？
+優菲: 魅兒她，從以前就是那樣，想到什麼就說什麼。
+優菲: 我知道她不是有惡意的，可是……
+優菲: 連她也覺得，我做得不好嗎……
+
+我不知道該說什麼，只能靜靜地陪在她身邊。
+
+優菲: ……呵，抱歉，跟你說這些做什麼。
+優菲: 謝謝你留下來，{PlayerName}。我沒事了。
+
+; （草稿，待潤飾）妮可回報發表會失控
+@char nic pos:25
+@char 優菲 pos:65
+
+妮可: 學姊，不好了！
+妮可: 莉莉娜在外面辦迷霧草發表會，現場已經完全失控了！
+優菲: ……莉莉娜？
+妮可: 新品的煙霧到處都是，已經有人倒下去了。
+優菲: ……知道了，馬上過去。
+優菲: {PlayerName}，跟我來，我可能需要你的幫忙。
+
+@hide nic,優菲
+
+@back bg04
 @char 優菲 pos:25
 @char nic pos:75
 
@@ -819,12 +991,18 @@ witchc: 迷霧草是最棒的！
 
 妮可: 學姊，場面有點失控，怎麼辦？
 優菲: 只能試著鎮壓了。
-涅莉: 魅兒……魅兒也在裡面。
-優菲: 先顧好妳自己再說。
 
+; （草稿，待潤飾）鋪墊：魅兒也在現場（戰後魅兒黏優菲的戲會用到）
+煙霧的另一頭，一個熟悉的身影搖搖晃晃地混在人群裡。
 
+優菲: ……！那是……魅兒？
+優菲: 為什麼連她也……
+優菲: ……先鎮壓再說！
 
-@hide 優菲,涅莉,nic
+@hide 優菲,nic
+
+; 煙霧鎮壓戰的勝敗分歧（打贏續劇情／打輸→ 蘇生）※ 壞結局不開放地圖捷徑
+# branch_ch4bt3
 
 @battle background:bg02 target:monster02 label:ch4bt3
 @stop

@@ -12,13 +12,11 @@
 西碧兒: 什麼米夏，什麼儀式，也許都不那麼重要了。
 西碧兒: 異鄉人，妳說呢？
 
-@set affinity_Syb=affinity_Syb+10
+; 第五夜＝告白場，跟其他角色同規格把好感度設滿
+@set affinity_Syb=100
+
+西碧兒: ……妳不用馬上回答我。
+西碧兒: 我等得起。
 
 @hide syb
-@if affinity_Syb>=50
-@goto syb_end label:end1
-@endif
-@if affinity_Syb>=30
-@goto badend13
-@endif
-@stop
+@restroom

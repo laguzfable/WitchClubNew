@@ -9,8 +9,8 @@
 # 55589622
 ; @choice "在妳身邊（ch6red）" goto:.goto_zaiyushenbian
 
-# 32c0dfdb
-; @choice "穢血新神（ch6red）" goto:.goto_eupie_newgod
+# f1ed15ea
+; @choice "穢血新神（ch6red）" goto:.goto_eupie_usurp
 
 # deeffde4
 ; @choice "深春（ch4green）" goto:.goto_greennight_v2
@@ -33,8 +33,8 @@
 # d934a825
 ; @choice "改寫命運（euphie_end）" goto:.goto_end1
 
-# 2732e89f
-; @choice "殉道（euphie_end）" goto:.goto_end2
+# 41de100c
+; @choice "殉道（badend01）" goto:.goto_end2
 
 # b33a4f33
 ; @choice "異端（badend12）" goto:.goto_badend12
@@ -57,5 +57,26 @@
 # 6dee0a18
 ; @choice "終焉（ch5common）" goto:.goto_ch5end
 
+# 44da216e
+; @choice "墮星之主（ch6red・mel_end）" goto:.goto_mel_end
+
+# 2b0df93d
+; @choice "私奔（syb_end）" goto:.goto_syb_end
+
+# 195efd91
+; @choice "▼ 劇情段落" goto:.page3
+
 # cb5d5d27
 ; @choice "▲ 上一頁" goto:.page1
+
+# de940bdd
+; @choice "第四章・分線抉擇（三選一＋薇狄亞攔截）" goto:.goto_ch4route
+
+# 88a13532
+; @choice "紅線・最終抉擇（兩段式二選一）" goto:.goto_finalred
+
+# 9bf907f0
+; @choice "梅爾線索日（redclue×3）" goto:.goto_redclue
+
+# 4e6c8ee9
+; @choice "▲ 回第一頁" goto:.page1

@@ -127,7 +127,10 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 @SaveReturnPoint script:"chapter5yellow" label:"afterpetday_yellow"
 @GotoUnityScene sceneName:MapTest
 @stop
+; 劇情分歧地圖節點：涅莉好感度分歧（>=100 →小精靈，飛走了／否則→米夏戰）
 # afterpetday_yellow
+# branch_nel_affinity
+@visitNode id:chapter5yellow label:branch_nel_affinity
 
 @back bg03
 @stopBgm
@@ -153,7 +156,10 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 @bgm energetic
 @battle background:bg03 target:monster03 label:ch5yt_micha
 @stop
+; 劇情分歧地圖節點：米夏戰之後，直接跳到「輪迴之鑰／背棄世界」的最終二選一
+# finalchoice_yellow
 # ch5yt_micha
+@visitNode id:chapter5yellow label:finalchoice_yellow
 @stopBgm
 @bgm sad
 @back black
@@ -217,7 +223,7 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 （END：輪迴的鑰匙）
 （蝕之聖典功能解鎖）
 @achieve id:ACH_END_07
-@wait input:true
+@wait i
 @exitToTitle
 @stop
 
@@ -247,7 +253,7 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 
 （END：背棄世界）
 @achieve id:ACH_END_08
-@wait input:true
+@wait i
 @exitToTitle
 @stop
 
@@ -307,6 +313,6 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 
 （END：小精靈，飛走了……）
 @achieve id:ACH_END_09
-@wait input:true
+@wait i
 @exitToTitle
 @stop

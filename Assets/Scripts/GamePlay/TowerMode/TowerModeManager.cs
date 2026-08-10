@@ -244,6 +244,11 @@ namespace Hexe.TowerMode
                 PlayerPrefs.Save();
             }
 
+            // 只關掉「記憶體中的作用中狀態」，PlayerPrefs 的續關記錄（IsActiveKey）保留。
+            // 不然回標題後去玩主線時，IsActive 還是 true，高塔的護身符加成/換符文返回/
+            // 地圖返回全都會被高塔模式劫走。續關時 ResumeRun 會把它設回 true。
+            isActiveField = false;
+
             await GoToTitleScene();
         }
 
@@ -370,7 +375,15 @@ namespace Hexe.TowerMode
 
             await SceneManager.LoadSceneAsync(TitleSceneName);
 
-            Engine.GetService<IUIManager>()?.GetUI<ITitleUI>()?.Show();
+            // 同 ExitToTitleCommand：Title 場景沒有還原 UI 顯示/相機的邏輯，而這兩個狀態
+            // 跨場景常駐、連 ResetStateAsync 都清不掉，玩過地圖後回 Title 會看不到選單。
+            var uiManager = Engine.GetService<IUIManager>();
+            uiManager?.SetUIVisibleWithToggle(true, false);
+
+            var naniCamera = Engine.GetService<ICameraManager>()?.Camera;
+            if (naniCamera != null) naniCamera.enabled = true;
+
+            uiManager?.GetUI<ITitleUI>()?.Show();
         }
 
         static void SnapshotAndUnlockAllRunes()

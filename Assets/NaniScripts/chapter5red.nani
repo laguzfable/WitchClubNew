@@ -213,11 +213,35 @@
 梅爾: 不然妳先躲好吧。
 梅爾: 陪我一起找找看，關於西碧兒的事情。
 梅爾: 我這邊有各種典籍，也許會有相關的線索。
-（之後跑三個白天事件　尋找西碧兒的線索）
+; 三個白天事件：尋找西碧兒的線索（redclue01→02→03）。
+; @overrideEvent 會讓地圖上梅爾的圖示改播特殊事件，一次一個、播完自動清除，
+; 也不會消耗她一般白天事件的進度（MapCharacterSpawner 對 specialEvents 不加進度）。
+@stopBgm
+@overrideEvent char:Mel evt:redclue01
+@saveMapDayNight isDay:true
+@SaveReturnPoint script:"chapter5red" label:"redclue_d1"
+@GotoUnityScene sceneName:MapTest
+@stop
+# redclue_d1
+
+@overrideEvent char:Mel evt:redclue02
+@saveMapDayNight isDay:true
+@SaveReturnPoint script:"chapter5red" label:"redclue_d2"
+@GotoUnityScene sceneName:MapTest
+@stop
+# redclue_d2
+
+@overrideEvent char:Mel evt:redclue03
+@saveMapDayNight isDay:true
+@SaveReturnPoint script:"chapter5red" label:"redclue_d3"
+@GotoUnityScene sceneName:MapTest
+@stop
+# redclue_d3
+
 @back bg11
 @char broom pos:50
 艾札蘭: 真有趣，妳們也會來找我問事啊。
-（這邊可能要完成他的任務才能繼續）
+; 艾札蘭的「帶酒來」任務已在 redclue03 完成，這裡直接開講
 @hide broom
 @char az pos:25
 @char 魅兒 pos:50

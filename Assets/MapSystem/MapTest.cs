@@ -44,11 +44,23 @@ public class MapTest : MonoBehaviour
             Debug.LogWarning("找不到 MapBackgroundController！");
     }
 
+    // 場景裡 MapTest 被掛在兩個物件上（Map 與 MapRoot），一次按鍵會觸發兩份 Update，
+    // 用靜態旗標確保整個地圖場景只觸發一次返回
+    static bool s_skipTriggered;
+
+    void OnEnable()
+    {
+        s_skipTriggered = false;
+    }
+
     // 除錯熱鍵：不管日夜，數字鍵盤的 . 直接跳過這次地圖，回到暫存的劇本位置
     void Update()
     {
+        if (s_skipTriggered) return;
+
         if (Input.GetKeyUp(KeyCode.KeypadPeriod))
         {
+            s_skipTriggered = true;
             Debug.Log("[MapTest] KeypadPeriod → 跳過地圖，回劇本");
             NaniBridgeUtility.GoBackToSavedStory();
         }

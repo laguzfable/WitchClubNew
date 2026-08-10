@@ -3,7 +3,7 @@
 @bgm night
 @spawn hello
 (薇狄亞直接親玩家)
-@set affinity_Ved=50
+@set affinity_Ved=100
 薇狄亞: 等好久了……
 薇狄亞: 啊，抱、抱歉，我太沒分寸了。
 @choice 妳知道就好。 goto:.green05cold
@@ -11,9 +11,14 @@
 @stop
 # green05cold
 ……
+@goto .green05story
+
 # green05passion
 薇狄亞: 真的嗎……
 薇狄亞: 啊啊，不行啦、不行啦，P不是為了這個來的。
+
+; 兩個選項在這裡匯流；沒有這個 label 的話，選「妳知道就好」也會看到上面那兩句
+# green05story
 薇狄亞: 我們先辦正事吧。
 薇狄亞: 我就這樣跟著梅伊在廢墟一帶旅行，有時候也會到比較遠的城鎮吃飯，買買衣服什麼的。
 薇狄亞: 我倆生活過得很愜意，而我也一天一天長大。

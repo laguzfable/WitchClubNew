@@ -573,7 +573,18 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 優菲: 說起來，還好{PlayerName}拒絕，其實我一直都不太想去那飯局。
 優菲: 比起跟不認識的人聊天，研究奧術還有趣得多呢。
 優菲: 我們去後巷找點小吃，然後回我房間研究魔法吧～
-(再次轉場 可能接夜晚事件)
+
+; 大決戰前最後一個自由夜晚：進劇情地圖跑夜間事件，回來後接夢境 → 隔天西碧兒事件 → 必敗戰
+; 劇情分歧地圖的「第五章・藍線・決戰前夜」節點會跳到 beforefinal_blue 這裡
+# beforefinal_blue
+@visitNode id:chapter5blue label:beforefinal_blue
+@stopbgm
+@saveMapDayNight isDay:false
+@SaveReturnPoint script:"chapter5blue" label:"afternight_blue"
+@GotoUnityScene sceneName:MapTest
+@stop
+# afternight_blue
+
 (這邊應該是也要有個夢境穿插)
 第一次見到梅爾的時候，我的心裡好激動喔。
 她大概是我見過，這個世界上最純真的人了。
@@ -701,7 +712,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 # ch5bt_micha
 @stopBgm
 @if CombatWin
-@goto euphie_end label:end1
+@goto euphie_end.end1
 @endif
 @stopBgm
 @bgm serious
@@ -724,7 +735,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 @choice 被震開了，動不了 goto:.nic_sacrifice
 @stop
 # nic_sacrifice
-@goto euphie_end label:end2
+@goto badend01
 
 # player_guards
 @hide 優菲,nic
@@ -768,6 +779,13 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 妮可: ……
 妮可: 那我也只能加油了。
 @hide nic
+; 劇情分歧地圖節點：直接跳到「緋紅替身／純藍之冠」的最終二選一
+# finalchoice_blue
+@visitNode id:chapter5blue label:finalchoice_blue
+@back bg01
+@stopBgm
+@bgm serious
+
 @char 優菲 pos:50
 優菲: {PlayerName}啊……
 優菲: 陪了我這麼久，我真的很感謝呢。
@@ -792,7 +810,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 
 （END：緋紅替身）
 @achieve id:ACH_END_01
-@wait input:true
+@wait i
 @exitToTitle
 @stop
 
@@ -813,6 +831,6 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 
 （END：純藍之冠）
 @achieve id:ACH_END_02
-@wait input:true
+@wait i
 @exitToTitle
 @stop

@@ -21,5 +21,7 @@ public class RestButton : MonoBehaviour
         }
 
         loader.GotoScript(MapReturnPoint.ScriptName, MapReturnPoint.Label);
+        // 返回點已交給 GotoScript（走 ExplicitGotoPending 路徑），用掉就清
+        MapReturnPoint.Clear();
     }
 }

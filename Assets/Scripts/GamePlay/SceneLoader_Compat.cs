@@ -15,6 +15,12 @@ public class SceneLoader : MonoBehaviour
     public static SceneLoader Instance { get; private set; }
     public static bool ReturnToTitleOnce = false;
 
+    /// <summary>剛透過 GotoScript（或戰鬥返回）明確指定過目標劇本時為 true，
+    /// NaniScriptLoader_HEX 讀取後歸零。用來區分「玩家剛指定的去向」跟
+    /// 「scriptParameter 的舊殘留」——前者必須優先於 MapReturnPoint，
+    /// 不然點地圖事件會被還沒用掉的主線返回點蓋掉、直接跳回主線。</summary>
+    public static bool ExplicitGotoPending = false;
+
     [Header("Scene Names")]
     public string titleSceneName = "Title";
     public string naniSceneName  = "NaniDialogTest";
@@ -57,33 +63,50 @@ public class SceneLoader : MonoBehaviour
             ? new ScriptParameter { scriptName = scriptName }
             : new ScriptParameter { scriptName = scriptName, scriptLabel = label };
 
+        ExplicitGotoPending = true;
         Debug.Log($"[SL*] GotoScript -> '{scriptName}#{label}' ; load Nani scene '{naniSceneName}'");
         GoScene(naniSceneName);
     }
 
+    private bool _isLoading;
+
     public void GoScene (string sceneName)
     {
+        // 同一幀可能有多個來源觸發切場（例如場景裡重複掛了熱鍵腳本），只接受第一個
+        if (_isLoading)
+        {
+            Debug.LogWarning($"[SL*] GoScene('{sceneName}') ignored: another load in progress.");
+            return;
+        }
         Debug.Log($"[SL*] GoScene('{sceneName}')");
         StartCoroutine(LoadSceneRoutine(sceneName));
     }
 
     private IEnumerator LoadSceneRoutine (string sceneName)
     {
-        var ui = Engine.GetService<IUIManager>();
-        var loading = ui != null ? ui.GetUI<ILoadingUI>() : null;
-        loading?.Show();
+        _isLoading = true;
+        try
+        {
+            var ui = Engine.GetService<IUIManager>();
+            var loading = ui != null ? ui.GetUI<ILoadingUI>() : null;
+            loading?.Show();
 
-        var op = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
-        op.allowSceneActivation = false;
+            var op = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
+            op.allowSceneActivation = false;
 
-        while (op.progress < 0.9f)
-            yield return null;
+            while (op.progress < 0.9f)
+                yield return null;
 
-        op.allowSceneActivation = true;
-        while (!op.isDone) yield return null;
+            op.allowSceneActivation = true;
+            while (!op.isDone) yield return null;
 
-        loading?.Hide();
-        Debug.Log($"[SL*] Loaded '{SceneManager.GetActiveScene().name}'");
+            loading?.Hide();
+            Debug.Log($"[SL*] Loaded '{SceneManager.GetActiveScene().name}'");
+        }
+        finally
+        {
+            _isLoading = false;
+        }
     }
 
     public void ReturnToTitleIfPending()

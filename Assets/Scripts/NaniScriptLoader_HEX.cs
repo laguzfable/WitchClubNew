@@ -110,11 +110,23 @@ public class NaniScriptLoader_HEX : MonoBehaviour
         string scriptName = null;
         string label = null;
 
-        // MapReturnPoint 是 @SaveReturnPoint 明確設下的一次性返回點，用完會自我清除；
-        // ds.scriptParameter 常常是舊的戰鬥/場景切換殘留（預設不會自動清掉），
-        // 兩者都有值時，代表玩家剛剛才明確指定要去哪，MapReturnPoint 才是真正該聽的那個，
-        // 所以優先順序要反過來，不然 scriptParameter 的舊值會一直卡住蓋過新指定的返回點。
-        if (MapReturnPoint.HasValid())
+        // 優先順序：
+        // 1) SceneLoader.ExplicitGotoPending —— 剛剛才明確指定的目標（地圖事件點擊、跳過熱鍵、
+        //    戰鬥返回續播）。這時 MapReturnPoint 要保持原樣不動，事件播完後 GoBackToSavedStory
+        //    才有返回點可以回主線。
+        // 2) MapReturnPoint —— @SaveReturnPoint 設下的一次性返回點，用完自我清除。
+        //    沒有明確指定目標時才輪到它，可防 scriptParameter 舊殘留（戰鬥/場景切換遺留）搶走入口。
+        // 3) ds.scriptParameter / ds.startScript —— 最後備援。
+        bool explicitGoto = SceneLoader.ExplicitGotoPending;
+        SceneLoader.ExplicitGotoPending = false;
+
+        if (explicitGoto && sp != null && !string.IsNullOrEmpty(sp.scriptName))
+        {
+            scriptName = sp.scriptName;
+            label      = string.IsNullOrEmpty(sp.scriptLabel) ? null : sp.scriptLabel;
+            Debug.Log($"★HEXE★ explicit goto name='{scriptName}' label='{(label ?? "<null>")}'");
+        }
+        else if (MapReturnPoint.HasValid())
         {
             scriptName = MapReturnPoint.ScriptName;
             label      = string.IsNullOrEmpty(MapReturnPoint.Label) ? null : MapReturnPoint.Label;

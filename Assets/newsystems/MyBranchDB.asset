@@ -11,57 +11,88 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d26e08a9791e50d48b1124f02eccfaaf, type: 3}
   m_Name: MyBranchDB
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier:
   nodes:
   - nodeId: chapter0
     displayName: 序章
     scriptName: chapter0
     label:
+    parentId:
   - nodeId: chapter1
     displayName: 第一章
     scriptName: chapter1
     label:
+    parentId: chapter0
   - nodeId: chapter2
     displayName: 第二章
     scriptName: chapter2
     label:
+    parentId: chapter1
   - nodeId: chapter3
     displayName: 第三章
     scriptName: chapter3
     label:
+    parentId: chapter2
   - nodeId: chapter4
     displayName: 第四章
     scriptName: chapter4
     label:
+    parentId: chapter3
+  - nodeId: chapter4
+    displayName: 第四章・分線抉擇
+    scriptName: chapter4
+    label: branch_ch4route
+    parentId: chapter4
   - nodeId: chapter4green
     displayName: 第四章・綠線
     scriptName: chapter4green
     label:
+    parentId: chapter4#branch_ch4route
+  - nodeId: chapter4green
+    displayName: 綠線・告知抉擇
+    scriptName: chapter4green
+    label: branch_green_tell
+    parentId: chapter4green
   - nodeId: chapter4red
     displayName: 第四章・紅線
     scriptName: chapter4red
     label:
-  - nodeId: chapter5blue
-    displayName: 第五章・藍線
-    scriptName: chapter5blue
-    label:
-  - nodeId: chapter5common
-    displayName: 第五章・共通
-    scriptName: chapter5common
-    label:
+    parentId: chapter4#branch_ch4route
   - nodeId: chapter5red
     displayName: 第五章・紅線
     scriptName: chapter5red
     label:
-  - nodeId: chapter5yellow
-    displayName: 第五章・黃線
-    scriptName: chapter5yellow
-    label:
-  - nodeId: chapter6blue
-    displayName: 第六章・藍線
-    scriptName: chapter6blue
-    label:
+    parentId: chapter4red
   - nodeId: chapter6red
     displayName: 第六章・紅線
     scriptName: chapter6red
     label:
+    parentId: chapter5red
+  - nodeId: chapter6red
+    displayName: 紅線・最終抉擇
+    scriptName: chapter6red
+    label: finalchoice_red
+    parentId: chapter6red
+  - nodeId: chapter5blue
+    displayName: 第五章・藍線
+    scriptName: chapter5blue
+    label:
+    parentId: chapter4#branch_ch4route
+  - nodeId: chapter5blue
+    displayName: 第五章・決戰前夜
+    scriptName: chapter5blue
+    label: beforefinal_blue
+    parentId: chapter5blue
+  - nodeId: chapter5blue
+    displayName: 藍線・最終抉擇
+    scriptName: chapter5blue
+    label: finalchoice_blue
+    parentId: chapter5blue#beforefinal_blue
+  - nodeId: chapter5yellow
+    displayName: 黃線・最終抉擇
+    scriptName: chapter5yellow
+    label: finalchoice_yellow
+    variableOverrides:
+    - name: affinity_Nel
+      value: 50
+    parentId: chapter4#branch_ch4route

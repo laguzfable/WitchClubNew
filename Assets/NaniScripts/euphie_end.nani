@@ -13,39 +13,6 @@
 （必敗戰鬥打贏——迎來完美的結局）
 （END：改寫命運）
 @achieve id:ACH_END_10
-@wait input:true
-@exitToTitle
-@stop
-
-# end2
-（結局：殉道——優菲視角）
-@stopBgm
-@bgm sad
-@back bg03
-
-@char nic pos:50
-
-妮可: 學姊！
-
-@char nic pos:35
-@char 優菲格玫 pos:65
-
-優菲: 妮可……
-妮可: 學姊，我很高興能夠跟隨妳。
-妮可: 所以……請妳，一定要好好活下去。
-優菲: 不行！妳不可以——
-
-（妮可犧牲自己救下優菲）
-
-@hide nic
-@char 優菲格玫 pos:50
-
-優菲: ……妮可……
-優菲: 我……我到底在做什麼……
-
-（優菲消沉，久久無法振作）
-（END：殉道）
-@achieve id:ACH_END_11
-@wait input:true
+@wait i
 @exitToTitle
 @stop

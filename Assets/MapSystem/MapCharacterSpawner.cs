@@ -36,6 +36,14 @@ public class MapCharacterSpawner : MonoBehaviour
         public List<CharacterEvent> specialEvents = new List<CharacterEvent>();
 
         public bool loop = true;
+
+        // ⭐ 限定出場的劇本。留空＝任何地圖日都出場（主要角色維持留空即可）。
+        //    例：西碧兒填 chapter4green，她就只會在綠線的地圖日出現。
+        //    判斷依據是 MapReturnPoint，也就是 @SaveReturnPoint 存下來的回程腳本名，
+        //    等同於「現在是哪一段劇情把地圖叫出來的」。
+        [Tooltip("限定出場的劇本名（例：chapter4green）。留空＝任何時候都出場。\n" +
+                 "由 @overrideEvent 指定的特殊事件不受這個限制。")]
+        public string[] onlyInScripts;
     }
 
     // ============================================
@@ -48,6 +56,23 @@ public class MapCharacterSpawner : MonoBehaviour
     public bool autoDetectTimeOfDay = true;
 
     private string logMsg = "▶ Spawner 啟動中...\n";
+
+    // ==========================================================
+    // ⭐ 這個角色現在這一段劇情該不該出現在地圖上
+    // ==========================================================
+    private bool IsAvailableHere (CharacterEventList c)
+    {
+        if (c.onlyInScripts == null || c.onlyInScripts.Length == 0) return true;
+
+        var currentScript = MapReturnPoint.ScriptName;
+        if (string.IsNullOrEmpty(currentScript)) return false;
+
+        foreach (var scriptName in c.onlyInScripts)
+            if (!string.IsNullOrEmpty(scriptName) && scriptName == currentScript)
+                return true;
+
+        return false;
+    }
 
     // ==========================================================
     // ⭐ 取得特殊事件（由 overrideEvent 指令使用）
@@ -96,12 +121,33 @@ public class MapCharacterSpawner : MonoBehaviour
 
         int count = 0;
 
+        // =======================================================
+        // ⭐ 劇情指定的日子：只生成掛著特殊事件的角色
+        //    特殊事件是主線用 @overrideEvent 排好的（梅爾的線索日、涅莉的
+        //    guidance），劇情接下去會假設它演過了。但 override 在「生成」當下
+        //    就會被清掉，所以玩家只要點了別人，這一天就被消耗掉、特殊事件
+        //    永遠不會播，主線就缺一塊。這種日子乾脆只讓該角色出現。
+        // =======================================================
+        var soloNames = new List<string>();
+        foreach (var c in characterEventTable)
+            if (c != null && !string.IsNullOrEmpty(c.characterName)
+                && MapSpecialOverride.TryGet(c.characterName, out _))
+                soloNames.Add(c.characterName);
+
+        if (soloNames.Count > 0)
+            logMsg += $"⭐ 今天是劇情指定日，只生成：{string.Join("、", soloNames)}\n";
 
         // ===============================
         // 逐角色生成 icon
         // ===============================
         foreach (var c in characterEventTable)
         {
+            if (soloNames.Count > 0 && !soloNames.Contains(c.characterName))
+            {
+                logMsg += $"⛔ {c.characterName} 今天讓位給劇情事件\n";
+                continue;
+            }
+
 // =======================================================
 // ⭐ 當角色有特殊事件 → 只生成特殊事件，不生成一般事件
 // =======================================================
@@ -129,6 +175,16 @@ if (MapSpecialOverride.TryGet(c.characterName, out var special))
     continue;
 }
 
+
+            // =======================================================
+            // ⭐ 限定出場章節：不在指定劇本的地圖日就不生成
+            //    （放在特殊事件之後，讓 @overrideEvent 的明確指定永遠優先）
+            // =======================================================
+            if (!IsAvailableHere(c))
+            {
+                logMsg += $"⛔ {c.characterName} 不在 '{MapReturnPoint.ScriptName}' 出場\n";
+                continue;
+            }
 
             // ===============================
             // ⭐ 原本白天/夜晚事件流程（不變）

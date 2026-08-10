@@ -21,7 +21,7 @@
 （所有的光消失了）
 （END：失敗終焉）
 @achieve id:ACH_END_18
-@wait input:true
+@wait i
 @exitToTitle
 @stop
 
@@ -37,6 +37,8 @@
 ？？？: 妳只需要閉上眼睛……
 （END：失敗終焉）
 @achieve id:ACH_END_18
+@wait i
+@exitToTitle
 @stop
 
 #notagree
@@ -60,6 +62,8 @@
 （沒有人記得你曾經來過這裡）
 （END：失敗終焉）
 @achieve id:ACH_END_18
+@wait i
+@exitToTitle
 @stop
 
 #no
@@ -68,6 +72,45 @@
 ？？？: 我將會，委身於您。
 ？？？: 聽起來很不錯吧？
 ？？？: 那也要您有這個本事才行，呵呵。
+
+; 設定書的「打輸米夏」。米夏自己在上面開了賭局，戰鬥就接在這裡。
+; 其餘三條分支是「你放棄了」的變體，不打。
+@stopBgm
+@bgm energetic
+@battle background:bg02 target:micha_final label:ch5c_micha
+@stop
+
+# ch5c_micha
+@stopBgm
+@bgm micha
+
+@if CombatWin
+@goto .micha_win
+@endif
+
+; ── 打輸：設定書指定的失敗終焉 ──
+？？？: 呵……果然呢。
+？？？: 連站在我面前的資格，都是要靠別人給的啊。
+（所有的光消失了）
 （END：失敗終焉）
 @achieve id:ACH_END_18
+@wait i
+@exitToTitle
+@stop
+
+; ── 打贏：米夏願賭服輸，但結局不變 ──（草稿，待潤飾）
+; 這條刻意仍然收在失敗終焉：18 的核心是「羈絆不夠深」，不是打不贏。
+; 贏了她也改變不了沒有人在等你這件事。要拆成獨立結局的話再說。
+# micha_win
+？？？: ……哎呀。
+？？？: 我輸了呢。
+？？？: 那就照約定，我委身於您吧。
+？？？: 可是啊，異鄉人——
+？？？: 您贏得了我，卻沒有任何一個人，在等您回去。
+？？？: 這樣的勝利，您真的想要嗎？
+（所有的光消失了）
+（END：失敗終焉）
+@achieve id:ACH_END_18
+@wait i
+@exitToTitle
 @stop

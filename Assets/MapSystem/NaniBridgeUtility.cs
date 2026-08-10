@@ -27,6 +27,9 @@ public static class NaniBridgeUtility
             if (SceneLoader.Instance != null)
             {
                 SceneLoader.Instance.GotoScript(MapReturnPoint.ScriptName, MapReturnPoint.Label);
+                // GotoScript 走 ExplicitGotoPending 優先路徑，loader 不會再經手 MapReturnPoint，
+                // 這個一次性返回點在這裡就算用掉了，要自己清，不然會殘留到下一次切場
+                MapReturnPoint.Clear();
             }
             else
             {
