@@ -566,7 +566,14 @@ if (isLose)
 void FinishBattle(bool isLose)
 {
     if (TowerModeManager.IsActive)
+    {
+        // 百合符文看的是「上一場是不是滿血結束」，所以要在切場景之前先把這場的血量記下來
+        var playerUnit = pc != null ? pc.GetPlayerUnit() : null;
+        if (playerUnit != null)
+            TowerModeManager.RecordBattleEndHP(isLose, playerUnit.HP.Value, playerUnit.HP.GetTotalValue());
+
         TowerModeManager.HandleBattleResult(isLose);
+    }
     else
         BackToNani();
 }

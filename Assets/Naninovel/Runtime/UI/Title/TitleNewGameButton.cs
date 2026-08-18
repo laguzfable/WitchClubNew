@@ -12,6 +12,13 @@ namespace Naninovel.UI
         [Tooltip("Services to exclude from state reset when starting a new game.")]
         [SerializeField] private string[] excludeFromReset = new string[0];
 
+        // Title 場景的裝飾物：標題插畫的 Canvas、粒子特效（ColorWave / TitleBokeh）。
+        // 開新遊戲後 Naninovel 是在同一個場景繼續演劇本，這些東西留著不但會蓋在
+        // 劇本畫面上（ColorWave 的 sortingOrder 比背景演員高），在「狀態重置完
+        // 到第一張背景進來」的那幾幀還會直接穿幫。
+        private static readonly string[] titleOnlyObjectNames =
+            { "Title", "Canvas", "ColorWave", "Bokeh", "BackgroundLayer", "Blurred" };
+
         private string startScriptName;
         private string titleScriptName;
         private TitleMenu titleMenu;
@@ -51,12 +58,16 @@ namespace Naninovel.UI
             // 立刻強制隱藏 TitleMenu，不等任何 async 流程
             titleMenu.gameObject.SetActive(false);
 
-            // 同時關掉場景中所有帶有 "Title" 或 "Canvas" 名稱的物件
+            // 同時關掉場景中所有只屬於標題畫面的物件
             foreach (var obj in UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects())
             {
                 if (obj == null) continue;
-                if (obj.name.Contains("Title") || obj.name.Contains("Canvas"))
-                    obj.SetActive(false);
+                foreach (var titleOnlyName in titleOnlyObjectNames)
+                    if (obj.name.Contains(titleOnlyName))
+                    {
+                        obj.SetActive(false);
+                        break;
+                    }
             }
 
             if (!string.IsNullOrEmpty(titleScriptName))

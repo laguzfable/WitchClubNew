@@ -175,9 +175,25 @@ public class EnemyUnit : BaseCombatUnit
 
             if (TowerModeManager.IsActive)
             {
-                HP.SetBaseValue(TowerModeManager.RollMonsterHP(mobData.HP));
+                // 競技場只跟池子借立繪，數值改走競技場自己的基準表（見 GetArenaMobData 的說明）。
+                // 順序有意義：先把立繪吃進來，再換掉 mobData，這樣抽到的還是池子裡那隻的外觀。
                 var towerSprite = TowerModeManager.RollMonsterSprite();
                 if (towerSprite != null) sprRend.sprite = towerSprite;
+
+                var arenaData = TowerModeManager.GetArenaMobData();
+                if (arenaData != null) mobData = arenaData;
+                else Debug.LogError("[EnemyUnit.Init] 載不到 Resources/TowerMode/ArenaMob，競技場會退回用池子裡那隻的數值");
+
+                HP.SetBaseValue(TowerModeManager.RollMonsterHP(mobData.HP));
+                EN.SetBaseValue(mobData.EN);
+
+                // 競技場的立繪是另外抽的，看畫面認不出實際在打誰，測試時以這行為準
+                Debug.Log($"[EnemyUnit.Init] 競技場: 立繪來自 '{mobName}'，數值來自 '{mobData.name}' (HP {HP.GetTotalValue()})");
+            }
+            else
+            {
+                // 高塔（女巫競技場）的怪是隨機湊出來的，不算劇情上「遇過」，所以不解鎖圖鑑。
+                Hexe.UI.MonsterCodex.RecordSeen(mobData.name);
             }
         }
         else

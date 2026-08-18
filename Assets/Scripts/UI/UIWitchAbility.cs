@@ -141,6 +141,17 @@ private void Awake()
             }
             //cost.Value = 0f;
             pc.CostEN(cost.Value);
+
+            // ★ 效果一定要在這裡就生效，不能等演出播完 ★
+            // 舊寫法是把 CastAbility 放在 SpecialFXCoroutine 的最後，而那支協程是 .Forget() 射後不理、
+            // 中間還 await 了 1 秒以上的特寫演出，期間玩家完全沒被鎖住。手快的話可以在效果還沒套上去
+            // 就選牌出牌，PlayCardAsync 檢查 HasEffect(Reflect/Shield) 全部是 false ——
+            // 症狀就是「符文明明按了卻沒作用」，反彈類的還會直接被打死。
+            unit.CastAbility(ability);
+            pc.CalculateAttr();
+
+            // 演出期間把操作鎖住，不然畫面被黑幕蓋著還能盲按出牌
+            pc.SetControllable(false);
             SpecialFXCoroutine().Forget();
         }
     }
@@ -187,7 +198,9 @@ private void Awake()
                 await FXSequence.PlayFX(displayFX);
             }
         }
-        unit.CastAbility(ability);
-        pc.CalculateAttr();
+        // CastAbility 已經在 OnClick 就做掉了（理由見那邊的註解），這裡只負責演出收尾。
+        // 演出途中如果戰鬥已經結束（例如直傷符文把敵人打死），就不要把操作解鎖回去。
+        if (pc.combatSystem.isContinue)
+            pc.SetControllable(true);
     }
 }

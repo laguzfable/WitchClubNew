@@ -1,112 +1,87 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 using Naninovel;
 using Naninovel.UI;
 
 namespace Hexe.UI
 {
     /// <summary>
-    /// 在 Title 場景載入完成後，自動複製一顆現有的標題按鈕，改造成「高塔模式」按鈕。
-    /// 這樣就不用手動去改 TitleUI.prefab。
-    /// 如果找不到範本按鈕，會在 Console 印警告，需要的話可以手動在 Title 場景加一顆
-    /// Button，掛上 TitleTowerModeButton.cs 就好。
+    /// 控制標題選單「女巫競技場」按鈕的顯示與否：跑過任一結局才會出現（壞結局也算）。
+    ///
+    /// ★ 這支程式以前是「複製一顆按鈕出來」，現在改成「找到 prefab 裡既有的那顆並開關它」★
+    /// 原因：複製出來的按鈕沒有自己的位置，完全靠 ButtonsPanel 的 Vertical Layout Group
+    /// 自動排版。一旦想手動排版而關掉那個 LayoutGroup，複製品會繼承範本的座標、
+    /// 直接疊在範本上面。改成用 prefab 裡真實存在的按鈕之後，位置、文字、樣式
+    /// 都跟其他按鈕一樣可以在 Prefab Mode 裡直接排，不用記「有一顆是程式生的」。
+    ///
+    /// ★ 按鈕要自己在 TitleUI.prefab 裡做好 ★
+    /// 這支程式只負責開關，找不到按鈕只會印一行警告，不會幫你生。
+    /// 那顆按鈕身上要掛 <see cref="TitleTowerModeButton"/>，這裡就是靠這個元件型別找它的。
+    ///
+    /// ★ 文字不歸這裡管 ★
+    /// 標籤的三語切換由 <see cref="TitleLabelInjector"/> 處理（它認得 TitleTowerModeButton
+    /// 這個型別，而且找得到隱藏中的物件）。
     /// </summary>
     public static class TitleTowerModeInjector
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        static void Register()
+        static void Register ()
         {
-            Debug.Log("[TitleTowerModeInjector] Register() 已執行");
             SceneManager.sceneLoaded += OnSceneLoaded;
-
-            // 如果 Title 就是遊戲開機第一個場景，這個方法執行的當下它的
-            // sceneLoaded 事件其實已經發生過了、上面訂閱會來不及接到，
-            // 所以這裡再補檢查一次目前場景。
-            Debug.Log($"[TitleTowerModeInjector] 目前場景：{SceneManager.GetActiveScene().name}");
-            if (SceneManager.GetActiveScene().name == "Title")
-                InjectRetryLoop().Forget();
+            ApplyRetryLoop().Forget();
         }
 
-        static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        static void OnSceneLoaded (Scene scene, LoadSceneMode mode)
         {
-            Debug.Log($"[TitleTowerModeInjector] sceneLoaded: {scene.name}");
-            if (scene.name != "Title") return;
-            InjectRetryLoop().Forget();
+            // TitleUI 是 DontDestroyOnLoad，正常只會處理一次；但引擎重新初始化時會重建 UI，
+            // 而且玩家可能在這一輪剛拿到第一個結局，所以每次載場景都重新判斷一次。
+            ApplyRetryLoop().Forget();
         }
 
-        /// <summary>
-        /// TitleMenu 的按鈕有可能是 Naninovel 非同步建置的，2 幀不一定夠，
-        /// 這裡改成最多重試 5 秒（每 0.2 秒試一次）。
-        /// </summary>
-        static async UniTaskVoid InjectRetryLoop()
+        static async UniTaskVoid ApplyRetryLoop ()
         {
-            const float timeout = 5f;
+            const float timeout = 30f;
             var elapsed = 0f;
 
             while (elapsed < timeout)
             {
-                if (Inject()) return;
-                await UniTask.Delay(System.TimeSpan.FromSeconds(0.2f));
-                elapsed += 0.2f;
+                if (TryApply()) return;
+                await UniTask.Yield();
+                elapsed += Time.unscaledDeltaTime;
             }
 
-            Debug.LogWarning("[TitleTowerModeInjector] 5 秒內都找不到可複製的範本按鈕，放棄自動注入。" +
-                "請手動在 Title 場景加一顆按鈕並掛上 TitleTowerModeButton.cs。");
+            Debug.LogWarning("[TitleTowerModeInjector] 30 秒內都拿不到 TitleUI，女巫競技場按鈕的顯示狀態沒設定。");
         }
 
-        /// <returns>true 表示已經成功注入（或本來就注入過了），不用再重試。</returns>
-        static bool Inject()
+        /// <returns>true 表示處理完了（含「找不到按鈕」這種再試也沒用的情況）。</returns>
+        static bool TryApply ()
         {
-            if (Object.FindObjectOfType<TitleTowerModeButton>() != null)
+            // 跟引擎要它掛在畫面上的那個 TitleUI，不要自己去場景裡撈：
+            // Resources.FindObjectsOfTypeAll + scene.IsValid() 在 TitleUI 開在 Prefab Mode 時
+            // 會抓到預覽副本，改到的是編輯器裡那份、不是遊戲中的。
+            var titleUI = Engine.GetService<IUIManager>()?.GetUI<ITitleUI>() as MonoBehaviour;
+            if (titleUI == null) return false;
+
+            // 用 true 這個參數才找得到「目前是隱藏狀態」的按鈕——
+            // 沒有結局時它本來就是關的，用預設參數會永遠找不到、也就永遠開不回來。
+            var button = titleUI.GetComponentInChildren<TitleTowerModeButton>(true);
+            if (button == null)
             {
-                Debug.Log("[TitleTowerModeInjector] 已經注入過了，略過");
-                return true;
+                Debug.LogWarning("[TitleTowerModeInjector] TitleUI 底下找不到掛著 TitleTowerModeButton 的按鈕。" +
+                                 "請在 TitleUI.prefab 的 ButtonsPanel 裡放一顆按鈕並掛上該元件。");
+                return true; // 結構問題，重試也沒用
             }
 
-            var template = FindTemplateButton();
-            if (template == null)
+            // 壞結局也算：EndingRecord 只認 ACH_END_ 前綴，不分好壞
+            var unlocked = EndingRecord.Count > 0;
+            if (button.gameObject.activeSelf != unlocked)
             {
-                Debug.Log("[TitleTowerModeInjector] 這輪還找不到範本按鈕，稍後重試...");
-                return false;
+                button.gameObject.SetActive(unlocked);
+                Debug.Log($"[TitleTowerModeInjector] 女巫競技場按鈕 → {(unlocked ? "顯示" : "隱藏")}" +
+                          $"（目前結局數 {EndingRecord.Count}）");
             }
 
-            Debug.Log($"[TitleTowerModeInjector] 找到範本按鈕：{template.name}，開始複製");
-
-            var clone = Object.Instantiate(template, template.transform.parent);
-            clone.name = "TitleTowerModeButton";
-
-            // 把範本原本掛的所有 ScriptableButton 類型腳本都拔掉，換成我們自己的
-            foreach (var btn in clone.GetComponents<ScriptableButton>())
-                Object.Destroy(btn);
-
-            clone.AddComponent<TitleTowerModeButton>();
-
-            var text = clone.GetComponentInChildren<Text>();
-            if (text != null) text.text = "高塔模式";
-            else Debug.LogWarning("[TitleTowerModeInjector] 複製出來的按鈕找不到 Text 子物件，文字沒改到");
-
-            clone.transform.SetSiblingIndex(template.transform.GetSiblingIndex() + 1);
-
-            Debug.Log("[TitleTowerModeInjector] ✅ 高塔模式按鈕注入完成");
             return true;
-        }
-
-        static GameObject FindTemplateButton()
-        {
-            // 優先找「結局測試」那顆按鈕當範本
-            var testEndings = Object.FindObjectOfType<TitleTestEndingsButton>();
-            if (testEndings != null) return testEndings.gameObject;
-
-            // 備案：找任何一顆掛在 TitleMenu 底下的 ScriptableButton 來當範本
-            var titleMenu = Object.FindObjectOfType<TitleMenu>();
-            if (titleMenu != null)
-            {
-                var anyButton = titleMenu.GetComponentInChildren<ScriptableButton>();
-                if (anyButton != null) return anyButton.gameObject;
-            }
-
-            return null;
         }
     }
 }

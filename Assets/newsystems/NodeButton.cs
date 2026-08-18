@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using Naninovel;
 using Naninovel.UI;
 
-public class NodeButton : MonoBehaviour
+public class NodeButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     public Text labelText;
 
@@ -44,8 +45,12 @@ public void Init(BranchNode data, BranchMapUI owner)
     if (labelText)
         labelText.text = data.displayName;
 
-    // 解鎖判定用 VisitKey，所以同一個 label 的多個變體節點會一起亮
-    bool visited = VisitedNodeManager.Instance.IsVisited(nodeId, label);
+    // 解鎖判定用 VisitKey，所以同一個 label 的多個變體節點會一起亮。
+    // debugUnlockAll 是排版用的旁路；VisitedNodeManager 沒在場上時也視為未解鎖，不要 NRE。
+    bool visited = data.alwaysUnlocked
+                || (owner != null && owner.debugUnlockAll)
+                || (VisitedNodeManager.Instance != null
+                    && VisitedNodeManager.Instance.IsVisited(nodeId, label));
 
     var lockedIcon = owner ? owner.lockedIcon : null;
     var lockedAlpha = owner ? owner.lockedAlpha : 0.4f;
@@ -81,7 +86,19 @@ public void Init(BranchNode data, BranchMapUI owner)
 }
 
 
-private void OnNodeClick()
+    // 未解鎖的節點在 Init 裡被關掉了 blocksRaycasts，收不到這兩個事件，
+    // 所以還沒走過的劇情不會因為滑過去就被右頁劇透——這是刻意的。
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (map != null) map.ShowPreview(node);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (map != null) map.ClearPreview(node);
+    }
+
+    private void OnNodeClick()
     {
         Debug.Log($"[NodeButton] Click nodeId={nodeId}, script={scriptName}, label={label}");
 

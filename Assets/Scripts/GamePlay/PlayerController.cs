@@ -81,6 +81,52 @@ public class PlayerController : MonoBehaviour
         if(!TutorialController.isTutorial && !TutorialController.isTutorial2)
         {
             ReflashCards(false);
+            ApplyGuaranteedCharacterCards();
+        }
+    }
+
+    /// <summary>
+    /// 高塔模式「女巫符文 / 百合符文」的效果：開場保證手上有幾張角色卡。
+    ///
+    /// 只在戰鬥開場叫這一次。洗牌符文和行動被打斷時走的也是 ReflashCards(false)，
+    /// 那些場合不該再白送角色卡，所以保證邏輯放在這裡，而不是塞進 ReflashCards 裡面。
+    /// </summary>
+    void ApplyGuaranteedCharacterCards()
+    {
+        var want = TowerModeManager.GuaranteedCharacterCards;
+        if (want <= 0) return;
+
+        // 自然抽到的角色卡也算數，不用重複塞
+        var owned = new List<int>();
+        var plainSlots = new List<int>();
+        for (var i = 0; i < cards.Length; i++)
+        {
+            if (cards[i].IsCharacter()) owned.Add(cards[i].ID);
+            else plainSlots.Add(i);
+        }
+
+        var missing = want - owned.Count;
+        if (missing <= 0) return;
+
+        // 同一種角色卡手上只會有一張（DrawRandomCard 本來就是這個規則），
+        // 所以候選只從「還沒出現過的」四種裡面挑。四種抽完就自然收斂，塞不出第五張。
+        var pool = new List<int>();
+        for (var i = 0; i < 4; i++)
+            if (!owned.Contains(cardIDArr[i])) pool.Add(cardIDArr[i]);
+
+        while (missing > 0 && pool.Count > 0 && plainSlots.Count > 0)
+        {
+            var pick = pool[Random.Range(0, pool.Count)];
+            var slot = plainSlots[Random.Range(0, plainSlots.Count)];
+
+            var card = cards[slot];
+            card.ID = pick;                        // setter 會一併換圖、換名字、重設等級
+            card.element = GetCardElement(pick);
+            card.SetSelectState(false);
+
+            pool.Remove(pick);
+            plainSlots.Remove(slot);
+            missing--;
         }
     }
 

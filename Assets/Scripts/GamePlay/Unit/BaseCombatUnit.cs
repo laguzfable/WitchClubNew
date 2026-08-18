@@ -445,9 +445,23 @@ public class PlayerAbilityEffectRef : AbilityEffectRef
 {
     public AbilityEffect effect;
 
+    /// <summary>
+    /// duration 只有在資料真的有填（> 0）時才採用，沒填就沿用欄位預設的 1 回合。
+    ///
+    /// 不能無條件把 newEffect.duration 帶過來：目前資料裡 18 個效果的 duration 都是 0，
+    /// 那是「沒填」而不是「永久」。而 BeforeAction() 的條件是 duration > 0 才會扣，
+    /// 直接帶 0 進來的話那些效果永遠不會被移除，反彈/護盾會變成整場無限持續——
+    /// 比原本的 bug 嚴重得多。
+    ///
+    /// 順帶一提，真的需要多回合的效果（HOT/DOT、抗魔裝甲）本來就在各自的 case 裡
+    /// 自己覆寫 duration，所以這個改動對現有符文的行為是零影響，只是把資料欄位打通，
+    /// 之後想做「持續 3 回合的護盾」直接填資料就會生效。
+    /// </summary>
     static public PlayerAbilityEffectRef Create(AbilityEffect newEffect)
     {
-        return new PlayerAbilityEffectRef() { type = newEffect.type, effect = newEffect };
+        var created = new PlayerAbilityEffectRef() { type = newEffect.type, effect = newEffect };
+        if (newEffect.duration > 0) created.duration = newEffect.duration;
+        return created;
     }
 
 }

@@ -1,0 +1,57 @@
+; 標題選單與設定選單的文字（來源語系 zh-TW）。
+;
+; key 有兩種來源，都不能改名：
+;   1. TitleUI.prefab / SettingsUI.prefab 上各個 ManagedTextProvider 元件的 key 欄位
+;   2. GameSettings*Dropdown.cs 裡標了 [ManagedText("DefaultUI")] 的靜態欄位（格式：類別名.欄位名）
+;
+; 英文／日文放在 Localization/<locale>/Text/DefaultUI.txt。
+; 沒有這份文件的話會 fallback 到元件上的 defaultValue（原廠值都是英文）。
+
+; ── 標題選單 ────────────────────────────────
+TitleMenu.NewGame: 新遊戲
+TitleMenu.Continue: 繼續遊戲
+TitleMenu.Settings: 設定
+TitleMenu.Exit: 離開遊戲
+TitleMenu.CGGallery: 回憶模式
+TitleMenu.TestEndings: 結局測試
+TitleMenu.Tips: 提示
+TitleMenu.ExternalScripts: 外部腳本
+
+; ── 設定選單 ────────────────────────────────
+General.Return: 返回
+SettingsMenu.Tab.Basic: 基本
+SettingsMenu.Tab.Text: 文字
+SettingsMenu.Tab.Sound: 音效
+SettingsMenu.Language: 語言：
+SettingsMenu.VoiceLanguage: 語音語言：
+SettingsMenu.Resolution: 解析度：
+SettingsMenu.ScreenMode: 顯示模式：
+SettingsMenu.Graphics: 畫質：
+SettingsMenu.MessageSpeed: 文字速度：
+SettingsMenu.AutoDelay: 自動播放延遲：
+SettingsMenu.SkipMode: 快轉模式：
+SettingsMenu.Font: 字型：
+SettingsMenu.FontSize: 字級：
+SettingsMenu.VolumeMaster: 主音量：
+SettingsMenu.VolumeMusic: 音樂音量：
+SettingsMenu.VolumeVoice: 語音音量：
+SettingsMenu.VolumeEffects: 音效音量：
+
+; ── 設定選單的下拉選項 ──────────────────────
+Naninovel.UI.GameSettingsFontDropdown.DefaultFontName: 預設
+Naninovel.UI.GameSettingsFontSizeDropdown.Small: 小
+Naninovel.UI.GameSettingsFontSizeDropdown.Default: 標準
+Naninovel.UI.GameSettingsFontSizeDropdown.Large: 大
+Naninovel.UI.GameSettingsFontSizeDropdown.ExtraLarge: 特大
+Naninovel.UI.GameSettingsGraphicsDropdown.GraphicOption1: 最低
+Naninovel.UI.GameSettingsGraphicsDropdown.GraphicOption2: 低
+Naninovel.UI.GameSettingsGraphicsDropdown.GraphicOption3: 中
+Naninovel.UI.GameSettingsGraphicsDropdown.GraphicOption4: 高
+Naninovel.UI.GameSettingsGraphicsDropdown.GraphicOption5: 很高
+Naninovel.UI.GameSettingsGraphicsDropdown.GraphicOption6: 極致
+Naninovel.UI.GameSettingsScreenModeDropdown.ExclusiveFullScreen: 全螢幕
+Naninovel.UI.GameSettingsScreenModeDropdown.FullScreenWindow: 無邊框全螢幕
+Naninovel.UI.GameSettingsScreenModeDropdown.MaximizedWindow: 最大化視窗
+Naninovel.UI.GameSettingsScreenModeDropdown.Windowed: 視窗
+Naninovel.UI.GameSettingsSkipModeDropdown.ReadOnly: 僅跳過已讀
+Naninovel.UI.GameSettingsSkipModeDropdown.Everything: 全部跳過

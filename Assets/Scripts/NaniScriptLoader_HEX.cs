@@ -104,8 +104,13 @@ public class NaniScriptLoader_HEX : MonoBehaviour
         }
 
         var ds = DataService.Instance;
-        Debug.Log($"★HEXE★ DataService={(ds==null?"NULL":"OK")}  scriptParameter={(ds?.scriptParameter==null?"null":ds.scriptParameter.scriptName.ToString())}");
         var sp = ds != null ? ds.scriptParameter : null;
+        // scriptName 是可以為 null 的（StringParameter 是 class）。女巫競技場的
+        // TowerModeManager.LoadFloor() 就只填 background + combatTarget，沒有劇本要回去，
+        // 所以這裡不能直接 .ToString()，會 NullReferenceException。
+        // 用 StringParameter → string 的隱式轉換取值，它本身是 null-safe 的。
+        Debug.Log($"★HEXE★ DataService={(ds == null ? "NULL" : "OK")}  " +
+                  $"scriptParameter={(sp == null ? "null" : $"name='{(string)sp.scriptName ?? "<null>"}' label='{(string)sp.scriptLabel ?? "<null>"}' target='{(string)sp.combatTarget ?? "<null>"}'")}");
 
         string scriptName = null;
         string label = null;

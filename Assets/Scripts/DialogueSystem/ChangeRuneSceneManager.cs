@@ -10,9 +10,18 @@ public class ChangeRuneSceneManager : MonoBehaviour
 {
     void Start()
     {
-        // Translate all tab / button labels to English
+        // Translate all tab / button labels to English.
+        // 交給 refresher 記住每個標籤的原文（Track 會立刻套用一次，行為跟原本一樣），
+        // 這樣玩家在設定選單切語言時整頁會即時重翻，不用退出再進來。
+        var refresher = LocaleRefresher.For(gameObject);
         foreach (var t in FindObjectsOfType<Text>())
-            t.text = RuneEnTranslation.TranslateName(t.text);
+        {
+            // 右側詳情面板的文字是隨著滑到哪張卡動態換的，原文不固定，
+            // 由 RuneDetailPanel 自己註冊重畫；被這裡記成「原文」的話，切語言時
+            // 會被蓋回當初記到的那一份（通常是「← 選擇一個符文」）。
+            if (t.GetComponentInParent<RuneDetailPanel>() != null) continue;
+            refresher.Track(t);
+        }
 
         // 好感度除錯顯示要在翻譯掃描「之後」才建立，不然會被 TranslateName 誤改
         // 高塔模式的換符文頁不是劇情流程，不需要顯示好感度除錯資訊

@@ -40,6 +40,31 @@ public class BranchNode
     //    只影響地圖上的識別，解鎖判定仍然看 VisitKey，所以幾格會一起亮。
     public string variantId;
 
+    // ⭐ 滑鼠移到這格時，右頁三角形裡要顯示的圖。留空＝三角形保持空白。
+    //    跟 icon 是兩張不同的圖：icon 是書頁上那顆小寶石，preview 是右頁的大圖。
+    public Sprite preview;
+
+    // ⭐ 三角形周圍的關鍵字，順序對應 BranchMapUI.keywordTexts。
+    //    給的比欄位少沒關係，多出來的欄位會清空。
+    public string[] keywords;
+
+    // ⭐ 不看解鎖紀錄，一律當成已解鎖。
+    //    主線必經的那幾格（第一～四章、分歧點前）勾這個。它們跟其他格是同生共死的：
+    //    有任何一格亮著就代表它們必定也走過了，所以「鎖住」的狀態只會出現在
+    //    全新存檔、而那時整張地圖本來就是暗的，鎖了也沒有意義。
+    public bool alwaysUnlocked;
+
+    // ⭐ 這個節點要用哪個按鈕 prefab。留空＝用 BranchMapUI.nodeButtonPrefab。
+    //    章節那幾格（羅馬數字）和路線那幾格（寶石）長相不同、行為一樣，
+    //    所以是換 prefab 而不是換元件——點擊邏輯只留一份在 NodeButton。
+    public GameObject buttonPrefab;
+
+    // ⭐ 書頁版面用：這個節點要放在左頁的哪個插槽上。
+    //    填 BranchMapUI.nodeSlotRoot 底下某個子物件的名字，位置直接在 Scene 裡拖。
+    //    留空的話，書頁模式下這個節點不會生成（Console 會提醒）。
+    //    舊的樹狀自動排版不看這個欄位。
+    public string slotName;
+
     // ⭐ 從地圖進入這個節點時要覆寫的變數。留空＝全部沿用 BranchMapUI 的預設好感度。
     //    例：第四章節點要填 affinity_Ved=0，否則會被 Ved>=50 直接推進綠線、三個選項不會出現。
     public VariablePreset[] variableOverrides;

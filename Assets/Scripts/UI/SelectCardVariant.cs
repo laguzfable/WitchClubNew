@@ -1,12 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using System.Linq;
 
 /// <summary>
 /// 休息頁的普通卡型態選擇按鈕，一個 element+variant 組合對應一個實例。
 /// 用法與 SelectRuneCard 相同：在 Inspector 裡對每個按鈕設定 element / variant。
 /// </summary>
-public class SelectCardVariant : MonoBehaviour
+public class SelectCardVariant : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     public ECardElement element;
     public string variant; // "" = 原版, "A", "B"
@@ -31,7 +32,12 @@ public class SelectCardVariant : MonoBehaviour
         if (cardData != null)
         {
             if (img != null) img.sprite = cardData.image;
-            if (nameText != null) nameText.text = RuneEnTranslation.TranslateName(cardData.displayName);
+
+            // 卡名是從 cardData 翻的（不是讀標籤現有文字），重跑是安全的，
+            // 所以直接註冊成重繪動作：註冊時會立刻套用一次，之後切語言也會跟著換。
+            if (nameText != null)
+                LocaleRefresher.For(gameObject).OnRefresh(() =>
+                    nameText.text = RuneEnTranslation.TranslateName(cardData.displayName));
         }
 
         // 自動找 SelectedFrame 子物件（不需要手動拖接線）
@@ -80,6 +86,17 @@ public class SelectCardVariant : MonoBehaviour
             if (card == null || card.element != element) continue;
             card.SetEquippedVisual(card.variant == variant);
         }
+    }
+
+    // ── Hover → 顯示右側詳情（跟符文頁同一套面板、同一套邏輯）──────
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        RuneDetailPanel.Instance?.ShowCard(cardData);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        RuneDetailPanel.Instance?.Hide();
     }
 
     static int BaseIdForElement(ECardElement element)

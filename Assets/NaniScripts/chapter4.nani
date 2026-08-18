@@ -796,14 +796,24 @@ nic: 終於走了，我們繼續吧……學姊？
 #ch4vedia_go
 @goto chapter4green
 
+; ══════════════════════════════════════════════════════════════
+;  三個選項各自看各自的好感度，都是 50。不夠就撲空，一律併入落單橋段。
+;  刻意不做「追梅爾失敗就改去找優菲」那種互相接住的 fallback ——
+;  你選了誰，就看你跟誰的關係夠不夠，選錯不該被系統偷偷改成別人。
+;
+;  判定一律寫成「達標才 goto」的正向形式。NCalc 遇到沒 @set 過的變數會
+;  求值失敗，失敗時 ShouldExecute 回 false，所以正向寫法會安全地掉進撲空，
+;  反過來寫 if:xxx<50 的話反而會讓未定義的變數通過門檻。
+; ══════════════════════════════════════════════════════════════
+
 #ch4mel_go
 @hide 薇狄亞         if:affinity_Ved>=50
 @goto chapter4red    if:affinity_Mel>=50
 
 梅爾的背影很快消失在轉角，只留下空氣中淡淡的香味。
+（追不上。從來就沒追上過。）
 
-@goto .ch4eupie_go   if:affinity_Eup>=50
-@goto .ch4nelly_go   if:affinity_Nel>=50
+@goto .ch4alone
 
 ; （草稿，待潤飾）誰的羈絆都不夠深 → 獨自留下 → 異變開始 → 接失敗終焉（chapter5common）
 #ch4alone
@@ -837,6 +847,15 @@ nic: 終於走了，我們繼續吧……學姊？
 
 #ch4nelly_go
 @hide 薇狄亞 if:affinity_Ved>=50
+@goto .ch4nelly_run if:affinity_Nel>=50
+
+; ── 好感不足：她沒有等你 ──（草稿，待潤飾）
+（等我回過神，走廊上已經沒有涅莉的影子了。）
+（她走得很快，快到像是根本沒打算讓誰跟上。）
+
+@goto .ch4alone
+
+#ch4nelly_run
 ; ── 跟著涅莉：出門看魅兒 → 迷霧草發表會 → 煙霧混亂 → 接 chapter5yellow（開頭就是會合場景） ──
 @back bg01
 
@@ -950,6 +969,17 @@ witchc: 迷霧草是最棒的！
 
 #ch4eupie_go
 @hide 薇狄亞 if:affinity_Ved>=50
+@goto .ch4eupie_run if:affinity_Eup>=50
+
+; ── 好感不足：你走過去，但你不是那個該在的人 ──（草稿，待潤飾）
+（你走向她。）
+（然後停住了。）
+（妮可不知道什麼時候擋在中間，什麼也沒說，只是搖了搖頭。）
+（——說得也是。這種時候，該在她身邊的，本來就不會是我。）
+
+@goto .ch4alone
+
+#ch4eupie_run
 ; ── 安慰優菲：留在優菲身邊 → 傳來發表會失控的消息 → 隨優菲趕往鎮壓 → 戰鬥 → 原有後續（→ chapter5blue） ──
 
 ; （草稿，待潤飾）安慰優菲

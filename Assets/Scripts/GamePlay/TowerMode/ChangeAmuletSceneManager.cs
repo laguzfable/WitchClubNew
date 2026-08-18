@@ -27,6 +27,11 @@ namespace Hexe.TowerMode
             }
 
             btn.onClick.AddListener(() => TowerModeManager.BackToHub());
+
+            // 這顆的文字本來完全沒被翻譯過（換符文頁是整頁掃描 Text，這裡沒有對應的處理），
+            // 所以英日文版的返回鍵一直是中文。順便一起接上即時換語系。
+            var label = btn.GetComponentInChildren<Text>();
+            if (label != null) LocaleRefresher.For(gameObject).Track(label);
         }
     }
 }

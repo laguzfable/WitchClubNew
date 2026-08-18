@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Naninovel;
 
 /// <summary>
 /// Chinese (zh-TW) → English / Japanese lookup for the Rune selection screen.
@@ -26,8 +27,12 @@ public static class RuneEnTranslation
         { "護身符",     "Amulet"      },
         { "進入下一層", "Next Floor"  },
         { "退出",       "Retreat"     },
+        { "退出女巫競技場", "Quit Arena" },
         { "回標題",     "Back to Title" },
+        { "回標題畫面", "Back to Title" }, // 場景裡按鈕實際寫的是「回標題畫面」，跟上面那筆不是同一個 key
         { "放棄本次挑戰", "Abandon Run" },
+        { "確定",       "Confirm"     },   // 放棄挑戰確認彈窗
+        { "取消",       "Cancel"      },
         { "藍護身符",   "Blue Amulet"   },
         { "紅護身符",   "Red Amulet"    },
         { "黃護身符",   "Yellow Amulet" },
@@ -35,6 +40,21 @@ public static class RuneEnTranslation
         { "次元護符",   "Dimension Amulet" },
         { "護符轉接頭", "Amulet Adapter" },
         { "起始能量全滿護符", "Full Energy Amulet" },
+        { "深淵護符",   "Abyss Amulet" },
+        { "女巫符文",   "Witch Rune" },
+        { "百合符文",   "Lily Rune"  },
+
+        // ── Detail panel（右側詳情）────────────────────────
+        { "← 選擇一個符文",   "← Select a rune"   },
+        { "← 選擇一張卡片",   "← Select a card"   },
+        { "← 選擇一個護身符", "← Select an amulet" },
+        { "攻擊",       "ATK"  },
+        { "防禦",       "DEF"  },
+        { "治療",       "HEAL" },
+        { "能量",       "EN"   },
+        { "卡片強化",   "Card Boost"   },
+        { "護符欄位",   "Amulet Slots" },
+        { "戰鬥起手",   "Battle Start" },
 
         // ── Card names (originals) ────────────────────────
         { "血巫觸手",   "Blood Tentacle" },
@@ -131,8 +151,12 @@ public static class RuneEnTranslation
         { "護身符",     "護符"       },
         { "進入下一層", "次の階へ"   },
         { "退出",       "撤退"       },
+        { "退出女巫競技場", "闘技場から撤退" },
         { "回標題",     "タイトルへ戻る" },
+        { "回標題畫面", "タイトルへ戻る" }, // 場景裡按鈕實際寫的是「回標題畫面」，跟上面那筆不是同一個 key
         { "放棄本次挑戰", "挑戦を放棄" },
+        { "確定",       "決定"       },   // 放棄挑戰確認彈窗
+        { "取消",       "キャンセル" },
         { "藍護身符",   "青の護符"   },
         { "紅護身符",   "赤の護符"   },
         { "黃護身符",   "黄の護符"   },
@@ -140,6 +164,21 @@ public static class RuneEnTranslation
         { "次元護符",   "次元の護符" },
         { "護符轉接頭", "護符アダプター" },
         { "起始能量全滿護符", "開幕満タン護符" },
+        { "深淵護符",   "深淵の護符" },
+        { "女巫符文",   "魔女のルーン" },
+        { "百合符文",   "百合のルーン" },
+
+        // ── Detail panel（右側詳情）────────────────────────
+        { "← 選擇一個符文",   "← ルーンを選択" },
+        { "← 選擇一張卡片",   "← カードを選択" },
+        { "← 選擇一個護身符", "← 護符を選択"   },
+        { "攻擊",       "攻撃"           },
+        { "防禦",       "防御"           },
+        { "治療",       "回復"           },
+        { "能量",       "エネルギー"     },
+        { "卡片強化",   "カード強化"     },
+        { "護符欄位",   "護符スロット"   },
+        { "戰鬥起手",   "戦闘開始時"     },
 
         // ── Card names (originals) ────────────────────────
         { "血巫觸手",   "血巫の触手"   },
@@ -224,8 +263,9 @@ public static class RuneEnTranslation
     static readonly Dictionary<string, string> DescsEn = new Dictionary<string, string>
     {
         // ── Tower hub screen ──────────────────────────────
-        { "確定要放棄本次高塔挑戰嗎？\n目前樓層進度將無法接續，只會保留最高紀錄。",
-          "Abandon this Tower run?\nYour current floor progress cannot be resumed — only your best floor record will be kept." },
+        // key 必須跟 TowerHubScene 裡那個 Text 的內容「一字不差」，這是完全比對的查表
+        { "確定要放棄本次挑戰嗎？\n目前樓層進度將無法接續，只會保留最高紀錄。",
+          "Abandon this run?\nYour current floor progress cannot be resumed — only your best floor record will be kept." },
 
         // ── Common ────────────────────────────────────────
         { "洗掉手上所有手牌",                     "Discard all cards in hand."                      },
@@ -283,6 +323,52 @@ public static class RuneEnTranslation
         { "受到傷害降低30%\n選擇隨機一個元素",    "Reduce damage by 30%. Choose element."           },
         { "受到傷害降低30% 傷害及治療提升20%\n選擇隨機一個元素", "Reduce dmg 30%. Boost dmg/heal 20%." },
         { "用來測試的技能啦",                      "[Test Skill]"                                    },
+
+        // ── Card variants（更換卡片頁右側詳情，key 見 CardEffectText.Flavors）──
+        { "純攻擊：只有攻擊力，沒有其他附加效果。",
+          "Pure offense: attack only, no extra effects." },
+        { "攻擊特化：攻擊力比原版更高，其餘一樣是零。",
+          "Offense focused: higher attack than the original, nothing else." },
+        { "攻守兼備：攻擊力比原版低，但每張同時附帶治療。",
+          "Balanced: lower attack than the original, but every card also heals." },
+        { "防禦為主：以防禦為主，附帶少量攻擊。",
+          "Defense focused: mostly defense with a little attack." },
+        { "防禦特化：防禦更高，攻擊更低。",
+          "Bulwark: higher defense, lower attack." },
+        { "充能型：防禦略降，改成每張提供 1 點符文能量。",
+          "Battery: slightly less defense, but each card gives 1 rune energy." },
+        { "治療為主：固定防禦搭配高治療。",
+          "Healer: fixed defense with strong healing." },
+        { "治療特化：治療更高，防禦更低。",
+          "Healing focused: more healing, less defense." },
+        { "守護型：治療降低，換取更高的固定防禦。",
+          "Guardian: less healing in exchange for higher fixed defense." },
+        { "均衡型：攻防兼具，每張還提供 1 點符文能量。",
+          "All-rounder: attack and defense, plus 1 rune energy per card." },
+        { "充能特化：攻防較低，但每張提供 2 點符文能量。",
+          "Battery focused: lower stats, but each card gives 2 rune energy." },
+        { "戰鬥型：攻防都更高，但不提供符文能量。",
+          "Brawler: higher attack and defense, but no rune energy." },
+
+        // ── Amulets（護身符頁右側詳情，key 見 AmuletInfo）──
+        { "挑戰中，學院（藍）卡片的攻擊、防禦、治療、能量全部變成 2 倍。",
+          "During a run, Academy (Blue) cards have their ATK, DEF, HEAL and EN doubled." },
+        { "挑戰中，血系（紅）卡片的攻擊、防禦、治療、能量全部變成 2 倍。",
+          "During a run, Blood (Red) cards have their ATK, DEF, HEAL and EN doubled." },
+        { "挑戰中，惡魔（黃）卡片的攻擊、防禦、治療、能量全部變成 2 倍。",
+          "During a run, Demon (Yellow) cards have their ATK, DEF, HEAL and EN doubled." },
+        { "挑戰中，自然（綠）卡片的攻擊、防禦、治療、能量全部變成 2 倍。",
+          "During a run, Nature (Green) cards have their ATK, DEF, HEAL and EN doubled." },
+        { "手牌的等級上限從 5 級提高到 7 級；第 6、7 級照第 4→5 級的成長幅度往上推算。",
+          "Raises the hand card level cap from 5 to 7. Levels 6-7 grow at the same rate as level 4 to 5." },
+        { "護身符欄位從 1 格變成 3 格（轉接頭本身也佔 1 格）。卸下時，多出來裝不下的護身符會自動取下。",
+          "Amulet slots go from 1 to 3 (the adapter itself takes one). Unequipping it drops any amulets that no longer fit." },
+        { "每場戰鬥一開始，符文能量就是全滿的。",
+          "Rune energy starts every battle fully charged." },
+        { "每場戰鬥開場，手上保證有 1 張角色卡。",
+          "Every battle starts with at least 1 character card in hand." },
+        { "上一場滿血過關的話，這場開場保證有 2 張角色卡；可以和女巫符文疊加。",
+          "If you cleared the previous battle at full HP, this battle starts with 2 character cards. Stacks with the Witch Rune." },
     };
 
     // ════════════════════════════════════════════════════════════════
@@ -291,8 +377,9 @@ public static class RuneEnTranslation
     static readonly Dictionary<string, string> DescsJa = new Dictionary<string, string>
     {
         // ── Tower hub screen ──────────────────────────────
-        { "確定要放棄本次高塔挑戰嗎？\n目前樓層進度將無法接續，只會保留最高紀錄。",
-          "今回の塔への挑戦を放棄しますか？\n現在の階の進行状況は引き継げません。最高到達階のみ記録されます。" },
+        // key 必須跟 TowerHubScene 裡那個 Text 的內容「一字不差」，這是完全比對的查表
+        { "確定要放棄本次挑戰嗎？\n目前樓層進度將無法接續，只會保留最高紀錄。",
+          "今回の挑戦を放棄しますか？\n現在の階の進行状況は引き継げません。最高到達階のみ記録されます。" },
 
         // ── Common ────────────────────────────────────────
         { "洗掉手上所有手牌",                     "手札をすべて捨てる。"                            },
@@ -350,15 +437,75 @@ public static class RuneEnTranslation
         { "受到傷害降低30%\n選擇隨機一個元素",    "受けるダメージ30%減。属性を選択。"               },
         { "受到傷害降低30% 傷害及治療提升20%\n選擇隨機一個元素", "ダメージ30%減、攻撃/回復+20%。属性を選択。" },
         { "用來測試的技能啦",                      "【テストスキル】"                                },
+
+        // ── Card variants（更換卡片頁右側詳情，key 見 CardEffectText.Flavors）──
+        { "純攻擊：只有攻擊力，沒有其他附加效果。",
+          "純攻撃型：攻撃力のみ、追加効果なし。" },
+        { "攻擊特化：攻擊力比原版更高，其餘一樣是零。",
+          "攻撃特化：原版より攻撃力が高いが、他は一切なし。" },
+        { "攻守兼備：攻擊力比原版低，但每張同時附帶治療。",
+          "攻防両立：攻撃力は原版より低いが、1枚ごとに回復も付く。" },
+        { "防禦為主：以防禦為主，附帶少量攻擊。",
+          "防御重視：防御が中心で、攻撃は少量。" },
+        { "防禦特化：防禦更高，攻擊更低。",
+          "堡塁型：防御がさらに高く、攻撃はより低い。" },
+        { "充能型：防禦略降，改成每張提供 1 點符文能量。",
+          "充電型：防御が少し下がり、1枚ごとにルーンエネルギー+1。" },
+        { "治療為主：固定防禦搭配高治療。",
+          "回復重視：固定の防御と高い回復量。" },
+        { "治療特化：治療更高，防禦更低。",
+          "回復特化：回復がさらに高く、防御は低い。" },
+        { "守護型：治療降低，換取更高的固定防禦。",
+          "守護型：回復を抑えて固定防御を強化。" },
+        { "均衡型：攻防兼具，每張還提供 1 點符文能量。",
+          "バランス型：攻防を兼ね備え、1枚ごとにルーンエネルギー+1。" },
+        { "充能特化：攻防較低，但每張提供 2 點符文能量。",
+          "充電特化：攻防は低いが、1枚ごとにルーンエネルギー+2。" },
+        { "戰鬥型：攻防都更高，但不提供符文能量。",
+          "格闘型：攻防ともに高いが、ルーンエネルギーは得られない。" },
+
+        // ── Amulets（護身符頁右側詳情，key 見 AmuletInfo）──
+        { "挑戰中，學院（藍）卡片的攻擊、防禦、治療、能量全部變成 2 倍。",
+          "挑戦中、アカデミー（青）カードの攻撃・防御・回復・エネルギーが全て2倍。" },
+        { "挑戰中，血系（紅）卡片的攻擊、防禦、治療、能量全部變成 2 倍。",
+          "挑戦中、血系（赤）カードの攻撃・防御・回復・エネルギーが全て2倍。" },
+        { "挑戰中，惡魔（黃）卡片的攻擊、防禦、治療、能量全部變成 2 倍。",
+          "挑戦中、悪魔（黄）カードの攻撃・防御・回復・エネルギーが全て2倍。" },
+        { "挑戰中，自然（綠）卡片的攻擊、防禦、治療、能量全部變成 2 倍。",
+          "挑戦中、自然（緑）カードの攻撃・防御・回復・エネルギーが全て2倍。" },
+        { "手牌的等級上限從 5 級提高到 7 級；第 6、7 級照第 4→5 級的成長幅度往上推算。",
+          "手札のレベル上限が5から7に上昇。6・7レベルは4→5レベルの伸び幅で計算。" },
+        { "護身符欄位從 1 格變成 3 格（轉接頭本身也佔 1 格）。卸下時，多出來裝不下的護身符會自動取下。",
+          "護符スロットが1から3に増える（アダプター自身も1枠使用）。外すと入りきらない護符は自動的に外れる。" },
+        { "每場戰鬥一開始，符文能量就是全滿的。",
+          "毎戦闘、開始時からルーンエネルギーが満タン。" },
+        { "每場戰鬥開場，手上保證有 1 張角色卡。",
+          "毎戦闘の開始時、手札にキャラクターカードが必ず1枚。" },
+        { "上一場滿血過關的話，這場開場保證有 2 張角色卡；可以和女巫符文疊加。",
+          "前の戦闘を満タンHPでクリアしていれば、開始時にキャラクターカードが2枚。魔女のルーンと重複可能。" },
     };
 
     // ════════════════════════════════════════════════════════════════
     //  Public API
     // ════════════════════════════════════════════════════════════════
 
-    // 沒有存過語言偏好時（例如剛清過 PlayerPrefs、或第一次啟動還沒選語言）要當作中文，
-    // 不能落到空字串——空字串不是 "zh" 開頭，會被英文分支誤判成「非中文」。
-    static string GetLang() => PlayerPrefs.GetString("Language", "zh-TW").ToLower();
+    // 語系以 Naninovel 的 SelectedLocale 為準：設定選單的語言選項改的是它，PlayerPrefs
+    // 是由 LocalePrefsSync 掛在同一個事件上事後同步的。如果這裡只讀 PlayerPrefs，那就變成
+    // 「誰先收到 OnLocaleChanged」決定讀到新值還是舊值——畫面重繪跑在同步之前就會顯示舊語言。
+    // 直接問引擎就沒有這個順序問題。
+    //
+    // 引擎還沒起來時才退回 PlayerPrefs；沒存過語言偏好時（剛清過 PlayerPrefs、或第一次啟動
+    // 還沒選語言）要當作中文，不能落到空字串——空字串不是 "zh" 開頭，會被英文分支誤判。
+    static string GetLang()
+    {
+        if (Engine.Initialized)
+        {
+            var locale = Engine.GetService<ILocalizationManager>()?.SelectedLocale;
+            if (!string.IsNullOrEmpty(locale)) return locale.ToLower();
+        }
+
+        return PlayerPrefs.GetString("Language", "zh-TW").ToLower();
+    }
 
     public static string TranslateName(string zh)
     {

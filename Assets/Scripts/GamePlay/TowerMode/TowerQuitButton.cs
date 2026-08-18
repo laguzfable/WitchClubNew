@@ -19,8 +19,9 @@ namespace Hexe.TowerMode
                 return;
             }
 
+            // 交給 refresher 記住原文，玩家中途切語言時這顆才跟得上
             var label = GetComponentInChildren<Text>();
-            if (label != null) label.text = RuneEnTranslation.TranslateName(label.text);
+            if (label != null) LocaleRefresher.For(gameObject).Track(label);
 
             GetComponent<Button>().onClick.AddListener(TowerModeManager.QuitRun);
         }

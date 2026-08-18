@@ -23,10 +23,25 @@ namespace Hexe.TowerMode
         [SerializeField] Button abandonYesButton; // 選填：彈窗的「確定」
         [SerializeField] Button abandonNoButton; // 選填：彈窗的「取消」
 
+        LocaleRefresher refresher;
+
         void Start()
         {
+            // 玩家在設定選單切語言時，這一頁要即時跟著換（不用退出再進來）
+            refresher = LocaleRefresher.For(gameObject);
+
             if (floorText != null)
-                floorText.text = BuildFloorLabel(TowerModeManager.CurrentFloor);
+            {
+                // 這個 Text 的寬度只夠放「第 X 層」，右邊緊接著就是「放棄本次挑戰」按鈕，
+                // 最高紀錄接在同一行會被切掉。所以換行放第二行，並且關掉截斷
+                // （場景裡設的是 Truncate，第二行會直接不見）。
+                floorText.horizontalOverflow = HorizontalWrapMode.Overflow;
+                floorText.verticalOverflow = VerticalWrapMode.Overflow;
+
+                // 樓層文字是數字組出來的、查表處理不了，所以走自訂重繪（註冊時會立刻執行一次）
+                refresher.OnRefresh(() =>
+                    floorText.text = BuildFloorLabel(TowerModeManager.CurrentFloor));
+            }
 
             SetupButton(runeButton, TowerModeManager.OpenRuneScreen, "runeButton");
             SetupButton(cardButton, TowerModeManager.OpenCardScreen, "cardButton");
@@ -38,7 +53,7 @@ namespace Hexe.TowerMode
             SetupButton(abandonNoButton, HideAbandonConfirmPanel, "abandonNoButton");
 
             if (abandonConfirmMessage != null)
-                abandonConfirmMessage.text = RuneEnTranslation.TranslateDesc(abandonConfirmMessage.text);
+                refresher.Track(abandonConfirmMessage, isDesc: true);
 
             HideAbandonConfirmPanel();
         }
@@ -63,19 +78,46 @@ namespace Hexe.TowerMode
                 return;
             }
 
-            // 按鈕上的文字沿用場景既有的多國語言字典（RuneEnTranslation）
+            // 按鈕上的文字沿用場景既有的多國語言字典（RuneEnTranslation）。
+            // 交給 refresher 記住原文，切語言時才回得去（直接覆寫的話第二次就查不到表了）。
             var label = btn.GetComponentInChildren<Text>();
-            if (label != null) label.text = RuneEnTranslation.TranslateName(label.text);
+            if (label != null) refresher.Track(label);
 
             btn.onClick.AddListener(onClick);
         }
 
+        /// <summary>
+        /// 「第 X 層」下面接一行最高紀錄，再接一行目前連勝（連勝有成就，看不到的話玩家不會知道自己打到哪）。
+        /// BestFloor 一直有在寫進 PlayerPrefs（TowerModeManager 的戰敗 / 退出 / 回標題 / 放棄挑戰都會更新），
+        /// 但之前沒有任何地方讀出來顯示，玩家等於看不到自己的紀錄。
+        /// 還沒有紀錄（0）時那一行就整行不出現，不會變成「最高紀錄 0 層」。
+        /// </summary>
         static string BuildFloorLabel(int floor)
         {
             var lang = PlayerPrefs.GetString("Language", "zh-TW").ToLower();
-            if (lang.StartsWith("ja")) return $"{floor}階";
-            if (!lang.StartsWith("zh")) return $"Floor {floor}";
-            return $"第 {floor} 層";
+            var best = TowerModeManager.BestFloor;
+            var streak = TowerModeManager.WinStreak;
+
+            if (lang.StartsWith("ja"))
+            {
+                var label = $"{floor}階";
+                if (best > 0) label += $"\n最高記録 {best}階";
+                if (streak > 0) label += $"\n連勝 {streak}";
+                return label;
+            }
+
+            if (!lang.StartsWith("zh"))
+            {
+                var label = $"Floor {floor}";
+                if (best > 0) label += $"\nBest: {best}";
+                if (streak > 0) label += $"\nWin streak: {streak}";
+                return label;
+            }
+
+            var zh = $"第 {floor} 層";
+            if (best > 0) zh += $"\n最高紀錄 {best} 層";
+            if (streak > 0) zh += $"\n連勝 {streak} 場";
+            return zh;
         }
     }
 }

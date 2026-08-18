@@ -11,87 +11,246 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d26e08a9791e50d48b1124f02eccfaaf, type: 3}
   m_Name: MyBranchDB
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   nodes:
-  - nodeId: chapter0
-    displayName: 序章
-    scriptName: chapter0
-    label:
-    parentId:
   - nodeId: chapter1
-    displayName: 第一章
+    displayName: HOUND
     scriptName: chapter1
-    label:
-    parentId: chapter0
+    label: 
+    icon: {fileID: 0}
+    variantId: 
+    preview: {fileID: 21300000, guid: 1f4de863b8b5bd1448ef472ef7df9617, type: 3}
+    keywords:
+    - "\u5165\u5B78"
+    - "\u521D\u9047"
+    - "\u72AC"
+    alwaysUnlocked: 0
+    buttonPrefab: {fileID: 0}
+    slotName: HOUND
+    variableOverrides: []
+    parentId: 
   - nodeId: chapter2
-    displayName: 第二章
+    displayName: TOME
     scriptName: chapter2
-    label:
+    label: 
+    icon: {fileID: 0}
+    variantId: 
+    preview: {fileID: 21300000, guid: 9e1c6941f4de2f3fad8d619288d93d93, type: 3}
+    keywords:
+    - "\u7981\u66F8"
+    - "\u6284\u5BEB"
+    - "\u898F\u5247"
+    alwaysUnlocked: 0
+    buttonPrefab: {fileID: 0}
+    slotName: TOME
+    variableOverrides: []
     parentId: chapter1
   - nodeId: chapter3
-    displayName: 第三章
+    displayName: TETHER
     scriptName: chapter3
-    label:
+    label: 
+    icon: {fileID: 0}
+    variantId: 
+    preview: {fileID: 21300000, guid: 37191124d063e046d4d4c8cf43457358, type: 3}
+    keywords:
+    - "\u7E6B\u7E1B"
+    - "\u8DDD\u96E2"
+    - "\u8A66\u63A2"
+    alwaysUnlocked: 0
+    buttonPrefab: {fileID: 0}
+    slotName: TETHER
+    variableOverrides: []
     parentId: chapter2
   - nodeId: chapter4
-    displayName: 第四章
+    displayName: SEANCE
     scriptName: chapter4
-    label:
+    label: 
+    icon: {fileID: 0}
+    variantId: 
+    preview: {fileID: 21300000, guid: 7073a7e158daf55fdadd1d13d4aebee9, type: 3}
+    keywords:
+    - "\u964D\u9748"
+    - "\u88C2\u75D5"
+    - "\u9810\u5146"
+    alwaysUnlocked: 0
+    buttonPrefab: {fileID: 0}
+    slotName: SEANCE
+    variableOverrides: []
     parentId: chapter3
   - nodeId: chapter4
-    displayName: 第四章・分線抉擇
+    displayName: PARTING
     scriptName: chapter4
     label: branch_ch4route
+    icon: {fileID: 0}
+    variantId: 
+    preview: {fileID: 21300000, guid: d01b44da98a56ee639228bfbf74bb6d2, type: 3}
+    keywords:
+    - "\u5225\u96E2"
+    - "\u4E09\u689D\u8DEF"
+    - "\u6C7A\u5B9A"
+    alwaysUnlocked: 0
+    buttonPrefab: {fileID: 0}
+    slotName: PARTING
+    variableOverrides: []
     parentId: chapter4
   - nodeId: chapter4green
-    displayName: 第四章・綠線
+    displayName: COMMUNION
     scriptName: chapter4green
-    label:
+    label: 
+    icon: {fileID: 21300000, guid: 0e314714aaf1f0e4bad41a99cb9c3e78, type: 3}
+    variantId: 
+    preview: {fileID: 21300000, guid: 47368bf4293e3fa56e6b3e62d35d6f0b, type: 3}
+    keywords:
+    - "\u8587\u72C4\u4E9E"
+    - "\u5171\u611F"
+    - "\u68EE\u6797"
+    alwaysUnlocked: 0
+    buttonPrefab: {fileID: 0}
+    slotName: COMMUNION
+    variableOverrides: []
     parentId: chapter4#branch_ch4route
   - nodeId: chapter4green
-    displayName: 綠線・告知抉擇
+    displayName: WHISPER
     scriptName: chapter4green
     label: branch_green_tell
+    icon: {fileID: 21300000, guid: 0e314714aaf1f0e4bad41a99cb9c3e78, type: 3}
+    variantId: 
+    preview: {fileID: 21300000, guid: 039c7b52143573554d7032b62f8a0339, type: 3}
+    keywords:
+    - "\u5766\u767D"
+    - "\u6C89\u9ED8"
+    - "\u706B"
+    alwaysUnlocked: 0
+    buttonPrefab: {fileID: 0}
+    slotName: WHISPER
+    variableOverrides: []
     parentId: chapter4green
   - nodeId: chapter4red
-    displayName: 第四章・紅線
+    displayName: TRUCE
     scriptName: chapter4red
-    label:
+    label: 
+    icon: {fileID: 21300000, guid: 97f3ade5d4a5694489a831dd58b5de09, type: 3}
+    variantId: 
+    preview: {fileID: 21300000, guid: 50e8de693b4b032daa6e97a80ced1eb1, type: 3}
+    keywords:
+    - "\u6885\u723E"
+    - "\u505C\u6230"
+    - "\u50B7"
+    alwaysUnlocked: 0
+    buttonPrefab: {fileID: 0}
+    slotName: TRUCE
+    variableOverrides: []
     parentId: chapter4#branch_ch4route
   - nodeId: chapter5red
-    displayName: 第五章・紅線
+    displayName: ACCOMPLICE
     scriptName: chapter5red
-    label:
+    label: 
+    icon: {fileID: 21300000, guid: 97f3ade5d4a5694489a831dd58b5de09, type: 3}
+    variantId: 
+    preview: {fileID: 21300000, guid: a854f7cd46bb5a01739b3fdbacbbd860, type: 3}
+    keywords:
+    - "\u5171\u72AF"
+    - "\u96B1\u779E"
+    - "\u591C"
+    alwaysUnlocked: 0
+    buttonPrefab: {fileID: 0}
+    slotName: ACCOMPLICE
+    variableOverrides: []
     parentId: chapter4red
   - nodeId: chapter6red
-    displayName: 第六章・紅線
+    displayName: UNMASK
     scriptName: chapter6red
-    label:
+    label: 
+    icon: {fileID: 21300000, guid: 97f3ade5d4a5694489a831dd58b5de09, type: 3}
+    variantId: 
+    preview: {fileID: 21300000, guid: 97016e1369ac2d1ab82632a437bf9216, type: 3}
+    keywords:
+    - "\u63ED\u9732"
+    - "\u7C73\u590F"
+    - "\u771F\u76F8"
+    alwaysUnlocked: 0
+    buttonPrefab: {fileID: 0}
+    slotName: UNMASK
+    variableOverrides: []
     parentId: chapter5red
   - nodeId: chapter6red
-    displayName: 紅線・最終抉擇
+    displayName: CHALICE
     scriptName: chapter6red
     label: finalchoice_red
+    icon: {fileID: 21300000, guid: ec7e76d5fe231ec489d55560975216af, type: 3}
+    variantId: 
+    preview: {fileID: 21300000, guid: c57d21e24e3f2287eb0ce2c703a4d363, type: 3}
+    keywords:
+    - "\u8056\u676F"
+    - "\u90AA\u795E\u8840"
+    - "\u738B\u5EA7"
+    alwaysUnlocked: 0
+    buttonPrefab: {fileID: 0}
+    slotName: CHALICE
+    variableOverrides: []
     parentId: chapter6red
   - nodeId: chapter5blue
-    displayName: 第五章・藍線
+    displayName: REVERIE
     scriptName: chapter5blue
-    label:
+    label: 
+    icon: {fileID: 21300000, guid: ec7e76d5fe231ec489d55560975216af, type: 3}
+    variantId: 
+    preview: {fileID: 21300000, guid: 64161569ba7d3b630b570dd46780ad17, type: 3}
+    keywords:
+    - "\u512A\u83F2"
+    - "\u5922"
+    - "\u5854"
+    alwaysUnlocked: 0
+    buttonPrefab: {fileID: 0}
+    slotName: REVERIE
+    variableOverrides: []
     parentId: chapter4#branch_ch4route
   - nodeId: chapter5blue
-    displayName: 第五章・決戰前夜
+    displayName: VIGIL
     scriptName: chapter5blue
     label: beforefinal_blue
+    icon: {fileID: 21300000, guid: ec7e76d5fe231ec489d55560975216af, type: 3}
+    variantId: 
+    preview: {fileID: 21300000, guid: b8c6c6d5fe8c790310a9fa7a08087e36, type: 3}
+    keywords:
+    - "\u5B88\u591C"
+    - "\u544A\u5225"
+    - "\u661F"
+    alwaysUnlocked: 0
+    buttonPrefab: {fileID: 0}
+    slotName: VIGIL
+    variableOverrides: []
     parentId: chapter5blue
   - nodeId: chapter5blue
-    displayName: 藍線・最終抉擇
+    displayName: CROWN
     scriptName: chapter5blue
     label: finalchoice_blue
+    icon: {fileID: 21300000, guid: ec7e76d5fe231ec489d55560975216af, type: 3}
+    variantId: 
+    preview: {fileID: 21300000, guid: a6e6899891c4f21e2e14a55cdd39f83f, type: 3}
+    keywords:
+    - "\u51A0\u5195"
+    - "\u66FF\u8EAB"
+    - "\u7D14\u85CD"
+    alwaysUnlocked: 0
+    buttonPrefab: {fileID: 0}
+    slotName: CROWN
+    variableOverrides: []
     parentId: chapter5blue#beforefinal_blue
   - nodeId: chapter5yellow
-    displayName: 黃線・最終抉擇
+    displayName: SPIRAL
     scriptName: chapter5yellow
     label: finalchoice_yellow
+    icon: {fileID: 21300000, guid: 9adce7557e7e18c43be49873e9778d7a, type: 3}
+    variantId: 
+    preview: {fileID: 21300000, guid: 8a12a7eebc15fd26f38df2be63a919c4, type: 3}
+    keywords:
+    - "\u6D85\u8389"
+    - "\u8F2A\u8FF4"
+    - "\u65E5\u8755"
+    alwaysUnlocked: 0
+    buttonPrefab: {fileID: 0}
+    slotName: SPIRAL
     variableOverrides:
     - name: affinity_Nel
       value: 50

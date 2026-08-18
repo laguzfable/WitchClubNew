@@ -18,11 +18,14 @@ namespace Hexe.TowerMode
 
         const string CombatSceneName = "CombatScene";
         const string TitleSceneName = "Title";
-        const string ChangeRuneSceneName = "ChangeRuneScene";
-        const string ChangeCardSceneName = "ChangeCardTypeScene";
+        // 換裝頁的場景名稱是 public 的：右側詳情面板要靠它判斷自己在哪一頁（符文／卡片／護身符）
+        public const string ChangeRuneSceneName = "ChangeRuneScene";
+        public const string ChangeCardSceneName = "ChangeCardTypeScene";
+        public const string ChangeAmuletSceneName = "ChangeAmuletScene";
         const string HubSceneName = "TowerHubScene";
-        const string ChangeAmuletSceneName = "ChangeAmuletScene";
         const string BestFloorKey = "TowerMode.BestFloor";
+        const string WinStreakKey = "TowerMode.WinStreak";
+        const string BestWinStreakKey = "TowerMode.BestWinStreak";
         const string IsActiveKey = "TowerMode.IsActive";
         const string CurrentFloorKey = "TowerMode.CurrentFloor";
         const string SnapshotKeyPrefix = "TowerMode.Snapshot.";
@@ -30,6 +33,9 @@ namespace Hexe.TowerMode
         const string AdapterAmuletId = "Adapter";
         const string DimensionAmuletId = "Dimension";
         const string FullEnergyAmuletId = "FullEnergy";
+        const string WitchRuneAmuletId = "WitchRune";
+        const string LilyRuneAmuletId = "LilyRune";
+        const string LilyReadyKey = "TowerMode.LilyReady";
 
         static readonly string[] Elements = { "Blue", "Red", "Yellow", "Green" };
         static readonly string[] BattleBackgrounds =
@@ -37,6 +43,7 @@ namespace Hexe.TowerMode
 
         static List<string> monsterPool;
         static List<Sprite> spritePool;
+        static MobData arenaMobData;
 
         static bool isActiveField;
         public static bool IsActive
@@ -63,6 +70,14 @@ namespace Hexe.TowerMode
         }
 
         public static int BestFloor => PlayerPrefs.GetInt(BestFloorKey, 0);
+
+        /// <summary>目前連勝場數。一場＝一層戰鬥。跨挑戰累計（不然 50 層封頂就永遠打不到 100 連勝）。
+        /// 歸零的只有兩種：真的戰敗、以及主動「放棄本次挑戰」。
+        /// 戰鬥中按「退出」、回標題、直接關遊戲都會保留——那些是離場，不是打輸。</summary>
+        public static int WinStreak => PlayerPrefs.GetInt(WinStreakKey, 0);
+
+        /// <summary>歷史最高連勝，只增不減。</summary>
+        public static int BestWinStreak => PlayerPrefs.GetInt(BestWinStreakKey, 0);
 
         /// <summary>關掉遊戲重開後，是否還有一場沒結束的高塔挑戰可以繼續。</summary>
         public static bool HasSavedRun => PlayerPrefs.GetInt(IsActiveKey, 0) == 1;
@@ -126,11 +141,57 @@ namespace Hexe.TowerMode
         /// <summary>裝備「起始能量全滿護符」時，戰鬥一開始符文能量是不是該直接全滿。</summary>
         public static bool ShouldStartWithFullRuneEnergy => IsActive && IsAmuletEquipped(FullEnergyAmuletId);
 
+        /// <summary>「百合符文」的觸發條件是否成立：上一場戰鬥是不是滿血結束的。</summary>
+        public static bool LilyBonusReady => PlayerPrefs.GetInt(LilyReadyKey, 0) == 1;
+
+        /// <summary>
+        /// 戰鬥開場保證會有幾張角色卡在手上。
+        /// 女巫符文 +1（每場都給），百合符文 +2（要上一場滿血結束）。兩者相加。
+        /// 護身符欄位平常只有 1 格，要同時裝這兩顆得先上「護符轉接頭」，
+        /// 所以實際上限就是 3 張——剛好也是題目說的那個數字。
+        /// </summary>
+        public static int GuaranteedCharacterCards
+        {
+            get
+            {
+                if (!IsActive) return 0;
+
+                var count = 0;
+                if (IsAmuletEquipped(WitchRuneAmuletId)) count += 1;
+                if (IsAmuletEquipped(LilyRuneAmuletId) && LilyBonusReady) count += 2;
+                return count;
+            }
+        }
+
+        /// <summary>
+        /// 由 CombatSystem 在一場戰鬥結束時呼叫，記下這場是不是滿血過關，給下一場的百合符文用。
+        /// 每場都會覆寫，所以條件不會累積——沒滿血的那一場就把加成關掉了。
+        /// </summary>
+        public static void RecordBattleEndHP(bool isLose, float curHP, float maxHP)
+        {
+            if (!IsActive) return;
+
+            // 輸掉當然不算。血量留一點容差，免得治療/減傷算出 99.9999 這種浮點結果被判成沒滿血。
+            var full = !isLose && maxHP > 0f && curHP >= maxHP - 0.01f;
+
+            PlayerPrefs.SetInt(LilyReadyKey, full ? 1 : 0);
+            PlayerPrefs.Save();
+        }
+
+        /// <summary>開新挑戰／放棄挑戰時清掉百合符文的狀態，不然會沿用上一輪最後一場的結果。</summary>
+        static void ResetLilyBonus()
+        {
+            PlayerPrefs.SetInt(LilyReadyKey, 0);
+            PlayerPrefs.Save();
+        }
+
         public static void StartRun()
         {
+            UnlockArenaOpenAchievement();
             EnsurePoolsLoaded();
             SnapshotAndUnlockAllRunes();
             SnapshotAndUnlockAllCardVariants();
+            ResetLilyBonus(); // 上一輪最後一場的滿血狀態不能帶進新挑戰的第一場
 
             IsActive = true;
             CurrentFloor = 1;
@@ -148,6 +209,7 @@ namespace Hexe.TowerMode
                 return;
             }
 
+            UnlockArenaOpenAchievement();
             EnsurePoolsLoaded();
             IsActive = true;
             CurrentFloor = PlayerPrefs.GetInt(CurrentFloorKey, 1);
@@ -195,10 +257,13 @@ namespace Hexe.TowerMode
                     PlayerPrefs.Save();
                 }
 
+                ResetWinStreak();
                 CurrentFloor = 1; // 死掉重新從第一層開始（跟主動「退出」不一樣，退出不會重置）
                 BackToHub();
                 return;
             }
+
+            AddWin();
 
             if (CurrentFloor > BestFloor)
             {
@@ -229,6 +294,14 @@ namespace Hexe.TowerMode
                 PlayerPrefs.Save();
             }
 
+            // 百合符文的加成要清掉：中途退出不算「滿血結束」，那場根本沒打完。
+            // 不清的話會變成——滿血贏一場拿到加成後，之後每次打不順就退出重來，
+            // 加成永遠留著，等於無限次帶著 2 張角色卡重試同一層。
+            ResetLilyBonus();
+
+            // 連勝刻意「不」歸零：這顆是戰鬥中唯一的離場出口，玩家臨時要走只能按它。
+            // 這場沒有結算成勝利，樓層也不會前進，回來還是得重打同一層才過得去，
+            // 所以最多是無限重試當前這層，不會變成刷簡單怪。只有真的戰敗才算斷。
             BackToHub();
         }
 
@@ -266,9 +339,47 @@ namespace Hexe.TowerMode
                 PlayerPrefs.Save();
             }
 
+            // 這裡要歸零，跟「退出」不一樣：放棄挑戰會把樓層打回 1，
+            // 不歸零的話玩家可以卡關就放棄、回頭刷第 1~10 層的簡單怪把連勝墊上去。
+            ResetWinStreak();
             RestoreRuneSnapshot();
             RestoreCardVariantSnapshot();
             StartRun();
+        }
+
+        /// <summary>贏了一場：連勝 +1，順便看看有沒有踩到連勝成就的門檻。</summary>
+        static void AddWin()
+        {
+            var streak = WinStreak + 1;
+            PlayerPrefs.SetInt(WinStreakKey, streak);
+            if (streak > BestWinStreak)
+                PlayerPrefs.SetInt(BestWinStreakKey, streak);
+            PlayerPrefs.Save();
+
+            // 用 >= 而不是 ==：Steam 還沒就緒時 Unlock 會直接放棄，門檻只判一次的話那次就永遠掉了。
+            // 重複呼叫是安全的（AchievementManager 自己會先查已解鎖狀態）。
+            if (streak >= 10)  AchievementManager.Instance?.Unlock(AchievementManager.ACH_ARENA_STREAK_10);
+            if (streak >= 50)  AchievementManager.Instance?.Unlock(AchievementManager.ACH_ARENA_STREAK_50);
+            if (streak >= 100) AchievementManager.Instance?.Unlock(AchievementManager.ACH_ARENA_STREAK_100);
+        }
+
+        static void ResetWinStreak()
+        {
+            if (WinStreak == 0) return;
+
+            PlayerPrefs.SetInt(WinStreakKey, 0);
+            PlayerPrefs.Save();
+        }
+
+        /// <summary>
+        /// 「女巫競技場開啟」成就。正常情況下拿到第一個結局的當下就會由
+        /// AchievementManager 發出去，這裡是補給「更新前就已經有結局」的存檔。
+        /// </summary>
+        static void UnlockArenaOpenAchievement()
+        {
+            if (EndingRecord.Count <= 0) return;
+
+            AchievementManager.Instance?.Unlock(AchievementManager.ACH_ARENA_OPEN);
         }
 
         /// <summary>在畫面左上角顯示目前樓層，不依賴任何場景既有的 UI 物件。</summary>
@@ -321,6 +432,19 @@ namespace Hexe.TowerMode
         {
             var tier = (CurrentFloor - 1) / 10;
             return 1f + tier * 0.2f;
+        }
+
+        /// <summary>
+        /// 女巫競技場專用的怪物數值表。競技場的怪只借用池子裡的立繪，戰鬥數值一律走這張表——
+        /// 劇情怪的數值是照各章難度曲線調的（monster03~05 是前期弱怪，一回合只打 6），
+        /// 直接丟進隨機池會讓同一層的強度差到 2 倍以上。分開算之後，調競技場平衡不會動到劇情。
+        /// </summary>
+        public static MobData GetArenaMobData()
+        {
+            if (arenaMobData == null)
+                arenaMobData = Resources.Load<MobData>("TowerMode/ArenaMob");
+
+            return arenaMobData;
         }
 
         public static Sprite RollMonsterSprite()
@@ -464,8 +588,10 @@ namespace Hexe.TowerMode
         {
             if (monsterPool != null && spritePool != null) return;
 
+            // 王要排除掉：牠的數值是照劇情戰鬥調的（單張卡 100+ ATK），
+            // 混進隨機池的話玩家會在某一層被一發打死。順便也不讓王的立繪被當成雜魚皮膚用掉。
             var allMobs = Resources.LoadAll<MobData>("MobData")
-                .Where(m => m != null && !m.name.StartsWith("TestMobData"))
+                .Where(m => m != null && !m.isBoss && !m.name.StartsWith("TestMobData"))
                 .ToList();
 
             monsterPool = allMobs.Select(m => m.name).ToList();

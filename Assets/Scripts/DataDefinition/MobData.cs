@@ -11,6 +11,9 @@ public class MobData : ScriptableObject
 
     public int maxSelectCardCount = 1;
 
+    // 王等級的怪，數值是照劇情戰鬥調的，不能混進女巫競技場的隨機池
+    public bool isBoss = false;
+
     public string displayName;
     
     [PreviewField(80, ObjectFieldAlignment.Left)]

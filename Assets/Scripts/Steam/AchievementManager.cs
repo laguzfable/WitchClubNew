@@ -31,6 +31,18 @@ public class AchievementManager : MonoSingleton<AchievementManager>
     // 全符文收集（UnlockRuneCommand / UnlockAllRunesCommand 自動觸發）
     public const string ACH_ALL_RUNES = "ACH_ALL_RUNES";
 
+    // 蝕之聖典（劇情分歧地圖）第一次打開（BranchMapUI 顯示時自動觸發）
+    public const string ACH_CODEX_OPEN = "ACH_CODEX_OPEN";
+
+    // 女巫競技場開啟：拿過任一結局就算（見 MarkEndingAndUnlockArena，
+    // 另外 TowerModeManager 開場也會補檢查一次，照顧更新前就已經有結局的存檔）
+    public const string ACH_ARENA_OPEN = "ACH_ARENA_OPEN";
+
+    // 女巫競技場連勝（TowerModeManager.HandleBattleResult 自動觸發）
+    public const string ACH_ARENA_STREAK_10  = "ACH_ARENA_STREAK_10";
+    public const string ACH_ARENA_STREAK_50  = "ACH_ARENA_STREAK_50";
+    public const string ACH_ARENA_STREAK_100 = "ACH_ARENA_STREAK_100";
+
     // 元素組合成就（PlayerController 首次打出對應元素組合牌時，透過 UnlockComboAchievement 自動觸發）
     public const string ACH_COMBO_RED_BLUE          = "ACH_COMBO_RED_BLUE";
     public const string ACH_COMBO_RED_GREEN         = "ACH_COMBO_RED_GREEN";
@@ -91,6 +103,17 @@ public class AchievementManager : MonoSingleton<AchievementManager>
     public const string ACH_END_19 = "ACH_END_19"; // 墮星之主（chapter6red #mel_stands → mel_end #end1）
     public const string ACH_END_20 = "ACH_END_20"; // 私奔（syb_day05 / chapter4green #greennight_s2 → syb_end #end1）
 
+    // 本地結局紀錄 + 「女巫競技場開啟」的連動。20 個結局全都經過 Unlock 這個入口，
+    // 所以掛在這裡就好，不用去改每一份 .nani。
+    // 遞迴只會有一層：ACH_ARENA_OPEN 不是結局 id，第二次進來就不會再往下走。
+    private void MarkEndingAndUnlockArena(string achievementApiName)
+    {
+        EndingRecord.Mark(achievementApiName);
+
+        if (EndingRecord.IsEnding(achievementApiName))
+            Unlock(ACH_ARENA_OPEN);
+    }
+
 #if !DISABLESTEAMWORKS
     private bool m_StatsValid;
 
@@ -142,6 +165,10 @@ public class AchievementManager : MonoSingleton<AchievementManager>
     // Unlocks an achievement by its Steamworks API Name. Safe to call repeatedly.
     public void Unlock(string achievementApiName)
     {
+        // 先留本地紀錄，再處理 Steam。底下那個 early return 在 Steam 沒就緒時
+        // 會直接跳出，劇情完成度不能依賴它。
+        MarkEndingAndUnlockArena(achievementApiName);
+
         if (!SteamManager.Initialized || !m_StatsValid)
         {
             Debug.LogWarning($"[AchievementManager] Cannot unlock '{achievementApiName}', stats not ready yet.");
@@ -180,7 +207,8 @@ public class AchievementManager : MonoSingleton<AchievementManager>
 #endif
 
 #else
-    public void Unlock(string achievementApiName) { }
+    // 非 Steam 平台一樣要記錄結局，劇情完成度才算得出來
+    public void Unlock(string achievementApiName) { MarkEndingAndUnlockArena(achievementApiName); }
     public void SetStat(string statApiName, int value) { }
 #endif
 }
