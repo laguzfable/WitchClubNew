@@ -60,3 +60,9 @@ sysinfo.txt
 crashlytics-build.properties
 
 Assets/Plugins/RainbowAssets/RainbowFolders/Editor/Data/RainbowFoldersRuleset.asset
+
+# Naninovel 存檔：Editor 下會寫進 Assets/NaninovelData/Saves/（打包後才是 persistentDataPath），
+# 內容是每次試玩都會變的快速存檔／全域狀態（回憶CG 解鎖）／個人設定，不該進版控。
+# 檔案還是留在各自的機器上，刪掉這裡的規則並不會救回別人的存檔。
+/Assets/NaninovelData/Saves/
+/Assets/NaninovelData/Saves.meta
