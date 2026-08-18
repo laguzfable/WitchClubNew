@@ -14,7 +14,17 @@ using UnityEngine.SceneManagement;
 [CommandAlias("exitToTitle")]
 public class ExitToTitleCommand : Command, Command.IForceWait
 {
-    public async override UniTask ExecuteAsync(AsyncToken asyncToken = default)
+    public override UniTask ExecuteAsync(AsyncToken asyncToken = default) => RunAsync();
+
+    /// <summary>
+    /// 回標題的完整流程。除了 @exitToTitle 這個指令，對話框控制列的 TITLE 按鈕
+    /// （<see cref="Hexe.UI.ControlPanelExitToTitleButton"/>）也走這裡。
+    ///
+    /// ★ 不要改用 Naninovel 內建的 ControlPanelTitleButton ★
+    /// 那顆只有 ResetStateAsync() + TitleUI.Show()，既不停止腳本播放、也不載入 Title 場景，
+    /// 結果是劇本在背景繼續跑、畫面卡在原地。這支才是這個專案驗證過能用的流程。
+    /// </summary>
+    public static async UniTask RunAsync()
     {
         // 隱藏「繼續」提示（可能是 inactive 狀態，FindObjectOfType 抓不到，
         // 用 FindObjectsOfTypeAll 保險）。

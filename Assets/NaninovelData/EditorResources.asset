@@ -465,35 +465,26 @@ MonoBehaviour:
     - name: bg11
       pathPrefix: Backgrounds/MainBackground
       guid: 3a591efb33b83e547a122cce747f6e79
-    - name: cg00
-      pathPrefix: Backgrounds/MainBackground
-      guid: b92f701b20d8bc5448b6fdedcba78934
     - name: cg01
-      pathPrefix: Backgrounds/MainBackground
+      pathPrefix: Backgrounds/MainBackground/CG
       guid: 6eeba9d029aa5d54cab38d7a509f7f9b
-    - name: cg02
-      pathPrefix: Backgrounds/MainBackground
-      guid: 8adca9837ede07c45bd1975a5c6fea4e
     - name: cg03
-      pathPrefix: Backgrounds/MainBackground
+      pathPrefix: Backgrounds/MainBackground/CG
       guid: 6e8b5b5d0fa39014f8f2ff92e06081bf
     - name: cg04
-      pathPrefix: Backgrounds/MainBackground
+      pathPrefix: Backgrounds/MainBackground/CG
       guid: 80b5f937314feda48bea7505a8e01afc
-    - name: cg05
-      pathPrefix: Backgrounds/MainBackground
-      guid: 718d375c22643fb4388992e0c44fad52
     - name: cg06
-      pathPrefix: Backgrounds/MainBackground
+      pathPrefix: Backgrounds/MainBackground/CG
       guid: 1aa9e1141f26b1148a24b63c93e4a4e9
     - name: cg07
-      pathPrefix: Backgrounds/MainBackground
+      pathPrefix: Backgrounds/MainBackground/CG
       guid: f6181d7c9475d114b9ac0445b39202d6
     - name: cg09
-      pathPrefix: Backgrounds/MainBackground
+      pathPrefix: Backgrounds/MainBackground/CG
       guid: 5ce763cd0463c4d45ba3f81ec514a0e5
     - name: cg10
-      pathPrefix: Backgrounds/MainBackground
+      pathPrefix: Backgrounds/MainBackground/CG
       guid: 1abb2dcf313b8ff4aaeb3c44275afb5a
     - name: cg11
       pathPrefix: Backgrounds/MainBackground
@@ -511,32 +502,29 @@ MonoBehaviour:
       pathPrefix: Backgrounds/MainBackground
       guid: 
     - name: cg16
-      pathPrefix: Backgrounds/MainBackground
+      pathPrefix: Backgrounds/MainBackground/CG
       guid: 85e09844fcae15a4caf9ceac9af83010
     - name: cg17
-      pathPrefix: Backgrounds/MainBackground
+      pathPrefix: Backgrounds/MainBackground/CG
       guid: 3d4216b37a275874eb84cc472ac305da
     - name: cg18
-      pathPrefix: Backgrounds/MainBackground
+      pathPrefix: Backgrounds/MainBackground/CG
       guid: dd1bcdd5da5d1874d962ec5a1419a855
     - name: cg19
-      pathPrefix: Backgrounds/MainBackground
+      pathPrefix: Backgrounds/MainBackground/CG
       guid: 119b9d22537d0b64caff83a0e0ff0829
     - name: cg20
-      pathPrefix: Backgrounds/MainBackground
+      pathPrefix: Backgrounds/MainBackground/CG
       guid: 8f4add957fb9ca84490f8702131963b0
     - name: cg25
-      pathPrefix: Backgrounds/MainBackground
+      pathPrefix: Backgrounds/MainBackground/CG
       guid: 70dfa7bb0520a7c4a89b8cc253df5f4d
     - name: cg26
-      pathPrefix: Backgrounds/MainBackground
+      pathPrefix: Backgrounds/MainBackground/CG
       guid: 2c343949e82cc3040bc06ed376ca2970
     - name: cg27
-      pathPrefix: Backgrounds/MainBackground
+      pathPrefix: Backgrounds/MainBackground/CG
       guid: 3201bdb8b890e3d499606713734980b3
-    - name: cg28
-      pathPrefix: Backgrounds/MainBackground
-      guid: df02c7197284a464e9f548e5ed714685
     - name: star1
       pathPrefix: Backgrounds/MainBackground
       guid: da8fcafa1ef663d49bbb3f72605a7a90
@@ -580,13 +568,13 @@ MonoBehaviour:
       pathPrefix: Backgrounds/MainBackground
       guid: f7e6c7a47acb65c4f8e205b24d35cd74
     - name: cg12
-      pathPrefix: Backgrounds/MainBackground
+      pathPrefix: Backgrounds/MainBackground/CG
       guid: 27f39006aa37b2b4abffd9d27062616e
     - name: bg12
       pathPrefix: Backgrounds/MainBackground
       guid: 7dbeac317760edc40843418e6291f7ee
     - name: cg13
-      pathPrefix: Backgrounds/MainBackground
+      pathPrefix: Backgrounds/MainBackground/CG
       guid: 7bea20eb1d263bd41a34c32814ac9b49
     - name: bg022b
       pathPrefix: Backgrounds/MainBackground
@@ -628,14 +616,32 @@ MonoBehaviour:
       pathPrefix: Backgrounds/MainBackground
       guid: 93bddb9a5701d4b49966f0aebf7cda92
     - name: cg00new
-      pathPrefix: Backgrounds/MainBackground
+      pathPrefix: Backgrounds/MainBackground/CG
       guid: d7eac840aa52a3d4788eff0820a3f79f
     - name: cg02new
-      pathPrefix: Backgrounds/MainBackground
+      pathPrefix: Backgrounds/MainBackground/CG
       guid: 990a627cd71335445940f25cf4141c82
     - name: cg30
-      pathPrefix: Backgrounds/MainBackground
+      pathPrefix: Backgrounds/MainBackground/CG
       guid: 02c3b0854c2887840acdcc9c347fc7b9
+    - name: cg0003
+      pathPrefix: Backgrounds/MainBackground/CG
+      guid: 3375772daab5baf4a8f8f5b80e9c7e8d
+    - name: cg21
+      pathPrefix: Backgrounds/MainBackground/CG
+      guid: 27dbfb93680c7a64f876f35f851ce6c4
+    - name: cg23
+      pathPrefix: Backgrounds/MainBackground/CG
+      guid: 45aacfbdb7ed82441bed3c758cd25611
+    - name: cg31
+      pathPrefix: Backgrounds/MainBackground/CG
+      guid: 8c46c6f8885aaea44b08816ceec00a48
+    - name: cg34
+      pathPrefix: Backgrounds/MainBackground/CG
+      guid: 1de6fcbe933f1ba4fb274cc7ebc8cae4
+    - name: cg40
+      pathPrefix: Backgrounds/MainBackground/CG
+      guid: fe334202765a70c469f62ab6078124ba
     - name: bg03b
       pathPrefix: Backgrounds/MainBackground
       guid: 5e3714764101b4b4b86411660f7acc69
@@ -1011,14 +1017,6 @@ MonoBehaviour:
     - name: bluedream
       pathPrefix: Audio
       guid: 4f561db1d1172bd4aa7eaa08c35197b2
-  - Id: Unlockables
-    Resources:
-    - name: bg01
-      pathPrefix: Unlockables
-      guid: ff1f726b695e51746932a1a4c5d7c59a
-    - name: CG00new
-      pathPrefix: Unlockables
-      guid: d7eac840aa52a3d4788eff0820a3f79f
   - Id: Characters/55169dbe-a042-4969-a143-1205e67017ed
     Resources:
     - name: "\u827E\u59AE\u62C9\u8FD1"

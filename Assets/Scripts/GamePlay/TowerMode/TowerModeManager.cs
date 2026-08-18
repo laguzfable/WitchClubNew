@@ -24,8 +24,6 @@ namespace Hexe.TowerMode
         public const string ChangeAmuletSceneName = "ChangeAmuletScene";
         const string HubSceneName = "TowerHubScene";
         const string BestFloorKey = "TowerMode.BestFloor";
-        const string WinStreakKey = "TowerMode.WinStreak";
-        const string BestWinStreakKey = "TowerMode.BestWinStreak";
         const string IsActiveKey = "TowerMode.IsActive";
         const string CurrentFloorKey = "TowerMode.CurrentFloor";
         const string SnapshotKeyPrefix = "TowerMode.Snapshot.";
@@ -70,14 +68,6 @@ namespace Hexe.TowerMode
         }
 
         public static int BestFloor => PlayerPrefs.GetInt(BestFloorKey, 0);
-
-        /// <summary>目前連勝場數。一場＝一層戰鬥。跨挑戰累計（不然 50 層封頂就永遠打不到 100 連勝）。
-        /// 歸零的只有兩種：真的戰敗、以及主動「放棄本次挑戰」。
-        /// 戰鬥中按「退出」、回標題、直接關遊戲都會保留——那些是離場，不是打輸。</summary>
-        public static int WinStreak => PlayerPrefs.GetInt(WinStreakKey, 0);
-
-        /// <summary>歷史最高連勝，只增不減。</summary>
-        public static int BestWinStreak => PlayerPrefs.GetInt(BestWinStreakKey, 0);
 
         /// <summary>關掉遊戲重開後，是否還有一場沒結束的高塔挑戰可以繼續。</summary>
         public static bool HasSavedRun => PlayerPrefs.GetInt(IsActiveKey, 0) == 1;
@@ -251,25 +241,13 @@ namespace Hexe.TowerMode
 
             if (isLose)
             {
-                if (CurrentFloor > BestFloor)
-                {
-                    PlayerPrefs.SetInt(BestFloorKey, CurrentFloor);
-                    PlayerPrefs.Save();
-                }
-
-                ResetWinStreak();
+                RecordBestFloor();
                 CurrentFloor = 1; // 死掉重新從第一層開始（跟主動「退出」不一樣，退出不會重置）
                 BackToHub();
                 return;
             }
 
-            AddWin();
-
-            if (CurrentFloor > BestFloor)
-            {
-                PlayerPrefs.SetInt(BestFloorKey, CurrentFloor);
-                PlayerPrefs.Save();
-            }
+            RecordBestFloor();
 
             var clearedFloor = CurrentFloor;
 
@@ -288,20 +266,13 @@ namespace Hexe.TowerMode
         {
             if (!IsActive) return;
 
-            if (CurrentFloor > BestFloor)
-            {
-                PlayerPrefs.SetInt(BestFloorKey, CurrentFloor);
-                PlayerPrefs.Save();
-            }
+            RecordBestFloor();
 
             // 百合符文的加成要清掉：中途退出不算「滿血結束」，那場根本沒打完。
             // 不清的話會變成——滿血贏一場拿到加成後，之後每次打不順就退出重來，
             // 加成永遠留著，等於無限次帶著 2 張角色卡重試同一層。
             ResetLilyBonus();
 
-            // 連勝刻意「不」歸零：這顆是戰鬥中唯一的離場出口，玩家臨時要走只能按它。
-            // 這場沒有結算成勝利，樓層也不會前進，回來還是得重打同一層才過得去，
-            // 所以最多是無限重試當前這層，不會變成刷簡單怪。只有真的戰敗才算斷。
             BackToHub();
         }
 
@@ -311,11 +282,7 @@ namespace Hexe.TowerMode
         {
             if (!IsActive) return;
 
-            if (CurrentFloor > BestFloor)
-            {
-                PlayerPrefs.SetInt(BestFloorKey, CurrentFloor);
-                PlayerPrefs.Save();
-            }
+            RecordBestFloor();
 
             // 只關掉「記憶體中的作用中狀態」，PlayerPrefs 的續關記錄（IsActiveKey）保留。
             // 不然回標題後去玩主線時，IsActive 還是 true，高塔的護身符加成/換符文返回/
@@ -333,42 +300,32 @@ namespace Hexe.TowerMode
         {
             if (!IsActive) return;
 
+            RecordBestFloor();
+
+            RestoreRuneSnapshot();
+            RestoreCardVariantSnapshot();
+            StartRun();
+        }
+
+        /// <summary>
+        /// 更新最高樓層紀錄，順便看看有沒有踩到成就門檻。
+        /// 戰敗／退出／回標題／放棄挑戰／打贏一場都會呼叫——記的是「到達過的最高層」，
+        /// 不是通關層數，所以死在第 30 層也算到達過 30。
+        /// </summary>
+        static void RecordBestFloor()
+        {
             if (CurrentFloor > BestFloor)
             {
                 PlayerPrefs.SetInt(BestFloorKey, CurrentFloor);
                 PlayerPrefs.Save();
             }
 
-            // 這裡要歸零，跟「退出」不一樣：放棄挑戰會把樓層打回 1，
-            // 不歸零的話玩家可以卡關就放棄、回頭刷第 1~10 層的簡單怪把連勝墊上去。
-            ResetWinStreak();
-            RestoreRuneSnapshot();
-            RestoreCardVariantSnapshot();
-            StartRun();
-        }
-
-        /// <summary>贏了一場：連勝 +1，順便看看有沒有踩到連勝成就的門檻。</summary>
-        static void AddWin()
-        {
-            var streak = WinStreak + 1;
-            PlayerPrefs.SetInt(WinStreakKey, streak);
-            if (streak > BestWinStreak)
-                PlayerPrefs.SetInt(BestWinStreakKey, streak);
-            PlayerPrefs.Save();
-
             // 用 >= 而不是 ==：Steam 還沒就緒時 Unlock 會直接放棄，門檻只判一次的話那次就永遠掉了。
             // 重複呼叫是安全的（AchievementManager 自己會先查已解鎖狀態）。
-            if (streak >= 10)  AchievementManager.Instance?.Unlock(AchievementManager.ACH_ARENA_STREAK_10);
-            if (streak >= 50)  AchievementManager.Instance?.Unlock(AchievementManager.ACH_ARENA_STREAK_50);
-            if (streak >= 100) AchievementManager.Instance?.Unlock(AchievementManager.ACH_ARENA_STREAK_100);
-        }
-
-        static void ResetWinStreak()
-        {
-            if (WinStreak == 0) return;
-
-            PlayerPrefs.SetInt(WinStreakKey, 0);
-            PlayerPrefs.Save();
+            var best = BestFloor;
+            if (best >= 10) AchievementManager.Instance?.Unlock(AchievementManager.ACH_ARENA_FLOOR_10);
+            if (best >= 25) AchievementManager.Instance?.Unlock(AchievementManager.ACH_ARENA_FLOOR_25);
+            if (best >= 50) AchievementManager.Instance?.Unlock(AchievementManager.ACH_ARENA_FLOOR_50);
         }
 
         /// <summary>

@@ -55,8 +55,24 @@ namespace Naninovel.UI
                 return;
             }
 
+            // Awake 抓服務時引擎不一定已經就緒（中途重載場景／重置狀態時，UI 有機會在
+            // 服務還沒接上的空檔被 Awake），那樣下面的 stateManager 會是 null 而 NRE，
+            // 開新遊戲就會停在這裡不動。點下去的當下補抓一次最保險。
+            if (stateManager == null) stateManager = Engine.GetService<IStateManager>();
+            if (scriptPlayer == null) scriptPlayer = Engine.GetService<IScriptPlayer>();
+            if (scriptManager == null) scriptManager = Engine.GetService<IScriptManager>();
+            if (titleMenu == null) titleMenu = GetComponentInParent<TitleMenu>();
+
+            if (stateManager == null || scriptPlayer == null)
+            {
+                Debug.LogError("[TitleNewGameButton] Naninovel 服務拿不到，開新遊戲中止。" +
+                               "（stateManager=" + (stateManager == null ? "null" : "ok") +
+                               ", scriptPlayer=" + (scriptPlayer == null ? "null" : "ok") + "）");
+                return;
+            }
+
             // 立刻強制隱藏 TitleMenu，不等任何 async 流程
-            titleMenu.gameObject.SetActive(false);
+            if (titleMenu != null) titleMenu.gameObject.SetActive(false);
 
             // 同時關掉場景中所有只屬於標題畫面的物件
             foreach (var obj in UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects())
@@ -83,7 +99,7 @@ namespace Naninovel.UI
             stateManager.ResetStateAsync(excludeFromReset, () =>
             {
                 // Reset 後再確認一次，防止 Naninovel 的 title state restore 重新啟用
-                titleMenu.gameObject.SetActive(false);
+                if (titleMenu != null) titleMenu.gameObject.SetActive(false);
                 return scriptPlayer.PreloadAndPlayAsync(startScriptName);
             });
         }

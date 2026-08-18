@@ -20,8 +20,8 @@ namespace Hexe.UI
     ///
     /// 這兩顆之所以要自己處理：
     /// ‧ 蝕之聖典（BranchMapUI）是從 ContinueButton 複製出來的，身上的 provider 被移掉了。
-    /// ‧ 女巫競技場（TitleTowerModeButton）是 <see cref="TitleTowerModeInjector"/> 在執行期複製出來的，
-    ///   prefab 裡根本不存在。
+    /// ‧ 女巫競技場（TitleTowerModeButton）在 prefab 裡預設是關閉的，由
+    ///   <see cref="TitleMenuUnlockInjector"/> 判斷結局條件後才打開，身上同樣沒有 provider。
     ///
     /// ★ 找按鈕的方式 ★
     /// 蝕之聖典用 GameObject 名字找：它身上沒有可辨識的自訂元件（只有 Naninovel 的 PlayScript），
@@ -30,7 +30,7 @@ namespace Hexe.UI
     /// </summary>
     public static class TitleLabelInjector
     {
-        // 給 TitleTowerModeInjector 用（那顆按鈕是它生的，生的當下就要有正確的字）
+        // 給 TitleMenuUnlockInjector 用（按鈕被打開的當下就要有正確的字）
         public static string Arena => Pick("女巫競技場", "Witch Arena", "魔女闘技場");
         static string Codex => Pick("蝕之聖典", "Codex of the Eclipse", "蝕の聖典");
 

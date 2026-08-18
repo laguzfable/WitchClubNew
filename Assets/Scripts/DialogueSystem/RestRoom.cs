@@ -7,6 +7,8 @@ using UnityEngine.UI;
 public class RestRoom : MonoBehaviour
 {
     [SerializeField] private GameObject selectPanel;
+    [Tooltip("「更換卡片」按鈕。留空的話會自動找 onClick 接到 ChangeCardType() 的那顆。")]
+    [SerializeField] private Button changeCardBtn;
     [SerializeField] private Button chatBtn;
 
     private void Awake()
@@ -36,6 +38,41 @@ public class RestRoom : MonoBehaviour
         Engine.GetService<ICustomVariableManager>().TryGetVariableValue("CanChat", out canChat);
         selectPanel.SetActive(canChat);
         chatBtn.interactable = canChat;
+
+        ApplyCardVariantLock();
+    }
+
+    /// <summary>
+    /// 還沒跑到解鎖卡片型態的劇情（@unlockCardVariant）之前，「更換卡片」整顆藏起來。
+    /// 那之前進去也只有四張原版可選，等於是一個沒有內容的頁面。
+    /// </summary>
+    private void ApplyCardVariantLock()
+    {
+        var btn = changeCardBtn != null ? changeCardBtn : FindChangeCardButton();
+        if (btn == null)
+        {
+            Debug.LogWarning("[RestRoom] 找不到「更換卡片」按鈕，鎖定狀態沒套用。" +
+                             "請把它拖進 changeCardBtn，或確認它的 onClick 有接 ChangeCardType()。");
+            return;
+        }
+
+        var unlocked = CardVariantUnlock.AnyUnlocked;
+        if (btn.gameObject.activeSelf != unlocked)
+            btn.gameObject.SetActive(unlocked);
+    }
+
+    /// <summary>
+    /// 沒指定的話，靠 onClick 的靜態接線反查——場景裡那顆叫 ChangeSkillButton (1)，
+    /// 名字看不出用途，用方法名找比較不會挑錯。
+    /// </summary>
+    private Button FindChangeCardButton()
+    {
+        foreach (var btn in FindObjectsOfType<Button>())
+            for (var i = 0; i < btn.onClick.GetPersistentEventCount(); i++)
+                if (btn.onClick.GetPersistentMethodName(i) == nameof(ChangeCardType) &&
+                    ReferenceEquals(btn.onClick.GetPersistentTarget(i), this))
+                    return btn;
+        return null;
     }
 
     public void ChangeSkill()

@@ -45,6 +45,11 @@ namespace Hexe.TowerMode
 
             SetupButton(runeButton, TowerModeManager.OpenRuneScreen, "runeButton");
             SetupButton(cardButton, TowerModeManager.OpenCardScreen, "cardButton");
+
+            // 還沒解鎖任何卡片型態就把換卡片藏起來（跟休息室同一個規則）。
+            // 競技場開挑戰時會把四色都解開，所以挑戰中這顆一定看得到。
+            if (cardButton != null && !CardVariantUnlock.AnyUnlocked)
+                cardButton.gameObject.SetActive(false);
             SetupButton(amuletButton, TowerModeManager.OpenAmuletScreen, "amuletButton");
             SetupButton(continueButton, TowerModeManager.ContinueToNextFloor, "continueButton");
             SetupButton(titleButton, TowerModeManager.QuitToTitle, "titleButton");
@@ -87,8 +92,9 @@ namespace Hexe.TowerMode
         }
 
         /// <summary>
-        /// 「第 X 層」下面接一行最高紀錄，再接一行目前連勝（連勝有成就，看不到的話玩家不會知道自己打到哪）。
-        /// BestFloor 一直有在寫進 PlayerPrefs（TowerModeManager 的戰敗 / 退出 / 回標題 / 放棄挑戰都會更新），
+        /// 「第 X 層」下面接一行最高紀錄（最高樓層有成就，看不到的話玩家不會知道自己打到哪）。
+        /// BestFloor 一直有在寫進 PlayerPrefs（TowerModeManager.RecordBestFloor：打贏一場 / 戰敗 /
+        /// 退出 / 回標題 / 放棄挑戰都會更新），
         /// 但之前沒有任何地方讀出來顯示，玩家等於看不到自己的紀錄。
         /// 還沒有紀錄（0）時那一行就整行不出現，不會變成「最高紀錄 0 層」。
         /// </summary>
@@ -96,13 +102,11 @@ namespace Hexe.TowerMode
         {
             var lang = PlayerPrefs.GetString("Language", "zh-TW").ToLower();
             var best = TowerModeManager.BestFloor;
-            var streak = TowerModeManager.WinStreak;
 
             if (lang.StartsWith("ja"))
             {
                 var label = $"{floor}階";
                 if (best > 0) label += $"\n最高記録 {best}階";
-                if (streak > 0) label += $"\n連勝 {streak}";
                 return label;
             }
 
@@ -110,13 +114,11 @@ namespace Hexe.TowerMode
             {
                 var label = $"Floor {floor}";
                 if (best > 0) label += $"\nBest: {best}";
-                if (streak > 0) label += $"\nWin streak: {streak}";
                 return label;
             }
 
             var zh = $"第 {floor} 層";
             if (best > 0) zh += $"\n最高紀錄 {best} 層";
-            if (streak > 0) zh += $"\n連勝 {streak} 場";
             return zh;
         }
     }

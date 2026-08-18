@@ -19,7 +19,8 @@
 @back bg07
 @sfx knocking
 ......
-@back cg09
+@back CG/cg09
+@unlock CG/cg09
 優菲: ……象牙塔的最後一座堡壘，才沒有那麼容易淪陷呢……
 優菲: 只要有我在……
 優菲: 奧術．椒鹽捲餅衝擊！
@@ -96,7 +97,8 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @char 蘇菲亞 pos:50
 蘇菲亞.beer: 慶祝大家都找到工作，我做了三種口味的特製炸雞，另外還有豬腳唷。
 @hide 蘇菲亞,優菲
-@back cg10
+@back CG/cg10
+@unlock CG/cg10
 優菲: 耶～～
 @back bg08b
 @stopBgm
@@ -123,7 +125,8 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 優菲: 今天整理要賣的遺物時，在茶葉罐裡找到一堆金幣呢！當然先享樂再說！
 魅兒: 真是幸運啊……
 @hide 優菲,魅兒
-@back cg16
+@back CG/cg16
+@unlock CG/cg16
 優菲: 魅兒，啊～
 魅兒: 呃、唔，我自己吃就可以了。
 優菲: 還記得戰爭前在橡樹鎮的水果鬆餅店嗎？我覺得跟這家的味道有點像唷。
@@ -157,7 +160,8 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @goto .C02
 # C02b
 @back bg02
-@back cg17
+@back CG/cg17
+@unlock CG/cg17
 @stopBgm
 @bgm happy
 薇狄亞: ……香芹、鼠尾草、迷迭香與百里香……
@@ -208,7 +212,8 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 蘇菲亞: 什麼生意呀？最好不要是什麼危險的事唷。
 優菲: 沒事的沒事的，{PlayerName}，趕快跟我來。
 @hide 蘇菲亞,優菲
-@back cg12
+@back CG/cg12
+@unlock CG/cg12
 女巫D: 好準喔～
 女巫B: 真的！
 女巫D: 換我了，我想知道我跟我的好朋友告白會不會有結果。
@@ -426,7 +431,8 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @char 魅兒 pos:35
 魅兒: 怎麼了？！
 @hide 魅兒,涅莉
-@back cg18
+@back CG/cg18
+@unlock CG/cg18
 @sfx success loop:false
 涅莉: 媽呀，看起來也太好吃了吧！
 薇狄亞: 居然這麼快就做好了。
@@ -492,7 +498,8 @@ may: 當然囉！
 優菲: 什麼什麼？蘇菲亞買了什麼？
 蘇菲亞: 是能讓妳們變強的好東西唷，趕快拿出來看看吧。
 @hide 優菲,蘇菲亞
-@back cg19
+@back CG/cg19
+@unlock CG/cg19
 薇狄亞: 好強的能量－－
 優菲: 這、這是？
 魅兒: 難道這是傳說中的那個？

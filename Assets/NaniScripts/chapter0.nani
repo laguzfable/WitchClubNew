@@ -8,11 +8,10 @@
 @spawn hello
 @stopBgm
 @bgm fantasy
-@back cg00new pos:40,50 time:1
-@unlock CG/CG00new
-@unlock CG/bg01
+@back CG/cg00new pos:40,50 time:1
+@unlock CG/cg00new
 @wait 0.3
-@back cg00new pos:65,50 time:5
+@back CG/cg00new pos:65,50 time:5
 @choice 這裡是哪裡？我是誰？
 @stop
 @char ？？？
@@ -23,7 +22,8 @@
 ？？？: 10銀？超便宜的耶，那我要這個小精靈～
 @back black pos:50,50 time:0
 @wait 1
-@back cg01
+@back CG/cg01
+@unlock CG/cg01
 @sfx bling loop:false
 ？？？: 異鄉人，沒想到真的遇見你了。
 ？？？: 我在這裡啦，這裡這裡。
@@ -48,7 +48,8 @@
 # end_naming
 @despawn hello
 @spawn ShakeBackground
-@back cg02new
+@back CG/cg02new
+@unlock CG/cg02new
 ？？？: 吶、魅兒，看看我買了什麼！
 紅髮女子: 七彩駱駝的睫毛嗎？我早說過那個戴起來不適合妳了。
 ？？？: 比那個厲害多了！
@@ -150,7 +151,8 @@
 @stopBgm
 @bgm intense
 @hide 優菲,薇狄亞
-@back cg03
+@back CG/cg03
+@unlock CG/cg03
 ？？？: 盡賣一些黑魔法道具，是怎樣，嫌這個世界不夠亂嗎？
 ？？？: 我會把貨源揪出來的，再看到你賣這些東西－－絕對會扒了你的皮。
 @back bg02
@@ -232,7 +234,8 @@
 魅兒: 也許就可以找到夠多人來重組血巫結社了嗎？
 優菲: 馬上動身吧！
 @hide 涅莉,優菲,魅兒,薇狄亞
-@back cg04
+@back CG/cg04
+@unlock CG/cg04
 優菲: 完美～
 薇狄亞: 好棒呀，看上去有種神奇的感覺，似乎真的可以團結一致了呢。
 蘇菲亞: 妳們在做什麼？咦？

@@ -9,7 +9,7 @@ namespace Hexe.UI
     /// 遊戲跑起來之後自動把 <see cref="MonsterCodexPanel"/> 掛到 Naninovel 的
     /// CGGalleryUI（回憶模式）上，這樣就不用去改 CGGalleryUI.prefab
     /// ——那是 Naninovel 套件自帶的檔案，之後升級版本比較不會衝突。
-    /// 作法跟 <see cref="TitleTowerModeInjector"/> 一樣：重試迴圈等 UI 生出來。
+    /// 作法跟 <see cref="TitleMenuUnlockInjector"/> 一樣：重試迴圈等 UI 生出來。
     /// </summary>
     public static class MonsterCodexInjector
     {
