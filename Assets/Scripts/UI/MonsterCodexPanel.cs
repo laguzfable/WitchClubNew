@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -106,6 +106,10 @@ namespace Hexe.UI
             // 每次重新打開回憶模式都回到 CG 分頁，並且把解鎖狀態重刷一次
             currentPage = 1;
             SelectTab(false);
+
+            // 「CG 全收集」成就：CG 是 Naninovel 在管的，沒有解鎖當下的 hook 可以掛，
+            // 所以在玩家打開回憶模式時補檢查一次。
+            CGGalleryProgress.CheckAchievement(GetComponentInParent<Naninovel.UI.CGGalleryPanel>());
         }
 
         void Update ()

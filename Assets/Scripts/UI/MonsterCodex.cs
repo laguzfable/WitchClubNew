@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -78,6 +78,9 @@ namespace Hexe.UI
         /// <summary>已解鎖數量 / 總數，給標題上的「12 / 26」用。</summary>
         public static int SeenCount => AllMobs.Count(IsSeen);
 
+        /// <summary>圖鑑是不是全開了。</summary>
+        public static bool AllSeen => AllMobs.Count > 0 && SeenCount >= AllMobs.Count;
+
         /// <summary>
         /// 記下玩家遇過這隻怪。傳進來的是 MobData 的 asset 檔名（例如 monster02）。
         /// 重複呼叫沒有副作用，已經記過就直接跳出，不會一直寫 PlayerPrefs。
@@ -91,6 +94,11 @@ namespace Hexe.UI
             PlayerPrefs.SetString(SeenKey, string.Join(",", Seen.ToArray()));
             PlayerPrefs.Save();
             Debug.Log($"[MonsterCodex] 解鎖怪物圖鑑：{mobName}（目前 {Seen.Count} 筆）");
+
+            // 用 AllSeen 而不是「這次剛好補滿最後一隻」：Steam 沒就緒時 Unlock 會直接放棄，
+            // 只在補滿的那一瞬間判一次的話，那次掉了就永遠補不回來。重複呼叫是安全的。
+            if (AllSeen)
+                AchievementManager.Instance?.Unlock(AchievementManager.ACH_MONSTER_CODEX_FULL);
         }
 
         /// <summary>清空解鎖紀錄，測試用。</summary>

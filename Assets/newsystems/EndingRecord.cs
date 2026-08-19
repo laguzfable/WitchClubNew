@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -57,6 +57,12 @@ public static class EndingRecord
 
     /// <summary>已收集的結局數。</summary>
     public static int Count { get { return Unlocked.Count; } }
+
+    /// <summary>結局總數。加新結局時這裡跟 AchievementManager 的 ACH_END_XX 常數要一起改。</summary>
+    public const int Total = 20;
+
+    /// <summary>結局是不是全收集了。</summary>
+    public static bool AllCollected { get { return Count >= Total; } }
 
     /// <summary>除錯用：清空紀錄。</summary>
     public static void Clear()

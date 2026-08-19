@@ -84,6 +84,13 @@ public class AchievementManager : MonoSingleton<AchievementManager>
         }
     }
 
+    // 收集類成就
+    // ACH_ALL_ENDINGS 由 MarkEndingAndUnlockArena 連動；另外兩個分別由 MonsterCodex.RecordSeen
+    // 和 MonsterCodexPanel（回憶模式打開時）呼叫 CheckCollectionAchievements 檢查。
+    public const string ACH_ALL_ENDINGS      = "ACH_ALL_ENDINGS";
+    public const string ACH_MONSTER_CODEX_FULL = "ACH_MONSTER_CODEX_FULL";
+    public const string ACH_CG_GALLERY_FULL    = "ACH_CG_GALLERY_FULL";
+
     // 結局成就（由各 .nani 檔用 @achieve id:ACH_END_XX 觸發，編號對應結局清單）
     public const string ACH_END_01 = "ACH_END_01"; // 緋紅替身（chapter5blue #end_crimson）
     public const string ACH_END_02 = "ACH_END_02"; // 純藍之冠（chapter5blue #end_blue_crown）
@@ -106,15 +113,20 @@ public class AchievementManager : MonoSingleton<AchievementManager>
     public const string ACH_END_19 = "ACH_END_19"; // 墮星之主（chapter6red #mel_stands → mel_end #end1）
     public const string ACH_END_20 = "ACH_END_20"; // 私奔（syb_day05 / chapter4green #greennight_s2 → syb_end #end1）
 
-    // 本地結局紀錄 + 「女巫競技場開啟」的連動。20 個結局全都經過 Unlock 這個入口，
-    // 所以掛在這裡就好，不用去改每一份 .nani。
-    // 遞迴只會有一層：ACH_ARENA_OPEN 不是結局 id，第二次進來就不會再往下走。
+    // 本地結局紀錄 +「女巫競技場開啟」「全結局」的連動。20 個結局全都經過 Unlock 這個
+    // 入口，所以掛在這裡就好，不用去改每一份 .nani。
     private void MarkEndingAndUnlockArena(string achievementApiName)
     {
         EndingRecord.Mark(achievementApiName);
 
-        if (EndingRecord.IsEnding(achievementApiName))
-            Unlock(ACH_ARENA_OPEN);
+        if (!EndingRecord.IsEnding(achievementApiName)) return;
+
+        Unlock(ACH_ARENA_OPEN);
+
+        // 遞迴只會有一層：ACH_ARENA_OPEN / ACH_ALL_ENDINGS 都不是結局 id，
+        // 第二次進來上面那個 return 就擋掉了。
+        if (EndingRecord.AllCollected)
+            Unlock(ACH_ALL_ENDINGS);
     }
 
 #if !DISABLESTEAMWORKS
