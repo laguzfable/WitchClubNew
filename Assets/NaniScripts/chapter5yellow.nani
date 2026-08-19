@@ -34,9 +34,19 @@
 涅莉: 我現在不想跟妳吵架。
 涅莉: {PlayerName}，梅爾的呼吸越來越微弱了。
 涅莉: 想想辦法……
-@choice 幫梅爾急救(人工呼吸)
-@choice 坐視不管(涅莉會去人工呼吸)
+@choice 幫梅爾急救(人工呼吸) set:"affinity_Mel=affinity_Mel+5;mel_rescue=true" goto:.c5y1_a
+@choice 坐視不管(涅莉會去人工呼吸) set:"mel_rescue=false" goto:.c5y1_b
 @stop
+
+# c5y1_a
+（你沒有猶豫。涅莉在旁邊看著，什麼也沒說。）
+@goto .c5y1_join
+
+# c5y1_b
+涅莉: ……算了，我來。你就站在那邊看著吧。
+@goto .c5y1_join
+
+# c5y1_join
 @char 涅莉 pos:20
 @char 優菲 pos:40
 @char 梅爾 pos:60

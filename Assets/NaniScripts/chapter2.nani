@@ -244,10 +244,24 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 優菲: 沒關係啦，是莉莉娜要的耶。
 優菲: {PlayerName}來幫我一起選，我們賣哪一本好呢？
 （會影響結局boss的強度）
-@choice 奧秘之書《無窮魔源》(The Tome of Infinite Magic)
-@choice 學院中的禁忌藥草 (Forbidden Herbs in the Academy)
-@choice 蝕之聖典 (Script of Eclipse)
+@choice 奧秘之書《無窮魔源》(The Tome of Infinite Magic) set:"bossPower=1" goto:.c2book_a
+@choice 學院中的禁忌藥草 (Forbidden Herbs in the Academy) set:"bossPower=0" goto:.c2book_b
+@choice 蝕之聖典 (Script of Eclipse) set:"bossPower=2" goto:.c2book_c
 @stop
+
+# c2book_a
+梅爾: 《無窮魔源》……妳們象牙塔真捨得。那本書流出去，會有人拿它做很麻煩的事。
+@goto .c2book_join
+
+# c2book_b
+梅爾: 藥草圖鑑啊，還算安全的選擇。價錢是低了點，但至少不會出事。
+@goto .c2book_join
+
+# c2book_c
+梅爾: ……妳認真的嗎？那本東西不該落到任何人手上。
+@goto .c2book_join
+
+# c2book_join
 優菲: 太棒了！我們趕快去賺錢吧！
 @back bg04
 @stopBgm
