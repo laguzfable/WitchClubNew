@@ -1,4 +1,4 @@
-#if !(UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX || STEAMWORKS_WIN || STEAMWORKS_LIN_OSX)
+﻿#if !(UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX || STEAMWORKS_WIN || STEAMWORKS_LIN_OSX)
 #define DISABLESTEAMWORKS
 #endif
 
@@ -14,6 +14,7 @@ using Steamworks;
 public class AchievementManager : MonoSingleton<AchievementManager>
 {
     // 章節成就（VisitNodeCommand 依 @visitNode id:chapterN 自動觸發）
+    // ACH_CHAPTER_0（序章）刻意不登記在 Steam 後台，VisitNodeCommand 會跳過 chapter0。
     public const string ACH_CHAPTER_0 = "ACH_CHAPTER_0";
     public const string ACH_CHAPTER_1 = "ACH_CHAPTER_1";
     public const string ACH_CHAPTER_2 = "ACH_CHAPTER_2";
@@ -39,12 +40,11 @@ public class AchievementManager : MonoSingleton<AchievementManager>
     public const string ACH_ARENA_OPEN = "ACH_ARENA_OPEN";
 
     // 女巫競技場最高樓層（TowerModeManager.RecordBestFloor 自動觸發）
-    // ★ 常數名稱改成 FLOOR，但字串刻意維持舊的 ACH_ARENA_STREAK_*：那是 Steam 後台已經
-    //   登記的 API 名稱，改字串等於變成三個全新的成就，已經解鎖的玩家會掉紀錄。
-    //   要一起正名的話，Steam 後台的 API 名稱也要同步改。
+    // 字串裡的 STREAK 是連勝時代的遺留，但後面的數字已經跟 Steam 後台一起改成真正的樓層門檻
+    // （10 / 25 / 50），常數名稱與字串現在是一致的。上市後不要再動這三個字串。
     public const string ACH_ARENA_FLOOR_10 = "ACH_ARENA_STREAK_10";
-    public const string ACH_ARENA_FLOOR_25 = "ACH_ARENA_STREAK_50";
-    public const string ACH_ARENA_FLOOR_50 = "ACH_ARENA_STREAK_100";
+    public const string ACH_ARENA_FLOOR_25 = "ACH_ARENA_STREAK_25";
+    public const string ACH_ARENA_FLOOR_50 = "ACH_ARENA_STREAK_50";
 
     // 元素組合成就（PlayerController 首次打出對應元素組合牌時，透過 UnlockComboAchievement 自動觸發）
     public const string ACH_COMBO_RED_BLUE          = "ACH_COMBO_RED_BLUE";

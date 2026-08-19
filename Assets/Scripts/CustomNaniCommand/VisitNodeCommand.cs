@@ -41,7 +41,8 @@ public class VisitNodeCommand : Command
                 if (!char.IsDigit(c)) break;
                 digits += c;
             }
-            if (int.TryParse(digits, out int chapterNum))
+            // chapter0（序章）沒有登記 Steam 成就，跳過；節點紀錄上面已經做完了
+            if (int.TryParse(digits, out int chapterNum) && chapterNum > 0)
                 AchievementManager.Instance.Unlock($"ACH_CHAPTER_{chapterNum}");
         }
 
