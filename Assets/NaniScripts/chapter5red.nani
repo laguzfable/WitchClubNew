@@ -22,9 +22,19 @@
 ……
 抱著的話比較溫暖嗎？好像是耶……
 說起來你那本書寫到哪裡了？我可以看嗎？
-@choice 當然可以。
-@choice 不行，還沒寫完。
+@choice 當然可以。 set:affinity_Mel=affinity_Mel+5 goto:.c5r1_a
+@choice 不行，還沒寫完。 goto:.c5r1_b
 @stop
+
+# c5r1_a
+（她眼睛亮了一下，動作比嘴巴誠實得多。）
+@goto .c5r1_join
+
+# c5r1_b
+（「小氣。」她這麼說，手卻已經伸過來了。）
+@goto .c5r1_join
+
+# c5r1_join
 我看看噢，嗯……整體的結構越來越完整了呢。
 以人類來說，也許算寫得不錯吧，不過整體來看，普普通通囉，還是有一堆破綻，量化來說大概就C+或B-的程度吧。
 怎麼樣，不服氣啊？不服來辯啊……欸欸欸，不要動手動腳的啦！呀－－
@@ -34,9 +44,19 @@
 想繼續？沒、沒有啦！我才沒有。
 可是可是……喂。
 待在我身邊嘛，不要走。
-@choice 這是請求嗎？
-@choice 這是命令嗎？
+@choice 這是請求嗎？ set:affinity_Mel=affinity_Mel+5 goto:.c5r2_a
+@choice 這是命令嗎？ goto:.c5r2_b
 @stop
+
+# c5r2_a
+（她的耳朵尖端紅了一小塊。）
+@goto .c5r2_join
+
+# c5r2_b
+（「當、當然是命令！」她的聲音比平常高了半度。）
+@goto .c5r2_join
+
+# c5r2_join
 ……請求？
 你說……我在求你？
 哈哈－－哈哈哈哈－－
@@ -190,9 +210,19 @@
 @char 薇狄亞 pos:50
 薇狄亞: 梅爾？還好嗎？
 薇狄亞: {PlayerName}？牆壁那邊那個洞是怎麼回事……
-@choice 假裝沒事
-@choice 捏造謊言
+@choice 假裝沒事 goto:.c5r3_a
+@choice 捏造謊言 goto:.c5r3_b
 @stop 
+
+# c5r3_a
+（你把視線從那個洞上移開，努力讓表情自然一點。）
+@goto .c5r3_join
+
+# c5r3_b
+（你隨口編了個理由。薇狄亞沒有戳破，但也沒有相信。）
+@goto .c5r3_join
+
+# c5r3_join
 薇狄亞: 哼……是嗎？
 薇狄亞: 我明明聞到屋裡有其他人的味道……
 薇狄亞: 如果這是{PlayerName}想要的話，我離開。

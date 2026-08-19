@@ -98,9 +98,19 @@ may: 當然不會呀，我可是神秘的旅行商人呢，這個重責大任就
 優菲: ……
 梅爾: ……
 選項
-@choice 看我做什麼啊？
-@choice 好啦、好啦，我知道了。
+@choice 看我做什麼啊？ goto:.c3a_a
+@choice 好啦、好啦，我知道了。 set:affinity_Mel=affinity_Mel+5 goto:.c3a_b
 @stop
+
+# c3a_a
+梅爾: 你說呢？都到這種時候了還裝傻。
+@goto .c3a_join
+
+# c3a_b
+梅爾: ……哼，算你上道。
+@goto .c3a_join
+
+# c3a_join
 梅爾: 這還差不多。
 @hide 蘇菲亞
 @char may pos:60

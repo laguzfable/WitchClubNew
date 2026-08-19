@@ -24,9 +24,19 @@
 優菲: ……象牙塔的最後一座堡壘，才沒有那麼容易淪陷呢……
 優菲: 只要有我在……
 優菲: 奧術．椒鹽捲餅衝擊！
-@choice 出聲叫醒她。
-@choice 對她搔癢。
+@choice 出聲叫醒她。 set:affinity_Eup=affinity_Eup+5 goto:.c2a_a
+@choice 對她搔癢。 goto:.c2a_b
 @stop
+
+# c2a_a
+優菲: 唔……嗯……再五分鐘就好……
+@goto .c2a_join
+
+# c2a_b
+優菲: 呀哈哈哈！住手、住手啦！
+@goto .c2a_join
+
+# c2a_join
 優菲: 欸欸欸？！原來是{PlayerName}啊？嚇我一跳。
 優菲: 嗚～我一定是睡過頭了對不對？
 優菲: 對不起，昨天玩太瘋了。

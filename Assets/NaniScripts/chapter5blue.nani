@@ -22,9 +22,19 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 不准再寫了！
 （金髮女子把紙撕碎）
 選項：
-@choice 悶不吭聲
-@choice 表現難過
+@choice 悶不吭聲 goto:.c5b1_a
+@choice 表現難過 set:affinity_Eup=affinity_Eup+5 goto:.c5b1_b
 @stop
+
+# c5b1_a
+（你什麼也沒說，只是看著滿地的碎紙。）
+@goto .c5b1_join
+
+# c5b1_b
+（你沒有掩飾。那點難過全寫在臉上了。）
+@goto .c5b1_join
+
+# c5b1_join
 ……你……這麼難過嗎？
 抱歉，我不該……不對，這是你自己的問題吧！
 要我替你著想是不可能的，你這弱小又悲哀的生物。
@@ -50,9 +60,19 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 還滿好吃的，你再說一遍那個怎麼做？
 這樣？還是這樣？
 啊啊－－算了，還是用咒語變出來比較省事。
-@choice 太隨便了吧？
-@choice 妳說了算。
+@choice 太隨便了吧？ goto:.c5b2_a
+@choice 妳說了算。 set:affinity_Eup=affinity_Eup+5 goto:.c5b2_b
 @stop
+
+# c5b2_a
+（她的眉毛挑了一下，顯然沒打算認錯。）
+@goto .c5b2_join
+
+# c5b2_b
+（她愣了一下，然後別開視線。「……你倒是很好說話嘛。」）
+@goto .c5b2_join
+
+# c5b2_join
 什麼太隨便，你們人類也就活幾十年而已，每天花那麼多時間做飯，根本一點效率都沒有啊！
 ……
 一起做的話，不管做什麼都很開心？
@@ -227,9 +247,19 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 西碧爾: 那我們呢？不會忘記我們了吧？
 優菲: 也不是那個意思啦……
 妮可: {PlayerName}感覺就比較喜歡學姊啊，不是嗎？
-@choice 是啊。
-@choice 這……
+@choice 是啊。 set:affinity_Eup=affinity_Eup+5 goto:.c5b3_a
+@choice 這…… goto:.c5b3_b
 @stop
+
+# c5b3_a
+優菲: 欸？！等、等一下，{PlayerName}你不用回答得這麼乾脆吧！
+@goto .c5b3_join
+
+# c5b3_b
+妮可: 看吧，連反駁都反駁不出來。
+@goto .c5b3_join
+
+# c5b3_join
 優菲: 別別別別別－－別再說了啦！！
 薇狄亞: 好嘛，乾掉這杯就放過妳。
 優菲: 咦咦咦－－
@@ -439,9 +469,19 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 妮可: 呃、唔，當當當當、當然可以呀！我們走吧。
 優菲: 我有點不懂妳為什麼要這麼緊張就是了……
 優菲: {PlayerName}有什麼頭緒嗎？
-@choice 沒辦法，因為妳是她的偶像囉。
-@choice 最近妳變得不一樣，我也覺得有點緊張呢。
+@choice 沒辦法，因為妳是她的偶像囉。 goto:.c5b4_a
+@choice 最近妳變得不一樣，我也覺得有點緊張呢。 set:affinity_Eup=affinity_Eup+5 goto:.c5b4_b
 @stop
+
+# c5b4_a
+優菲: 偶像……？我嗎？才沒有那回事啦。
+@goto .c5b4_join
+
+# c5b4_b
+優菲: ……不、不一樣？哪、哪裡不一樣了啦，別亂說。
+@goto .c5b4_join
+
+# c5b4_join
 妮可: 這裡的環境好舒服啊－－
 優菲: 妳還記得那門課嗎？占星術基礎。
 妮可: 啊，我記得我記得。
