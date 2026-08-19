@@ -216,6 +216,11 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 @choice 累了的話就和我走吧。 goto:.realworld
 @stop
 # eclipse
+; 第二章把蝕之聖典賣掉的話（bossPower=2），星塵手上沒有聖典可以開，
+; 這條路走不通，改走下面的 eclipse_lost。
+@if bossPower==2
+@goto .eclipse_lost
+@endif
 @back ed07
 @stopBgm
 @bgm white
@@ -237,10 +242,22 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 @exitToTitle
 @stop
 
+# eclipse_lost
+@char 星塵 pos:50
+星塵: 蝕之聖典，開啟——
+星塵: ……開不了。主人，聖典不在我們手上。
+涅莉: 什麼……？
+星塵: 那本書已經流到別人手裡了。這一次，沒有重來的機會。
+涅莉: ……是嗎。
+涅莉: 那也好。反正我也累了。
+@goto .realworld_body
+
 # realworld
 @if affinity_Nel<50
 @goto .eclipse
 @endif
+
+# realworld_body
 @back ed08
 @stopBgm
 @bgm white

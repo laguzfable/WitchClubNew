@@ -167,7 +167,8 @@ public class EnemyUnit : BaseCombatUnit
                 base.Init();
                 return;
             }
-            HP.SetBaseValue(mobData.HP);
+            // 結局王的血量會被第二章賣掉哪本書影響，其他敵人原樣照 MobData。
+            HP.SetBaseValue(BossPower.ApplyHP(mobData.name, mobData.HP));
             EN.SetBaseValue(mobData.EN);
 
             sprRend.sprite = mobData.sprite;//combatSystem.visualResource.GetMobByName(mobName);

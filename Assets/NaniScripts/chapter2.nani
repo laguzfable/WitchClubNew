@@ -1,4 +1,7 @@
 @visitNode id:chapter2
+; bossPower 先歸零，chapter5yellow 才不會比較到未定義變數。
+; 第二章賣書的選項在後面，會覆蓋掉這個 0。
+@set bossPower=0
 @back bg06
 @sfx morning
 @char 涅莉 pos:50
