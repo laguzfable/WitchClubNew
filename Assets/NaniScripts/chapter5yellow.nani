@@ -34,8 +34,8 @@
 涅莉: 我現在不想跟妳吵架。
 涅莉: {PlayerName}，梅爾的呼吸越來越微弱了。
 涅莉: 想想辦法……
-@choice 幫梅爾急救(人工呼吸) set:"affinity_Mel=affinity_Mel+5;mel_rescue=true" goto:.c5y1_a
-@choice 坐視不管(涅莉會去人工呼吸) set:"mel_rescue=false" goto:.c5y1_b
+@choice 幫梅爾急救(人工呼吸) set:affinity_Mel=affinity_Mel+5 goto:.c5y1_a
+@choice 坐視不管(涅莉會去人工呼吸) goto:.c5y1_b
 @stop
 
 # c5y1_a
