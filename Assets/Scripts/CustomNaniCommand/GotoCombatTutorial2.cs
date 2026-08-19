@@ -1,4 +1,4 @@
-using Naninovel;
+﻿using Naninovel;
 using Naninovel.Commands;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -28,7 +28,7 @@ public class GotoCombatTutorial2 : Command, Command.IForceWait
         /*
         PlayerData.Instance.usingRuneIDs[(int)ECardElement.Red] = "艾妮(血系)";
         PlayerData.Instance.usingRuneIDs[(int)ECardElement.Green] = "樹女";
-        PlayerData.Instance.usingRuneIDs[(int)ECardElement.Blue] = "赫菲";
+        PlayerData.Instance.usingRuneIDs[(int)ECardElement.Blue] = "優菲";
         */
         Engine.GetService<ICustomVariableManager>().SetVariableValue("RuneActive", "True");
 

@@ -66,7 +66,7 @@ public class RuneDatabaseEditor : Editor
         Add("red02", "象牙塔之眼", 1);
         Add("red03", "伊莎貝拉", 1);
         Add("red04", "血系女巫", 1);
-        Add("red05", "赫菲", 1);
+        Add("red05", "優菲", 1);
 
         // Green
         Add("green00", "預設", 2);

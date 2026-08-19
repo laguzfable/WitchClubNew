@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Naninovel;
 
@@ -101,7 +101,7 @@ public static class RuneEnTranslation
         { "魔書",         "Grimoire"        },
         { "伊莎貝拉",     "Isabella"        },
         { "史嘉蕾特",     "Scarlet"         },
-        { "赫菲",         "Hephie"          },
+        { "優菲",         "Eupie"           },
 
         // ── Nature abilities ──────────────────────────────
         { "狼",        "Wolf"        },
@@ -225,7 +225,7 @@ public static class RuneEnTranslation
         { "魔書",         "魔導書"             },
         { "伊莎貝拉",     "イザベラ"           },
         { "史嘉蕾特",     "スカーレット"       },
-        { "赫菲",         "ヘフィー"           },
+        { "優菲",         "ユーフィ"           },
 
         // ── Nature abilities ──────────────────────────────
         { "狼",        "ウルフ"         },
