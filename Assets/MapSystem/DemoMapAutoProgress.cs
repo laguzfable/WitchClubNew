@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,7 +15,8 @@ public class DemoMapAutoProgress : MonoBehaviour
     {
         { "Mei",    "demo_mei"    }, { "Mel",    "demo_mei"    },
         { "Euphie", "demo_euphie" }, { "Eupie",  "demo_euphie" },
-        { "魅兒",   "demo_mei"    }, { "優菲",   "demo_euphie" },
+        { "梅爾",   "demo_mei"    }, { "優菲",   "demo_euphie" },
+        { "魅兒",   "demo_mei"    }, // 魅兒是梅爾的舊名，舊存檔可能還留著
     };
     static readonly HashSet<string> DayHideChars = new HashSet<string>
     {
@@ -31,7 +32,7 @@ public class DemoMapAutoProgress : MonoBehaviour
     };
     static readonly HashSet<string> NightHideChars = new HashSet<string>
     {
-        "Mel", "Mei", "魅兒", "Euphie", "Eupie", "優菲",  // Lilina 從這裡移除，由下方邏輯控制
+        "Mel", "Mei", "梅爾", "魅兒", "Euphie", "Eupie", "優菲",  // Lilina 從這裡移除，由下方邏輯控制
     };
 
     public static bool LilinaSpokenThisSession = false;

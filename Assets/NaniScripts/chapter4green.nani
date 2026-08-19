@@ -62,7 +62,7 @@
 莉莉娜: 這場盛宴是屬於妳們的－－
 @hide 莉莉娜
 @char 涅莉 pos:20
-@char 魅兒 pos:40
+@char 梅爾 pos:40
 @char 優菲 pos:60
 @char 薇狄亞 pos:80
 優菲: 聽到了嗎？魔力的低語。
@@ -82,7 +82,7 @@
 薇狄亞: 我啊，總是看著妳們互相鬥爭。
 薇狄亞: 再次自相殘殺的那天不遠了吧……
 薇狄亞: 我不想看到那樣……
-@hide 涅莉,魅兒
+@hide 涅莉,梅爾
 @char 優菲 pos:25
 @char syb pos:50
 @char 薇狄亞 pos:75
@@ -136,7 +136,7 @@
 莉莉娜: 繼續狂歡吧～
 女巫ABCDE: 耶！！！
 @hide 莉莉娜
-@char 魅兒 pos:35
+@char 梅爾 pos:35
 @char 涅莉 pos:65
 梅爾: 這……我真是霧裡看花，越看越糊塗了……
 涅莉: 哇哇哇，我在噴七彩煙火，耶咿～～
@@ -385,7 +385,7 @@
 （暗殺當天）
 @back bg04
 @char chl pos:25
-@char 魅兒 pos:50
+@char 梅爾 pos:50
 @char syb pos:75
 
 西碧兒: {PlayerName}，妳來了。
@@ -399,7 +399,7 @@
 薇狄亞: 我不允許這樣，就算是妳的命令也不行！
 
 @char chl pos:20
-@char 魅兒 pos:40
+@char 梅爾 pos:40
 @char syb pos:60
 @char 薇狄亞 pos:80
 
@@ -416,7 +416,7 @@
 
 ; ── 動手：為她殺人。薇狄亞看見了，也認定了你是她真正的對手 ──
 #syb_strike
-@hide chl,魅兒,薇狄亞
+@hide chl,梅爾,薇狄亞
 @char syb pos:50
 
 （你動了。）
@@ -442,7 +442,7 @@
 
 ; ── 收手：違背她，但那是為了她。她若在乎你，就會停下來 ──
 #syb_refuse
-@hide chl,魅兒,薇狄亞
+@hide chl,梅爾,薇狄亞
 @char syb pos:50
 
 （你放下了手。）
@@ -478,7 +478,7 @@
 #syb_ritual
 @back bg04
 @char chl pos:25
-@char 魅兒 pos:50
+@char 梅爾 pos:50
 @char syb pos:75
 
 西碧兒: 那麼，把她們帶下去吧。
@@ -489,7 +489,7 @@
 （梅爾沒有再說話）
 （火焰很安靜，安靜得不像在燒人）
 
-@hide chl,魅兒
+@hide chl,梅爾
 @char syb pos:35
 @char 薇狄亞 pos:65
 
