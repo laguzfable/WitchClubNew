@@ -71,11 +71,6 @@ namespace Naninovel.UI
                 return;
             }
 
-            // 單周目進度歸零。Naninovel 的 ResetState 只清自訂變數，
-            // 儀式進度／符文／卡片型態都在 PlayerPrefs，不清的話會整包帶進二週目。
-            // 收集紀錄和「曾經拿過」的那份不受影響（見 NewGameReset）。
-            NewGameReset.Run();
-
             // 立刻強制隱藏 TitleMenu，不等任何 async 流程
             if (titleMenu != null) titleMenu.gameObject.SetActive(false);
 
