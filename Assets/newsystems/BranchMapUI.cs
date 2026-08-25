@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Naninovel;
@@ -78,6 +78,57 @@ public class BranchMapUI : CustomUI
     [Tooltip("沒走過那條線時要設定的值")]
     public int lockedAffinityValue = 0;
 
+    [Header("進節點前的選人面板")]
+    //
+    // 好感度不夠就走不到分歧，等於要玩家把養成再做一遍——那跟聖典存在的理由互相矛盾。
+    // 所以進節點前明著問玩家「這一輪你陪的是誰」，選到的人直接發滿（defaultAffinityValue）。
+    // 偷偷灌滿不行：會去研究數值的玩家看到的必須是他自己選的結果，不是黑箱。
+    //
+    // 這是「加法」：沒被選到的人仍然照 Affinity Presets 的走過／沒走過判定，不會被降級。
+    // 節點自己的 Variable Overrides 永遠最後套用，所以強制值（例如第四章要 Ved=0）不受影響。
+    //
+    [Tooltip("進節點前要不要先問「這一輪你與誰最親近」。\n" +
+             "★ 底下四個選項的圖全是空的時候，就算勾起來也不會跳面板 ★")]
+    public bool askAffinityBeforeEnter = true;
+
+    [Tooltip("面板上的標題。留空＝不顯示標題")]
+    public string affinityChoiceTitle = "這一輪，你與誰最親近？";
+
+    [Tooltip("跳過用的文字。留空＝不給跳過（不建議，玩家會被關在面板裡）")]
+    public string affinityChoiceSkipLabel = "都不選，照原本的走";
+
+    [Tooltip("星塵在選人之前要講的話，一句一行（點畫面推進）。\n" +
+             "留空＝不講話，直接跳到選人。個別節點想加一句就填 BranchNode 的 Stardust Line。")]
+    [TextArea(1, 3)]
+    public string[] stardustLines =
+    {
+        "又要重來一次了嗎，異鄉人。",
+        "記憶是可以改寫的——反正時間本來就不站在你們那邊。",
+        "說吧。這一輪，你把心留給了誰？"
+    };
+
+    [Tooltip("說話者。也是 Naninovel 模式下的角色 ID，所以要跟劇本裡的 @char 名字一致")]
+    public string stardustSpeakerName = "星塵";
+
+    [Tooltip("用 Naninovel 的對話框播這段台詞（真的對話框／背景／字體，Auto・Skip・回顧都照常）。\n" +
+             "取消＝用程式自己畫的簡易對話框。引擎沒起來時一律走簡易版。")]
+    public bool stardustUseNaninovelDialogue = true;
+
+    [Tooltip("星塵講話時要切的背景 ID（chapter5 用的是 stardust1）。留空＝不動背景")]
+    public string stardustBackground = "stardust1";
+
+    [Tooltip("要不要把星塵的立繪叫出來（@char）。留空＝只有台詞沒有立繪")]
+    public string stardustCharacterId = "星塵";
+
+    [Tooltip("面板上的選項。把立繪拖進 Portrait 就會出現，留空的不會出現。")]
+    public AffinityChoiceOption[] affinityChoiceOptions =
+    {
+        new AffinityChoiceOption { displayName = "優菲",   variableName = "affinity_Eup" },
+        new AffinityChoiceOption { displayName = "梅爾",   variableName = "affinity_Mel" },
+        new AffinityChoiceOption { displayName = "薇狄亞", variableName = "affinity_Ved" },
+        new AffinityChoiceOption { displayName = "涅莉",   variableName = "affinity_Nel" },
+    };
+
     [Header("劇情完成度")]
     [Tooltip("顯示完成度的 Text。留空就不顯示，其餘功能不受影響")]
     public Text completionText;
@@ -85,6 +136,21 @@ public class BranchMapUI : CustomUI
     public int totalEndings = 20;
     [Tooltip("{0}=已收集　{1}=總數")]
     public string completionFormat = "結局　{0} / {1}";
+
+    [Tooltip("Completion Text 沒指定時，自動生一個放在這個位置（畫面比例，0~1）")]
+    public Vector2 completionAutoAnchor = new Vector2(0.5f, 0.94f);
+
+    [Tooltip("右頁顯示「這一格通往的結局」的 Text。留空＝自動生一個")]
+    public Text endingListText;
+
+    [Tooltip("Ending List Text 沒指定時，自動生一個放在這個位置（畫面比例，0~1）")]
+    public Vector2 endingListAutoAnchor = new Vector2(0.76f, 0.2f);
+
+    [Tooltip("還沒拿到的結局要顯示成什麼")]
+    public string endingHiddenLabel = "？？？";
+
+    [Tooltip("這一格沒有任何結局時要顯示什麼。留空＝整行清空")]
+    public string endingNoneLabel = "";
 
     [Header("右頁預覽")]
     [Tooltip("整組預覽的容器。沒有滑到任何節點時會關掉，留空＝不開關容器")]
@@ -125,10 +191,6 @@ public class BranchMapUI : CustomUI
         {
             GenerateNodes();
             RefreshCompletion();
-
-            // 「蝕之聖典開啟」成就。標題選單那顆按鈕是 prefab 裡的 @showUI BranchMapUI，
-            // 沒有程式可以掛，所以改在面板自己被顯示出來時觸發。
-            AchievementManager.Instance?.Unlock(AchievementManager.ACH_CODEX_OPEN);
         }
 
         // 讓 Naninovel 自己處理 fade
@@ -159,9 +221,70 @@ public class BranchMapUI : CustomUI
     /// </summary>
     private void RefreshCompletion()
     {
-        if (!completionText) return;
+        var text = EnsureCompletionText();
+        if (text == null) return;
 
-        completionText.text = string.Format(completionFormat, EndingRecord.Count, totalEndings);
+        text.text = string.Format(completionFormat, EndingRecord.Count, totalEndings);
+    }
+
+    // ============================================================
+    //  兩行提示文字。欄位有指定就用你排好的那個，沒指定才自己生一個。
+    //  自己生的位置用 Inspector 的 Anchor（畫面比例）調，不用改程式；
+    //  想要精準排在書頁上的話，還是在 prefab 裡做一個 Text 拖進欄位最準。
+    // ============================================================
+
+    private Text autoCompletionText;
+    private Text autoEndingListText;
+
+    private Text EnsureCompletionText()
+    {
+        if (completionText) return completionText;
+        if (autoCompletionText) return autoCompletionText;
+
+        autoCompletionText = CreateAutoText("AutoCompletionText", completionAutoAnchor, 30, TextAnchor.MiddleCenter);
+        return autoCompletionText;
+    }
+
+    private Text EnsureEndingListText()
+    {
+        if (endingListText) return endingListText;
+        if (autoEndingListText) return autoEndingListText;
+
+        autoEndingListText = CreateAutoText("AutoEndingListText", endingListAutoAnchor, 24, TextAnchor.UpperCenter);
+        return autoEndingListText;
+    }
+
+    private Text CreateAutoText(string name, Vector2 anchor, int size, TextAnchor alignment)
+    {
+        var go = new GameObject(name, typeof(RectTransform), typeof(Text));
+        go.transform.SetParent(transform, false);
+
+        var rect = go.GetComponent<RectTransform>();
+        rect.anchorMin = anchor;
+        rect.anchorMax = anchor;
+        rect.sizeDelta = new Vector2(420, 200);
+        rect.anchoredPosition = Vector2.zero;
+
+        var text = go.GetComponent<Text>();
+        text.font = FindFont();
+        text.fontSize = size;
+        text.alignment = alignment;
+        text.horizontalOverflow = HorizontalWrapMode.Overflow;
+        text.verticalOverflow = VerticalWrapMode.Overflow;
+        text.color = new Color(0.25f, 0.16f, 0.09f); // 書頁是米色的，用墨色比白色搭
+        text.raycastTarget = false;
+
+        return text;
+    }
+
+    /// <summary>借書頁上現成的字型，這樣中文不會變成豆腐、風格也跟其他字一致。</summary>
+    private Font FindFont()
+    {
+        foreach (var existing in GetComponentsInChildren<Text>(true))
+            if (existing != null && existing.font != null && existing != autoCompletionText && existing != autoEndingListText)
+                return existing.font;
+
+        return Resources.GetBuiltinResource<Font>("Arial.ttf");
     }
 
     /// <summary>滑鼠移到節點上時由 NodeButton 呼叫。</summary>
@@ -183,6 +306,30 @@ public class BranchMapUI : CustomUI
         if (previewTitle) previewTitle.text = node.displayName;
 
         ApplyKeywords(node.keywords);
+        ApplyEndingList(node);
+    }
+
+    /// <summary>
+    /// 右頁的「這一格通往的結局」。已收集顯示名字，還沒拿到顯示 ???。
+    /// 給的是方向而不只是分數：玩家看到 SPIRAL 底下兩個 ???，就知道那格還有東西沒挖。
+    /// </summary>
+    private void ApplyEndingList(BranchNode node)
+    {
+        var text = EnsureEndingListText();
+        if (text == null) return;
+
+        if (node == null || node.endingIds == null || node.endingIds.Length == 0)
+        {
+            text.text = endingNoneLabel;
+            return;
+        }
+
+        var parts = new System.Collections.Generic.List<string>();
+        foreach (var id in node.endingIds)
+            if (!string.IsNullOrEmpty(id))
+                parts.Add(EndingCatalog.DisplayFor(id, endingHiddenLabel));
+
+        text.text = string.Join("\n", parts.ToArray());
     }
 
     /// <summary>滑鼠離開節點時由 NodeButton 呼叫；node 傳 null 代表無條件清空。</summary>
@@ -196,6 +343,7 @@ public class BranchMapUI : CustomUI
 
         if (previewRoot) previewRoot.SetActive(false);
         if (previewImage) previewImage.enabled = false;
+        ApplyEndingList(null);
         if (previewTitle) previewTitle.text = "";
         ApplyKeywords(null);
     }

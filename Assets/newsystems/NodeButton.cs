@@ -102,17 +102,95 @@ public void Init(BranchNode data, BranchMapUI owner)
     {
         Debug.Log($"[NodeButton] Click nodeId={nodeId}, script={scriptName}, label={label}");
 
+        // 先讓星塵講一段，再問「這一輪你與誰最親近」，選完才真的進去。
+        // 圖沒設定、或這一格沒勾 askAffinity 時，直接照舊進去。
+        if (map != null && map.askAffinityBeforeEnter && node != null && node.askAffinity)
+        {
+            // 先把聖典收起來：星塵那段是走 Naninovel 的對話框和背景，
+            // 書頁還開著的話會蓋在對話框上面。
+            HideMapUI();
+            AffinityChoicePanel.Show(BuildChoiceRequest(), Enter);
+            return;
+        }
+
+        Enter(null);
+    }
+
+    /// <summary>
+    /// 這一格真正能讓玩家選的角色。
+    /// 被 variableOverrides 寫死的角色要拿掉——那個值最後一定會蓋回去，
+    /// 留在面板上等於騙玩家（例：PARTING 強制 affinity_Ved=0，選了薇狄亞卻不會生效）。
+    /// </summary>
+    private System.Collections.Generic.List<AffinityChoiceOption> SelectableOptions()
+    {
+        var result = new System.Collections.Generic.List<AffinityChoiceOption>();
+        if (map.affinityChoiceOptions == null) return result;
+
+        foreach (var option in map.affinityChoiceOptions)
+        {
+            if (option == null || string.IsNullOrEmpty(option.variableName)) continue;
+
+            var forced = false;
+            if (node != null && node.variableOverrides != null)
+                foreach (var preset in node.variableOverrides)
+                    if (preset != null && preset.name == option.variableName) forced = true;
+
+            if (forced)
+            {
+                Debug.Log($"[NodeButton] {option.variableName} 被這一格寫死了，不放進選人面板");
+                continue;
+            }
+
+            result.Add(option);
+        }
+
+        return result;
+    }
+
+    /// <summary>收起標題選單與聖典書頁。</summary>
+    private static void HideMapUI()
+    {
+        var uiManager = Engine.GetService<IUIManager>();
+        if (uiManager == null) return;
+
+        uiManager.GetUI<TitleMenu>()?.Hide();
+        uiManager.GetUI<BranchMapUI>()?.Hide();
+    }
+
+    /// <summary>把 BranchMapUI 的共通設定和這一格自己的台詞組成一包。</summary>
+    private AffinityChoicePanel.Request BuildChoiceRequest()
+    {
+        var lines = new System.Collections.Generic.List<string>();
+        if (map.stardustLines != null) lines.AddRange(map.stardustLines);
+        if (!string.IsNullOrEmpty(node.stardustLine)) lines.Add(node.stardustLine);
+
+        return new AffinityChoicePanel.Request
+        {
+            Options = SelectableOptions(),
+            Title = map.affinityChoiceTitle,
+            SkipLabel = map.affinityChoiceSkipLabel,
+            Lines = lines,
+            SpeakerName = map.stardustSpeakerName,
+            UseNaninovelDialogue = map.stardustUseNaninovelDialogue,
+            Background = map.stardustBackground,
+            CharacterId = map.stardustCharacterId
+        };
+    }
+
+    /// <summary>真正進入節點。<paramref name="chosen"/> 是選人面板的結果，沒選就是 null。</summary>
+    private void Enter(AffinityChoiceOption chosen)
+    {
+
         // 清掉舊的返回點，避免 NaniScriptLoader_HEX 撿到之前留下的殘留值。
         // （scriptParameter 不用清，下面 GotoScript 會直接覆寫成這次的目標。）
         MapReturnPoint.Clear();
 
-        // 1. 關閉 UI
-        var uiManager = Engine.GetService<IUIManager>();
-        if (uiManager != null)
-        {
-            uiManager.GetUI<TitleMenu>()?.Hide();
-            uiManager.GetUI<BranchMapUI>()?.Hide();
-        }
+        // 特殊事件預約同理：從聖典跳節點等於換一條時間線，
+        // 留著上一輪的預約會讓進去之後的地圖日接到別條線的劇情。
+        MapSpecialOverride.ClearAll();
+
+        // 1. 關閉 UI（選人面板那條路已經先關過了，重複呼叫沒有副作用）
+        HideMapUI();
 
         // 2. 停止播放，避免舊指令干擾
         Engine.GetService<IScriptPlayer>()?.Stop();
@@ -125,9 +203,24 @@ public void Init(BranchNode data, BranchMapUI owner)
         // 不需要照劇情腳本原本的順序判斷（場景重載會讓 RuneActive 被重置成預設值 false）
         vars?.SetVariableValue("RuneActive", "True");
 
-        // 好感度同理：它是「讓玩家走到這個節點」的門票，走過那條線就代表當初驗過了。
-        // @exitToTitle 會把好感度清成 0，不先補回去的話，分歧點的兩個選項會掉進同一個結局。
-        ApplyVariablePresets(vars);
+        // 好感度：@exitToTitle 會把它清成 0，不先補回去的話分歧點的選項會掉進同一個結局。
+        //
+        // 有兩套發法，看玩家這一格有沒有真的選人：
+        //   ‧ 選了誰 → 只有她 100，其他人一律 0。規則單純到玩家一眼看得懂：
+        //     「我選了誰，誰就是 100」。不能再混進走過／沒走過的判定——
+        //     開得了聖典的人一定走過 chapter5yellow，涅莉會恆等於 100，
+        //     那樣選她沒意義、不選她也照樣有她。
+        //   ‧ 按了跳過（或這一格根本不問）→ 照舊用「走過那條線就發滿」的回溯判定。
+        if (chosen != null)
+            ApplyChosenAffinity(vars, chosen);
+        else
+            ApplyVariablePresets(vars);
+
+        ApplyNodeOverrides(vars);
+
+        // 名字也是被 @exitToTitle 清掉的東西之一。節點劇本不會重新問名字，
+        // 不補的話台詞裡的 {PlayerName} 全都是空白。
+        PlayerNameStore.RestoreIfMissing(vars);
 
         vars?.SetVariableValue("NextScript", scriptName);
         vars?.SetVariableValue("NextLabel", string.IsNullOrEmpty(label) ? "" : label);
@@ -150,7 +243,39 @@ public void Init(BranchNode data, BranchMapUI owner)
     }
 
     /// <summary>
-    /// 先依「玩家有沒有走過那條線」決定每個好感度，再套用這個節點自己的例外。
+    /// 選人面板的結果：選到的人發滿，其他所有候選人歸零。
+    /// 歸零的名單同時取自 affinityPresets 和面板的選項，兩邊都掃過才不會漏
+    /// （例如某個角色只出現在其中一邊）。
+    /// </summary>
+    private void ApplyChosenAffinity(ICustomVariableManager vars, AffinityChoiceOption chosen)
+    {
+        if (vars == null || map == null) return;
+
+        var locked = map.lockedAffinityValue.ToString();
+        var names = new System.Collections.Generic.HashSet<string>();
+
+        if (map.affinityPresets != null)
+            foreach (var preset in map.affinityPresets)
+                if (preset != null && !string.IsNullOrEmpty(preset.variableName))
+                    names.Add(preset.variableName);
+
+        if (map.affinityChoiceOptions != null)
+            foreach (var option in map.affinityChoiceOptions)
+                if (option != null && !string.IsNullOrEmpty(option.variableName))
+                    names.Add(option.variableName);
+
+        foreach (var name in names)
+            vars.SetVariableValue(name, locked);
+
+        var value = map.defaultAffinityValue.ToString();
+        vars.SetVariableValue(chosen.variableName, value);
+
+        Debug.Log($"[NodeButton] 選人面板：{chosen.variableName}={value}，其餘 {names.Count - 1} 人歸 {locked}");
+    }
+
+    /// <summary>
+    /// 依「玩家有沒有走過那條線」決定每個好感度。這是最底層的一道，
+    /// 之後還會被選人面板和節點的 Variable Overrides 依序蓋過去。
     /// </summary>
     private void ApplyVariablePresets(ICustomVariableManager vars)
     {
@@ -177,15 +302,22 @@ public void Init(BranchNode data, BranchMapUI owner)
 
             Debug.Log($"[NodeButton] 回溯好感度 → {summary}");
         }
+    }
 
-        if (node != null && node.variableOverrides != null)
+    /// <summary>
+    /// 節點自己宣告的強制值（BranchNode.variableOverrides）。
+    /// 這是最後一道，蓋過回溯判定和選人面板——它代表「這一格的劇情非這樣不可」，
+    /// 例如第四章那格必須 affinity_Ved=0，否則三個選項不會出現、直接被推進綠線。
+    /// </summary>
+    private void ApplyNodeOverrides(ICustomVariableManager vars)
+    {
+        if (vars == null || node == null || node.variableOverrides == null) return;
+
+        foreach (var preset in node.variableOverrides)
         {
-            foreach (var preset in node.variableOverrides)
-            {
-                if (preset == null || string.IsNullOrEmpty(preset.name)) continue;
-                vars.SetVariableValue(preset.name, preset.value.ToString());
-                Debug.Log($"[NodeButton] 節點覆寫 {preset.name}={preset.value}");
-            }
+            if (preset == null || string.IsNullOrEmpty(preset.name)) continue;
+            vars.SetVariableValue(preset.name, preset.value.ToString());
+            Debug.Log($"[NodeButton] 節點覆寫 {preset.name}={preset.value}");
         }
     }
 

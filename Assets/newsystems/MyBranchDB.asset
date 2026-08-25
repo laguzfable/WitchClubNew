@@ -28,6 +28,9 @@ MonoBehaviour:
     buttonPrefab: {fileID: 0}
     slotName: HOUND
     variableOverrides: []
+    endingIds: []
+    askAffinity: 0
+    stardustLine: 
     parentId: 
   - nodeId: chapter2
     displayName: TOME
@@ -44,6 +47,9 @@ MonoBehaviour:
     buttonPrefab: {fileID: 0}
     slotName: TOME
     variableOverrides: []
+    endingIds: []
+    askAffinity: 0
+    stardustLine: 
     parentId: chapter1
   - nodeId: chapter3
     displayName: TETHER
@@ -60,6 +66,9 @@ MonoBehaviour:
     buttonPrefab: {fileID: 0}
     slotName: TETHER
     variableOverrides: []
+    endingIds: []
+    askAffinity: 0
+    stardustLine: 
     parentId: chapter2
   - nodeId: chapter4
     displayName: SEANCE
@@ -76,6 +85,11 @@ MonoBehaviour:
     buttonPrefab: {fileID: 0}
     slotName: SEANCE
     variableOverrides: []
+    endingIds:
+    - ACH_END_14
+    - ACH_END_16
+    askAffinity: 1
+    stardustLine: 
     parentId: chapter3
   - nodeId: chapter4
     displayName: PARTING
@@ -92,6 +106,11 @@ MonoBehaviour:
     buttonPrefab: {fileID: 0}
     slotName: PARTING
     variableOverrides: []
+    endingIds:
+    - ACH_END_17
+    - ACH_END_18
+    askAffinity: 1
+    stardustLine: 
     parentId: chapter4
   - nodeId: chapter4green
     displayName: COMMUNION
@@ -108,6 +127,10 @@ MonoBehaviour:
     buttonPrefab: {fileID: 0}
     slotName: COMMUNION
     variableOverrides: []
+    endingIds:
+    - ACH_END_15
+    askAffinity: 1
+    stardustLine: 
     parentId: chapter4#branch_ch4route
   - nodeId: chapter4green
     displayName: WHISPER
@@ -124,6 +147,13 @@ MonoBehaviour:
     buttonPrefab: {fileID: 0}
     slotName: WHISPER
     variableOverrides: []
+    endingIds:
+    - ACH_END_05
+    - ACH_END_06
+    - ACH_END_13
+    - ACH_END_20
+    askAffinity: 1
+    stardustLine: 
     parentId: chapter4green
   - nodeId: chapter4red
     displayName: TRUCE
@@ -140,6 +170,10 @@ MonoBehaviour:
     buttonPrefab: {fileID: 0}
     slotName: TRUCE
     variableOverrides: []
+    endingIds:
+    - ACH_END_12
+    askAffinity: 1
+    stardustLine: 
     parentId: chapter4#branch_ch4route
   - nodeId: chapter5red
     displayName: ACCOMPLICE
@@ -156,6 +190,9 @@ MonoBehaviour:
     buttonPrefab: {fileID: 0}
     slotName: ACCOMPLICE
     variableOverrides: []
+    endingIds: []
+    askAffinity: 1
+    stardustLine: 
     parentId: chapter4red
   - nodeId: chapter6red
     displayName: UNMASK
@@ -172,6 +209,9 @@ MonoBehaviour:
     buttonPrefab: {fileID: 0}
     slotName: UNMASK
     variableOverrides: []
+    endingIds: []
+    askAffinity: 0
+    stardustLine: 
     parentId: chapter5red
   - nodeId: chapter6red
     displayName: CHALICE
@@ -188,6 +228,12 @@ MonoBehaviour:
     buttonPrefab: {fileID: 0}
     slotName: CHALICE
     variableOverrides: []
+    endingIds:
+    - ACH_END_03
+    - ACH_END_04
+    - ACH_END_19
+    askAffinity: 0
+    stardustLine: 
     parentId: chapter6red
   - nodeId: chapter5blue
     displayName: REVERIE
@@ -204,6 +250,9 @@ MonoBehaviour:
     buttonPrefab: {fileID: 0}
     slotName: REVERIE
     variableOverrides: []
+    endingIds: []
+    askAffinity: 1
+    stardustLine: 
     parentId: chapter4#branch_ch4route
   - nodeId: chapter5blue
     displayName: VIGIL
@@ -220,6 +269,11 @@ MonoBehaviour:
     buttonPrefab: {fileID: 0}
     slotName: VIGIL
     variableOverrides: []
+    endingIds:
+    - ACH_END_10
+    - ACH_END_11
+    askAffinity: 1
+    stardustLine: 
     parentId: chapter5blue
   - nodeId: chapter5blue
     displayName: CROWN
@@ -236,6 +290,11 @@ MonoBehaviour:
     buttonPrefab: {fileID: 0}
     slotName: CROWN
     variableOverrides: []
+    endingIds:
+    - ACH_END_01
+    - ACH_END_02
+    askAffinity: 0
+    stardustLine: 
     parentId: chapter5blue#beforefinal_blue
   - nodeId: chapter5yellow
     displayName: SPIRAL
@@ -254,4 +313,10 @@ MonoBehaviour:
     variableOverrides:
     - name: affinity_Nel
       value: 50
+    endingIds:
+    - ACH_END_07
+    - ACH_END_08
+    - ACH_END_09
+    askAffinity: 0
+    stardustLine: 
     parentId: chapter4#branch_ch4route

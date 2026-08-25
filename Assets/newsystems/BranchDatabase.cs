@@ -69,6 +69,21 @@ public class BranchNode
     //    例：第四章節點要填 affinity_Ved=0，否則會被 Ved>=50 直接推進綠線、三個選項不會出現。
     public VariablePreset[] variableOverrides;
 
+    // ⭐ 這一格通往哪些結局（ACH_END_XX）。右頁會顯示：已收集的顯示名字、還沒拿到的顯示 ???。
+    //    只填「分歧點落在這一格段落裡」的結局——更深的格子有自己的，重複掛上去會讓玩家
+    //    以為在這一格就拿得到。名字對照在 EndingCatalog。
+    public string[] endingIds;
+
+    // ⭐ 進這一格之前，要不要先讓星塵出來問「這一輪你陪的是誰」。
+    //    判準是「這一格之後還會走到地圖日」：夜晚儀式要好感（RitualGate），
+    //    儀式贏了才給符文，符文數才決定分歧（RunesGreen()>=3 那些）。
+    //    走不到地圖日的格子（結局段）問了也沒用；chapter3 開頭會把好感全部歸零，
+    //    所以第一～三章那幾格問了也會被清掉，一樣不要勾。
+    public bool askAffinity;
+
+    // ⭐ 這一格專屬的星塵台詞，接在 BranchMapUI.stardustLines 後面。留空＝只講共通的那幾句。
+    public string stardustLine;
+
     // ⭐ 樹狀排版用：父節點的 Key，留空代表這是樹根。
     //    Key 的寫法跟 VisitedNodeManager 一致：沒有 label 就寫 nodeId，
     //    有 label 就寫 "nodeId#label"（例如 chapter5blue#beforefinal_blue）。
