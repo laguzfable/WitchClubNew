@@ -35,6 +35,7 @@ public class MapCharacterSpawner : MonoBehaviour
         // ⭐ 新增：特殊事件（由 Nani 呼叫）
         public List<CharacterEvent> specialEvents = new List<CharacterEvent>();
 
+        [Tooltip("白天事件播完之後要不要從第一個重來。\n★ 只影響白天 ★ 夜晚的五場儀式一律不循環，做完那個角色就不會出現在夜晚的地圖上。")]
         public bool loop = true;
 
         // ⭐ 限定出場的劇本。留空＝任何地圖日都出場（主要角色維持留空即可）。
@@ -221,20 +222,14 @@ if (MapSpecialOverride.TryGet(c.characterName, out var special))
                 eventIdx = StoryProgressManager.Instance.GetNightProgress(c.characterName);
                 if (c.nightEvents != null && c.nightEvents.Count > 0)
                 {
+                    // ⭐ 夜晚一律不循環（loop 只管白天）
+                    // 夜晚是五場儀式，是一條有頭有尾的線，不是可以重複的日常。
+                    // 繞回第一場的話，玩家做完全部之後又會被請去做一次「第一次引導」，
+                    // 台詞和進度都對不起來。做完就讓她從夜晚的地圖上消失。
                     if (eventIdx >= c.nightEvents.Count)
                     {
-                        if (c.loop)
-                        {
-                            eventIdx = 0;
-                            PlayerPrefs.SetInt($"{c.characterName}_NightProgress", 0);
-                            PlayerPrefs.Save();
-                            logMsg += $"🔁 {c.characterName} 夜晚事件重新開始\n";
-                        }
-                        else
-                        {
-                            logMsg += $"⭐ {c.characterName} 夜晚事件已播完\n";
-                            continue;
-                        }
+                        logMsg += $"⭐ {c.characterName} 五場儀式都做完了，今晚不出現\n";
+                        continue;
                     }
 
                     evt = c.nightEvents[eventIdx];
