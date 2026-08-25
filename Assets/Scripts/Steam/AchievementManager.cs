@@ -24,27 +24,28 @@ public class AchievementManager : MonoSingleton<AchievementManager>
     public const string ACH_CHAPTER_6 = "ACH_CHAPTER_6";
 
     // 各路線「第五關／夜晚儀式」擊敗成就（CombatSystem.GameOver 自動觸發）
-    public const string ACH_RITUAL_BLUE   = "ACH_RITUAL_BLUE";
-    public const string ACH_RITUAL_RED    = "ACH_RITUAL_RED";
-    public const string ACH_RITUAL_YELLOW = "ACH_RITUAL_YELLOW";
-    public const string ACH_RITUAL_GREEN  = "ACH_RITUAL_GREEN";
+    public const string ACH_RITUAL_BLUE   = "RITUAL_BLUE";
+    public const string ACH_RITUAL_RED    = "RITUAL_RED";
+    public const string ACH_RITUAL_YELLOW = "RITUAL_YELLOW";
+    public const string ACH_RITUAL_GREEN  = "RITUAL_GREEN";
 
     // 全符文收集（UnlockRuneCommand / UnlockAllRunesCommand 自動觸發）
-    public const string ACH_ALL_RUNES = "ACH_ALL_RUNES";
+    public const string ACH_ALL_RUNES = "ALL_RUNES";
 
-    // 蝕之聖典（劇情分歧地圖）第一次打開（BranchMapUI 顯示時自動觸發）
-    public const string ACH_CODEX_OPEN = "ACH_CODEX_OPEN";
+    // 蝕之聖典解鎖：拿到 ACH_END_07「輪迴の鑰匙」的當下就給
+    // （跟標題選單那顆按鈕的解鎖條件一致，見 TitleMenuUnlockInjector）
+    public const string ACH_CODEX_OPEN = "CODEX_OPEN";
 
     // 女巫競技場開啟：拿過任一結局就算（見 MarkEndingAndUnlockArena，
     // 另外 TowerModeManager 開場也會補檢查一次，照顧更新前就已經有結局的存檔）
-    public const string ACH_ARENA_OPEN = "ACH_ARENA_OPEN";
+    public const string ACH_ARENA_OPEN = "ARENA_OPEN";
 
     // 女巫競技場最高樓層（TowerModeManager.RecordBestFloor 自動觸發）
-    // 字串裡的 STREAK 是連勝時代的遺留，但後面的數字已經跟 Steam 後台一起改成真正的樓層門檻
-    // （10 / 25 / 50），常數名稱與字串現在是一致的。上市後不要再動這三個字串。
-    public const string ACH_ARENA_FLOOR_10 = "ACH_ARENA_STREAK_10";
-    public const string ACH_ARENA_FLOOR_25 = "ACH_ARENA_STREAK_25";
-    public const string ACH_ARENA_FLOOR_50 = "ACH_ARENA_STREAK_50";
+    // 字串裡的 STREAK 是連勝時代的遺留，數字才是真正的樓層門檻（10 / 25 / 50）。
+    // 這裡的字串必須跟 Steam 後台的 API 名稱逐字相同，上市後不要再動。
+    public const string ACH_ARENA_FLOOR_10 = "STREAK_10";
+    public const string ACH_ARENA_FLOOR_25 = "STREAK_25";
+    public const string ACH_ARENA_FLOOR_50 = "STREAK_50";
 
     // 元素組合成就（PlayerController 首次打出對應元素組合牌時，透過 UnlockComboAchievement 自動觸發）
     public const string ACH_COMBO_RED_BLUE          = "ACH_COMBO_RED_BLUE";
@@ -87,9 +88,9 @@ public class AchievementManager : MonoSingleton<AchievementManager>
     // 收集類成就
     // ACH_ALL_ENDINGS 由 MarkEndingAndUnlockArena 連動；另外兩個分別由 MonsterCodex.RecordSeen
     // 和 MonsterCodexPanel（回憶模式打開時）呼叫 CheckCollectionAchievements 檢查。
-    public const string ACH_ALL_ENDINGS      = "ACH_ALL_ENDINGS";
-    public const string ACH_MONSTER_CODEX_FULL = "ACH_MONSTER_CODEX_FULL";
-    public const string ACH_CG_GALLERY_FULL    = "ACH_CG_GALLERY_FULL";
+    public const string ACH_ALL_ENDINGS      = "ALL_ENDINGS";
+    public const string ACH_MONSTER_CODEX_FULL = "MONSTER_CODEX_FULL";
+    public const string ACH_CG_GALLERY_FULL    = "CG_GALLERY_FULL";
 
     // 結局成就（由各 .nani 檔用 @achieve id:ACH_END_XX 觸發，編號對應結局清單）
     public const string ACH_END_01 = "ACH_END_01"; // 緋紅替身（chapter5blue #end_crimson）
@@ -123,7 +124,11 @@ public class AchievementManager : MonoSingleton<AchievementManager>
 
         Unlock(ACH_ARENA_OPEN);
 
-        // 遞迴只會有一層：ACH_ARENA_OPEN / ACH_ALL_ENDINGS 都不是結局 id，
+        // 輪迴の鑰匙＝蝕之聖典解鎖，系統給，不是玩家去點開才給。
+        if (achievementApiName == ACH_END_07)
+            Unlock(ACH_CODEX_OPEN);
+
+        // 遞迴只會有一層：ACH_ARENA_OPEN / ACH_CODEX_OPEN / ACH_ALL_ENDINGS 都不是結局 id，
         // 第二次進來上面那個 return 就擋掉了。
         if (EndingRecord.AllCollected)
             Unlock(ACH_ALL_ENDINGS);
