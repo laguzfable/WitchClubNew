@@ -36,7 +36,7 @@
 西碧爾: 莉莉娜交給我就好了，快去支援她們！
 西碧爾: {PlayerName}，還可以嗎？別太勉強唷。
 
-@choice 等一下，這也太混亂了吧？ goto:.ch5_cont2
+@choice 等一下，這也太混亂了吧？ set:affinity_Syb=affinity_Syb+5 goto:.ch5_cont2
 @stop
 
 #ch5_cont2
@@ -228,8 +228,8 @@
 優菲: 也不是那個意思啦……
 妮可: {PlayerName}感覺就比較喜歡學姊啊，不是嗎？
 
-@choice 是啊。 goto:.ch5_cont3
-@choice 這…… goto:.ch5_cont3
+@choice 是啊。 set:affinity_Eup=affinity_Eup+5 goto:.ch5_cont3
+@choice 這…… set:affinity_Eup=affinity_Eup+5 goto:.ch5_cont3
 @stop
 
 #ch5_cont3
@@ -538,8 +538,8 @@
 優菲: 我有點不懂妳為什麼要這麼緊張就是了……
 優菲: {PlayerName}有什麼頭緒嗎？
 
-@choice 沒辦法，因為妳是她的偶像囉。 goto:.ch5_cont4
-@choice 最近妳變得不一樣，我也覺得有點緊張呢。 goto:.ch5_cont4
+@choice 沒辦法，因為妳是她的偶像囉。 set:affinity_Eup=affinity_Eup+5 goto:.ch5_cont4
+@choice 最近妳變得不一樣，我也覺得有點緊張呢。 set:affinity_Eup=affinity_Eup+5 goto:.ch5_cont4
 
 @stop
 

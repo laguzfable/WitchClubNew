@@ -6,8 +6,8 @@
 @set affinity_Ved=100
 薇狄亞: 等好久了……
 薇狄亞: 啊，抱、抱歉，我太沒分寸了。
-@choice 妳知道就好。 goto:.green05cold
-@choice 再來一次也可以。 goto:.green05passion
+@choice 妳知道就好。 set:affinity_Ved=affinity_Ved+5 goto:.green05cold
+@choice 再來一次也可以。 set:affinity_Ved=affinity_Ved+5 goto:.green05passion
 @stop
 # green05cold
 ……

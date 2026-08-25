@@ -5,8 +5,8 @@
 ; 第五夜＝告白場，四個角色一律在這裡把好感度設滿（跟 blue05/green05/yellow05 同規格）
 @set affinity_Mel=100
 梅爾: 哎，怎麼這麼快就來了，不是說好要多給我一點時間的嗎？
-@choice 我會把我人生的所有時間都給妳。 goto:.red05yes
-@choice 好吧，那我下次再來。 goto:.red05no
+@choice 我會把我人生的所有時間都給妳。 set:affinity_Mel=affinity_Mel+5 goto:.red05yes
+@choice 好吧，那我下次再來。 set:affinity_Mel=affinity_Mel+5 goto:.red05no
 @stop
 # red05yes
 梅爾: 好吧……我也只能認了。

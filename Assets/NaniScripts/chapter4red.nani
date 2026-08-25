@@ -13,7 +13,7 @@
 梅爾: ……女巫獵人？
 梅爾: 我要怎麼相信妳……
 克蘿伊: 聽我說就對了。
-@choice 聽看看女巫獵人的說法 goto:.listen
+@choice 聽看看女巫獵人的說法 set:affinity_Mel=affinity_Mel+5 goto:.listen
 @choice 把她就地解決掉 goto:.kill
 @stop
 # kill

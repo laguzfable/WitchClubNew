@@ -22,7 +22,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 不准再寫了！
 （金髮女子把紙撕碎）
 選項：
-@choice 悶不吭聲 goto:.c5b1_a
+@choice 悶不吭聲 set:affinity_Eup=affinity_Eup+5 goto:.c5b1_a
 @choice 表現難過 set:affinity_Eup=affinity_Eup+5 goto:.c5b1_b
 @stop
 
@@ -60,7 +60,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 還滿好吃的，你再說一遍那個怎麼做？
 這樣？還是這樣？
 啊啊－－算了，還是用咒語變出來比較省事。
-@choice 太隨便了吧？ goto:.c5b2_a
+@choice 太隨便了吧？ set:affinity_Eup=affinity_Eup+5 goto:.c5b2_a
 @choice 妳說了算。 set:affinity_Eup=affinity_Eup+5 goto:.c5b2_b
 @stop
 
@@ -97,7 +97,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 @char syb pos:50
 西碧爾: 莉莉娜交給我就好了，快去支援她們！
 西碧爾: {PlayerName}，還可以嗎？別太勉強唷。
-@choice 等一下，這也太混亂了吧？
+@choice 等一下，這也太混亂了吧？ set:affinity_Syb=affinity_Syb+5
 @stop
 @hide syb
 @char 涅莉 pos:50
@@ -175,10 +175,8 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 西碧爾: 更精彩的還在後頭呢。
 涅莉: ……
 @hide syb,涅莉
-@back bg05
-@char 莉莉娜 pos:35
-@char 優菲 pos:65
-(CG 莉莉娜拿著陰陰鬱鬱的娃娃)
+@back CG/cg32
+@unlock CG/cg32
 優菲: 莉莉娜，妳的傷……
 莉莉娜: 我沒事。
 優菲: 可是陰陰跟鬱鬱都……
@@ -192,7 +190,6 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 莉莉娜: 至少給妳的象牙塔同伴一個官方說法吧。
 優菲: ……我會再好好想想的。
 優菲: 妳安心休息吧，莉莉娜。
-@hide 優菲,莉莉娜
 @back bg07
 @char 優菲
 優菲: 不能原諒。
@@ -248,7 +245,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 優菲: 也不是那個意思啦……
 妮可: {PlayerName}感覺就比較喜歡學姊啊，不是嗎？
 @choice 是啊。 set:affinity_Eup=affinity_Eup+5 goto:.c5b3_a
-@choice 這…… goto:.c5b3_b
+@choice 這…… set:affinity_Eup=affinity_Eup+5 goto:.c5b3_b
 @stop
 
 # c5b3_a
@@ -319,7 +316,9 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 妮可: 抱歉，學姊，都是因為我不夠強……
 優菲: 妳也真是的，又不是不知道那個惡魔的劣根性。
 優菲: 去跟她硬碰硬做什麼呢……
-(CG包紮學妹)
+@hideChars
+@back CG/cg34
+@unlock CG/cg34
 妮可: 我不想聽到學姊被她那樣講嘛。
 妮可: 妳應該是象牙塔的榮耀才對，哪是可以隨便被汙辱的……啊、痛痛痛……
 優菲: 對、對不起，我太大力了嗎？
@@ -469,7 +468,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 妮可: 呃、唔，當當當當、當然可以呀！我們走吧。
 優菲: 我有點不懂妳為什麼要這麼緊張就是了……
 優菲: {PlayerName}有什麼頭緒嗎？
-@choice 沒辦法，因為妳是她的偶像囉。 goto:.c5b4_a
+@choice 沒辦法，因為妳是她的偶像囉。 set:affinity_Eup=affinity_Eup+5 goto:.c5b4_a
 @choice 最近妳變得不一樣，我也覺得有點緊張呢。 set:affinity_Eup=affinity_Eup+5 goto:.c5b4_b
 @stop
 
@@ -482,6 +481,9 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 @goto .c5b4_join
 
 # c5b4_join
+@hideChars
+@back CG/cg31
+@unlock CG/cg31
 妮可: 這裡的環境好舒服啊－－
 優菲: 妳還記得那門課嗎？占星術基礎。
 妮可: 啊，我記得我記得。
@@ -561,8 +563,8 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 優菲: 太好了，正想吃吃看她們新出的紅酒慕斯呢！
 優菲: {PlayerName}會一起來的對吧？
 妮可: 請務必、務必大駕光臨！我們的贊助者一直心心念念見到異鄉人呢！
-@choice 那我就不客氣了 goto:.toxickiss
-@choice 還是改天好了 goto:.nexttime
+@choice 那我就不客氣了 set:affinity_Eup=affinity_Eup+5 goto:.toxickiss
+@choice 還是改天好了 set:affinity_Eup=affinity_Eup+5 goto:.nexttime
 @stop
 @hide 優菲,nic
 #toxickiss
@@ -839,6 +841,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 # end_crimson
 @stopBgm
 @bgm title
+@hideChars
 @back ed01
 
 優菲: ……嗯。
@@ -857,6 +860,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 # end_blue_crown
 @stopBgm
 @bgm title
+@hideChars
 @back ed02
 
 優菲: ……

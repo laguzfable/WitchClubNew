@@ -7,8 +7,8 @@
 優菲: 那個、呃，這個時候該講什麼比較好？
 優菲: 我、我也是第一次，所以……
 優菲: 啊啊，好像不應該這麼緊張的。
-@choice 先聊些讓她放鬆的事。 goto:.hn0101a
-@choice 直接進入正題吧。 goto:.hn0101b
+@choice 先聊些讓她放鬆的事。 set:affinity_Eup=affinity_Eup+5 goto:.hn0101a
+@choice 直接進入正題吧。 set:affinity_Eup=affinity_Eup+5 goto:.hn0101b
 @stop
 # hn0101a
 優菲: 什麼？ {PlayerName}想知道這件睡衣是哪裡買的？
@@ -16,8 +16,8 @@
 優菲: 可惜那間店沒了，不然我也會給{PlayerName}買一件。
 優菲: 畢竟{PlayerName}裝了義體嘛，這種精密的東西，得要小心呵護才行。
 優菲: 對了，我其實一直很好奇……可以摸摸看嗎，{PlayerName}的身體？
-@choice 就摸一下 goto:.hn0102a
-@choice 不行 goto:.hn0101b
+@choice 就摸一下 set:affinity_Eup=affinity_Eup+5 goto:.hn0102a
+@choice 不行 set:affinity_Eup=affinity_Eup+5 goto:.hn0101b
 @stop
 # hn0102a
 優菲: 哇～比我想像得還要……怎麼說呢？溫暖？

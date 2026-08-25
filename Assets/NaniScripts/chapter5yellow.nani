@@ -35,7 +35,7 @@
 涅莉: {PlayerName}，梅爾的呼吸越來越微弱了。
 涅莉: 想想辦法……
 @choice 幫梅爾急救(人工呼吸) set:affinity_Mel=affinity_Mel+5 goto:.c5y1_a
-@choice 坐視不管(涅莉會去人工呼吸) goto:.c5y1_b
+@choice 坐視不管(涅莉會去人工呼吸) set:affinity_Nel=affinity_Nel+5 goto:.c5y1_b
 @stop
 
 # c5y1_a
@@ -146,7 +146,10 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 @stopBgm
 @bgm chill
 
-@if affinity_Nel>=100
+; 「小精靈，飛走了」是第二輪限定：第一輪一定會打米夏戰、走到最後的二選一，
+; 拿到結局回標題重跑之後，好感夠深才開得出這條救援線。
+; IsSecondPlaythrough() 看的是本地結局紀錄（EndingRecord），不是 Steam 成就。
+@if "IsSecondPlaythrough() && RunesYellow()>=5"
 @goto .success
 @endif
 
@@ -174,8 +177,26 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 @bgm sad
 @back black
 
-涅莉: 果然……還是差了一截。
+; 米夏戰輸贏都會走到同一個結局，但台詞要分開——贏了還說「差了一截」很怪。
+@if CombatWin
+@goto .micha_win
+@endif
 
+涅莉: 果然……還是差了一截。
+@goto .micha_join
+
+# micha_win
+@char 涅莉 pos:50
+涅莉: ……打退了。真的打退了。
+涅莉: 可是，為什麼她還在笑？
+
+（米夏的身影像碎裂的鏡面一樣散開，又在更遠的地方重新聚攏）
+
+涅莉: 打碎那個軀殼根本沒有用……
+涅莉: 她從一開始就不在那裡面。
+@hide 涅莉
+
+# micha_join
 @char 梅爾 pos:50
 梅爾: 她太強了，我來擋——
 @hide 梅爾
@@ -221,6 +242,7 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 @if bossPower==2
 @goto .eclipse_lost
 @endif
+@hideChars
 @back ed07
 @stopBgm
 @bgm white
@@ -253,11 +275,12 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 @goto .realworld_body
 
 # realworld
-@if affinity_Nel<50
+@if RunesYellow()<3
 @goto .eclipse
 @endif
 
 # realworld_body
+@hideChars
 @back ed08
 @stopBgm
 @bgm white

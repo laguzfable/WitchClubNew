@@ -12,8 +12,8 @@
 優菲: ……
 優菲: 在我們進行儀式之前，P可以先答應我嗎？
 優菲: 答應我，永遠不要離開我，好嗎？
-@choice 我答應妳。 goto:.b05yes
-@choice 這……可能沒辦法。 goto:.b05no
+@choice 我答應妳。 set:affinity_Eup=affinity_Eup+5 goto:.b05yes
+@choice 這……可能沒辦法。 set:affinity_Eup=affinity_Eup+5 goto:.b05no
 @stop
 # b05no
 優菲: 是嗎？那……

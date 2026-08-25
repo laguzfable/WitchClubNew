@@ -77,6 +77,12 @@ may: 剛剛的符文都裝上去了，透過墮星石預言的力量，可以看
 may: 選好要用的符文之後，按下實裝就完成了。
 may: 很簡單吧～
 may: 至於符文的用法嘛……
+; 看過一次而且設定裡「跳過已觀看教學」開著的話，用一句台詞帶過（見 TutorialRecord）
+@if SkipRuneTutorial()
+may: ……妳應該早就會了吧，我就不多說了。
+@hide may
+@goto .afterbattle3
+@endif
 @hide may
 @stopBgm 
 @bgm tutorial
@@ -98,7 +104,7 @@ may: 當然不會呀，我可是神秘的旅行商人呢，這個重責大任就
 優菲: ……
 梅爾: ……
 選項
-@choice 看我做什麼啊？ goto:.c3a_a
+@choice 看我做什麼啊？ set:affinity_Mel=affinity_Mel+5 goto:.c3a_a
 @choice 好啦、好啦，我知道了。 set:affinity_Mel=affinity_Mel+5 goto:.c3a_b
 @stop
 
@@ -383,7 +389,7 @@ CG上菜
 薇狄亞: 因為梅伊主人突然宣布要離開了，我想趁今晚趕緊做一個旅行用的護符給她。
 薇狄亞: 夜色太黑了我不敢一個人出門，所以{PlayerName}……陪我好嗎？
 @choice 當然好 (加薇狄亞好感) goto:.ved_yes
-@choice 還是算了 (無法進薇狄亞線) goto:.ved_no
+@choice 還是算了 (無法進薇狄亞線) set:affinity_Ved=affinity_Ved+5 goto:.ved_no
 @stop
 # ved_yes
 @set affinity_Ved=affinity_Ved+15
@@ -599,7 +605,7 @@ nic: 想想那些為了象牙塔而捐軀的烈士們，他們會希望身為現
 梅爾: ……我現在不想講話。
 選項
 @choice 抱住她(CG抱住梅爾) goto:.hold
-@choice 繼續沉默 goto:.silence
+@choice 繼續沉默 set:affinity_Mel=affinity_Mel+5 goto:.silence
 @stop
 #hold
 @set affinity_Mel=100

@@ -28,7 +28,7 @@
 優菲: 只要有我在……
 優菲: 奧術．椒鹽捲餅衝擊！
 @choice 出聲叫醒她。 set:affinity_Eup=affinity_Eup+5 goto:.c2a_a
-@choice 對她搔癢。 goto:.c2a_b
+@choice 對她搔癢。 set:affinity_Eup=affinity_Eup+5 goto:.c2a_b
 @stop
 
 # c2a_a
@@ -119,8 +119,8 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @char 蘇菲亞.idle pos:50
 蘇菲亞.idle: 早安，{PlayerName}，大家都出門工作了呢。
 蘇菲亞.idle: 要不要出去探班呢？她們一定會很開心的。
-@choice 去找優菲和梅爾吧！ goto:.C02a
-@choice 想知道薇狄亞和涅莉的情況。 goto:.C02b
+@choice 去找優菲和梅爾吧！ set:affinity_Eup=affinity_Eup+5 goto:.C02a
+@choice 想知道薇狄亞和涅莉的情況。 set:affinity_Ved=affinity_Ved+5 goto:.C02b
 @hide 蘇菲亞
 @stop
 @stopBgm
@@ -153,7 +153,7 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 優菲: 梅爾需要的話，我可以加入唷？
 梅爾: 別開玩笑了，我才不要。
 梅爾: 妳還是繼續死守著那無趣的象牙塔吧，那樣比較適合妳。
-@choice 就是說嘛。
+@choice 就是說嘛。 set:affinity_Mel=affinity_Mel+5
 @stop
 @back bg02
 @stopBgm
@@ -247,9 +247,9 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 優菲: 沒關係啦，是莉莉娜要的耶。
 優菲: {PlayerName}來幫我一起選，我們賣哪一本好呢？
 （會影響結局boss的強度）
-@choice 奧秘之書《無窮魔源》(The Tome of Infinite Magic) set:"bossPower=1" goto:.c2book_a
-@choice 學院中的禁忌藥草 (Forbidden Herbs in the Academy) set:"bossPower=0" goto:.c2book_b
-@choice 蝕之聖典 (Script of Eclipse) set:"bossPower=2" goto:.c2book_c
+@choice 奧秘之書《無窮魔源》(The Tome of Infinite Magic) set:"bossPower=1;affinity_Eup=affinity_Eup+5" goto:.c2book_a
+@choice 學院中的禁忌藥草 (Forbidden Herbs in the Academy) set:"bossPower=0;affinity_Mel=affinity_Mel+5" goto:.c2book_b
+@choice 蝕之聖典 (Script of Eclipse) set:"bossPower=2;affinity_Eup=affinity_Eup+5" goto:.c2book_c
 @stop
 
 # c2book_a

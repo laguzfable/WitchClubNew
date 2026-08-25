@@ -4,8 +4,8 @@
 @sfx morning
 @char 涅莉 pos:50
 涅莉.happy: 早啊～{PlayerName}，怎麼臉色看起來不太好的樣子？
-@choice 妳可以看出骷髏的臉色，真是不簡單。 goto:.C01a
-@choice 我作了一個奇怪的夢……。 goto:.C01b
+@choice 妳可以看出骷髏的臉色，真是不簡單。 set:affinity_Nel=affinity_Nel+5 goto:.C01a
+@choice 我作了一個奇怪的夢……。 set:affinity_Nel=affinity_Nel+5 goto:.C01b
 @stop
 # C01a
 涅莉: 當然啦，我可是閱髏無數呢。
@@ -362,7 +362,7 @@
 優菲: 這樣{PlayerName}就能盡情體驗生活了。
 梅爾: 也可以幫忙抄寫咒文了。
 @choice 原來這是妳打的主意嗎…… set:affinity_Eup=affinity_Eup+5 goto:.c1a_a
-@choice 有了身體當然要到處去玩呀！ goto:.c1a_b
+@choice 有了身體當然要到處去玩呀！ set:affinity_Mel=affinity_Mel+5 goto:.c1a_b
 @stop
 
 # c1a_a

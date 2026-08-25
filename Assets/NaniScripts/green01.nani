@@ -5,8 +5,8 @@
 薇狄亞: 真是個安靜的夜晚呢，P真的來找我了，我很開心。
 薇狄亞: 我的房間氣氛還可以嗎？我總是希望可以更週到，但沒有經驗的事情還是很有難度呢。
 薇狄亞: P呢？已經替其他人做過了嗎？
-@choice 做過了。 goto:.green01did
-@choice 沒有，妳是第一個。 goto:.green01didnot
+@choice 做過了。 set:affinity_Ved=affinity_Ved+5 goto:.green01did
+@choice 沒有，妳是第一個。 set:affinity_Ved=affinity_Ved+5 goto:.green01didnot
 @stop
 # green01did
 薇狄亞: ……真過分。

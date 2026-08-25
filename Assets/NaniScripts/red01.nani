@@ -5,8 +5,8 @@
 梅爾: 嘖，怎麼會是來找我啊？
 梅爾: 沒有啦，我絕對不是因為怕那個石頭飛出鬼還是什麼的。
 梅爾: 這種儀式就是這樣啊～確定要找我嗎？真的不再考慮一下嗎？
-@choice 確定是妳。 goto:.red01yes
-@choice 好，我考慮別人。 goto:.red01no
+@choice 確定是妳。 set:affinity_Mel=affinity_Mel+5 goto:.red01yes
+@choice 好，我考慮別人。 set:affinity_Mel=affinity_Mel+5 goto:.red01no
 @stop
 # red01yes
 梅爾: 好吧……我也只能認了。
@@ -15,8 +15,8 @@
 梅爾: 啊啊啊啊啊－－
 梅爾: 等一下！我還沒做好心理準備！！！
 梅爾: 會痛嗎？呀啊啊－－
-@choice 放輕鬆，慢慢回想第一次使用魔法的時候。 goto:.red01calm
-@choice 妳知道儀式要幹嘛對吧？廢話少說，不然我真的放鬼嚇妳。 goto:.red01threaten
+@choice 放輕鬆，慢慢回想第一次使用魔法的時候。 set:affinity_Mel=affinity_Mel+5 goto:.red01calm
+@choice 妳知道儀式要幹嘛對吧？廢話少說，不然我真的放鬼嚇妳。 set:affinity_Mel=affinity_Mel+5 goto:.red01threaten
 @stop
 # red01no
 梅爾: 欸你別這樣嘛，來都來了。

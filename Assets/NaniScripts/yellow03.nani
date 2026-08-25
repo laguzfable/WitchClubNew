@@ -4,17 +4,17 @@
 @spawn hello
 涅莉: 嘿，現在是點心時間。
 涅莉: 我在吃杏仁糖。{PlayerName}選一個吧，要什麼顏色的？
-@choice 紅色杏仁糖。 goto:.yellow03blue
-@choice 藍色杏仁糖。 goto:.yellow03red
+@choice 紅色杏仁糖。 set:affinity_Nel=affinity_Nel+5 goto:.yellow03blue
+@choice 藍色杏仁糖。 set:affinity_Nel=affinity_Nel+5 goto:.yellow03red
 @stop
 # yellow03blue
 涅莉: 喔喔喔喔喔，要覺醒了是嗎？
 涅莉: 開玩笑的啦，哈哈哈－－
-goto:.ritual
+@goto .ritual
 # yellow03red
 涅莉: 原來如此，{PlayerName}比較喜歡舒服的夢境是嗎？
 涅莉: 啊啊沒什麼啦當我沒說～
-goto:.ritual
+@goto .ritual
 #ritual
 涅莉: 總之我們開始吧。
 (回憶中)

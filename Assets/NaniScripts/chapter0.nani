@@ -31,9 +31,17 @@
 ？？？: 異鄉人，沒想到真的遇見你了。
 ？？？: 我在這裡啦，這裡這裡。
 ？？？: 這樣貌……跟預言中的敘述好像不太一樣呢。
+; 玩過就記得名字了：之前存過的話走「我們是不是見過？」那段，不再重問（見 PlayerNameStore）
+@if HasSavedName()
+@goto .name_remembered
+@endif
+
+# ask_name
 ？？？: 您的名字是？
 @input PlayerName value:玩家
 @stop
+
+# name_check
 @if StrLeng(PlayerName)>8
     @goto .name_toolong
 @else
@@ -48,7 +56,27 @@
 ？？？: {PlayerName}啊，在精靈語裡面是很機車的意思耶。
 ？？？: 開玩笑的啦～哈哈～
 @goto .end_naming
+; ── 之前玩過：先確認是不是同一個人 ──
+# name_remembered
+@restorePlayerName
+？？？: ……等一下。
+？？？: 我們是不是在哪裡見過？
+？？？: {PlayerName}，對嗎？
+@choice 對，是我。 goto:.end_naming
+@choice 不是，妳認錯人了。 goto:.rename
+@stop
+
+# rename
+？？？: 是嗎……奇怪，我明明記得那張臉的。
+？？？: 那，重來一次好了。您的名字是？
+@input PlayerName value:玩家
+@stop
+@goto .name_check
+
 # end_naming
+; 存一份到 PlayerPrefs：@exitToTitle 會清掉自訂變數，之後從蝕之聖典
+; 直接跳進節點時要靠這份把 {PlayerName} 補回來（見 PlayerNameStore）
+@rememberPlayerName
 @despawn hello
 @spawn ShakeBackground
 @back CG/cg02new
@@ -57,7 +85,7 @@
 紅髮女子: 七彩駱駝的睫毛嗎？我早說過那個戴起來不適合妳了。
 ？？？: 比那個厲害多了！
 紅髮女子: 還會是什麼？不會是妳上次說一直很想要的邪神的嘔吐物吧？
-@choice 全猜錯了，她買的是我。
+@choice 全猜錯了，她買的是我。 set:affinity_Eup=affinity_Eup+5
 @stop
 @stopBgm
 @bgm happy
@@ -78,7 +106,7 @@
 @spawn Dust
 @sfx mist2 loop:false
 優菲.smile: 太好吃了。
-@choice 我也要、我也要！
+@choice 我也要、我也要！ set:affinity_Ved=affinity_Ved+5
 @stop
 梅爾.scared: 啊啊啊－－它又講話了！
 @char 薇狄亞.smile pos:55
@@ -213,6 +241,12 @@
 優菲.smile: 哈哈哈－－梅爾嚇得臉色都變了耶！涅莉妳好幽默唷！
 梅爾.sad: ……
 涅莉.yummy: 好啦，既然我都被放出來了，就傳授一些小精靈戰鬥秘訣給妳們吧。
+; 看過一次而且設定裡「跳過已觀看教學」開著的話，用一句台詞帶過（見 TutorialRecord）
+@if SkipBasicTutorial()
+涅莉.yummy: ……不過看妳這身手，這些應該都不用我教了吧？那就省下來囉。
+@hide 涅莉,優菲,梅爾,薇狄亞
+@goto .afterbattle
+@endif
 @hide 涅莉,優菲,梅爾,薇狄亞
 @stopBgm
 @bgm tutorial

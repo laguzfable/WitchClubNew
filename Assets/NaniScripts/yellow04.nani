@@ -5,7 +5,7 @@
 (涅莉變小在喝酒)
 涅莉: 正在想{PlayerName}的事情呢，出現得正是時候。
 涅莉: 吶，陪我玩個遊戲吧？
-@choice 不好的預感……一定要嗎？ goto:.y04a_a
+@choice 不好的預感……一定要嗎？ set:affinity_Nel=affinity_Nel+5 goto:.y04a_a
 @choice 悉聽尊便。 set:"affinity_Nel=affinity_Nel+5" goto:.y04a_b
 @stop
 
@@ -19,9 +19,9 @@
 #yellow04yes
 涅莉: 哈哈哈，幹嘛這麼見外呀，那我出招了唷，只要回答我的問題就好。
 涅莉: 我們第一次見面是在……哪裡？
-@choice 女巫的包包裡。 goto:.ritual
-@choice 街上。 goto:.ritual
-@choice 道具店。 goto:.ritual
+@choice 女巫的包包裡。 set:affinity_Nel=affinity_Nel+5 goto:.ritual
+@choice 街上。 set:affinity_Nel=affinity_Nel+5 goto:.ritual
+@choice 道具店。 set:affinity_Nel=affinity_Nel+5 goto:.ritual
 @stop
 #ritual
 (這邊應該是幫涅莉加戲分 然後考驗玩家之前有沒有仔細玩)
@@ -51,8 +51,8 @@
 涅莉: 就先……先這樣待著就好……
 涅莉: zzz……
 (CG: 涅莉躺在床上)
-@choice 幫她蓋好被子就走 goto:.yellow04end
-@choice 陪她直到她醒來 goto:.yellow04end
+@choice 幫她蓋好被子就走 set:affinity_Nel=affinity_Nel+5 goto:.yellow04end
+@choice 陪她直到她醒來 set:affinity_Nel=affinity_Nel+5 goto:.yellow04end
 @stop
 # yellow04end
 @set affinity_Nel=affinity_Nel+25
