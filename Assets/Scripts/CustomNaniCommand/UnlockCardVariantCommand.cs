@@ -55,6 +55,9 @@ public class UnlockCardVariantCommand : Command
                 PlayerPrefs.SetString(key, string.Join(",", list));
                 Debug.Log($"[unlockCardVariant] 解鎖 {element}{variant}（key={key}）");
             }
+
+            // 另外記一份「曾經解鎖過」：開新遊戲會清掉上面那份，但聖典要看得到（見 RunRecord）
+            RunRecord.Add(key, variant);
             else
             {
                 Debug.Log($"[unlockCardVariant] {element}{variant} 已解鎖，跳過");

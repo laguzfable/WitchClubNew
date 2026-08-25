@@ -34,6 +34,22 @@ public static class RuneCollection
     /// <summary>這個顏色是不是全收了。</summary>
     public static bool IsComplete (string color) => Count(color) >= PerColor;
 
+    /// <summary>PlayerPrefs 的 key。RunRecord 和聖典都要用同一個算法。</summary>
+    public static string KeyFor (string color) => "UnlockedRunes_" + Normalize(color);
+
+    /// <summary>四個顏色的 key。</summary>
+    public static readonly string[] Colors = { "blue", "red", "yellow", "green" };
+
+    /// <summary>「曾經拿過」的數量（跨周目，開新遊戲不會清）。</summary>
+    public static int CountEver (string color) => RunRecord.CountEver(KeyFor(color));
+
+    /// <summary>把曾經拿過的符文還原到這一輪（進聖典節點時用）。</summary>
+    public static void RestoreEver ()
+    {
+        foreach (var color in Colors)
+            RunRecord.RestoreEverToRun(KeyFor(color));
+    }
+
     /// <summary>PlayerPrefs 的 key 是首字母大寫（元素列舉的 ToString），這裡統一轉過去。</summary>
     static string Normalize (string color)
     {

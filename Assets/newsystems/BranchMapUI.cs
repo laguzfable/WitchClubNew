@@ -126,6 +126,17 @@ public class BranchMapUI : CustomUI
     [Tooltip("Completion Text 沒指定時，自動生一個放在這個位置（畫面比例，0~1）")]
     public Vector2 completionAutoAnchor = new Vector2(0.5f, 0.94f);
 
+    [Tooltip("顯示「已習得符文」的 Text。留空＝自動生一個。\n" +
+             "★ 這行是給玩家看的，別拿掉 ★ 進節點時會把曾經打贏過的符文還原回來，\n" +
+             "玩家要先知道自己帶著什麼進去，才不會覺得路是莫名其妙開的。")]
+    public Text runeSummaryText;
+
+    [Tooltip("Rune Summary Text 沒指定時，自動生一個放在這個位置（畫面比例，0~1）")]
+    public Vector2 runeSummaryAutoAnchor = new Vector2(0.5f, 0.90f);
+
+    [Tooltip("{0}=藍 {1}=紅 {2}=黃 {3}=綠，都是「曾經拿過」的數量")]
+    public string runeSummaryFormat = "已習得符文　藍 {0}　紅 {1}　黃 {2}　綠 {3}";
+
     [Tooltip("右頁顯示「這一格通往的結局」的 Text。留空＝自動生一個")]
     public Text endingListText;
 
@@ -211,6 +222,24 @@ public class BranchMapUI : CustomUI
         if (text == null) return;
 
         text.text = string.Format(completionFormat, EndingRecord.Count, totalEndings);
+
+        RefreshRuneSummary();
+    }
+
+    /// <summary>
+    /// 「已習得符文」。進節點時 NodeButton 會把這些還原到這一輪，
+    /// 所以要先讓玩家看到——路開不開跟這行數字直接相關。
+    /// </summary>
+    private void RefreshRuneSummary()
+    {
+        var text = EnsureRuneSummaryText();
+        if (text == null) return;
+
+        text.text = string.Format(runeSummaryFormat,
+            RuneCollection.CountEver("blue"),
+            RuneCollection.CountEver("red"),
+            RuneCollection.CountEver("yellow"),
+            RuneCollection.CountEver("green"));
     }
 
     // ============================================================
@@ -221,6 +250,7 @@ public class BranchMapUI : CustomUI
 
     private Text autoCompletionText;
     private Text autoEndingListText;
+    private Text autoRuneSummaryText;
 
     private Text EnsureCompletionText()
     {
@@ -229,6 +259,15 @@ public class BranchMapUI : CustomUI
 
         autoCompletionText = CreateAutoText("AutoCompletionText", completionAutoAnchor, 30, TextAnchor.MiddleCenter);
         return autoCompletionText;
+    }
+
+    private Text EnsureRuneSummaryText()
+    {
+        if (runeSummaryText) return runeSummaryText;
+        if (autoRuneSummaryText) return autoRuneSummaryText;
+
+        autoRuneSummaryText = CreateAutoText("AutoRuneSummaryText", runeSummaryAutoAnchor, 24, TextAnchor.MiddleCenter);
+        return autoRuneSummaryText;
     }
 
     private Text EnsureEndingListText()
@@ -267,7 +306,8 @@ public class BranchMapUI : CustomUI
     private Font FindFont()
     {
         foreach (var existing in GetComponentsInChildren<Text>(true))
-            if (existing != null && existing.font != null && existing != autoCompletionText && existing != autoEndingListText)
+            if (existing != null && existing.font != null && existing != autoCompletionText
+                && existing != autoEndingListText && existing != autoRuneSummaryText)
                 return existing.font;
 
         return Resources.GetBuiltinResource<Font>("Arial.ttf");

@@ -696,6 +696,9 @@ void TryUnlockRune(string mobID)
     PlayerPrefs.SetString(key, string.Join(",", list));
     PlayerPrefs.Save();
 
+    // ✅ 另外記一份「曾經拿過」：開新遊戲會清掉上面那份，但聖典要看得到（見 RunRecord）
+    RunRecord.Add(key, data.runeID);
+
     Debug.Log($"[RuneUnlock] ✅ 加入解鎖清單: {data.runeID} → key:{key} = {PlayerPrefs.GetString(key)}");
 }
 

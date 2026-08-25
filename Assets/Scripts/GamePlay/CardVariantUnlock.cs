@@ -16,6 +16,23 @@ public static class CardVariantUnlock
     /// <summary>key 要跟 UnlockCardVariantCommand / SelectCardVariant 用的一致，改的話三邊一起改。</summary>
     public static string KeyFor(ECardElement element) => "UnlockedCardVariant_" + element;
 
+    /// <summary>所有元素（不含 None）。</summary>
+    public static System.Collections.Generic.IEnumerable<ECardElement> Elements
+    {
+        get
+        {
+            foreach (ECardElement e in System.Enum.GetValues(typeof(ECardElement)))
+                if (e != ECardElement.None) yield return e;
+        }
+    }
+
+    /// <summary>把曾經解鎖過的型態還原到這一輪（進聖典節點時用）。</summary>
+    public static void RestoreEver()
+    {
+        foreach (var e in Elements)
+            RunRecord.RestoreEverToRun(KeyFor(e));
+    }
+
     /// <summary>有沒有解鎖過「任何一個」卡片型態。決定換卡片入口要不要出現。</summary>
     public static bool AnyUnlocked
     {
