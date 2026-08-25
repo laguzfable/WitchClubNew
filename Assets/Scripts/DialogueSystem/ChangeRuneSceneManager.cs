@@ -43,6 +43,13 @@ public class ChangeRuneSceneManager : MonoBehaviour
         }
 
         btn.onClick.AddListener(OnConfirm);
+
+        // 競技場挑戰中整條控制列都不顯示：那邊每一頁本來就有自己的按鈕組（返回／回標題），
+        // 而且回標題必須走 TowerModeManager.QuitToTitle 才會保留續關記錄。
+        // 只有劇情流程（休息室進來的）才需要這排。
+        if (!TowerModeManager.IsActive)
+            Hexe.UI.SceneControlBar.Show();
+
         Debug.Log("[ChangeRuneScene] 確認按鈕已綁定");
     }
 

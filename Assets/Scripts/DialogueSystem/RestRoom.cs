@@ -40,6 +40,9 @@ public class RestRoom : MonoBehaviour
         chatBtn.interactable = canChat;
 
         ApplyCardVariantLock();
+
+        // 沒有對話框的頁面，共用控制列（設定／回顧／回標題）
+        Hexe.UI.SceneControlBar.Show();
     }
 
     /// <summary>

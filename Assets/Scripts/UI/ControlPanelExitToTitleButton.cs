@@ -16,7 +16,7 @@ namespace Hexe.UI
     public class ControlPanelExitToTitleButton : ScriptableButton
     {
         [ManagedText("DefaultUI")]
-        protected static string ConfirmationMessage = "Return to the title screen?\nAny unsaved progress will be lost.";
+        public static string ConfirmationMessage = "Return to the title screen?\nAny unsaved progress will be lost.";
 
         private IUIManager uiManager;
         private IConfirmationUI confirmationUI;
