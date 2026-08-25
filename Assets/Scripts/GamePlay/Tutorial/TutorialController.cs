@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
@@ -256,6 +256,10 @@ public class TutorialController : MonoBehaviour
                 tutorial.displayBG.SetActive(false);
             }
         }
+
+        // 跑完所有步驟才算「看過」。中途離開戰鬥場景的話上面就 return 了，不會標記。
+        if (isTutorial) TutorialRecord.MarkSeen(TutorialRecord.Basic);
+        else if (isTutorial2) TutorialRecord.MarkSeen(TutorialRecord.Rune);
 
         if (this == null || playerController == null || playerController.combatSystem == null) return;
         playerController.combatSystem.GameOver(false);
