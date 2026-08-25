@@ -41,6 +41,10 @@ public class ExitToTitleCommand : Command, Command.IForceWait
         if (stateManager != null)
             await stateManager.ResetStateAsync();
 
+        // 地圖的特殊事件預約是純記憶體的 static，ResetStateAsync 碰不到它。
+        // 不清的話，這一輪排好卻沒演到的事件會綁架下一輪的第一個地圖日。
+        MapSpecialOverride.ClearAll();
+
         await SceneManager.LoadSceneAsync("Title");
         Debug.Log("[ExitToTitle] Title 場景已載入，開始還原 UI");
 

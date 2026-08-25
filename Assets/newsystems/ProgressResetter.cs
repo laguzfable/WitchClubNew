@@ -19,14 +19,23 @@ public class ProgressResetter : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(resetKey))
-        {
-            PlayerPrefs.DeleteAll(); // 或 StoryProgressManager.Instance.ResetProgress("角色代號");
-            Hexe.UI.MonsterCodex.InvalidateCache(); // 圖鑑解鎖紀錄有快取，要一起丟掉
-            EndingRecord.Clear(); // 結局紀錄也有快取，不清的話 DeleteAll 之後還是會判定成「拿過結局」
-            ResetUnlockables(); // 回憶CG
-            Hexe.UI.TitleMenuUnlockInjector.Refresh(); // 標題選單的蝕之聖典／女巫競技場要立刻縮回去
-            Debug.Log("已清除所有 PlayerPrefs 儲存的事件進度");
-        }
+            ResetLocalProgress();
+    }
+
+    /// <summary>
+    /// 清掉所有「本地」進度。F10 和 Editor 的 Tools 選單都走這裡，
+    /// 兩邊共用同一份步驟，才不會其中一邊漏清東西。
+    /// 注意：Steam 成就不在這裡面，那是雲端的，要另外呼叫 AchievementManager.DebugResetAll()。
+    /// </summary>
+    public static void ResetLocalProgress()
+    {
+        PlayerPrefs.DeleteAll(); // 或 StoryProgressManager.Instance.ResetProgress("角色代號");
+        Hexe.UI.MonsterCodex.InvalidateCache(); // 圖鑑解鎖紀錄有快取，要一起丟掉
+        EndingRecord.Clear(); // 結局紀錄也有快取，不清的話 DeleteAll 之後還是會判定成「拿過結局」
+        ResetUnlockables(); // 回憶CG
+        MapSpecialOverride.ClearAll(); // 地圖上還沒演到的特殊事件預約（純記憶體，DeleteAll 碰不到）
+        Hexe.UI.TitleMenuUnlockInjector.Refresh(); // 標題選單的蝕之聖典／女巫競技場要立刻縮回去
+        Debug.Log("已清除所有 PlayerPrefs 儲存的事件進度");
     }
 
     /// <summary>

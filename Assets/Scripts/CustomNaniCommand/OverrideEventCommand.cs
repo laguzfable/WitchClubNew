@@ -46,6 +46,7 @@ public class OverrideEventCommand : Command
         // --- 動畫 ---
         if (!string.IsNullOrEmpty(animatorPath?.Value))
         {
+            data.animatorPath = animatorPath.Value; // 存檔時要靠它把動畫找回來
             var anim = Resources.Load<RuntimeAnimatorController>(animatorPath.Value);
             if (anim != null)
                 data.animator = anim;
