@@ -66,7 +66,8 @@ public class BranchNode
     public string slotName;
 
     // ⭐ 從地圖進入這個節點時要覆寫的變數。留空＝全部沿用 BranchMapUI 的預設好感度。
-    //    例：第四章節點要填 affinity_Ved=0，否則會被 Ved>=50 直接推進綠線、三個選項不會出現。
+    //    ★ 不要拿它偷改好感 ★ 那是在玩家看不到的情況下改數值。舊制度的分歧看好感
+    //    （Ved>=50、Nel>=50），節點才需要先壓值；現在全部改看符文數，15 格都清空了。
     public VariablePreset[] variableOverrides;
 
     // ⭐ 這一格通往哪些結局（ACH_END_XX）。右頁會顯示：已收集的顯示名字、還沒拿到的顯示 ???。
