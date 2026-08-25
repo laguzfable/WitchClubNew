@@ -51,32 +51,17 @@ public class BranchMapUI : CustomUI
     [Tooltip("節點圖是否維持原始長寬比，避免被 nodeSize 拉伸變形")]
     public bool preserveAspect = true;
 
-    [Header("回溯時的好感度")]
-    [Tooltip("從地圖進入節點時，這些變數會先被設好。\n" +
-             "理由：好感度是「讓玩家走到這個節點」的門票，節點解鎖就代表當初驗過了，不該再驗一次。\n" +
-             "不這樣做的話，@exitToTitle 會把好感度清成 0，分歧點的兩個選項會掉進同一個結局。\n\n" +
-             "但只有「曾經走過那條線」的角色才算數（Require Visited）——如果玩家之前跑的都是\n" +
-             "別人的線，卻被薇狄亞攔下來說「我一直都在這裡」，那說不通。")]
+    [Header("進節點時的好感度")]
     //
-    // 只放「決定進不進得去某條線」的好感度。西碧兒刻意不放——她決定的是
-    // 綠線內拿到哪個結局（06／13／20），預設達標會把那個分歧直接判死，
-    // 玩家在綠線那四個晚上約誰就變得毫無意義。她要讓玩家自己重新養。
+    // 只有一個來源：玩家在選人面板上挑的那個人。選到的發 Default、其他候選人發 Locked。
+    // 沒選就什麼都不做——@exitToTitle 已經把變數清光，那個狀態本身就是「全部從零開始」。
     //
-    // ★ 不要用 Variable Overrides 偷改數值 ★
-    // 那個欄位會在玩家看不到的情況下改好感，違反「任何數值變動都要在玩家眼底進行」。
-    // 舊制度的分歧看好感（Ved>=50、Nel>=50），所以節點要先壓值；現在全部改看符文數，
-    // 那些 override 都清掉了。真的非壓不可的話，要讓玩家在畫面上看得到結果。
+    // 以前這裡有一組 Affinity Presets（走過那條線就發滿），已經整組拿掉：
+    // 那是在玩家看不到的情況下改數值。任何數值變動都要在玩家眼底進行。
     //
-    public AffinityPreset[] affinityPresets =
-    {
-        new AffinityPreset { variableName = "affinity_Mel", requireVisited = "chapter4red" },
-        new AffinityPreset { variableName = "affinity_Ved", requireVisited = "chapter4green" },
-        new AffinityPreset { variableName = "affinity_Eup", requireVisited = "chapter5blue" },
-        new AffinityPreset { variableName = "affinity_Nel", requireVisited = "chapter5yellow" },
-    };
-    [Tooltip("走過那條線時要設定的值。要蓋掉個別節點請用 BranchNode 的 Variable Overrides")]
+    [Tooltip("選到的人要設成多少")]
     public int defaultAffinityValue = 100;
-    [Tooltip("沒走過那條線時要設定的值")]
+    [Tooltip("面板上其他人要設成多少")]
     public int lockedAffinityValue = 0;
 
     [Header("進節點前的選人面板")]
@@ -96,7 +81,7 @@ public class BranchMapUI : CustomUI
     public string affinityChoiceTitle = "這一輪，你與誰最親近？";
 
     [Tooltip("跳過用的文字。留空＝不給跳過（不建議，玩家會被關在面板裡）")]
-    public string affinityChoiceSkipLabel = "都不選，照原本的走";
+    public string affinityChoiceSkipLabel = "都不選（好感全部從零開始）";
 
     [Tooltip("星塵在選人之前要講的話，一句一行（點畫面推進）。\n" +
              "留空＝不講話，直接跳到選人。個別節點想加一句就填 BranchNode 的 Stardust Line。")]

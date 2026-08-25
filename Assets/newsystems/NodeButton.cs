@@ -203,18 +203,14 @@ public void Init(BranchNode data, BranchMapUI owner)
         // 不需要照劇情腳本原本的順序判斷（場景重載會讓 RuneActive 被重置成預設值 false）
         vars?.SetVariableValue("RuneActive", "True");
 
-        // 好感度：@exitToTitle 會把它清成 0，不先補回去的話分歧點的選項會掉進同一個結局。
+        // 好感度只有一種發法：玩家在面板上選了誰，誰就 100，其他人 0。
+        // 沒選（按跳過、或這一格不問）就什麼都不做——@exitToTitle 已經把變數清光了，
+        // 那個狀態本身就是「全部從零開始」，不需要程式再去補什麼。
         //
-        // 有兩套發法，看玩家這一格有沒有真的選人：
-        //   ‧ 選了誰 → 只有她 100，其他人一律 0。規則單純到玩家一眼看得懂：
-        //     「我選了誰，誰就是 100」。不能再混進走過／沒走過的判定——
-        //     開得了聖典的人一定走過 chapter5yellow，涅莉會恆等於 100，
-        //     那樣選她沒意義、不選她也照樣有她。
-        //   ‧ 按了跳過（或這一格根本不問）→ 照舊用「走過那條線就發滿」的回溯判定。
+        // 以前這裡還有一套「走過那條線就發滿」的回溯判定，已經拿掉：
+        // 那是在玩家看不到的情況下改數值，違反「任何數值變動都要在玩家眼底進行」。
         if (chosen != null)
             ApplyChosenAffinity(vars, chosen);
-        else
-            ApplyVariablePresets(vars);
 
         ApplyNodeOverrides(vars);
 
@@ -242,22 +238,13 @@ public void Init(BranchNode data, BranchMapUI owner)
         loader.GotoScript(scriptName, string.IsNullOrEmpty(label) ? null : label);
     }
 
-    /// <summary>
-    /// 選人面板的結果：選到的人發滿，其他所有候選人歸零。
-    /// 歸零的名單同時取自 affinityPresets 和面板的選項，兩邊都掃過才不會漏
-    /// （例如某個角色只出現在其中一邊）。
-    /// </summary>
+    /// <summary>選人面板的結果：選到的人發滿，面板上其他候選人歸零。</summary>
     private void ApplyChosenAffinity(ICustomVariableManager vars, AffinityChoiceOption chosen)
     {
         if (vars == null || map == null) return;
 
         var locked = map.lockedAffinityValue.ToString();
         var names = new System.Collections.Generic.HashSet<string>();
-
-        if (map.affinityPresets != null)
-            foreach (var preset in map.affinityPresets)
-                if (preset != null && !string.IsNullOrEmpty(preset.variableName))
-                    names.Add(preset.variableName);
 
         if (map.affinityChoiceOptions != null)
             foreach (var option in map.affinityChoiceOptions)
@@ -271,37 +258,6 @@ public void Init(BranchNode data, BranchMapUI owner)
         vars.SetVariableValue(chosen.variableName, value);
 
         Debug.Log($"[NodeButton] 選人面板：{chosen.variableName}={value}，其餘 {names.Count - 1} 人歸 {locked}");
-    }
-
-    /// <summary>
-    /// 依「玩家有沒有走過那條線」決定每個好感度。這是最底層的一道，
-    /// 之後還會被選人面板和節點的 Variable Overrides 依序蓋過去。
-    /// </summary>
-    private void ApplyVariablePresets(ICustomVariableManager vars)
-    {
-        if (vars == null) return;
-
-        if (map != null && map.affinityPresets != null)
-        {
-            var summary = "";
-            foreach (var preset in map.affinityPresets)
-            {
-                if (preset == null || string.IsNullOrEmpty(preset.variableName)) continue;
-
-                // 走過那條線才算「跟她好過」。沒走過就維持 0——否則玩家明明只跑過別人的線，
-                // 從地圖進第四章卻會被薇狄亞攔下來說「我一直都在這裡」，講不通。
-                var earned = string.IsNullOrEmpty(preset.requireVisited)
-                          || HasVisited(preset.requireVisited);
-
-                var value = earned ? map.defaultAffinityValue : map.lockedAffinityValue;
-                vars.SetVariableValue(preset.variableName, value.ToString());
-
-                summary += $"{preset.variableName}={value}"
-                         + (earned ? " " : $"(沒走過 {preset.requireVisited}) ");
-            }
-
-            Debug.Log($"[NodeButton] 回溯好感度 → {summary}");
-        }
     }
 
     /// <summary>
@@ -321,15 +277,5 @@ public void Init(BranchNode data, BranchMapUI owner)
         }
     }
 
-    /// <summary>「nodeId」或「nodeId#label」寫法的解鎖查詢。</summary>
-    private static bool HasVisited(string key)
-    {
-        if (VisitedNodeManager.Instance == null || string.IsNullOrEmpty(key)) return false;
-
-        var sep = key.IndexOf('#');
-        return sep < 0
-            ? VisitedNodeManager.Instance.IsVisited(key)
-            : VisitedNodeManager.Instance.IsVisited(key.Substring(0, sep), key.Substring(sep + 1));
-    }
 
 }

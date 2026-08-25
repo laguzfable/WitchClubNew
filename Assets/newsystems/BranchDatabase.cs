@@ -8,20 +8,6 @@ public class VariablePreset
     public int value;
 }
 
-// 「這個角色的好感度，要玩家曾經走過哪條線才算數」
-[System.Serializable]
-public class AffinityPreset
-{
-    [Tooltip("好感度變數名稱，例如 affinity_Ved")]
-    public string variableName;
-
-    [Tooltip("要曾經走過哪個節點，才算跟這個角色好過。\n" +
-             "寫法同 parentId：沒有 label 就寫 nodeId，有的話寫 nodeId#label。\n" +
-             "留空＝一律視為達標。\n" +
-             "沒走過的話，從地圖進場時這個變數會被設成 Locked Affinity Value。")]
-    public string requireVisited;
-}
-
 // 這是小型的資料類別
 [System.Serializable]
 public class BranchNode
