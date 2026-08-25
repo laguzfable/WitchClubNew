@@ -275,14 +275,47 @@ if (MapSpecialOverride.TryGet(c.characterName, out var special))
         }
 
         if (count == 0)
+        {
             logMsg += "⭐ 所有角色事件都已播畢\n";
+            Debug.Log(logMsg);
+            ReturnToStory();
+            return;
+        }
 
         Debug.Log(logMsg);
     }
 
+    /// <summary>
+    /// 一個 icon 都沒生出來時的保險：直接回劇本。
+    ///
+    /// ★ 為什麼需要 ★
+    /// 離開地圖的唯一方法是點某個角色（RestButton 那支程式沒掛在任何場景上），
+    /// 所以空地圖等於卡死。兩種情況碰得到：五個人的夜晚儀式都做完了，
+    /// 或者這一天的角色都被 onlyInScripts 擋掉。
+    /// </summary>
+    void ReturnToStory ()
+    {
+        if (!MapReturnPoint.HasValid())
+        {
+            Debug.LogWarning("[MapCharacterSpawner] 地圖上沒有任何角色，但也沒有返回點可以回。" +
+                             "玩家會卡在空地圖上，請檢查進地圖前有沒有 @SaveReturnPoint。");
+            return;
+        }
+
+        var loader = SceneLoader.Instance;
+        if (loader == null)
+        {
+            Debug.LogError("[MapCharacterSpawner] 找不到 SceneLoader，無法自動回到劇本。");
+            return;
+        }
+
+        Debug.Log($"[MapCharacterSpawner] 今天沒人可以找，直接回劇本：{MapReturnPoint.ScriptName}#{MapReturnPoint.Label}");
+        loader.GotoScript(MapReturnPoint.ScriptName, MapReturnPoint.Label);
+        MapReturnPoint.Clear();
+    }
+
     // ==========================================================
     // ⑤ 建立角色 icon（保持你原本邏輯）
-    // ==========================================================
     IEnumerator CreateCharacterIcon(CharacterEventList c, CharacterEvent evt)
     {
         var iconGO = Instantiate(characterIconPrefab, iconParent != null ? iconParent : transform);
