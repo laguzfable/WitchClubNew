@@ -62,9 +62,10 @@ public class BranchMapUI : CustomUI
     // 綠線內拿到哪個結局（06／13／20），預設達標會把那個分歧直接判死，
     // 玩家在綠線那四個晚上約誰就變得毫無意義。她要讓玩家自己重新養。
     //
-    // 涅莉在這裡是因為第四章的「跟著涅莉」需要 50 才進得去黃線。
-    // 想在節點裡自己決定 09／07／08 的話，用 BranchNode 的 Variable Overrides
-    // individually 蓋掉（SPIRAL 那格就是覆寫成 50）。
+    // ★ 不要用 Variable Overrides 偷改數值 ★
+    // 那個欄位會在玩家看不到的情況下改好感，違反「任何數值變動都要在玩家眼底進行」。
+    // 舊制度的分歧看好感（Ved>=50、Nel>=50），所以節點要先壓值；現在全部改看符文數，
+    // 那些 override 都清掉了。真的非壓不可的話，要讓玩家在畫面上看得到結果。
     //
     public AffinityPreset[] affinityPresets =
     {
