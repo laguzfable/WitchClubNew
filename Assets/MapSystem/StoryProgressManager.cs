@@ -67,6 +67,17 @@ public class StoryProgressManager : MonoBehaviour
         PlayerPrefs.Save();
     }
 
+    /// <summary>
+    /// 丟掉記憶體快取，下次查詢重新從 PlayerPrefs 讀。
+    /// RitualGate 在戰鬥場景裡會直接寫 PlayerPrefs（那邊沒有這個管理器），
+    /// 回到地圖後不清快取的話會讀到舊值。
+    /// </summary>
+    public void InvalidateCache()
+    {
+        dayProgress.Clear();
+        nightProgress.Clear();
+    }
+
     // 清除指定角色的進度（除錯用）
     public void ResetProgress(string characterName)
     {

@@ -238,6 +238,36 @@ if (MapSpecialOverride.TryGet(c.characterName, out var special))
                     }
 
                     evt = c.nightEvents[eventIdx];
+
+                    // ⭐ 好感門檻：不夠就改播閒聊，儀式進度原地不動（見 RitualGate）
+                    if (!RitualGate.CanPerform(c.characterName, eventIdx))
+                    {
+                        var chat = RitualGate.ChatScript(c.characterName);
+                        if (string.IsNullOrEmpty(chat))
+                        {
+                            logMsg += $"⚠️ {c.characterName} 好感不足但沒設定閒聊劇本，照舊播儀式\n";
+                        }
+                        else
+                        {
+                            // 複製原本那顆 icon 的外觀（位置、動畫），只換掉要播的劇本。
+                            // 先找有沒有上次建過的，不然每次刷新地圖都會往 specialEvents 塞一筆。
+                            var chatName = c.characterName + "_chat";
+                            var chatEvt = c.specialEvents.Find(e => e.eventName == chatName);
+                            if (chatEvt == null)
+                            {
+                                chatEvt = new CharacterEvent { eventName = chatName };
+                                // 放進 specialEvents，點下去就不會 IncrementNightProgress。
+                                c.specialEvents.Add(chatEvt);
+                            }
+
+                            chatEvt.naninovelScript = chat;
+                            chatEvt.animatorController = evt.animatorController;
+                            chatEvt.offset = evt.offset;
+
+                            evt = chatEvt;
+                            logMsg += $"💬 {c.characterName} 好感不足 → 改播閒聊 {chat}\n";
+                        }
+                    }
                 }
             }
 
@@ -308,9 +338,19 @@ button.onClick.AddListener(() =>
     {
         // 只有一般事件才推進進度
         if (currentTimeOfDay == TimeOfDay.Day)
+        {
             StoryProgressManager.Instance.IncrementDayProgress(c.characterName);
+        }
+        else if (RitualGate.HasGate(c.characterName))
+        {
+            // 夜晚儀式改成「打贏才算過」——推進在 CombatSystem 勝利結算時做
+            // （RitualGate.AdvanceOnRitualWin）。這裡先不動，輸了才能重打。
+            Debug.Log($"🌙 {c.characterName} 的儀式進度等戰鬥結果，先不推進");
+        }
         else
+        {
             StoryProgressManager.Instance.IncrementNightProgress(c.characterName);
+        }
     }
     else
     {

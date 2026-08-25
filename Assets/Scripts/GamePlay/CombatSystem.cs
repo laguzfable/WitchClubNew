@@ -307,7 +307,13 @@ public class MobRuneUnlockData
     }
 
     List<ResultOrder> orderList = new List<ResultOrder>();
-    enum Order { PlayerDealDamage = 1, InterruptMobsAction, PlayerHealing, MobDealDamage, MobHealing };
+    // ★ 玩家補血排在最前面 ★
+    // 原本是「玩家傷害 → 打斷 → 玩家補血」，但敵人被打死時 isContinue 會變成 false，
+    // 下面那個 foreach 直接 return，玩家這回合打出去的補血就被吞掉了
+    // （症狀：補血牌把敵人打死，結果血沒回，高塔的百合符文判定不算滿血）。
+    // 玩家補血本來就排在敵人攻擊之前，提到最前面不影響誰先誰後的結果，
+    // 只是保證它一定會結算。
+    enum Order { PlayerHealing = 1, PlayerDealDamage, InterruptMobsAction, MobDealDamage, MobHealing };
 
     [SerializeField] CGFadeHelper blackScreen;
     [SerializeField] Image comboSpecialImg;
@@ -532,8 +538,14 @@ public void GameOver(bool isLose)
     if (!isLose)
         TryUnlockRune(monsterID);
 
-    // ✅ 各路線「第五關／夜晚儀式」擊敗成就
-    if (!isLose)
+    // ✅ 夜晚儀式也是只有勝利才推進進度（輸了下個夜晚可以重打，見 RitualGate）
+    //    女巫競技場用的是同一批怪（blue01…green05），所以要排除掉，
+    //    不然在塔裡打贏也會被當成完成了那個角色的儀式。
+    if (!isLose && !TowerModeManager.IsActive)
+        RitualGate.AdvanceOnRitualWin(monsterID);
+
+    // ✅ 各路線「第五關／夜晚儀式」擊敗成就（同樣要排除女巫競技場）
+    if (!isLose && !TowerModeManager.IsActive)
     {
         switch (monsterID)
         {
