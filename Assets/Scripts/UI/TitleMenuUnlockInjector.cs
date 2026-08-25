@@ -85,16 +85,16 @@ namespace Hexe.UI
             // 條件沒到時它本來就是關的，用預設參數會永遠找不到、也就永遠開不回來。
             var arena = titleUI.GetComponentInChildren<TitleTowerModeButton>(true);
             if (arena != null)
-                SetVisible(arena.gameObject, EndingRecord.Count > 0, "女巫競技場",
-                           $"目前結局數 {EndingRecord.Count}");
+                SetVisible(arena.gameObject, EndingRecord.Count > 0 || CheatUnlock.IsActive, "女巫競技場",
+                           CheatUnlock.IsActive ? "作弊名字" : $"目前結局數 {EndingRecord.Count}");
             else
                 Debug.LogWarning("[TitleMenuUnlockInjector] TitleUI 底下找不到掛著 TitleTowerModeButton 的按鈕。" +
                                  "請在 TitleUI2.prefab 的 ButtonsPanel 裡放一顆按鈕並掛上該元件。");
 
             var codex = FindByName(titleUI.gameObject, CodexButtonName);
             if (codex != null)
-                SetVisible(codex, EndingRecord.Has(CodexUnlockEnding), "蝕之聖典",
-                           $"需要 {CodexUnlockEnding}");
+                SetVisible(codex, EndingRecord.Has(CodexUnlockEnding) || CheatUnlock.IsActive, "蝕之聖典",
+                           CheatUnlock.IsActive ? "作弊名字" : $"需要 {CodexUnlockEnding}");
             else
                 Debug.LogWarning($"[TitleMenuUnlockInjector] TitleUI 底下找不到名為 {CodexButtonName} 的按鈕。");
 

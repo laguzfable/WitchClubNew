@@ -74,6 +74,10 @@ public class VisitedNodeManager : MonoBehaviour
     {
         if (string.IsNullOrEmpty(nodeId)) return false;
 
+        // 作弊名字：整張蝕之聖典當成走過。放在這裡而不是 NodeButton，
+        // 是因為好感度 preset 的 requireVisited 也走同一條查詢，兩邊要一致。
+        if (CheatUnlock.IsActive) return true;
+
         string key = string.IsNullOrEmpty(label) ? nodeId : $"{nodeId}#{label}";
         return visited.Contains(key);
     }
