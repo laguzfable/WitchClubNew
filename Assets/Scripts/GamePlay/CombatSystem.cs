@@ -514,6 +514,18 @@ public void GameOver(bool isLose)
     }
     hasGameEnded = true;
 
+    // 教學戰鬥打完就算看過。
+    // 原本只在 TutorialController 跑完所有步驟那一行標記，但戰鬥有一個
+    // 除錯熱鍵（數字鍵盤 .）直接判定勝利，敵人提早被打死也一樣，
+    // 那些情況下步驟迴圈沒跑完，標記永遠不會執行，
+    // 玩家就算開了「跳過已觀看教學」也永遠跳不掉。
+    // 中途離開戰鬥場景不會走到這裡，所以「看完才算」這個前提還在。
+    if (!isLose)
+    {
+        if (TutorialController.isTutorial) TutorialRecord.MarkSeen(TutorialRecord.Basic);
+        else if (TutorialController.isTutorial2) TutorialRecord.MarkSeen(TutorialRecord.Rune);
+    }
+
     Debug.Log($"[GameOver] isLose={isLose}  呼叫者：\n{new System.Diagnostics.StackTrace(true)}");
 
     // ✅ 把勝敗結果寫進 Naninovel 變數（給 @if CombatResult 用）
