@@ -50,7 +50,14 @@ public static class TutorialRecord
     /// <summary>劇本用的總判斷：設定有開、而且這個教學看過了，才跳過。</summary>
     public static bool ShouldSkip(string tutorialId)
     {
-        return SkipSeenEnabled && HasSeen(tutorialId);
+        var skip = SkipSeenEnabled && HasSeen(tutorialId);
+
+        // 劇本跑到 @if SkipBasicTutorial() 的當下就印一行，
+        // 下次再錯的話不用猜是設定還是觀看紀錄的問題。
+        Debug.Log($"[TutorialRecord] {tutorialId}：設定={(SkipSeenEnabled ? "跳過" : "每次播")}，"
+                + $"紀錄={(HasSeen(tutorialId) ? "看過" : "沒看過")} → {(skip ? "跳過" : "照常播")}");
+
+        return skip;
     }
 
     /// <summary>除錯用。PlayerPrefs.DeleteAll 也會一起清掉，這裡是給只想重置教學時用的。</summary>
