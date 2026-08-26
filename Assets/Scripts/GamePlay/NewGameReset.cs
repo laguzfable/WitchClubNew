@@ -56,6 +56,9 @@ public static class NewGameReset
             PlayerPrefs.DeleteKey("Equipped_" + element); // 裝備中的符文
         }
 
+        // 聖典的快照也丟掉：整輪都重來了，沒有什麼要還的
+        SanctumLoan.Discard();
+
         PlayerPrefs.Save();
 
         // 記憶體快取也要丟，不然還是讀得到舊值

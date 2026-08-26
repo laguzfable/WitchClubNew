@@ -45,6 +45,9 @@ public class ExitToTitleCommand : Command, Command.IForceWait
         // 不清的話，這一輪排好卻沒演到的事件會綁架下一輪的第一個地圖日。
         MapSpecialOverride.ClearAll();
 
+        // 聖典借出去的符文／卡片型態還回來，正在跑的那一輪才不會被墊高。
+        SanctumLoan.Return();
+
         await SceneManager.LoadSceneAsync("Title");
         Debug.Log("[ExitToTitle] Title 場景已載入，開始還原 UI");
 

@@ -203,11 +203,13 @@ public void Init(BranchNode data, BranchMapUI owner)
         // 不需要照劇情腳本原本的順序判斷（場景重載會讓 RuneActive 被重置成預設值 false）
         vars?.SetVariableValue("RuneActive", "True");
 
-        // 把「曾經打贏過」的符文和卡片型態還原回來。開新遊戲會把這一輪的清掉，
-        // 不還原的話開過新遊戲的人再進聖典，chapter4 的分歧、黃線的救援線會全部關上。
+        // 把「曾經打贏過」的符文和卡片型態借給玩家。開新遊戲會把這一輪的清掉，
+        // 不借的話開過新遊戲的人再進聖典，chapter4 的分歧、黃線的救援線會全部關上。
         // 這不是憑空給：Ever 那份記的是玩家真的打贏過的儀式，書頁上也標出來了。
-        RuneCollection.RestoreEver();
-        CardVariantUnlock.RestoreEver();
+        //
+        // 借之前會先存快照，回標題時原封不動還回去（見 SanctumLoan）——
+        // 不然二週目跑到一半來逛聖典，回去之後那一輪的符文數會被墊高。
+        SanctumLoan.Borrow();
 
         // 好感度只有一種發法：玩家在面板上選了誰，誰就 100，其他人 0。
         // 沒選（按跳過、或這一格不問）就什麼都不做——@exitToTitle 已經把變數清光了，
