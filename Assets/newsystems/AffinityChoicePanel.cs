@@ -58,6 +58,7 @@ public class AffinityChoicePanel : MonoBehaviour
             case "affinity_Mel": return new Color(0.80f, 0.25f, 0.30f); // 紅
             case "affinity_Ved": return new Color(0.35f, 0.70f, 0.40f); // 綠
             case "affinity_Nel": return new Color(0.90f, 0.75f, 0.30f); // 黃
+            case "affinity_Syb": return new Color(0.55f, 0.35f, 0.70f); // 紫（西碧兒沒有自己的線色）
             default: return new Color(0.5f, 0.5f, 0.5f);
         }
     }

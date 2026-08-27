@@ -113,6 +113,10 @@ public class BranchMapUI : CustomUI
         new AffinityChoiceOption { displayName = "梅爾",   variableName = "affinity_Mel" },
         new AffinityChoiceOption { displayName = "薇狄亞", variableName = "affinity_Ved" },
         new AffinityChoiceOption { displayName = "涅莉",   variableName = "affinity_Nel" },
+        // 西碧兒也在名單上：綠線的 20 私奔要「刻意陪過她」才進得去（chapter4green 的
+        // if:affinity_Syb>=25），從聖典跳進 WHISPER 沒有那幾個夜可以陪，
+        // 不給選的話那條線就永遠開不了。她決定的是「進不進得去」，不是「進去之後拿哪個結局」。
+        new AffinityChoiceOption { displayName = "西碧兒", variableName = "affinity_Syb" },
     };
 
     [Header("劇情完成度")]
