@@ -22,7 +22,7 @@ public static class EndingCatalog
         { "ACH_END_03", "在妳身邊" },
         { "ACH_END_04", "穢血新神" },
         { "ACH_END_05", "深春" },
-        { "ACH_END_06", "火中の幻影" },
+        { "ACH_END_06", "火中的樂園" },
         { "ACH_END_07", "輪迴の鑰匙" },
         { "ACH_END_08", "背棄世界" },
         { "ACH_END_09", "小精靈，飛走了" },

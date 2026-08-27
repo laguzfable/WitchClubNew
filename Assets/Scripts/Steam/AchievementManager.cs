@@ -98,7 +98,7 @@ public class AchievementManager : MonoSingleton<AchievementManager>
     public const string ACH_END_03 = "ACH_END_03"; // 在妳身邊（chapter6red #zaiyushenbian）
     public const string ACH_END_04 = "ACH_END_04"; // 穢血新神（chapter6red #eupie_usurp）玩家坐視 → 優菲成神 → 最終幕梅爾穿象牙塔正裝
     public const string ACH_END_05 = "ACH_END_05"; // 深春（chapter4green #greennight_v2）
-    public const string ACH_END_06 = "ACH_END_06"; // 火中の幻影（chapter4green #greennight_s2）
+    public const string ACH_END_06 = "ACH_END_06"; // 火中的樂園（chapter4green #greennight_s2）
     public const string ACH_END_07 = "ACH_END_07"; // 輪迴の鑰匙（chapter5yellow #eclipse）
     public const string ACH_END_08 = "ACH_END_08"; // 背棄世界（chapter5yellow #realworld）
     public const string ACH_END_09 = "ACH_END_09"; // 小精靈，飛走了（chapter5yellow #success）
