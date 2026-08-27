@@ -217,6 +217,7 @@ public void Init(BranchNode data, BranchMapUI owner)
         //
         // 以前這裡還有一套「走過那條線就發滿」的回溯判定，已經拿掉：
         // 那是在玩家看不到的情況下改數值，違反「任何數值變動都要在玩家眼底進行」。
+        ResetAffinities(vars);
         if (chosen != null)
             ApplyChosenAffinity(vars, chosen);
 
@@ -246,26 +247,31 @@ public void Init(BranchNode data, BranchMapUI owner)
         loader.GotoScript(scriptName, string.IsNullOrEmpty(label) ? null : label);
     }
 
-    /// <summary>選人面板的結果：選到的人發滿，面板上其他候選人歸零。</summary>
+    /// <summary>
+    /// 把所有好感度歸零。@exitToTitle 清掉的是「變數本身」，不是把它設成 0——
+    /// 沒被 @set 過的變數，NCalc 算 affinity_Syb+5 會求值失敗，
+    /// 那一段的加值就全部靜靜地不見了（綠線的西碧兒就是這樣被吃掉的）。
+    /// 這也正是跳過那顆按鈕寫的「好感全部從零開始」。
+    /// </summary>
+    private void ResetAffinities(ICustomVariableManager vars)
+    {
+        if (vars == null || map == null || map.affinityVariables == null) return;
+
+        var locked = map.lockedAffinityValue.ToString();
+        foreach (var name in map.affinityVariables)
+            if (!string.IsNullOrEmpty(name))
+                vars.SetVariableValue(name, locked);
+    }
+
+    /// <summary>選人面板的結果：選到的人發滿。其他人在上面已經歸零了。</summary>
     private void ApplyChosenAffinity(ICustomVariableManager vars, AffinityChoiceOption chosen)
     {
         if (vars == null || map == null) return;
 
-        var locked = map.lockedAffinityValue.ToString();
-        var names = new System.Collections.Generic.HashSet<string>();
-
-        if (map.affinityChoiceOptions != null)
-            foreach (var option in map.affinityChoiceOptions)
-                if (option != null && !string.IsNullOrEmpty(option.variableName))
-                    names.Add(option.variableName);
-
-        foreach (var name in names)
-            vars.SetVariableValue(name, locked);
-
         var value = map.defaultAffinityValue.ToString();
         vars.SetVariableValue(chosen.variableName, value);
 
-        Debug.Log($"[NodeButton] 選人面板：{chosen.variableName}={value}，其餘 {names.Count - 1} 人歸 {locked}");
+        Debug.Log($"[NodeButton] 選人面板：{chosen.variableName}={value}，其餘歸 {map.lockedAffinityValue}");
     }
 
     /// <summary>

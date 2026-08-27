@@ -59,6 +59,15 @@ public class BranchMapUI : CustomUI
     // 以前這裡有一組 Affinity Presets（走過那條線就發滿），已經整組拿掉：
     // 那是在玩家看不到的情況下改數值。任何數值變動都要在玩家眼底進行。
     //
+    [Tooltip("進節點時一律先歸零的好感度變數。\n" +
+             "★ 一定要含劇本裡會用到的每一個 ★ 沒被 @set 過的變數，NCalc 算 xxx+5 會直接" +
+             "求值失敗，那一段的加值就全部靜靜地不見了。西碧兒不在選人面板上（隱藏角色），" +
+             "但綠線會加她的好感，所以她一定要列在這裡。")]
+    public string[] affinityVariables =
+    {
+        "affinity_Eup", "affinity_Mel", "affinity_Ved", "affinity_Nel", "affinity_Syb",
+    };
+
     [Tooltip("選到的人要設成多少")]
     public int defaultAffinityValue = 100;
     [Tooltip("面板上其他人要設成多少")]
@@ -107,16 +116,15 @@ public class BranchMapUI : CustomUI
     public string stardustCharacterId = "星塵";
 
     [Tooltip("面板上的選項。把立繪拖進 Portrait 就會出現，留空的不會出現。")]
+    // 西碧兒刻意不在名單上：她是隱藏角色，面板上出現她的名字就等於劇透。
+    // 她那條線（20 私奔）是靠玩家自己「什麼都不說」＋在地圖上主動去找她走出來的，
+    // 從聖典進 WHISPER 也有那三個夜可以陪，不需要面板幫忙開路。
     public AffinityChoiceOption[] affinityChoiceOptions =
     {
         new AffinityChoiceOption { displayName = "優菲",   variableName = "affinity_Eup" },
         new AffinityChoiceOption { displayName = "梅爾",   variableName = "affinity_Mel" },
         new AffinityChoiceOption { displayName = "薇狄亞", variableName = "affinity_Ved" },
         new AffinityChoiceOption { displayName = "涅莉",   variableName = "affinity_Nel" },
-        // 西碧兒也在名單上：綠線的 20 私奔要「刻意陪過她」才進得去（chapter4green 的
-        // if:affinity_Syb>=25），從聖典跳進 WHISPER 沒有那幾個夜可以陪，
-        // 不給選的話那條線就永遠開不了。她決定的是「進不進得去」，不是「進去之後拿哪個結局」。
-        new AffinityChoiceOption { displayName = "西碧兒", variableName = "affinity_Syb" },
     };
 
     [Header("劇情完成度")]
