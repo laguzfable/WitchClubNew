@@ -228,6 +228,15 @@
 ;  25 ＝ 前面兩個夜都點西碧兒（syb_day01 +10、syb_day02 +15）。
 ; ══════════════════════════════════════════════════════════════
 把這件事……
+
+; 沒陪過西碧兒的話下面只會剩一個選項，補一句說明，
+; 不然玩家會以為是選單壞了，而不是「你還沒有那個資格」。
+; 寫成「達標才跳過」的正向形式：affinity_Syb 沒被 @set 過時 NCalc 會求值失敗，
+; 反過來寫 if:affinity_Syb<25 的話那句反而不會出現。
+@goto .tell_choice if:affinity_Syb>=25
+（西碧兒……不，你跟她還沒有熟到能說這種事。）
+
+# tell_choice
 @choice 告訴薇狄亞 set:affinity_Ved=affinity_Ved+5 goto:.vedia
 @choice 告訴西碧兒 if:affinity_Syb>=25 set:affinity_Syb=affinity_Syb+5 goto:.sybil
 @stop
