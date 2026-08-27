@@ -25,8 +25,11 @@ public static class SanctumLoan
     /// <summary>目前是不是借出中。</summary>
     public static bool Active => PlayerPrefs.GetInt(ActiveKey, 0) == 1;
 
-    /// <summary>快照要蓋住的 key：四色符文 + 四色卡片型態。</summary>
-    static IEnumerable<string> Keys
+    /// <summary>MapCharacterSpawner 的 characterName。跟 NewGameReset 那份一致。</summary>
+    static readonly string[] Characters = { "Eupie", "Mel", "Nelly", "Vedia", "Sybil" };
+
+    /// <summary>逗號清單型的 key（PlayerPrefs 存字串）：四色符文 + 四色卡片型態。</summary>
+    static IEnumerable<string> StringKeys
     {
         get
         {
@@ -39,6 +42,30 @@ public static class SanctumLoan
     }
 
     /// <summary>
+    /// 數字型的 key（PlayerPrefs 存 int）：五個角色的地圖事件進度。
+    /// 跟上面分開處理，因為 GetString 讀 int 的 key 會拿到空字串，
+    /// 還原時就變成把它刪掉——那會把正在跑的那一輪的儀式進度洗掉。
+    ///
+    /// 從聖典重播一段劇情時，那一段的夜晚事件本來就該重演一次。沿用這一輪的進度
+    /// 會變成「五場都做完了所以她不出現」，那幾個夜就成了空地圖，
+    /// 靠陪伴累積好感的路線（例如綠線的西碧兒）永遠走不到。
+    /// </summary>
+    static IEnumerable<string> IntKeys
+    {
+        get
+        {
+            foreach (var character in Characters)
+            {
+                yield return character + "_Event_Day";
+                yield return character + "_Event_Night";
+            }
+        }
+    }
+
+    /// <summary>key 原本不存在時，快照裡記這個值。</summary>
+    const int Absent = -1;
+
+    /// <summary>
     /// 借出：先存快照，再把 Ever 還原到這一輪。
     /// 已經在借出中就不再存一次快照——那會把「這一輪原本的樣子」換成上一格借完的狀態。
     /// </summary>
@@ -46,16 +73,33 @@ public static class SanctumLoan
     {
         if (!Active)
         {
-            foreach (var key in Keys)
+            foreach (var key in StringKeys)
                 PlayerPrefs.SetString(SnapshotPrefix + key, PlayerPrefs.GetString(key, ""));
+
+            foreach (var key in IntKeys)
+                PlayerPrefs.SetInt(SnapshotPrefix + key,
+                                   PlayerPrefs.HasKey(key) ? PlayerPrefs.GetInt(key) : Absent);
 
             PlayerPrefs.SetInt(ActiveKey, 1);
             PlayerPrefs.Save();
-            Debug.Log("[SanctumLoan] 已存下這一輪的符文／卡片型態快照");
+            Debug.Log("[SanctumLoan] 已存下這一輪的符文／卡片型態／地圖事件進度快照");
         }
 
         RuneCollection.RestoreEver();
         CardVariantUnlock.RestoreEver();
+
+        // 事件進度歸零：這一段要從頭演一次，地圖上的人才會回來。
+        foreach (var character in Characters)
+        {
+            PlayerPrefs.DeleteKey(character + "_Event_Day");
+            PlayerPrefs.DeleteKey(character + "_Event_Night");
+        }
+        PlayerPrefs.Save();
+
+        if (StoryProgressManager.Instance != null)
+            StoryProgressManager.Instance.InvalidateCache();
+
+        Debug.Log("[SanctumLoan] 符文與卡片型態已借出，地圖事件進度歸零（這一段重演一次）");
     }
 
     /// <summary>還回去：把快照寫回「這一輪」的帳，然後把快照清掉。</summary>
@@ -63,7 +107,18 @@ public static class SanctumLoan
     {
         if (!Active) return;
 
-        foreach (var key in Keys)
+        foreach (var key in IntKeys)
+        {
+            var snapshotKey = SnapshotPrefix + key;
+            var value = PlayerPrefs.GetInt(snapshotKey, Absent);
+
+            if (value == Absent) PlayerPrefs.DeleteKey(key);
+            else PlayerPrefs.SetInt(key, value);
+
+            PlayerPrefs.DeleteKey(snapshotKey);
+        }
+
+        foreach (var key in StringKeys)
         {
             var snapshotKey = SnapshotPrefix + key;
             var value = PlayerPrefs.GetString(snapshotKey, "");
@@ -78,13 +133,20 @@ public static class SanctumLoan
 
         PlayerPrefs.SetInt(ActiveKey, 0);
         PlayerPrefs.Save();
-        Debug.Log("[SanctumLoan] 已把符文／卡片型態還原成進聖典之前的樣子");
+
+        if (StoryProgressManager.Instance != null)
+            StoryProgressManager.Instance.InvalidateCache();
+
+        Debug.Log("[SanctumLoan] 已把符文／卡片型態與地圖事件進度還原成進聖典之前的樣子");
     }
 
     /// <summary>丟掉快照（開新遊戲時用：整輪都重來了，沒有什麼要還的）。</summary>
     public static void Discard ()
     {
-        foreach (var key in Keys)
+        foreach (var key in StringKeys)
+            PlayerPrefs.DeleteKey(SnapshotPrefix + key);
+
+        foreach (var key in IntKeys)
             PlayerPrefs.DeleteKey(SnapshotPrefix + key);
 
         PlayerPrefs.SetInt(ActiveKey, 0);
