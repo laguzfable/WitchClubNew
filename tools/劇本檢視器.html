@@ -650,12 +650,18 @@ function playBgm(src, name, btn) {
   p.scrollIntoView({block: 'nearest'});
 }
 
+const playBtn = (n, src) => '<button class="play" onclick="playBgm(&quot;' + esc(src) +
+  '&quot;, &quot;' + esc(n) + '&quot;, this)">▶ 試聽</button>';
+
 function renderAssets(v) {
   if (!ASSETS) return v.innerHTML =
     '<div class="empty">資源清單需要「已載入」的版本。<br>在專案根目錄跑：python tools/build_viewer.py</div>';
 
   const usedBack = usedIn(/^@back (\S+)/), usedBgm = usedIn(/^@bgm (\S+)/),
-        usedMob = usedIn(/^@battle .*?target:(\S+)/);
+        usedSfx = usedIn(/^@sfx (\S+)/), usedMob = usedIn(/^@battle .*?target:(\S+)/);
+  const kind = ASSETS.audioKind || {};
+  const bgmList = Object.entries(ASSETS.audio).filter(([n]) => kind[n] !== 'sfx');
+  const sfxList = Object.entries(ASSETS.audio).filter(([n]) => kind[n] === 'sfx');
 
   const card = (name, inner, used, extra) =>
     '<div class="ass' + (used && !used[name] ? ' unused' : '') + '">' + inner +
@@ -679,12 +685,18 @@ function renderAssets(v) {
       '<div class="grid">' + Object.entries(ASSETS.backgrounds).map(([n, src]) =>
         card(n, '<img loading="lazy" src="' + src + '">', usedBack)).join('') + '</div>') +
 
-    sec('音樂', Object.keys(ASSETS.audio).length + ' 首。按 ▶ 直接聽。',
+    '<audio id="player" controls preload="none"></audio>' +
+
+    sec('音樂（BGM）', bgmList.length + ' 首，寫成 <code>@bgm 名字</code>。按 ▶ 試聽。',
       missing(usedBgm, ASSETS.audio, '音樂') +
-      '<audio id="player" controls preload="none"></audio>' +
-      '<div class="grid wide">' + Object.entries(ASSETS.audio).map(([n, src]) =>
-        card(n, '<button class="play" onclick="playBgm(&quot;' + esc(src) + '&quot;, &quot;' +
-          esc(n) + '&quot;, this)">▶ 試聽</button>', usedBgm)).join('') + '</div>') +
+      '<div class="grid wide">' + bgmList.map(([n, src]) =>
+        card(n, playBtn(n, src), usedBgm)).join('') + '</div>') +
+
+    sec('音效（SE）', sfxList.length + ' 個，寫成 <code>@sfx 名字</code>。' +
+      '放在 Sound/SE、UI、Magic、HitSound 這些資料夾底下。',
+      missing(usedSfx, ASSETS.audio, '音效') +
+      '<div class="grid wide">' + sfxList.map(([n, src]) =>
+        card(n, playBtn(n, src), usedSfx)).join('') + '</div>') +
 
     sec('怪物', Object.keys(ASSETS.monsters || {}).length + ' 隻。@battle 的 target 就是這些名字。',
       missing(usedMob, ASSETS.monsters || {}, '怪物') +

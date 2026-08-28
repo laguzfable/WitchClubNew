@@ -11,6 +11,7 @@ import codecs, glob, io, json, os
 
 BACKSLASH = chr(92)
 char_prefab = {}
+audio_kind = {}
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, 'tools', '劇本檢視器.html')
@@ -58,6 +59,7 @@ def build_assets():
         return x
 
     backs, audio, chars, exprs = {}, {}, set(), {}
+    audio_kind.clear()
     char_prefab.clear()
     pattern = r'- name: (\S+)\s+pathPrefix: (\S+)\s+guid: (\w+)'
     for m in re.finditer(pattern, res):
@@ -73,7 +75,9 @@ def build_assets():
             sub = prefix.split('MainBackground/')[-1] if 'MainBackground/' in prefix else ''
             backs[(sub + '/' + name) if sub else name] = rel
         elif prefix == 'Audio':
+            # BGM 跟音效混在同一個 Audio 前綴底下，只有資料夾分得出來
             audio[name] = rel
+            audio_kind[name] = 'bgm' if '/Sound/BGM/' in rel.replace(os.sep, '/') else 'sfx'
         elif prefix == 'Characters' or prefix.startswith('Characters/'):
             cid = name if prefix == 'Characters' else prefix.split('Characters/', 1)[1]
             chars.add(cid)
@@ -84,7 +88,7 @@ def build_assets():
                 folder = os.path.dirname(path)
                 exprs[cid] = sorted(f[:-5] for f in os.listdir(folder) if f.endswith('.anim'))
 
-    return {'backgrounds': backs, 'audio': audio,
+    return {'backgrounds': backs, 'audio': audio, 'audioKind': dict(audio_kind),
             'characters': sorted(chars), 'expressions': exprs}
 
 
@@ -125,6 +129,8 @@ assets = build_assets()
 assets.update(build_extra())
 print(f"背景 {len(assets['backgrounds'])} 張、音樂 {len(assets['audio'])} 首、"
       f"{len(assets['expressions'])} 個角色有表情、怪物 {len(assets['monsters'])} 隻")
+print(f"  音樂裡 BGM {sum(1 for v in assets['audioKind'].values() if v == 'bgm')} 首、"
+      f"音效 {sum(1 for v in assets['audioKind'].values() if v == 'sfx')} 個")
 
 html = io.open(SRC, encoding='utf-8').read()
 blob = json.dumps(data, ensure_ascii=False).replace('</', r'<\/')  # 避免提早關掉 <script>
