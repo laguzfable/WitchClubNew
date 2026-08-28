@@ -43,10 +43,11 @@
 梅爾: ……我們成功了嗎？
 克蘿伊: 應該是。
 梅爾: 太好了，一切都結束了吧。
-@char 梅爾 pos:20
-@char 優菲 pos:40
-@char 薇狄亞 pos:60
-@char 涅莉 pos:80
+@char chl pos:67
+@char 梅爾 pos:17
+@char 優菲 pos:33
+@char 薇狄亞 pos:50
+@char 涅莉 pos:83
 涅莉: 發生什麼事了？！
 薇狄亞: 西碧兒？西碧兒！
 優菲: {PlayerName}！梅爾帕莫妮！
@@ -82,13 +83,14 @@
 ; 劇情分歧地圖節點：直接跳到最終抉擇（在妳身邊／墮星之主／穢血新神）
 # finalchoice_red
 @visitNode id:chapter6red label:finalchoice_red
+@char micha pos:40
 @back vedia_night
 @stopBgm
 @bgm serious
 
-@char syb pos:25
-@char 梅爾 pos:50
-@char 優菲 pos:75
+@char syb pos:20
+@char 梅爾 pos:60
+@char 優菲 pos:80
 米夏: 喝下我的血吧，少女。
 米夏: 妳將成為這個世界上最強的存在。
 
@@ -175,9 +177,10 @@
 @stop
 
 # mel_stands
-@char syb pos:35
-@char 梅爾 pos:50
-@char 優菲 pos:75
+@char micha pos:40
+@char syb pos:20
+@char 梅爾 pos:60
+@char 優菲 pos:80
 
 梅爾: 我又不是要獻祭自己，只是要拿回本來就屬於我的東西而已。
 
@@ -225,8 +228,10 @@
 梅爾: 可惡。
 梅爾: 還是……差了那麼一點啊。
 
-@char syb pos:35
-@char 梅爾 pos:65
+@char micha pos:40
+@char 優菲 pos:80
+@char syb pos:20
+@char 梅爾 pos:60
 
 米夏: 我就說了嘛。凡人的容器。
 梅爾: ……
@@ -243,13 +248,20 @@
 
 （強光爆發，兩股力量在梅爾體內激烈拉扯）
 
-@char 優菲 pos:35
-@char chl pos:65
+@char syb pos:17
+@char micha pos:50
+@char 梅爾 pos:67
+@char 優菲 pos:33
+@char chl pos:83
 
 優菲: 梅爾！
 克蘿伊: ……她的臉色，不太對。
 
-@char 梅爾 pos:50
+@char syb pos:17
+@char 優菲 pos:33
+@char micha pos:50
+@char chl pos:83
+@char 梅爾 pos:67
 
 梅爾: ……哈啊……哈……
 梅爾: 閉嘴，還沒完呢。
@@ -258,9 +270,11 @@
 
 （光芒漸漸收斂，化為梅爾身上淡淡的紅色紋路）
 
-@char syb pos:25
+@char micha pos:33
+@char chl pos:83
+@char syb pos:17
 @char 梅爾 pos:50
-@char 優菲 pos:75
+@char 優菲 pos:67
 
 米夏: ……啊啊，真掃興。
 米夏: 我沒辦法吞掉妳呢，血巫結社的族母。
@@ -284,8 +298,9 @@
 @goto mel_end.end1
 
 # stop_eupie
-@char syb pos:35
-@char 梅爾 pos:50
+@char micha pos:25
+@char syb pos:50
+@char 梅爾 pos:75
 梅爾: 但是，妳的肉身已經被毀，儀式是無法繼續的……
 米夏: 我可以融合整個世界啊。
 米夏: 全部都化為一體的話，該有多好。
@@ -302,9 +317,10 @@
 米夏: 這麼有野心的人……巫術世界還沒有過幾個呢。
 米夏: 好，我們來簽約吧。
 梅爾: 我，血巫結社族母，梅爾帕莫妮，在此，獻上我的軀體－－
-@char syb pos:25
-@char 梅爾 pos:50
-@char 優菲 pos:75
+@char micha pos:20
+@char syb pos:40
+@char 梅爾 pos:60
+@char 優菲 pos:80
 優菲: 不要——！梅爾，妳放手！
 優菲: 那是我欠的！是我把她放進來的，憑什麼由妳來還！
 優菲: 喂！不准簽約啊！
@@ -337,9 +353,10 @@
 
 ; ══ 04 穢血新神：你沒有動，優菲自己接下了那杯血 ══（草稿，待潤飾）
 # eupie_usurp
-@char syb pos:25
-@char 梅爾 pos:50
-@char 優菲 pos:75
+@char micha pos:20
+@char syb pos:40
+@char 梅爾 pos:60
+@char 優菲 pos:80
 
 （你沒有動。）
 
@@ -380,11 +397,12 @@
 
 （米夏的意識消散在光芒中）
 
+@char micha pos:17
 @hide syb
-@char 涅莉 pos:20
-@char 梅爾 pos:40
-@char 優菲 pos:60
-@char nic pos:80
+@char 涅莉 pos:33
+@char 梅爾 pos:50
+@char 優菲 pos:67
+@char nic pos:83
 
 妮可: 學姊！！學姊妳還好嗎！
 優菲: ……嗯。好多了。

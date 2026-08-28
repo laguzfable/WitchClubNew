@@ -324,8 +324,9 @@ broom: 妳好可愛唷，叫什麼名字啊？要不要跟我一起舒服一下�
 
 @char 涅莉 pos:50
 涅莉: 好餓喔，我要下去找東西吃了。
+@char 涅莉 pos:35
 @char broom pos:0
-@char broom pos:50
+@char broom pos:65
 broom: 我先！
 @spawn ShakeBackground
 @hide broom
@@ -1068,9 +1069,10 @@ witchc: 迷霧草是最棒的！
 莉莉娜: 讓妳老同學好好教教妳吧。
 
 
+@char 莉莉娜 pos:25
 @hide lilina 
-@char 優菲 pos:35
-@char 梅爾 pos:65
+@char 優菲 pos:50
+@char 梅爾 pos:75
 
 (類百合CG 接近)
 梅爾: 吶，優菲……
@@ -1097,10 +1099,11 @@ witchc: 迷霧草是最棒的！
 
 
 
-@char 涅莉 pos:20
-@char 優菲 pos:40
-@char 梅爾 pos:60
-@char nic pos:80
+@char 莉莉娜 pos:33
+@char 涅莉 pos:17
+@char 優菲 pos:50
+@char 梅爾 pos:67
+@char nic pos:83
 
 涅莉: 謝天謝地，終於找到妳們了！
 優菲: 幫我、幫我把她架開。
@@ -1194,11 +1197,12 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 優菲: 妳們先回去吧，這裡我來處理就好。
 艾札蘭: 滾！！！
 
+@char 莉莉娜 pos:25
 @hide nic,witcha
 
 
-@char broom pos:65
-@char 優菲 pos:35
+@char broom pos:75
+@char 優菲 pos:50
 
 
 優菲: 如果妳有什麼意見的話，盡管跟我講，不要欺負我的同伴。
@@ -1217,19 +1221,21 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 優菲: 是嗎……
 優菲: 就這麼多人……對我不滿嗎？
 
-@char nic pos:25
-@char 優菲 pos:50
-@char 薇狄亞 pos:75
+@char 莉莉娜 pos:20
+@char nic pos:40
+@char 優菲 pos:60
+@char 薇狄亞 pos:80
 
 
 薇狄亞: 我回來了……咦？
 薇狄亞: {PlayerName}，氣氛是不是……怪怪的？
 
 
-@char nic pos:20
-@char 優菲 pos:40
-@char 薇狄亞 pos:60
-@char 涅莉 pos:80
+@char 莉莉娜 pos:17
+@char nic pos:33
+@char 優菲 pos:50
+@char 薇狄亞 pos:67
+@char 涅莉 pos:83
 
 涅莉: 會滿意才有鬼吧，妳剛剛明明就想對梅爾見死不救！
 妮可: 下等生物給我閉嘴！

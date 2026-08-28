@@ -209,8 +209,9 @@
 克蘿伊: 快、快點，幫我解咒！
 梅爾: 什麼、什麼咒，欸，等等！
 梅爾: {PlayerName}，正好，幫我支開薇狄亞，她好像注意到這邊了！
+@char chl pos:35
 @hide 梅爾,克蘿伊
-@char 薇狄亞 pos:50
+@char 薇狄亞 pos:65
 薇狄亞: 梅爾？還好嗎？
 薇狄亞: {PlayerName}？牆壁那邊那個洞是怎麼回事……
 @choice 假裝沒事 set:affinity_Mel=affinity_Mel+5 goto:.c5r3_a
@@ -271,6 +272,8 @@
 @stop
 # redclue_d3
 
+@char chl pos:25
+@char 梅爾 pos:75
 @back bg11
 @char broom pos:50
 艾札蘭: 真有趣，妳們也會來找我問事啊。
