@@ -64,19 +64,21 @@
         margin:0 8px 8px 0}
   .stat b{color:var(--gold);font-size:18px}
   .empty{color:var(--dim);padding:28px 0}
-  .scene{border:1px solid var(--line);border-radius:10px;margin-bottom:16px;overflow:hidden}
+  .scenes{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+        max-width:1500px}
+  .scene{border:1px solid var(--line);border-radius:10px;overflow:hidden}
   .scene .stage{position:relative;aspect-ratio:16/9;background:#0d0c11;overflow:hidden}
   .scene .stage img{width:100%;height:100%;object-fit:cover;display:block}
   .scene .noimg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
         color:#4d4960;font-size:13px}
   .actor{position:absolute;bottom:8%;transform:translateX(-50%);text-align:center}
-  .actor .card{background:rgba(20,19,26,.82);border:1px solid var(--gold);border-radius:8px;
-        padding:6px 12px;font-size:13px;white-space:nowrap}
-  .actor .pos{color:var(--dim);font-size:10px;margin-top:3px}
-  .scene .bar{display:flex;gap:8px;align-items:center;padding:8px 12px;background:#221f2c;
+  .actor .card{background:rgba(20,19,26,.85);border:1px solid var(--gold);border-radius:6px;
+        padding:3px 7px;font-size:11px;white-space:nowrap;line-height:1.4}
+  .actor .pos{color:var(--dim);font-size:9px;margin-top:2px}
+  .scene .bar{display:flex;gap:6px;align-items:center;padding:6px 9px;background:#221f2c;
         flex-wrap:wrap;font-size:12px}
   .scene .bar .ln{color:#54506a;font-family:ui-monospace,Consolas,monospace}
-  .scene .line{padding:6px 12px 10px;color:var(--dim);font-size:13px}
+  .scene .line{padding:5px 9px 8px;color:var(--dim);font-size:12px}
   .actor .card{cursor:grab;user-select:none}
   .actor.drag .card{cursor:grabbing;border-color:var(--rose);box-shadow:0 0 0 3px rgba(217,140,160,.25)}
   .stage.hot{outline:2px dashed var(--gold);outline-offset:-6px}
@@ -500,7 +502,7 @@ function renderScenes(v) {
       allActors().map(a =>
         '<span class="chip" draggable="true" data-id="' + esc(a) + '">' + esc(a) + '</span>').join('') +
     '</div>' +
-    shots.map(s => {
+    '<div class="scenes">' + shots.map(s => {
       const src = ASSETS.backgrounds[s.back] ||
                   (s.back ? ASSETS.backgrounds[s.back.split('.')[0]] : null);
       const audio = ASSETS.audio[s.bgm];
@@ -520,7 +522,7 @@ function renderScenes(v) {
         (s.bgm ? '<span class="tag t-choice">♪ ' + esc(s.bgm) + '</span>' : '') +
         (audio ? '<audio controls preload="none" style="height:26px" src="' + audio + '"></audio>' : '') +
         '</div>' + (s.talk ? '<div class="line">' + esc(s.talk) + '</div>' : '') + '</div>';
-    }).join('');
+    }).join('') + '</div>';
 
   wireDragging();
 }
