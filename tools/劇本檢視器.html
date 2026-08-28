@@ -98,6 +98,9 @@
 <script>
 const CHAR = {affinity_Eup:'優菲', affinity_Mel:'梅爾', affinity_Ved:'薇狄亞',
               affinity_Nel:'涅莉', affinity_Syb:'西碧兒'};
+// 產生資料版時，build_viewer.py 會把下面這行換成真的資料（見 tools/build_viewer.py）
+const EMBEDDED = null;
+
 let scripts = {};      // name -> {name, lines}
 let issues = [];
 let current = null;
@@ -373,6 +376,17 @@ function renderEndings(v) {
     rows.map(r => `<div class="row"><span class="tag t-end">${r.id}</span>
       <span class="jump" onclick="select('${r.file}')">${r.file}</span>
       <span class="txt">第 ${r.line} 行</span></div>`).join('');
+}
+
+// 內建資料版：打開就直接進畫面
+if (EMBEDDED) {
+  for (const name in EMBEDDED) scripts[name] = {name, lines: EMBEDDED[name].split(/?
+/)};
+  check();
+  drop.classList.add('hide');
+  document.getElementById('app').classList.add('show');
+  renderList();
+  select(Object.keys(scripts).sort()[0]);
 }
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
