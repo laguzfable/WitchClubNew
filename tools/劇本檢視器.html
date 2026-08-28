@@ -77,6 +77,16 @@
         flex-wrap:wrap;font-size:12px}
   .scene .bar .ln{color:#54506a;font-family:ui-monospace,Consolas,monospace}
   .scene .line{padding:6px 12px 10px;color:var(--dim);font-size:13px}
+  .actor .card{cursor:grab;user-select:none}
+  .actor.drag .card{cursor:grabbing;border-color:var(--rose);box-shadow:0 0 0 3px rgba(217,140,160,.25)}
+  .stage.hot{outline:2px dashed var(--gold);outline-offset:-6px}
+  #bar{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0 12px;
+       display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--line);margin-bottom:14px}
+  #bar .chip{border:1px solid var(--line);border-radius:14px;padding:3px 11px;font-size:12px;
+       cursor:grab;background:var(--panel)}
+  #bar .chip:hover{border-color:var(--gold)}
+  #bar .dirty{color:var(--gold)}
+  #bar button.save{border-color:var(--gold);color:var(--gold)}
 </style>
 
 <div id="drop">
@@ -396,21 +406,21 @@ function renderEndings(v) {
 }
 
 
-// ── 場景：把一支腳本攤成一連串畫面 ──────────────────────
+// ── 場景：把一支腳本攤成一連串畫面，而且可以拖 ──────────
 // 逐行模擬 @back / @bgm / @char / @hide，每次「背景或在場的人變了」就切一張卡。
-function renderScenes(v) {
-  const sc = scripts[current];
-  if (!sc) return v.innerHTML = '<div class="empty">左邊選一支腳本</div>';
-  if (!ASSETS) return v.innerHTML =
-    '<div class="empty">場景預覽需要「已載入」的版本（背景與音樂的路徑要先對好）。<br>' +
-    '在專案根目錄跑：python tools/build_viewer.py</div>';
+// 每個名牌記著它是哪一行 @char 生出來的，所以拖動時改得回那一行。
+let dirty = new Set();
 
+function sceneShots(sc) {
   const shots = [];
-  let back = null, bgm = null, actors = new Map(), pending = false, firstLine = 1, talk = '';
+  let back = null, bgm = null, actors = new Map(), pending = false,
+      firstLine = 1, talk = '', lastCmd = 1;
 
   const flush = () => {
     if (!pending) return;
-    shots.push({back, bgm, actors: [...actors.entries()], line: firstLine, talk});
+    shots.push({back, bgm,
+      actors: [...actors.entries()].map(([id, a]) => [id, a.pos, a.line]),
+      line: firstLine, insertAt: lastCmd, talk});
     pending = false; talk = '';
   };
 
@@ -418,42 +428,74 @@ function renderScenes(v) {
     const t = raw.trim(), no = i + 1;
     if (!t || t.startsWith(';')) return;
     let m;
-
     if ((m = t.match(/^@back (\S+)/))) {
-      flush(); back = m[1].split(',')[0]; firstLine = no; pending = true;
+      flush(); back = m[1].split(',')[0]; firstLine = no; lastCmd = no; pending = true;
     }
-    else if ((m = t.match(/^@bgm (\S+)/))) { bgm = m[1]; pending = true; if (!firstLine) firstLine = no; }
-    else if (/^@stopBgm/.test(t)) { bgm = null; }
+    else if ((m = t.match(/^@bgm (\S+)/))) { bgm = m[1]; lastCmd = no; pending = true; }
+    else if (/^@stopBgm/.test(t)) { bgm = null; lastCmd = no; }
     else if ((m = t.match(/^@char (\S+)/))) {
       const id = m[1].split('.')[0].split(',')[0];
       const p = t.match(/pos:(\d+)/);
       const before = actors.get(id);
-      actors.set(id, p ? +p[1] : (before !== undefined ? before : 50));
+      actors.set(id, {pos: p ? +p[1] : (before ? before.pos : 50), line: no});
+      lastCmd = no;
       if (!pending) { firstLine = no; pending = true; }
     }
     else if ((m = t.match(/^@hide (\S+)/))) {
       m[1].split(',').forEach(x => actors.delete(x.trim().split('.')[0]));
+      lastCmd = no;
     }
-    else if (/^@hideChars/.test(t)) { actors.clear(); }
+    else if (/^@hideChars/.test(t)) { actors.clear(); lastCmd = no; }
     else if (!t.startsWith('@') && !t.startsWith('#') && !talk) {
       talk = t.length > 60 ? t.slice(0, 60) + '…' : t;
       if (pending) flush();
     }
   });
   flush();
+  return shots;
+}
 
-  v.innerHTML = '<h2>' + sc.name + '</h2><div class="sub">' + shots.length +
-    ' 個畫面。人物先用名牌表示站位（pos 就是畫面的水平百分比）。</div>' +
+// 專案裡出現過的角色 id，拿來當調色盤
+function allActors() {
+  const set = new Set();
+  for (const n in scripts)
+    scripts[n].lines.forEach(l => {
+      const m = l.trim().match(/^@char (\S+)/);
+      if (m) set.add(m[1].split('.')[0].split(',')[0]);
+    });
+  return [...set].sort();
+}
+
+function renderScenes(v) {
+  const sc = scripts[current];
+  if (!sc) return v.innerHTML = '<div class="empty">左邊選一支腳本</div>';
+  if (!ASSETS) return v.innerHTML =
+    '<div class="empty">場景預覽需要「已載入」的版本。<br>在專案根目錄跑：python tools/build_viewer.py</div>';
+
+  const canSave = location.protocol.startsWith('http');
+  const shots = sceneShots(sc);
+
+  v.innerHTML =
+    '<div id="bar">' +
+      '<b>' + esc(sc.name) + '</b>' +
+      '<span class="txt">' + shots.length + ' 個畫面</span>' +
+      (dirty.has(sc.name) ? '<span class="dirty">● 有未存的變更</span>' : '') +
+      (canSave ? '<button class="save" onclick="saveScript()">存回 .nani</button>'
+               : '<span class="txt">（唯讀。要能存檔就跑 python tools/serve.py）</span>') +
+      '<span class="txt" style="margin-left:auto">拖名牌改站位　把下面的角色拖進畫面可以加人</span>' +
+      '<div style="flex-basis:100%;height:0"></div>' +
+      allActors().map(a =>
+        '<span class="chip" draggable="true" data-id="' + esc(a) + '">' + esc(a) + '</span>').join('') +
+    '</div>' +
     shots.map(s => {
-      // @back 有時會帶轉場（bg01.CloudReveal），對不到就退一步用點號前面那段
       const src = ASSETS.backgrounds[s.back] ||
                   (s.back ? ASSETS.backgrounds[s.back.split('.')[0]] : null);
       const audio = ASSETS.audio[s.bgm];
-      return '<div class="scene"><div class="stage">' +
+      return '<div class="scene"><div class="stage" data-insert="' + s.insertAt + '">' +
         (src ? '<img loading="lazy" src="' + src + '">'
              : '<div class="noimg">' + (s.back ? '找不到背景　' + esc(s.back) : '（沒有指定背景）') + '</div>') +
-        s.actors.map(([id, pos]) =>
-          '<div class="actor" style="left:' + pos + '%">' +
+        s.actors.map(([id, pos, line]) =>
+          '<div class="actor" style="left:' + pos + '%" data-line="' + line + '">' +
           '<div class="card">' + esc(id) + '</div><div class="pos">pos ' + pos + '</div></div>').join('') +
         '</div><div class="bar"><span class="ln">' + s.line + ' 行</span>' +
         '<span class="tag t-map">' + esc(s.back || '—') + '</span>' +
@@ -461,6 +503,84 @@ function renderScenes(v) {
         (audio ? '<audio controls preload="none" style="height:26px" src="' + audio + '"></audio>' : '') +
         '</div>' + (s.talk ? '<div class="line">' + esc(s.talk) + '</div>' : '') + '</div>';
     }).join('');
+
+  wireDragging();
+}
+
+function wireDragging() {
+  // 拖名牌 → 改那一行的 pos
+  document.querySelectorAll('.actor').forEach(el => {
+    el.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      const stage = el.parentElement;
+      el.classList.add('drag');
+      el.setPointerCapture(e.pointerId);
+
+      const move = ev => {
+        const r = stage.getBoundingClientRect();
+        const pct = Math.max(0, Math.min(100,
+          Math.round((ev.clientX - r.left) / r.width * 100)));
+        el.style.left = pct + '%';
+        el.querySelector('.pos').textContent = 'pos ' + pct;
+        el.dataset.pos = pct;
+      };
+      const up = () => {
+        el.releasePointerCapture(e.pointerId);
+        el.classList.remove('drag');
+        el.removeEventListener('pointermove', move);
+        el.removeEventListener('pointerup', up);
+        if (el.dataset.pos !== undefined) setPos(+el.dataset.line, +el.dataset.pos);
+      };
+      el.addEventListener('pointermove', move);
+      el.addEventListener('pointerup', up);
+    });
+  });
+
+  // 從調色盤把角色拖進畫面 → 插一行 @char
+  document.querySelectorAll('#bar .chip').forEach(chip => {
+    chip.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', chip.dataset.id));
+  });
+  document.querySelectorAll('.stage').forEach(stage => {
+    stage.addEventListener('dragover', e => {e.preventDefault(); stage.classList.add('hot')});
+    stage.addEventListener('dragleave', () => stage.classList.remove('hot'));
+    stage.addEventListener('drop', e => {
+      e.preventDefault(); stage.classList.remove('hot');
+      const id = e.dataTransfer.getData('text/plain');
+      if (!id) return;
+      const r = stage.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(100,
+        Math.round((e.clientX - r.left) / r.width * 100)));
+      addChar(+stage.dataset.insert, id, pct);
+    });
+  });
+}
+
+function setPos(line, pos) {
+  const sc = scripts[current], i = line - 1, old = sc.lines[i];
+  sc.lines[i] = /pos:\d+/.test(old) ? old.replace(/pos:\d+/, 'pos:' + pos)
+                                    : old.trimEnd() + ' pos:' + pos;
+  if (sc.lines[i] !== old) { dirty.add(sc.name); render(); }
+}
+
+function addChar(afterLine, id, pos) {
+  const sc = scripts[current];
+  sc.lines.splice(afterLine, 0, '@char ' + id + ' pos:' + pos);
+  dirty.add(sc.name);
+  check();
+  render();
+}
+
+async function saveScript() {
+  const sc = scripts[current];
+  const res = await fetch('/save', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({file: sc.name + '.nani', content: sc.lines.join('\n'),
+                          original: sc.original})
+  }).then(r => r.json()).catch(err => ({ok: false, error: err.message}));
+
+  if (res.ok) { sc.original = sc.lines.join('\n'); dirty.delete(sc.name); render(); }
+  else alert('存檔失敗：' + (res.error || '？'));
 }
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -469,7 +589,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':
 // 內建資料版（build_viewer.py 產生）：打開就直接進畫面，不用拖檔案
 if (EMBEDDED) {
   for (const name in EMBEDDED)
-    scripts[name] = {name, lines: EMBEDDED[name].split(/\r?\n/)};
+    scripts[name] = {name, lines: EMBEDDED[name].split(/\r?\n/), original: EMBEDDED[name]};
   check();
   drop.classList.add('hide');
   document.getElementById('app').classList.add('show');
