@@ -87,6 +87,8 @@
   /* 這一幕換了曲子：整張卡的左邊立一條金線，掃過去一眼看得到 */
   .scene.bgmchanged{border-left:3px solid var(--gold)}
   .newbgm{color:var(--gold);font-size:11px;white-space:nowrap}
+  .actor .x{margin-left:6px;color:#7a7590;cursor:pointer;font-size:12px}
+  .actor .x:hover{color:var(--red)}
   .inherit{color:#6b6780;font-size:11px;white-space:nowrap;border:1px dashed var(--line);
         border-radius:5px;padding:2px 6px}
   .actor .card{cursor:grab;user-select:none}
@@ -438,17 +440,21 @@ function sceneShots(sc) {
   const shots = [];
   let back = null, bgm = null, actors = new Map(), pending = false,
       firstLine = 1, talk = '', lastCmd = 1,
-      backLine = 0, bgmLine = 0, lastBgm = null, ownBack = false, ownBgm = false;
+      backLine = 0, bgmLine = 0, lastBgm = null, ownBack = false, ownBgm = false,
+      prevIds = new Set();
 
   const flush = () => {
     if (!pending) return;
     shots.push({back, bgm,
       // 依站位排序：名牌的陣列順序＝畫面上的左右順序，槽位判定才對得起來
       backLine, bgmLine, bgmChanged: bgm !== lastBgm, ownBack, ownBgm,
+      // 這一幕才上場的人：拿掉他們是刪 @char，其餘是插 @hide
+      fresh: [...actors.keys()].filter(id => !prevIds.has(id)),
       actors: [...actors.entries()].map(([id, a]) => [id, a.pos, a.line])
                                    .sort((x, y) => x[1] - y[1]),
       line: firstLine, insertAt: lastCmd, talk});
     lastBgm = bgm;
+    prevIds = new Set(actors.keys());
     pending = false; talk = ''; ownBack = false; ownBgm = false;
   };
 
@@ -532,7 +538,14 @@ function renderScenes(v) {
         s.actors.map(([id, pos, line], i) =>
           '<div class="actor" style="left:' + pos + '%" data-line="' + line +
           '" data-pos="' + pos + '" data-id="' + esc(id) + '">' +
-          '<div class="card">' + esc(id) + '</div>' +
+          '<div class="card">' + esc(id) +
+            '<span class="x" title="' + (s.fresh.includes(id)
+              ? '這一幕才上場，拿掉＝刪掉那行 @char'
+              : '她是前面就在場的，拿掉＝在這一幕插一行 @hide') + '"' +
+            ' onpointerdown="event.stopPropagation()"' +
+            ' onclick="removeActor(&quot;' + esc(id) + '&quot;,' + line + ',' +
+            s.fresh.includes(id) + ',' + s.line + ')">×</span>' +
+          '</div>' +
           '<div class="pos">第 ' + (i + 1) + ' 位　pos ' + pos + '</div></div>').join('') +
         '</div>' +
 
@@ -549,7 +562,7 @@ function renderScenes(v) {
           '<select class="pick' + (s.bgmChanged ? ' hot' : '') + '"' +
             ' title="' + (s.ownBgm ? '換掉這一幕的曲子' : '選了會在這一幕插一行 @bgm，從這裡開始換曲') + '"' +
             ' onchange="setBgm(' + (s.ownBgm ? s.bgmLine : 0) + ', ' +
-            (s.backLine || s.insertAt) + ', this.value)">' +
+            (s.ownBgm ? 0 : s.line) + ', this.value)">' +
             '<option value="">' + (s.ownBgm ? '（不換）' : '沿用 ' + (s.bgm || '無聲')) + '</option>' +
             (s.bgm && !bgmNames.includes(s.bgm) ? '<option selected>' + esc(s.bgm) + '</option>' : '') +
             opts(bgmNames, s.bgm) + '</select>' +
@@ -561,6 +574,33 @@ function renderScenes(v) {
     }).join('') + '</div>';
 
   wireDragging();
+}
+
+// 拿掉一個人。要做的事有兩件，看情況做一件或兩件：
+//   ‧ 她的 @char 就在這一幕裡 → 刪掉那一行（不刪的話等一下的 @hide 會被它抵消）
+//   ‧ 她是前面就在場的        → 在這一幕開頭插一行 @hide
+// 兩件都做完之後，剩下的人重新排位。
+function removeActor(id, line, fresh, shotLine) {
+  const sc = scripts[current];
+  const shot = sceneShots(sc).find(x => x.actors.some(a => a[0] === id && a[2] === line));
+  if (!shot) return;
+
+  let rest = shot.actors.filter(a => a[0] !== id);
+  const inThisShot = line >= shotLine;
+
+  if (inThisShot) {
+    sc.lines.splice(line - 1, 1);
+    rest = rest.map(([i, p, l]) => [i, p, l > line ? l - 1 : l]);
+  }
+  if (!fresh) {
+    const at = shotLine - 1;
+    sc.lines.splice(at, 0, '@hide ' + id);
+    rest = rest.map(([i, p, l]) => [i, p, l > at ? l + 1 : l]);
+  }
+
+  dirty.add(sc.name);
+  check();
+  if (rest.length) applySlots(rest); else render();
 }
 
 // 換背景：直接改那一行的 @back
@@ -582,7 +622,8 @@ function setBgm(line, insertAt, name) {
     const i = line - 1;
     sc.lines[i] = sc.lines[i].replace(/@bgm \S+/, '@bgm ' + name);
   } else {
-    sc.lines.splice(insertAt, 0, '@bgm ' + name);
+    // 從這一幕開始換曲：插在這一幕的第一行之前
+    sc.lines.splice(Math.max(0, insertAt - 1), 0, '@bgm ' + name);
   }
   dirty.add(sc.name);
   render();
