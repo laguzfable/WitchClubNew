@@ -17,7 +17,6 @@ import http.server
 import json
 import os
 import posixpath
-import socketserver
 import threading
 import sys
 import urllib.parse
@@ -97,8 +96,10 @@ if __name__ == '__main__':
     print('可以拖名牌改站位，改完按存檔就會寫回 .nani。關掉這個視窗就結束。')
     threading.Timer(1.0, lambda: webbrowser.open(url)).start()
 
-    socketserver.TCPServer.allow_reuse_address = True
-    with socketserver.TCPServer(('127.0.0.1', PORT), Handler) as httpd:
+    # 一定要多執行緒：瀏覽器會同時開好幾條連線抓圖和音訊，
+    # 單執行緒的話第一條沒結束就卡住，整個網頁會停在載入中。
+    http.server.ThreadingHTTPServer.allow_reuse_address = True
+    with http.server.ThreadingHTTPServer(('127.0.0.1', PORT), Handler) as httpd:
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:

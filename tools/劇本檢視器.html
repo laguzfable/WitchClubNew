@@ -430,7 +430,9 @@ function sceneShots(sc) {
   const flush = () => {
     if (!pending) return;
     shots.push({back, bgm,
-      actors: [...actors.entries()].map(([id, a]) => [id, a.pos, a.line]),
+      // 依站位排序：名牌的陣列順序＝畫面上的左右順序，槽位判定才對得起來
+      actors: [...actors.entries()].map(([id, a]) => [id, a.pos, a.line])
+                                   .sort((x, y) => x[1] - y[1]),
       line: firstLine, insertAt: lastCmd, talk});
     pending = false; talk = '';
   };
@@ -505,10 +507,15 @@ function renderScenes(v) {
       return '<div class="scene"><div class="stage" data-insert="' + s.insertAt + '">' +
         (src ? '<img loading="lazy" src="' + src + '">'
              : '<div class="noimg">' + (s.back ? '找不到背景　' + esc(s.back) : '（沒有指定背景）') + '</div>') +
-        s.actors.map(([id, pos, line]) =>
-          '<div class="actor" style="left:' + pos + '%" data-line="' + line + '">' +
-          '<div class="card">' + esc(id) + '</div><div class="pos">pos ' + pos + '</div></div>').join('') +
+        s.actors.map(([id, pos, line], i) =>
+          '<div class="actor" style="left:' + pos + '%" data-line="' + line +
+          '" data-pos="' + pos + '" data-id="' + esc(id) + '">' +
+          '<div class="card">' + esc(id) + '</div>' +
+          '<div class="pos">第 ' + (i + 1) + ' 位　pos ' + pos + '</div></div>').join('') +
         '</div><div class="bar"><span class="ln">' + s.line + ' 行</span>' +
+        (s.actors.length && !isCanonical(s.actors)
+          ? '<button onclick="applySlots(' + JSON.stringify(s.actors).replace(/"/g, '&quot;') +
+            ')">站位重排</button>' : '') +
         '<span class="tag t-map">' + esc(s.back || '—') + '</span>' +
         (s.bgm ? '<span class="tag t-choice">♪ ' + esc(s.bgm) + '</span>' : '') +
         (audio ? '<audio controls preload="none" style="height:26px" src="' + audio + '"></audio>' : '') +
@@ -518,36 +525,77 @@ function renderScenes(v) {
   wireDragging();
 }
 
+// ── 站位是算出來的，不是隨便擺的 ──────────────────────
+// 從整包劇本統計出來的慣例（次數壓倒性）：
+//   1 人 50 ／ 2 人 35,65 ／ 3 人 25,50,75 ／ 4 人 20,40,60,80
+// 規律就是等分：第 i 個站在 100*i/(n+1)。2 人的 33/67 被四捨五入寫成 35/65，
+// 用得太多了所以照抄，其餘照公式算。
+function slotsFor(n) {
+  if (n <= 0) return [];
+  if (n === 1) return [50];
+  if (n === 2) return [35, 65];
+  return Array.from({length: n}, (_, i) => Math.round(100 * (i + 1) / (n + 1)));
+}
+
+// 這一幕的站位合不合慣例
+function isCanonical(actors) {
+  const want = slotsFor(actors.length);
+  return actors.every(([, pos], i) => pos === want[i]);
+}
+
+// 把整幕的人按目前的左右順序重新排到標準站位
+function applySlots(order) {
+  const want = slotsFor(order.length);
+  const sc = scripts[current];
+  order.forEach(([id, , line], i) => {
+    const idx = line - 1, old = sc.lines[idx];
+    sc.lines[idx] = /pos:\d+/.test(old) ? old.replace(/pos:\d+/, 'pos:' + want[i])
+                                        : old.trimEnd() + ' pos:' + want[i];
+  });
+  dirty.add(sc.name);
+  render();
+}
+
 function wireDragging() {
-  // 拖名牌 → 改那一行的 pos
+  // 拖名牌 → 只換順序，位置還是由人數決定
   document.querySelectorAll('.actor').forEach(el => {
     el.addEventListener('pointerdown', e => {
       e.preventDefault();
       const stage = el.parentElement;
+      const peers = [...stage.querySelectorAll('.actor')];
+      const slots = slotsFor(peers.length);
+      let from = peers.indexOf(el), to = from;
+
       el.classList.add('drag');
       el.setPointerCapture(e.pointerId);
 
       const move = ev => {
         const r = stage.getBoundingClientRect();
-        const pct = Math.max(0, Math.min(100,
-          Math.round((ev.clientX - r.left) / r.width * 100)));
-        el.style.left = pct + '%';
-        el.querySelector('.pos').textContent = 'pos ' + pct;
-        el.dataset.pos = pct;
+        const pct = (ev.clientX - r.left) / r.width * 100;
+        // 找最接近的槽，拖動時只在槽之間跳，不會停在中間
+        to = slots.reduce((best, s, i) =>
+          Math.abs(s - pct) < Math.abs(slots[best] - pct) ? i : best, 0);
+        el.style.left = slots[to] + '%';
+        el.querySelector('.pos').textContent = '第 ' + (to + 1) + ' 位';
       };
       const up = () => {
         el.releasePointerCapture(e.pointerId);
         el.classList.remove('drag');
         el.removeEventListener('pointermove', move);
         el.removeEventListener('pointerup', up);
-        if (el.dataset.pos !== undefined) setPos(+el.dataset.line, +el.dataset.pos);
+        if (to === from) return render();
+
+        const order = peers.map(p => [p.dataset.id, +p.dataset.pos, +p.dataset.line]);
+        const [moved] = order.splice(from, 1);
+        order.splice(to, 0, moved);
+        applySlots(order);
       };
       el.addEventListener('pointermove', move);
       el.addEventListener('pointerup', up);
     });
   });
 
-  // 從調色盤把角色拖進畫面 → 插一行 @char
+  // 從調色盤把角色拖進畫面 → 插一行 @char，然後整幕重排
   document.querySelectorAll('#bar .chip').forEach(chip => {
     chip.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', chip.dataset.id));
   });
@@ -558,27 +606,29 @@ function wireDragging() {
       e.preventDefault(); stage.classList.remove('hot');
       const id = e.dataTransfer.getData('text/plain');
       if (!id) return;
+
       const r = stage.getBoundingClientRect();
-      const pct = Math.max(0, Math.min(100,
-        Math.round((e.clientX - r.left) / r.width * 100)));
-      addChar(+stage.dataset.insert, id, pct);
+      const pct = (e.clientX - r.left) / r.width * 100;
+      const peers = [...stage.querySelectorAll('.actor')]
+        .map(p => [p.dataset.id, +p.dataset.pos, +p.dataset.line]);
+      if (peers.some(([pid]) => pid === id)) return alert(id + ' 已經在這一幕了');
+
+      // 插在最接近放手位置的地方
+      let at = peers.findIndex(([, pos]) => pos > pct);
+      if (at < 0) at = peers.length;
+
+      const sc = scripts[current];
+      const line = +stage.dataset.insert;
+      sc.lines.splice(line, 0, '@char ' + id + ' pos:50');
+      dirty.add(sc.name);
+
+      // 插入之後後面的行號會位移，重新算一次再排
+      const shifted = peers.map(([pid, pos, ln]) => [pid, pos, ln > line ? ln + 1 : ln]);
+      shifted.splice(at, 0, [id, 50, line + 1]);
+      check();
+      applySlots(shifted);
     });
   });
-}
-
-function setPos(line, pos) {
-  const sc = scripts[current], i = line - 1, old = sc.lines[i];
-  sc.lines[i] = /pos:\d+/.test(old) ? old.replace(/pos:\d+/, 'pos:' + pos)
-                                    : old.trimEnd() + ' pos:' + pos;
-  if (sc.lines[i] !== old) { dirty.add(sc.name); render(); }
-}
-
-function addChar(afterLine, id, pos) {
-  const sc = scripts[current];
-  sc.lines.splice(afterLine, 0, '@char ' + id + ' pos:' + pos);
-  dirty.add(sc.name);
-  check();
-  render();
 }
 
 async function saveScript() {
