@@ -86,6 +86,11 @@
   .scene .lines .ln,.scene .evs .ln{display:inline-block;min-width:38px;color:#54506a;
     font-family:ui-monospace,Consolas,monospace}
   .scene .lab{color:var(--gold);font-size:11px}
+  .scene .expr{display:block;margin-top:2px;max-width:96px;font-size:10px;
+    background:#1b1925;color:var(--dim);border:1px solid var(--line);border-radius:4px}
+  .scene .edit{outline:none;border-bottom:1px dashed transparent;cursor:text}
+  .scene .edit:hover{border-bottom-color:var(--line)}
+  .scene .edit:focus{border-bottom-color:var(--gold);color:#efeaff}
   .scene .bar audio{height:24px;max-width:150px}
   .pick{background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:5px;
         font:inherit;font-size:11px;padding:2px 4px;max-width:110px}
@@ -457,7 +462,7 @@ function sceneShots(sc) {
       // 這一幕才上場的人：拿掉他們是刪 @char，其餘是插 @hide
       fresh: [...actors.keys()].filter(id => !prevIds.has(id)),
       // 依站位排序：名牌的陣列順序＝畫面上的左右順序，槽位判定才對得起來
-      actors: [...actors.entries()].map(([id, a]) => [id, a.pos, a.line])
+      actors: [...actors.entries()].map(([id, a]) => [id, a.pos, a.line, a.app || ''])
                                    .sort((x, y) => x[1] - y[1]),
       line: firstLine, insertAt: lastCmd, talks, events,
       talk: talks.length ? talks[0].text : ''});
@@ -491,10 +496,13 @@ function sceneShots(sc) {
     else if (/^@stopBgm/i.test(t)) { change(no); bgm = null; bgmLine = 0; }
     else if ((m = t.match(/^@char (\S+)/))) {
       change(no);
-      const id = m[1].split('.')[0].split(',')[0];
+      const tok = m[1].split(',')[0];
+      const id = tok.split('.')[0], app = tok.includes('.') ? tok.split('.')[1] : null;
       const p = t.match(/pos:([\d.]+)/);
       const before = actors.get(id);
-      actors.set(id, {pos: p ? Math.round(+p[1]) : (before ? before.pos : 50), line: no});
+      // 表情跟站位一樣，沒寫就是延續上一次的
+      actors.set(id, {pos: p ? Math.round(+p[1]) : (before ? before.pos : 50),
+                      line: no, app: app !== null ? app : (before ? before.app : '')});
     }
     else if ((m = t.match(/^@hide (\S+)/))) {
       change(no);
@@ -567,7 +575,7 @@ function renderScenes(v) {
         '<div class="stage" data-insert="' + s.insertAt + '">' +
         (src ? '<img loading="lazy" src="' + src + '">'
              : '<div class="noimg">' + (s.back ? '找不到背景　' + esc(s.back) : '（沒有指定背景）') + '</div>') +
-        s.actors.map(([id, pos, line], i) =>
+        s.actors.map(([id, pos, line, app], i) =>
           '<div class="actor" style="left:' + pos + '%" data-line="' + line +
           '" data-pos="' + pos + '" data-id="' + esc(id) + '">' +
           '<div class="card">' + esc(id) +
@@ -578,7 +586,8 @@ function renderScenes(v) {
             ' onclick="removeActor(&quot;' + esc(id) + '&quot;,' + line + ',' +
             s.fresh.includes(id) + ',' + s.line + ')">×</span>' +
           '</div>' +
-          '<div class="pos">第 ' + (i + 1) + ' 位　pos ' + pos + '</div></div>').join('') +
+          '<div class="pos">第 ' + (i + 1) + ' 位　pos ' + pos +
+            exprPicker(id, app, line, s.line) + '</div></div>').join('') +
         '</div>' +
 
         '<div class="bar">' +
@@ -603,7 +612,13 @@ function renderScenes(v) {
           (audio ? '<audio controls preload="none" src="' + audio + '"></audio>' : '') +
         '</div>' +
         (s.talks.length ? '<div class="lines">' + s.talks.map(x =>
-            '<div><span class="ln">' + x.line + '</span>' + esc(x.text) + '</div>').join('') + '</div>' : '') +
+            '<div><span class="ln">' + x.line + '</span>' +
+            '<span class="edit" contenteditable="true" spellcheck="false" data-line="' + x.line + '"' +
+            ' onblur="editLine(' + x.line + ', this)"' +
+            ' onkeydown="if(event.key===&quot;Enter&quot;){event.preventDefault();this.blur()}' +
+            'if(event.key===&quot;Escape&quot;){this.textContent=this.dataset.was;this.blur()}"' +
+            ' onfocus="this.dataset.was=this.textContent">' + esc(x.text) + '</span></div>').join('') +
+          '</div>' : '') +
         (s.events.length ? '<div class="evs">' + s.events.map(x =>
             '<div><span class="ln">' + x.line + '</span><span class="tag t-' + x.kind + '">' +
             (EVENT_NAME[x.kind] || x.kind) + '</span>' + esc(x.text) + '</div>').join('') + '</div>' : '') +
@@ -611,6 +626,46 @@ function renderScenes(v) {
     }).join('') + '</div>';
 
   wireDragging();
+}
+
+// 表情選單。ASSETS.expressions 是角色 prefab 旁邊那些 .anim。
+function exprPicker(id, app, line, shotLine) {
+  const list = (ASSETS.expressions || {})[id];
+  if (!list || list.length < 2) return '';
+  return '<select class="expr" title="換這一幕的表情"' +
+    ' onpointerdown="event.stopPropagation()"' +
+    ' onchange="setExpr(&quot;' + esc(id) + '&quot;,' + line + ',' + shotLine + ', this.value)">' +
+    '<option value=""' + (app ? '' : ' selected') + '>（沿用）</option>' +
+    list.map(x => '<option' + (x === app ? ' selected' : '') + '>' + esc(x) + '</option>').join('') +
+    '</select>';
+}
+
+// 換表情。她的 @char 在這一幕裡就直接改那行；在更早的幕就得插新的一行，
+// 不然會連前面幾幕的表情一起改掉。
+function setExpr(id, line, shotLine, app) {
+  const sc = scripts[current];
+  const token = app ? id + '.' + app : id;
+
+  if (line >= shotLine) {
+    sc.lines[line - 1] = sc.lines[line - 1].replace(/^(\s*@char )(\S+)/,
+      (_, head, tok) => head + token + (tok.includes(',') ? ',' + tok.split(',').slice(1).join(',') : ''));
+  } else {
+    const shot = sceneShots(sc).find(x => x.line === shotLine);
+    const me = shot && shot.actors.find(a => a[0] === id);
+    sc.lines.splice(shotLine - 1, 0, '@char ' + token + (me ? ' pos:' + me[1] : ''));
+  }
+  dirty.add(sc.name); check(); render();
+}
+
+// 直接改對白。只動那一行的文字，行號不變。
+function editLine(line, el) {
+  const sc = scripts[current];
+  const text = el.textContent.replace(/\s+$/, '');
+  if (text === sc.lines[line - 1].trim()) return;
+  if (!text) { el.textContent = sc.lines[line - 1].trim(); return; }   // 空的就還原，要刪請去改檔案
+  const indent = (sc.lines[line - 1].match(/^\s*/) || [''])[0];
+  sc.lines[line - 1] = indent + text;
+  dirty.add(sc.name); check(); render();
 }
 
 // 拿掉一個人。要做的事有兩件，看情況做一件或兩件：

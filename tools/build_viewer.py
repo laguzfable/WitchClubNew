@@ -56,7 +56,7 @@ def build_assets():
                 return x
         return x
 
-    backs, audio, chars = {}, {}, set()
+    backs, audio, chars, exprs = {}, {}, set(), {}
     pattern = r'- name: (\S+)\s+pathPrefix: (\S+)\s+guid: (\w+)'
     for m in re.finditer(pattern, res):
         name, prefix, guid = (unescape(g) for g in m.groups())
@@ -72,17 +72,22 @@ def build_assets():
             backs[(sub + '/' + name) if sub else name] = rel
         elif prefix == 'Audio':
             audio[name] = rel
-        elif prefix == 'Characters':
-            chars.add(name)
-        elif prefix.startswith('Characters/'):
-            # 多外觀的角色：id 在前綴後面，name 是外觀
-            chars.add(prefix.split('Characters/', 1)[1])
+        elif prefix == 'Characters' or prefix.startswith('Characters/'):
+            cid = name if prefix == 'Characters' else prefix.split('Characters/', 1)[1]
+            chars.add(cid)
+            # 表情＝角色 prefab 旁邊那些 .anim（Live2D 的動作檔）。
+            # 靜圖角色（那些女巫 png）沒有表情可挑，就不要給選單。
+            if path.endswith('.prefab'):
+                folder = os.path.dirname(path)
+                exprs[cid] = sorted(f[:-5] for f in os.listdir(folder) if f.endswith('.anim'))
 
-    return {'backgrounds': backs, 'audio': audio, 'characters': sorted(chars)}
+    return {'backgrounds': backs, 'audio': audio,
+            'characters': sorted(chars), 'expressions': exprs}
 
 
 assets = build_assets()
-print(f"背景 {len(assets['backgrounds'])} 張、音樂 {len(assets['audio'])} 首")
+print(f"背景 {len(assets['backgrounds'])} 張、音樂 {len(assets['audio'])} 首、"
+      f"{len(assets['expressions'])} 個角色有表情")
 
 html = io.open(SRC, encoding='utf-8').read()
 blob = json.dumps(data, ensure_ascii=False).replace('</', r'<\/')  # 避免提早關掉 <script>
