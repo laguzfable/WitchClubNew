@@ -79,6 +79,13 @@
         flex-wrap:wrap;font-size:12px}
   .scene .bar .ln{color:#54506a;font-family:ui-monospace,Consolas,monospace}
   .scene .line{padding:5px 9px 8px;color:var(--dim);font-size:12px}
+  .scene .lines{padding:5px 9px 6px;color:var(--dim);font-size:12px;max-height:190px;overflow:auto}
+  .scene .lines div{padding:1px 0}
+  .scene .evs{padding:2px 9px 8px;font-size:12px;border-top:1px dashed var(--line)}
+  .scene .evs div{padding:2px 0;color:#9d97b8}
+  .scene .lines .ln,.scene .evs .ln{display:inline-block;min-width:38px;color:#54506a;
+    font-family:ui-monospace,Consolas,monospace}
+  .scene .lab{color:var(--gold);font-size:11px}
   .scene .bar audio{height:24px;max-width:150px}
   .pick{background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:5px;
         font:inherit;font-size:11px;padding:2px 4px;max-width:110px}
@@ -439,51 +446,68 @@ let dirty = new Set();
 function sceneShots(sc) {
   const shots = [];
   let back = null, bgm = null, actors = new Map(), pending = false,
-      firstLine = 1, talk = '', lastCmd = 1,
+      firstLine = 1, talks = [], events = [], lastCmd = 1, label = '',
       backLine = 0, bgmLine = 0, lastBgm = null, ownBack = false, ownBgm = false,
-      prevIds = new Set();
+      talked = false, prevIds = new Set();
 
   const flush = () => {
     if (!pending) return;
-    shots.push({back, bgm,
-      // 依站位排序：名牌的陣列順序＝畫面上的左右順序，槽位判定才對得起來
+    shots.push({back, bgm, label,
       backLine, bgmLine, bgmChanged: bgm !== lastBgm, ownBack, ownBgm,
       // 這一幕才上場的人：拿掉他們是刪 @char，其餘是插 @hide
       fresh: [...actors.keys()].filter(id => !prevIds.has(id)),
+      // 依站位排序：名牌的陣列順序＝畫面上的左右順序，槽位判定才對得起來
       actors: [...actors.entries()].map(([id, a]) => [id, a.pos, a.line])
                                    .sort((x, y) => x[1] - y[1]),
-      line: firstLine, insertAt: lastCmd, talk});
+      line: firstLine, insertAt: lastCmd, talks, events,
+      talk: talks.length ? talks[0].text : ''});
     lastBgm = bgm;
     prevIds = new Set(actors.keys());
-    pending = false; talk = ''; ownBack = false; ownBgm = false;
+    pending = false; talks = []; events = []; talked = false;
+    ownBack = false; ownBgm = false;
   };
+
+  // 一幕＝從這次畫面變動到下一次畫面變動。中間講的話全部留著，
+  // 之前只留第一句，等於九成的劇本在這一頁是看不到的。
+  const change = no => {
+    if (talked) flush();          // 已經開始講話了才切幕，不然連續的 @char 會被拆成好幾張卡
+    if (!pending) { firstLine = no; pending = true; }
+    lastCmd = no;
+  };
+
+  // 白名單會漏掉之後新增的指令，所以反過來：只有純節奏用的才不顯示。
+  const SKIP = /^(stop|wait|print|showUI|hidePrinter|stopSfx|stopsfx)$/i;
 
   sc.lines.forEach((raw, i) => {
     const t = raw.trim(), no = i + 1;
     if (!t || t.startsWith(';')) return;
     let m;
+    if (t.startsWith('#')) { flush(); label = t.slice(1).trim(); return; }
     if ((m = t.match(/^@back (\S+)/))) {
-      flush(); back = m[1].split(',')[0]; backLine = no; ownBack = true; firstLine = no; lastCmd = no; pending = true;
+      flush(); back = m[1].split(',')[0]; backLine = no; ownBack = true;
+      firstLine = no; lastCmd = no; pending = true;
     }
-    else if ((m = t.match(/^@bgm (\S+)/))) { bgm = m[1]; bgmLine = no; ownBgm = true; lastCmd = no; pending = true; }
-    else if (/^@stopBgm/.test(t)) { bgm = null; bgmLine = 0; lastCmd = no; }
+    else if ((m = t.match(/^@bgm (\S+)/))) { change(no); bgm = m[1]; bgmLine = no; ownBgm = true; }
+    else if (/^@stopBgm/i.test(t)) { change(no); bgm = null; bgmLine = 0; }
     else if ((m = t.match(/^@char (\S+)/))) {
+      change(no);
       const id = m[1].split('.')[0].split(',')[0];
-      const p = t.match(/pos:(\d+)/);
+      const p = t.match(/pos:([\d.]+)/);
       const before = actors.get(id);
-      actors.set(id, {pos: p ? +p[1] : (before ? before.pos : 50), line: no});
-      lastCmd = no;
-      if (!pending) { firstLine = no; pending = true; }
+      actors.set(id, {pos: p ? Math.round(+p[1]) : (before ? before.pos : 50), line: no});
     }
     else if ((m = t.match(/^@hide (\S+)/))) {
+      change(no);
       m[1].split(',').forEach(x => actors.delete(x.trim().split('.')[0]));
-      lastCmd = no;
     }
-    else if (/^@hideChars/.test(t)) { actors.clear(); lastCmd = no; }
-    else if (!t.startsWith('@') && !t.startsWith('#') && !talk) {
-      talk = t.length > 60 ? t.slice(0, 60) + '…' : t;
-      if (pending) flush();
+    else if (/^@hideChars/.test(t)) { change(no); actors.clear(); }
+    else if ((m = t.match(/^@(\w+)/))) {
+      // 其他指令不切幕，但要留在這一幕的紀錄裡——選項、跳轉、戰鬥都在這裡
+      if (SKIP.test(m[1])) return;
+      if (!pending) { firstLine = no; pending = true; }
+      events.push({line: no, kind: m[1], text: t});
     }
+    else { talks.push({line: no, text: t}); talked = true; if (!pending) { firstLine = no; pending = true; } }
   });
   flush();
   return shots;
@@ -499,6 +523,14 @@ function allActors() {
     });
   return [...set].sort();
 }
+
+const EVENT_NAME = {choice:'選項', goto:'跳轉', battle:'戰鬥', restroom:'休息',
+                    achieve:'結局', unlock:'解鎖', set:'變數', GotoUnityScene:'切場景',
+                    spawn:'特效', despawn:'收特效', sfx:'音效', visitNode:'聖典',
+                    overrideEvent:'蓋事件', if:'條件', else:'否則', endif:'條件結束',
+                    exitToTitle:'回標題', input:'輸入', tutorial:'教學',
+                    SaveReturnPoint:'存返回點', saveMapDayNight:'存日夜',
+                    unlockCardVariant:'解卡', GotoChangeRune:'換符文'};
 
 function renderScenes(v) {
   const sc = scripts[current];
@@ -551,6 +583,7 @@ function renderScenes(v) {
 
         '<div class="bar">' +
           '<span class="ln">' + s.line + ' 行</span>' +
+          (s.label ? '<span class="lab" title="這一幕屬於哪個段落"># ' + esc(s.label) + '</span>' : '') +
           (s.actors.length && !isCanonical(s.actors)
             ? '<button onclick="applySlots(' +
               JSON.stringify(s.actors).replace(/"/g, '&quot;') + ')" title="這一幕的站位不合慣例， 按了會依左右順序拉回標準值">站位 → ' + slotsFor(s.actors.length).join('/') + '</button>' : '') +
@@ -569,7 +602,11 @@ function renderScenes(v) {
           (s.bgmChanged ? '<span class="newbgm">♪ 換曲</span>' : '') +
           (audio ? '<audio controls preload="none" src="' + audio + '"></audio>' : '') +
         '</div>' +
-        (s.talk ? '<div class="line">' + esc(s.talk) + '</div>' : '') +
+        (s.talks.length ? '<div class="lines">' + s.talks.map(x =>
+            '<div><span class="ln">' + x.line + '</span>' + esc(x.text) + '</div>').join('') + '</div>' : '') +
+        (s.events.length ? '<div class="evs">' + s.events.map(x =>
+            '<div><span class="ln">' + x.line + '</span><span class="tag t-' + x.kind + '">' +
+            (EVENT_NAME[x.kind] || x.kind) + '</span>' + esc(x.text) + '</div>').join('') + '</div>' : '') +
       '</div>';
     }).join('') + '</div>';
 
