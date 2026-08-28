@@ -306,6 +306,19 @@ function check() {
           bad(n, no, '角色「' + id + '」沒有註冊，這行叫不出人來');
       }
 
+      // 表情打錯 → 遊戲裡不會換臉，但也不會報錯，很難發現
+      if (ASSETS && ASSETS.expressions) {
+        for (const m of t.matchAll(/(?:^|@char )([^\s:@#,]+)\.([^\s:,]+)\s*[:\s]/g)) {
+          const list = ASSETS.expressions[m[1]];
+          if (!list) continue;
+          if (list.includes(m[2])) continue;
+          const near = list.find(x => x.toLowerCase() === m[2].toLowerCase());
+          bad(n, no, near
+            ? '表情大小寫不對：「' + m[2] + '」應該是「' + near + '」'
+            : '「' + m[1] + '」沒有「' + m[2] + '」這個表情（有的是：' + list.join('、') + '）');
+        }
+      }
+
       const w = t.match(/affinity_(\w+)=affinity_(\w+)\+/);
       if (w && w[1] !== w[2]) bad(n, no, `加錯人了：affinity_${w[1]} 被設成 affinity_${w[2]} 的值`);
     });
@@ -515,7 +528,18 @@ function sceneShots(sc) {
       if (!pending) { firstLine = no; pending = true; }
       events.push({line: no, kind: m[1], text: t});
     }
-    else { talks.push({line: no, text: t}); talked = true; if (!pending) { firstLine = no; pending = true; } }
+    else {
+      // 表情多半寫在說話者那一行（「優菲.bling: ……」），不是寫在 @char。
+      // 這也是畫面變動，所以要另起一幕，不然舞台上會一路是預設表情。
+      const sp = t.match(/^([^\s:@#]+)\.([^\s:]+)\s*:/);
+      if (sp && actors.has(sp[1])) {
+        change(no);
+        const a = actors.get(sp[1]);
+        actors.set(sp[1], {pos: a.pos, line: a.line, app: sp[2]});
+      }
+      talks.push({line: no, text: t}); talked = true;
+      if (!pending) { firstLine = no; pending = true; }
+    }
   });
   flush();
   return shots;
