@@ -1,0 +1,379 @@
+<!-- 劇本檢視器 — 用瀏覽器打開這個檔案，把 Assets/NaniScripts 資料夾拖進來
+     不需要 Unity，不需要安裝任何東西，也不會動到你的檔案（只讀） -->
+<meta charset="utf-8">
+<title>劇本檢視器</title>
+<style>
+  :root{
+    --bg:#14131a; --panel:#1c1b24; --line:#2c2a37; --ink:#e8e6f0; --dim:#8f8ba3;
+    --gold:#c9a227; --rose:#d98ca0; --blue:#7aa2d9; --green:#7fb98a; --red:#d97a7a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:14px/1.7 "Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif}
+  #drop{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+        flex-direction:column;gap:16px;background:var(--bg);z-index:10;text-align:center}
+  #drop.hide{display:none}
+  #drop .box{border:2px dashed var(--line);border-radius:16px;padding:56px 72px}
+  #drop h1{font-size:20px;margin:0 0 8px;font-weight:600}
+  #drop p{color:var(--dim);margin:4px 0}
+  #drop.over .box{border-color:var(--gold);background:#1a1822}
+  button,label.btn{background:var(--panel);color:var(--ink);border:1px solid var(--line);
+        border-radius:8px;padding:7px 14px;cursor:pointer;font:inherit;font-size:13px}
+  button:hover,label.btn:hover{border-color:var(--gold)}
+  button.on{border-color:var(--gold);color:var(--gold)}
+  #app{display:none;grid-template-columns:250px 1fr;height:100vh}
+  #app.show{display:grid}
+  aside{border-right:1px solid var(--line);overflow-y:auto;background:var(--panel)}
+  aside .head{padding:12px 14px;border-bottom:1px solid var(--line);position:sticky;top:0;
+        background:var(--panel);display:flex;gap:8px;align-items:center}
+  aside input{flex:1;min-width:0;background:var(--bg);border:1px solid var(--line);
+        border-radius:6px;color:var(--ink);padding:6px 8px;font:inherit;font-size:13px}
+  .file{padding:8px 14px;cursor:pointer;border-bottom:1px solid #23212c;display:flex;
+        justify-content:space-between;gap:8px;align-items:baseline}
+  .file:hover{background:#232130}
+  .file.sel{background:#2a2739;box-shadow:inset 3px 0 var(--gold)}
+  .file .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .file .m{color:var(--dim);font-size:11px;white-space:nowrap}
+  .file .m .err{color:var(--red)}
+  main{overflow-y:auto;padding:20px 26px 80px}
+  .tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+  h2{font-size:17px;margin:0 0 4px}
+  .sub{color:var(--dim);font-size:12px;margin-bottom:18px}
+  .block{border:1px solid var(--line);border-radius:10px;margin-bottom:12px;overflow:hidden}
+  .block>.t{background:#221f2c;padding:8px 12px;font-weight:600;color:var(--gold);
+        display:flex;justify-content:space-between;gap:10px;cursor:pointer}
+  .block>.t .c{color:var(--dim);font-weight:400;font-size:12px}
+  .block>.b{padding:6px 12px 10px}
+  .row{display:flex;gap:8px;padding:3px 0;align-items:baseline;font-size:13px}
+  .row .ln{color:#54506a;min-width:44px;text-align:right;font-variant-numeric:tabular-nums;
+        font-family:ui-monospace,Consolas,monospace;font-size:11px}
+  .tag{border-radius:5px;padding:1px 7px;font-size:11px;white-space:nowrap;border:1px solid}
+  .t-choice{color:var(--rose);border-color:#5a3a45}
+  .t-goto{color:var(--blue);border-color:#35496b}
+  .t-aff{color:var(--green);border-color:#3a5c42}
+  .t-end{color:var(--gold);border-color:#5c4c1e}
+  .t-battle{color:#d9a37a;border-color:#5c452e}
+  .t-map{color:#a99ad9;border-color:#463c6b}
+  .jump{color:var(--blue);cursor:pointer;text-decoration:underline dotted}
+  .txt{color:var(--dim)}
+  .issue{border:1px solid var(--line);border-left:3px solid var(--red);border-radius:8px;
+        padding:8px 12px;margin-bottom:8px}
+  .issue.warn{border-left-color:var(--gold)}
+  .issue .w{color:var(--dim);font-size:12px}
+  .stat{display:inline-block;border:1px solid var(--line);border-radius:8px;padding:8px 14px;
+        margin:0 8px 8px 0}
+  .stat b{color:var(--gold);font-size:18px}
+  .empty{color:var(--dim);padding:28px 0}
+</style>
+
+<div id="drop">
+  <div class="box">
+    <h1>劇本檢視器</h1>
+    <p>把 <code>Assets/NaniScripts</code> 整個資料夾拖進來</p>
+    <p style="margin-top:14px">
+      <label class="btn">或點這裡選檔案
+        <input type="file" id="pick" multiple accept=".nani" hidden>
+      </label>
+    </p>
+    <p style="font-size:12px;margin-top:18px">只讀，不會動到你的檔案</p>
+  </div>
+</div>
+
+<div id="app">
+  <aside>
+    <div class="head"><input id="q" placeholder="搜尋腳本或台詞"></div>
+    <div id="list"></div>
+  </aside>
+  <main>
+    <div class="tabs">
+      <button data-tab="outline" class="on">結構</button>
+      <button data-tab="issues">檢查</button>
+      <button data-tab="affinity">好感總覽</button>
+      <button data-tab="endings">結局</button>
+    </div>
+    <div id="view"></div>
+  </main>
+</div>
+
+<script>
+const CHAR = {affinity_Eup:'優菲', affinity_Mel:'梅爾', affinity_Ved:'薇狄亞',
+              affinity_Nel:'涅莉', affinity_Syb:'西碧兒'};
+let scripts = {};      // name -> {name, lines}
+let issues = [];
+let current = null;
+let tab = 'outline';
+
+// ── 讀檔 ──────────────────────────────────────────────
+const drop = document.getElementById('drop');
+drop.addEventListener('dragover', e => {e.preventDefault(); drop.classList.add('over')});
+drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+drop.addEventListener('drop', async e => {
+  e.preventDefault(); drop.classList.remove('over');
+  const files = [];
+  for (const item of e.dataTransfer.items) {
+    const entry = item.webkitGetAsEntry && item.webkitGetAsEntry();
+    if (entry) await walk(entry, files);
+    else if (item.getAsFile) files.push(item.getAsFile());
+  }
+  load(files);
+});
+document.getElementById('pick').addEventListener('change', e => load([...e.target.files]));
+
+async function walk(entry, out) {
+  if (entry.isFile) {
+    if (entry.name.endsWith('.nani'))
+      out.push(await new Promise(r => entry.file(r)));
+  } else if (entry.isDirectory) {
+    const reader = entry.createReader();
+    let batch;
+    do {
+      batch = await new Promise(r => reader.readEntries(r));
+      for (const e of batch) await walk(e, out);
+    } while (batch.length);
+  }
+}
+
+async function load(files) {
+  files = files.filter(f => f.name.endsWith('.nani'));
+  if (!files.length) return alert('沒有找到 .nani 檔案');
+  for (const f of files) {
+    const name = f.name.replace(/\.nani$/, '');
+    scripts[name] = {name, lines: (await f.text()).split(/\r?\n/)};
+  }
+  check();
+  drop.classList.add('hide');
+  document.getElementById('app').classList.add('show');
+  renderList();
+  select(Object.keys(scripts).sort()[0]);
+}
+
+// ── 解析 ──────────────────────────────────────────────
+function labelsOf(s) {
+  const set = new Set();
+  s.lines.forEach(l => {const t = l.trim(); if (t.startsWith('#')) set.add(t.slice(1).trim())});
+  set.delete('');
+  return set;
+}
+
+function parse(s) {
+  const out = [];
+  let block = {label: '（開頭）', line: 1, items: [], talk: 0, first: ''};
+  s.lines.forEach((raw, i) => {
+    const t = raw.trim(), no = i + 1;
+    if (!t || t.startsWith(';')) return;
+
+    if (t.startsWith('#')) {
+      out.push(block);
+      block = {label: t.slice(1).trim() || '（無名）', line: no, items: [], talk: 0, first: ''};
+      return;
+    }
+    const add = (kind, text, jump) => block.items.push({kind, text, jump, line: no});
+
+    if (t.startsWith('@choice')) {
+      const body = t.slice(7).trim();
+      const g = body.match(/goto:\.?([\w.]+)/);
+      const a = body.match(/affinity_(\w+)=affinity_\1\+(\d+)/);
+      const txt = body.split(/\s+(?:set:|goto:|if:)/)[0].replace(/^"|"$/g, '');
+      add('choice', txt + (a ? `　＋${a[2]} ${CHAR['affinity_' + a[1]] || a[1]}` : ''), g && g[1]);
+    }
+    else if (/^@goto /.test(t)) {
+      const m = t.match(/@goto \.?([\w.]+)/);
+      add('goto', t.replace(/^@goto\s+/, ''), m && m[1]);
+    }
+    else if (/^@achieve/.test(t)) add('end', t.replace(/^@achieve\s+id:/, ''));
+    else if (/^@battle/.test(t)) {
+      const m = t.match(/target:(\S+)/);
+      add('battle', '戰鬥　' + (m ? m[1] : ''));
+    }
+    else if (/GotoUnityScene sceneName:MapTest/.test(t)) add('map', '進地圖');
+    else if (/^@set .*affinity_/.test(t)) {
+      const m = t.match(/affinity_(\w+)=affinity_\1([+\-]\d+)/) || t.match(/(affinity_\w+)=(\d+)/);
+      add('aff', m ? (t.includes('+') || t.includes('-')
+            ? `${CHAR['affinity_' + m[1]] || m[1]}　${m[2]}`
+            : `${CHAR[m[1]] || m[1]}　設為 ${m[2]}`) : t);
+    }
+    else if (/^@overrideEvent/.test(t)) add('map', t.replace('@overrideEvent ', '預約事件　'));
+    else if (!t.startsWith('@')) {  // 台詞或旁白
+      block.talk++;
+      if (!block.first) block.first = t.length > 40 ? t.slice(0, 40) + '…' : t;
+    }
+  });
+  out.push(block);
+  // 只有台詞的段落也要留著——它一樣是 @goto 的目標
+  return out.filter(b => b.items.length || b.talk);
+}
+
+// ── 檢查（規則跟 Unity 那支一致）────────────────────────
+function check() {
+  issues = [];
+  const labels = {};
+  for (const n in scripts) labels[n] = labelsOf(scripts[n]);
+
+  for (const n in scripts) {
+    const s = scripts[n], lab = labels[n], seen = new Set();
+
+    s.lines.forEach((raw, i) => {
+      const t = raw.trim(), no = i + 1;
+      if (!t || t.startsWith(';')) return;
+
+      if (t.startsWith('#')) {
+        const l = t.slice(1).trim();
+        if (l && seen.has(l)) bad(n, no, `label「${l}」重複了，@goto 只會跳到第一個`);
+        seen.add(l);
+        return;
+      }
+      if (t.startsWith('goto:')) bad(n, no, '少了 @：這行會被當成旁白印出來');
+
+      for (const m of t.matchAll(/@goto \.(\S+)/g))
+        if (!lab.has(m[1])) bad(n, no, `跳不到：這支腳本裡沒有 label「${m[1]}」`);
+      for (const m of t.matchAll(/goto:\.(\S+)/g))
+        if (!lab.has(m[1])) bad(n, no, `跳不到：這支腳本裡沒有 label「${m[1]}」`);
+      for (const m of t.matchAll(/@goto (\w+)\.(\w+)/g)) {
+        if (!labels[m[1]]) bad(n, no, `跳不到：找不到腳本「${m[1]}」`);
+        else if (!labels[m[1]].has(m[2])) bad(n, no, `跳不到：「${m[1]}」裡沒有 label「${m[2]}」`);
+      }
+      if (!t.startsWith('@') && !t.startsWith('#') && /\s(if|set):\S/.test(t))
+        bad(n, no, '旁白行不吃 if:／set:，會整串印在畫面上');
+
+      if (t.startsWith('@choice ')) {
+        const txt = t.slice(8).split(/\s+(?:set:|goto:|if:)/)[0];
+        if (!txt.startsWith('"') && txt.includes(' '))
+          bad(n, no, '選項文字有半形空格，畫面上會被截斷（用半形引號包起來）', true);
+      }
+      const w = t.match(/affinity_(\w+)=affinity_(\w+)\+/);
+      if (w && w[1] !== w[2]) bad(n, no, `加錯人了：affinity_${w[1]} 被設成 affinity_${w[2]} 的值`);
+    });
+
+    // 選項群組後面要有 @stop
+    for (let i = 0; i < s.lines.length; i++) {
+      if (!s.lines[i].trim().startsWith('@choice')) continue;
+      let j = i, found = false;
+      while (j < s.lines.length) {
+        const t = s.lines[j].trim();
+        if (t.startsWith('@stop')) {found = true; break}
+        if (t && !t.startsWith('@') && !t.startsWith(';')) break;
+        j++;
+      }
+      if (!found) bad(n, i + 1, '這組選項後面沒有 @stop，劇本會直接往下衝過去');
+      i = j;
+    }
+  }
+  issues.sort((a, b) => (a.warn - b.warn) || a.file.localeCompare(b.file) || a.line - b.line);
+}
+function bad(file, line, msg, warn) {issues.push({file, line, msg, warn: !!warn})}
+
+// ── 畫面 ──────────────────────────────────────────────
+function renderList() {
+  const q = document.getElementById('q').value.trim();
+  const el = document.getElementById('list');
+  el.innerHTML = '';
+  Object.keys(scripts).sort().forEach(n => {
+    const s = scripts[n];
+    if (q && !n.includes(q) && !s.lines.some(l => l.includes(q))) return;
+    const errs = issues.filter(i => i.file === n && !i.warn).length;
+    const ends = s.lines.filter(l => l.trim().startsWith('@achieve')).length;
+    const div = document.createElement('div');
+    div.className = 'file' + (n === current ? ' sel' : '');
+    div.innerHTML = `<span class="n">${n}</span><span class="m">${
+      errs ? `<span class="err">✕${errs}</span> ` : ''}${ends ? `結局${ends} ` : ''}${s.lines.length}行</span>`;
+    div.onclick = () => select(n);
+    el.appendChild(div);
+  });
+}
+
+function select(n) {current = n; renderList(); render()}
+
+document.getElementById('q').addEventListener('input', renderList);
+document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
+  tab = b.dataset.tab;
+  document.querySelectorAll('.tabs button').forEach(x => x.classList.toggle('on', x === b));
+  render();
+});
+
+function render() {
+  const v = document.getElementById('view');
+  if (tab === 'issues') return renderIssues(v);
+  if (tab === 'affinity') return renderAffinity(v);
+  if (tab === 'endings') return renderEndings(v);
+  renderOutline(v);
+}
+
+function renderOutline(v) {
+  const s = scripts[current];
+  if (!s) return v.innerHTML = '<div class="empty">左邊選一支腳本</div>';
+  const blocks = parse(s);
+  v.innerHTML = `<h2>${s.name}</h2><div class="sub">${s.lines.length} 行、${blocks.length} 個段落。點藍色的跳轉可以直接過去。</div>` +
+    blocks.map(b => `
+      <div class="block">
+        <div class="t" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'">
+          <span># ${esc(b.label)}</span><span class="c">${b.line} 行　${b.items.length ? b.items.length + ' 項　' : ''}台詞 ${b.talk}</span>
+        </div>
+        <div class="b">${b.items.length ? b.items.map(it => `
+          <div class="row">
+            <span class="ln">${it.line}</span>
+            <span class="tag t-${it.kind}">${kindName(it.kind)}</span>
+            <span class="${it.jump ? 'jump' : 'txt'}" ${it.jump ? `onclick="goJump('${it.jump}')"` : ''}>${esc(it.text)}</span>
+          </div>`).join('') : `<div class="row"><span class="ln"></span><span class="txt">${esc(b.first)}</span></div>`}</div>
+      </div>`).join('');
+}
+const kindName = k => ({choice:'選項', goto:'跳轉', aff:'好感', end:'結局', battle:'戰鬥', map:'地圖'})[k] || k;
+
+function goJump(target) {
+  if (target.includes('.')) {
+    const [file, lab] = target.split('.');
+    if (scripts[file]) {select(file); setTimeout(() => scrollTo(lab), 60); return}
+  }
+  scrollTo(target);
+}
+function scrollTo(label) {
+  [...document.querySelectorAll('.block > .t > span:first-child')]
+    .find(e => e.textContent.trim() === '# ' + label)
+    ?.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function renderIssues(v) {
+  const errs = issues.filter(i => !i.warn), warns = issues.filter(i => i.warn);
+  v.innerHTML = `<h2>檢查</h2><div class="sub">錯誤 ${errs.length} 個、提醒 ${warns.length} 個。錯誤會讓劇本跑不動，提醒不會。</div>` +
+    (issues.length ? issues.map(i => `
+      <div class="issue ${i.warn ? 'warn' : ''}">
+        <div>${esc(i.msg)}</div>
+        <div class="w"><span class="jump" onclick="select('${i.file}')">${i.file}</span>　第 ${i.line} 行</div>
+      </div>`).join('') : '<div class="empty">沒有問題。</div>');
+}
+
+function renderAffinity(v) {
+  const rows = [];
+  for (const n in scripts) {
+    const sum = {};
+    scripts[n].lines.forEach(l => {
+      for (const m of l.matchAll(/affinity_(\w+)=affinity_\1\+(\d+)/g))
+        sum['affinity_' + m[1]] = (sum['affinity_' + m[1]] || 0) + (+m[2]);
+      for (const m of l.matchAll(/@set affinity_(\w+)=(\d+)\s*$/g))
+        sum['affinity_' + m[1]] = `設為 ${m[2]}`;
+    });
+    if (Object.keys(sum).length) rows.push([n, sum]);
+  }
+  v.innerHTML = `<h2>好感總覽</h2><div class="sub">每支腳本裡各角色的加值合計（選項是「全部都選」的合計，實際只會拿到其中一條）。</div>` +
+    rows.map(([n, sum]) => `<div class="block"><div class="t"><span>${n}</span></div><div class="b">` +
+      Object.entries(sum).map(([k, val]) =>
+        `<div class="row"><span class="tag t-aff">${CHAR[k] || k}</span><span class="txt">${
+          typeof val === 'number' ? '＋' + val : val}</span></div>`).join('') +
+      `</div></div>`).join('');
+}
+
+function renderEndings(v) {
+  const rows = [];
+  for (const n in scripts)
+    scripts[n].lines.forEach((l, i) => {
+      const m = l.trim().match(/@achieve\s+id:(\S+)/);
+      if (m) rows.push({id: m[1], file: n, line: i + 1});
+    });
+  rows.sort((a, b) => a.id.localeCompare(b.id));
+  v.innerHTML = `<h2>結局</h2><div class="sub">全部的 @achieve，共 ${rows.length} 處。</div>` +
+    rows.map(r => `<div class="row"><span class="tag t-end">${r.id}</span>
+      <span class="jump" onclick="select('${r.file}')">${r.file}</span>
+      <span class="txt">第 ${r.line} 行</span></div>`).join('');
+}
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+</script>
