@@ -64,6 +64,19 @@
         margin:0 8px 8px 0}
   .stat b{color:var(--gold);font-size:18px}
   .empty{color:var(--dim);padding:28px 0}
+  .scene{border:1px solid var(--line);border-radius:10px;margin-bottom:16px;overflow:hidden}
+  .scene .stage{position:relative;aspect-ratio:16/9;background:#0d0c11;overflow:hidden}
+  .scene .stage img{width:100%;height:100%;object-fit:cover;display:block}
+  .scene .noimg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+        color:#4d4960;font-size:13px}
+  .actor{position:absolute;bottom:8%;transform:translateX(-50%);text-align:center}
+  .actor .card{background:rgba(20,19,26,.82);border:1px solid var(--gold);border-radius:8px;
+        padding:6px 12px;font-size:13px;white-space:nowrap}
+  .actor .pos{color:var(--dim);font-size:10px;margin-top:3px}
+  .scene .bar{display:flex;gap:8px;align-items:center;padding:8px 12px;background:#221f2c;
+        flex-wrap:wrap;font-size:12px}
+  .scene .bar .ln{color:#54506a;font-family:ui-monospace,Consolas,monospace}
+  .scene .line{padding:6px 12px 10px;color:var(--dim);font-size:13px}
 </style>
 
 <div id="drop">
@@ -89,6 +102,7 @@
       <button data-tab="outline" class="on">結構</button>
       <button data-tab="issues">檢查</button>
       <button data-tab="affinity">好感總覽</button>
+      <button data-tab="scenes">場景</button>
       <button data-tab="endings">結局</button>
     </div>
     <div id="view"></div>
@@ -100,6 +114,8 @@ const CHAR = {affinity_Eup:'優菲', affinity_Mel:'梅爾', affinity_Ved:'薇狄
               affinity_Nel:'涅莉', affinity_Syb:'西碧兒'};
 // 產生資料版時，build_viewer.py 會把下面這行換成真的資料（見 tools/build_viewer.py）
 const EMBEDDED = null;
+// 背景與音樂的檔案路徑（build_viewer.py 從 EditorResources 對出來的）
+const ASSETS = null;
 
 let scripts = {};      // name -> {name, lines}
 let issues = [];
@@ -298,6 +314,7 @@ function render() {
   if (tab === 'issues') return renderIssues(v);
   if (tab === 'affinity') return renderAffinity(v);
   if (tab === 'endings') return renderEndings(v);
+  if (tab === 'scenes') return renderScenes(v);
   renderOutline(v);
 }
 
@@ -378,16 +395,85 @@ function renderEndings(v) {
       <span class="txt">第 ${r.line} 行</span></div>`).join('');
 }
 
-// 內建資料版：打開就直接進畫面
+
+// ── 場景：把一支腳本攤成一連串畫面 ──────────────────────
+// 逐行模擬 @back / @bgm / @char / @hide，每次「背景或在場的人變了」就切一張卡。
+function renderScenes(v) {
+  const sc = scripts[current];
+  if (!sc) return v.innerHTML = '<div class="empty">左邊選一支腳本</div>';
+  if (!ASSETS) return v.innerHTML =
+    '<div class="empty">場景預覽需要「已載入」的版本（背景與音樂的路徑要先對好）。<br>' +
+    '在專案根目錄跑：python tools/build_viewer.py</div>';
+
+  const shots = [];
+  let back = null, bgm = null, actors = new Map(), pending = false, firstLine = 1, talk = '';
+
+  const flush = () => {
+    if (!pending) return;
+    shots.push({back, bgm, actors: [...actors.entries()], line: firstLine, talk});
+    pending = false; talk = '';
+  };
+
+  sc.lines.forEach((raw, i) => {
+    const t = raw.trim(), no = i + 1;
+    if (!t || t.startsWith(';')) return;
+    let m;
+
+    if ((m = t.match(/^@back (\S+)/))) {
+      flush(); back = m[1].split(',')[0]; firstLine = no; pending = true;
+    }
+    else if ((m = t.match(/^@bgm (\S+)/))) { bgm = m[1]; pending = true; if (!firstLine) firstLine = no; }
+    else if (/^@stopBgm/.test(t)) { bgm = null; }
+    else if ((m = t.match(/^@char (\S+)/))) {
+      const id = m[1].split('.')[0].split(',')[0];
+      const p = t.match(/pos:(\d+)/);
+      const before = actors.get(id);
+      actors.set(id, p ? +p[1] : (before !== undefined ? before : 50));
+      if (!pending) { firstLine = no; pending = true; }
+    }
+    else if ((m = t.match(/^@hide (\S+)/))) {
+      m[1].split(',').forEach(x => actors.delete(x.trim().split('.')[0]));
+    }
+    else if (/^@hideChars/.test(t)) { actors.clear(); }
+    else if (!t.startsWith('@') && !t.startsWith('#') && !talk) {
+      talk = t.length > 60 ? t.slice(0, 60) + '…' : t;
+      if (pending) flush();
+    }
+  });
+  flush();
+
+  v.innerHTML = '<h2>' + sc.name + '</h2><div class="sub">' + shots.length +
+    ' 個畫面。人物先用名牌表示站位（pos 就是畫面的水平百分比）。</div>' +
+    shots.map(s => {
+      // @back 有時會帶轉場（bg01.CloudReveal），對不到就退一步用點號前面那段
+      const src = ASSETS.backgrounds[s.back] ||
+                  (s.back ? ASSETS.backgrounds[s.back.split('.')[0]] : null);
+      const audio = ASSETS.audio[s.bgm];
+      return '<div class="scene"><div class="stage">' +
+        (src ? '<img loading="lazy" src="' + src + '">'
+             : '<div class="noimg">' + (s.back ? '找不到背景　' + esc(s.back) : '（沒有指定背景）') + '</div>') +
+        s.actors.map(([id, pos]) =>
+          '<div class="actor" style="left:' + pos + '%">' +
+          '<div class="card">' + esc(id) + '</div><div class="pos">pos ' + pos + '</div></div>').join('') +
+        '</div><div class="bar"><span class="ln">' + s.line + ' 行</span>' +
+        '<span class="tag t-map">' + esc(s.back || '—') + '</span>' +
+        (s.bgm ? '<span class="tag t-choice">♪ ' + esc(s.bgm) + '</span>' : '') +
+        (audio ? '<audio controls preload="none" style="height:26px" src="' + audio + '"></audio>' : '') +
+        '</div>' + (s.talk ? '<div class="line">' + esc(s.talk) + '</div>' : '') + '</div>';
+    }).join('');
+}
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+
+// 內建資料版（build_viewer.py 產生）：打開就直接進畫面，不用拖檔案
 if (EMBEDDED) {
-  for (const name in EMBEDDED) scripts[name] = {name, lines: EMBEDDED[name].split(/?
-/)};
+  for (const name in EMBEDDED)
+    scripts[name] = {name, lines: EMBEDDED[name].split(/\r?\n/)};
   check();
   drop.classList.add('hide');
   document.getElementById('app').classList.add('show');
   renderList();
   select(Object.keys(scripts).sort()[0]);
 }
-
-const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 </script>

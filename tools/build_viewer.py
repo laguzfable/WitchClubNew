@@ -19,9 +19,59 @@ for path in sorted(glob.glob(SCRIPTS)):
     name = os.path.splitext(os.path.basename(path))[0]
     data[name] = io.open(path, encoding='utf-8-sig', errors='ignore').read()
 
+
+def build_assets():
+    """把 EditorResources 裡的背景與音樂對到實際檔案，路徑寫成 tools/ 的相對路徑。
+
+    Naninovel 只記 guid，所以要掃一遍 .meta 才知道 guid 是哪個檔案。
+    """
+    import re
+
+    guid_to_file = {}
+    for root, _dirs, files in os.walk(os.path.join(ROOT, 'Assets')):
+        for f in files:
+            if not f.endswith('.meta'):
+                continue
+            full = os.path.join(root, f)
+            try:
+                text = io.open(full, encoding='utf-8', errors='ignore').read()
+            except OSError:
+                continue
+            m = re.search(r'guid: (\w+)', text)
+            if m:
+                guid_to_file[m.group(1)] = full[:-5]
+
+    res = io.open(os.path.join(ROOT, 'Assets', 'NaninovelData', 'EditorResources.asset'),
+                  encoding='utf-8', errors='ignore').read()
+
+    backs, audio = {}, {}
+    pattern = r'- name: (\S+)\s+pathPrefix: (\S+)\s+guid: (\w+)'
+    for m in re.finditer(pattern, res):
+        name, prefix, guid = m.groups()
+        path = guid_to_file.get(guid)
+        if not path:
+            continue
+        rel = os.path.relpath(path, os.path.join(ROOT, 'tools')).replace(os.sep, '/')
+        name = name.strip('"')
+        if prefix.startswith('Backgrounds'):
+            # 劇本裡 CG 是寫 @back CG/cg01，但 EditorResources 只記 cg01，
+            # 前綴在 pathPrefix 那邊（Backgrounds/MainBackground/CG），要補回去
+            sub = prefix.split('MainBackground/')[-1] if 'MainBackground/' in prefix else ''
+            backs[(sub + '/' + name) if sub else name] = rel
+        elif prefix == 'Audio':
+            audio[name] = rel
+
+    return {'backgrounds': backs, 'audio': audio}
+
+
+assets = build_assets()
+print(f"背景 {len(assets['backgrounds'])} 張、音樂 {len(assets['audio'])} 首")
+
 html = io.open(SRC, encoding='utf-8').read()
 blob = json.dumps(data, ensure_ascii=False).replace('</', r'<\/')  # 避免提早關掉 <script>
 html = html.replace('const EMBEDDED = null;', 'const EMBEDDED = ' + blob + ';', 1)
+html = html.replace('const ASSETS = null;',
+                    'const ASSETS = ' + json.dumps(assets, ensure_ascii=False) + ';', 1)
 
 io.open(OUT, 'w', encoding='utf-8', newline='').write(html)
 print(f'{len(data)} 支腳本 → {OUT}')

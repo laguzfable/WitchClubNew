@@ -82,7 +82,7 @@ public class AffinityChoicePanel : MonoBehaviour
         /// </summary>
         public bool UseNaninovelDialogue;
 
-        /// <summary>Naninovel 模式要切的背景 ID，例如 stardust1。留空＝不動背景。</summary>
+        /// <summary>Naninovel 模式要切的背景 ID，例如 star1。留空＝不動背景。</summary>
         public string Background;
 
         /// <summary>Naninovel 模式要不要把角色叫出來（@char）。留空＝只有聲音沒有立繪。</summary>

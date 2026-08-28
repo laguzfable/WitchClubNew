@@ -110,8 +110,8 @@ public class BranchMapUI : CustomUI
              "取消＝用程式自己畫的簡易對話框。引擎沒起來時一律走簡易版。")]
     public bool stardustUseNaninovelDialogue = true;
 
-    [Tooltip("星塵講話時要切的背景 ID（chapter5 用的是 stardust1）。留空＝不動背景")]
-    public string stardustBackground = "stardust1";
+    [Tooltip("星塵講話時要切的背景 ID（那張星空是 star1，不是檔名的 stardust1）。留空＝不動背景")]
+    public string stardustBackground = "star1";
 
     [Tooltip("要不要把星塵的立繪叫出來（@char）。留空＝只有台詞沒有立繪")]
     public string stardustCharacterId = "星塵";
