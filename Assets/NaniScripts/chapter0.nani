@@ -85,7 +85,7 @@
 紅髮女子: 七彩駱駝的睫毛嗎？我早說過那個戴起來不適合妳了。
 ？？？: 比那個厲害多了！
 紅髮女子: 還會是什麼？不會是妳上次說一直很想要的邪神的嘔吐物吧？
-@choice 全猜錯了，她買的是我。 set:affinity_Eup=affinity_Eup+5
+@choice 全猜錯了，她買的是我。 set:affinity_Eup=affinity_Eup+10
 @stop
 @stopBgm
 @bgm happy
@@ -106,7 +106,7 @@
 @spawn Dust
 @sfx mist2 loop:false
 優菲.smile: 太好吃了。
-@choice 我也要、我也要！ set:affinity_Ved=affinity_Ved+5
+@choice 我也要、我也要！ set:affinity_Ved=affinity_Ved+20
 @stop
 梅爾.scared: 啊啊啊－－它又講話了！
 @char 薇狄亞.smile pos:55

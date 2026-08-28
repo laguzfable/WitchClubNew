@@ -1,9 +1,7 @@
 @visitNode id:chapter3
-@set affinity_Mel=0
-@set affinity_Ved=0
-@set affinity_Eup=0
-@set affinity_Nel=0
-@set affinity_Syb=0
+; 這裡本來會把五個好感歸零，拿掉了——那會把序章到第二章的選擇全部作廢。
+; 初始化在別的地方做：正常開局是 chapter0 開頭那五行，
+; 從蝕之聖典跳進來則是 NodeButton.ResetAffinities（進節點時一律先歸零）。
 @back bg01
 @stopBgm
 @bgm peace
