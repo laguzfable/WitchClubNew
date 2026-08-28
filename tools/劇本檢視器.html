@@ -71,8 +71,12 @@
   .scene .stage img{width:100%;height:100%;object-fit:cover;display:block}
   .scene .noimg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
         color:#4d4960;font-size:13px}
-  .actor{position:absolute;bottom:8%;transform:translateX(-50%);text-align:center;
-        max-width:32%}
+  .actor{position:absolute;bottom:8%;transform:translateX(-50%);text-align:center}
+  .actor:hover,.actor:focus-within{z-index:8}
+  .actor .pos.clash{color:var(--red)}
+  /* 人多的時候整個縮一號，擠得下 */
+  .actor.tight .card{padding:2px 4px;font-size:10px}
+  .actor.tight .pos{font-size:8px}
   .actor .card{background:rgba(20,19,26,.85);border:1px solid var(--gold);border-radius:6px;
         padding:3px 7px;font-size:11px;white-space:nowrap;line-height:1.4;
         overflow:hidden;text-overflow:ellipsis}
@@ -102,8 +106,11 @@
   .scene .addch button{background:#1b1925;color:var(--dim);border:1px dashed var(--line);
     border-radius:5px;font-size:11px;padding:2px 8px;cursor:pointer}
   .scene .addch button:hover{color:var(--gold);border-color:var(--gold)}
-  .scene .expr{display:block;margin-top:2px;width:100%;max-width:100%;font-size:10px;
+  /* 表情選單平常收起來，不然名牌會被它撐寬、彼此蓋住 */
+  .actor .expr{position:absolute;left:50%;transform:translateX(-50%);top:100%;margin-top:2px;
+    width:118px;font-size:10px;display:none;
     background:#1b1925;color:var(--dim);border:1px solid var(--line);border-radius:4px}
+  .actor:hover .expr,.actor:focus-within .expr{display:block}
   .scene .expr.inline{display:inline-block;margin:0 6px 0 0;vertical-align:baseline;max-width:120px}
   .scene .edit{outline:none;border-bottom:1px dashed transparent;cursor:text}
   .scene .edit:hover{border-bottom-color:var(--line)}
@@ -582,6 +589,14 @@ const EVENT_NAME = {choice:'選項', goto:'跳轉', battle:'戰鬥', restroom:'�
                     SaveReturnPoint:'存返回點', saveMapDayNight:'存日夜',
                     unlockCardVariant:'解卡', GotoChangeRune:'換符文'};
 
+// 這個名牌能有多寬：取左右鄰居距離的一半再留點縫，最寬 32%
+function gapAt(actors, i) {
+  const p = actors[i][1];
+  const left = i > 0 ? p - actors[i - 1][1] : 100;
+  const right = i < actors.length - 1 ? actors[i + 1][1] - p : 100;
+  return Math.max(12, Math.min(32, Math.floor(Math.min(left, right) * 0.9)));
+}
+
 function renderScenes(v) {
   const sc = scripts[current];
   if (!sc) return v.innerHTML = '<div class="empty">左邊選一支腳本</div>';
@@ -618,7 +633,11 @@ function renderScenes(v) {
         (src ? '<img loading="lazy" src="' + src + '">'
              : '<div class="noimg">' + (s.back ? '找不到背景　' + esc(s.back) : '（沒有指定背景）') + '</div>') +
         s.actors.map(([id, pos, line, app], i) =>
-          '<div class="actor" style="left:' + pos + '%" data-line="' + line +
+          // 人越多名牌越窄，這樣才不會互相蓋住又不用把它們排成階梯
+          // 名牌寬度看的是左右鄰居離多遠，不是人數——
+          // 兩個人站 40/60 也會擠，人數少不代表寬得下
+          '<div class="actor' + (gapAt(s.actors, i) < 24 ? ' tight' : '') +
+          '" style="left:' + pos + '%;max-width:' + gapAt(s.actors, i) + '%" data-line="' + line +
           '" data-pos="' + pos + '" data-id="' + esc(id) + '">' +
           '<div class="card">' + esc(id) +
             '<span class="x" title="' + (s.fresh.includes(id)
@@ -628,7 +647,11 @@ function renderScenes(v) {
             ' onclick="removeActor(&quot;' + esc(id) + '&quot;,' + line + ',' +
             s.fresh.includes(id) + ',' + s.line + ')">×</span>' +
           '</div>' +
-          '<div class="pos" title="左邊數來第 ' + (i + 1) + ' 位">pos ' + pos +
+          '<div class="pos' +
+            (s.actors.filter(o => Math.abs(o[1] - pos) < 6).length > 1 ? ' clash' : '') +
+            '" title="左邊數來第 ' + (i + 1) + ' 位' +
+            (s.actors.filter(o => Math.abs(o[1] - pos) < 6).length > 1
+              ? '。這一幕有人站在同一個位置，遊戲裡會疊在一起' : '') + '">pos ' + pos +
             (app ? '　' + esc(EXPR_ZH[app] || app) : '') + '</div>' +
             exprPicker(id, app, line, s.line) + '</div>').join('') +
         '</div>' +
@@ -680,7 +703,6 @@ function renderScenes(v) {
     }).join('') + '</div>';
 
   wireDragging();
-  destack();
 }
 
 // ── 選項 ──────────────────────────────────────────────
@@ -945,25 +967,6 @@ function applySlots(order, shotLine) {
 
   dirty.add(sc.name);
   render();
-}
-
-// 名牌會撞在一起（人多、名字長、又掛了表情選單）。
-// 位置是劇本決定的不能亂動，所以改成往上疊：撞到的排到上一列去。
-function destack() {
-  document.querySelectorAll('.scene .stage').forEach(stage => {
-    const els = [...stage.querySelectorAll('.actor')]
-      .sort((a, b) => a.getBoundingClientRect().left - b.getBoundingClientRect().left);
-    const rowRight = [];
-    els.forEach(el => {
-      el.style.transform = '';
-      const r = el.getBoundingClientRect();
-      let row = rowRight.findIndex(right => r.left > right + 6);
-      if (row < 0) { row = rowRight.length; rowRight.push(0); }
-      rowRight[row] = r.right;
-      // 用 transform 不用 bottom：bottom 的 calc(% + px) 在這裡會被瀏覽器丟掉
-      el.style.transform = 'translateX(-50%) translateY(' + (-row * (el.offsetHeight + 4)) + 'px)';
-    });
-  });
 }
 
 function wireDragging() {
