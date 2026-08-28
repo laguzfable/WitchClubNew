@@ -239,6 +239,9 @@ function check() {
   for (const n in scripts) labels[n] = labelsOf(scripts[n]);
 
   for (const n in scripts) {
+    // 備份和測試檔不檢查——它們本來就是半成品，報出來只會蓋掉真的問題
+    if (/備份|^Test|^111|^222|Test$/.test(n)) continue;
+
     const s = scripts[n], lab = labels[n], seen = new Set();
 
     s.lines.forEach((raw, i) => {
@@ -269,6 +272,14 @@ function check() {
         if (!txt.startsWith('"') && txt.includes(' '))
           bad(n, no, '選項文字有半形空格，畫面上會被截斷（用半形引號包起來）', true);
       }
+      // @char 叫了沒註冊的角色 → 那個人不會出現在畫面上
+      const ch = t.match(/^@char (\S+)/);
+      if (ch && ASSETS && ASSETS.characters) {
+        const id = ch[1].split('.')[0].split(',')[0];
+        if (!ASSETS.characters.includes(id))
+          bad(n, no, '角色「' + id + '」沒有註冊，這行叫不出人來');
+      }
+
       const w = t.match(/affinity_(\w+)=affinity_(\w+)\+/);
       if (w && w[1] !== w[2]) bad(n, no, `加錯人了：affinity_${w[1]} 被設成 affinity_${w[2]} 的值`);
     });

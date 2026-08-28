@@ -7,7 +7,9 @@
 改過劇本之後重跑一次就好。原本那支 劇本檢視器.html 不會被動到，
 它仍然是「拖資料夾進去」的通用版。
 """
-import glob, io, json, os
+import codecs, glob, io, json, os
+
+BACKSLASH = chr(92)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, 'tools', '劇本檢視器.html')
@@ -44,10 +46,20 @@ def build_assets():
     res = io.open(os.path.join(ROOT, 'Assets', 'NaninovelData', 'EditorResources.asset'),
                   encoding='utf-8', errors='ignore').read()
 
-    backs, audio = {}, {}
+    def unescape(x):
+        # EditorResources 把中文寫成 uXXXX 逃脫碼，還原回來才對得上劇本裡的 @char
+        x = x.strip('"')
+        if BACKSLASH + 'u' in x:
+            try:
+                return codecs.decode(x, 'unicode_escape')
+            except Exception:
+                return x
+        return x
+
+    backs, audio, chars = {}, {}, set()
     pattern = r'- name: (\S+)\s+pathPrefix: (\S+)\s+guid: (\w+)'
     for m in re.finditer(pattern, res):
-        name, prefix, guid = m.groups()
+        name, prefix, guid = (unescape(g) for g in m.groups())
         path = guid_to_file.get(guid)
         if not path:
             continue
@@ -60,8 +72,13 @@ def build_assets():
             backs[(sub + '/' + name) if sub else name] = rel
         elif prefix == 'Audio':
             audio[name] = rel
+        elif prefix == 'Characters':
+            chars.add(name)
+        elif prefix.startswith('Characters/'):
+            # 多外觀的角色：id 在前綴後面，name 是外觀
+            chars.add(prefix.split('Characters/', 1)[1])
 
-    return {'backgrounds': backs, 'audio': audio}
+    return {'backgrounds': backs, 'audio': audio, 'characters': sorted(chars)}
 
 
 assets = build_assets()
