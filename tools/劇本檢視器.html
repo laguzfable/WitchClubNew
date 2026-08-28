@@ -94,6 +94,23 @@
   .scene .lines .ln,.scene .evs .ln{display:inline-block;min-width:38px;color:#54506a;
     font-family:ui-monospace,Consolas,monospace}
   .scene .lab{color:var(--gold);font-size:11px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:10px 0 22px}
+  .grid.wide{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+  .ass{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#1b1925}
+  .ass img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
+  .ass img.mob{aspect-ratio:1;object-fit:contain;background:#100f16}
+  .ass audio{width:100%;height:30px;margin-top:6px}
+  .ass .an{padding:4px 7px 0;font-size:12px;word-break:break-all}
+  .ass .au{padding:0 7px 5px;font-size:10px;color:#6b6685}
+  .ass.unused{opacity:.42}
+  .miss{border:1px solid var(--red);border-radius:8px;padding:7px 10px;margin:8px 0;
+    color:#e0a0a8;font-size:12px}
+  .chars{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;margin:10px 0 22px}
+  .cha{display:flex;gap:9px;border:1px solid var(--line);border-radius:8px;padding:8px;background:#1b1925}
+  .cha img{width:86px;height:86px;object-fit:contain;background:#100f16;border-radius:5px}
+  .cha b{font-size:13px;margin-right:6px}
+  .exs{margin-top:5px;display:flex;flex-wrap:wrap;gap:3px}
+  .ex{font-size:10px;color:var(--dim);background:#241f30;border-radius:4px;padding:1px 5px}
   .scene .ch{display:inline-flex;gap:4px;align-items:center;flex-wrap:wrap}
   .scene .ch input,.scene .ch select{background:#1b1925;color:#cfc9e6;font-size:11px;
     border:1px solid var(--line);border-radius:4px;padding:1px 3px}
@@ -166,6 +183,7 @@
       <button data-tab="affinity">好感總覽</button>
       <button data-tab="scenes">場景</button>
       <button data-tab="endings">結局</button>
+      <button data-tab="assets">資源</button>
     </div>
     <div id="view"></div>
   </main>
@@ -401,6 +419,7 @@ function render() {
   if (tab === 'affinity') return renderAffinity(v);
   if (tab === 'endings') return renderEndings(v);
   if (tab === 'scenes') return renderScenes(v);
+  if (tab === 'assets') return renderAssets(v);
   renderOutline(v);
 }
 
@@ -601,6 +620,71 @@ function gapAt(actors, i) {
   const left = i > 0 ? p - actors[i - 1][1] : 100;
   const right = i < actors.length - 1 ? actors[i + 1][1] - p : 100;
   return Math.max(12, Math.min(32, Math.floor(Math.min(left, right) * 0.9)));
+}
+
+// ── 資源清單 ────────────────────────────────────────
+// 有哪些背景、音樂、怪物、角色跟表情，一頁看完。
+// 順便標出劇本裡用到、但檔案找不到的（那些在遊戲裡會是黑畫面或沒聲音）。
+function usedIn(re) {
+  const used = {};
+  for (const n in scripts)
+    scripts[n].lines.forEach((l, i) => {
+      const m = l.trim().match(re);
+      if (m) (used[m[1]] = used[m[1]] || []).push(n + ':' + (i + 1));
+    });
+  return used;
+}
+
+function renderAssets(v) {
+  if (!ASSETS) return v.innerHTML =
+    '<div class="empty">資源清單需要「已載入」的版本。<br>在專案根目錄跑：python tools/build_viewer.py</div>';
+
+  const usedBack = usedIn(/^@back (\S+)/), usedBgm = usedIn(/^@bgm (\S+)/),
+        usedMob = usedIn(/^@battle .*?target:(\S+)/);
+
+  const card = (name, inner, used, extra) =>
+    '<div class="ass' + (used && !used[name] ? ' unused' : '') + '">' + inner +
+    '<div class="an">' + esc(name) + '</div>' +
+    (extra ? '<div class="ax">' + extra + '</div>' : '') +
+    (used ? '<div class="au">' + (used[name] ? used[name].length + ' 處用到' : '沒有用到') + '</div>' : '') +
+    '</div>';
+
+  const missing = (used, have, what) => {
+    const bad = Object.keys(used).filter(k => !have[k] && !have[k.split('.')[0]]);
+    return bad.length ? '<div class="miss">劇本裡用到但找不到檔案的' + what + '：' +
+      bad.map(b => esc(b) + '（' + used[b][0] + ' 等 ' + used[b].length + ' 處）').join('、') + '</div>' : '';
+  };
+
+  const sec = (title, sub, body) =>
+    '<h2>' + title + '</h2><div class="sub">' + sub + '</div>' + body;
+
+  v.innerHTML =
+    sec('背景', Object.keys(ASSETS.backgrounds).length + ' 張。灰的是劇本裡沒用到的。',
+      missing(usedBack, ASSETS.backgrounds, '背景') +
+      '<div class="grid">' + Object.entries(ASSETS.backgrounds).map(([n, src]) =>
+        card(n, '<img loading="lazy" src="' + src + '">', usedBack)).join('') + '</div>') +
+
+    sec('音樂', Object.keys(ASSETS.audio).length + ' 首。按 ▶ 直接聽。',
+      missing(usedBgm, ASSETS.audio, '音樂') +
+      '<div class="grid wide">' + Object.entries(ASSETS.audio).map(([n, src]) =>
+        card(n, '<audio controls preload="none" src="' + src + '"></audio>', usedBgm)).join('') + '</div>') +
+
+    sec('怪物', Object.keys(ASSETS.monsters || {}).length + ' 隻。@battle 的 target 就是這些名字。',
+      missing(usedMob, ASSETS.monsters || {}, '怪物') +
+      '<div class="grid">' + Object.entries(ASSETS.monsters || {}).map(([n, src]) =>
+        card(n, '<img loading="lazy" class="mob" src="' + src + '">', usedMob)).join('') + '</div>') +
+
+    sec('角色與表情',
+      '角色是 Live2D，沒有立繪可以預覽——圖是 prefab 旁邊的貼圖集，只能當個示意。' +
+      '表情就是可以寫在 <code>@char 涅莉.happy</code> 或 <code>涅莉.happy: 台詞</code> 的那些名字。',
+      '<div class="chars">' + Object.entries(ASSETS.expressions || {})
+        .sort((a, b) => b[1].length - a[1].length).map(([id, list]) =>
+        '<div class="cha">' +
+          ((ASSETS.atlas || {})[id] ? '<img loading="lazy" src="' + ASSETS.atlas[id] + '">' : '') +
+          '<div><b>' + esc(id) + '</b><span class="au">' + list.length + ' 種表情</span>' +
+          '<div class="exs">' + list.map(e =>
+            '<span class="ex" title="' + esc(e) + '">' + esc(EXPR_ZH[e] || e) + '</span>').join('') +
+          '</div></div></div>').join('') + '</div>');
 }
 
 function renderScenes(v) {

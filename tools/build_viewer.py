@@ -10,6 +10,7 @@
 import codecs, glob, io, json, os
 
 BACKSLASH = chr(92)
+char_prefab = {}
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, 'tools', '劇本檢視器.html')
@@ -57,6 +58,7 @@ def build_assets():
         return x
 
     backs, audio, chars, exprs = {}, {}, set(), {}
+    char_prefab.clear()
     pattern = r'- name: (\S+)\s+pathPrefix: (\S+)\s+guid: (\w+)'
     for m in re.finditer(pattern, res):
         name, prefix, guid = (unescape(g) for g in m.groups())
@@ -78,6 +80,7 @@ def build_assets():
             # 表情＝角色 prefab 旁邊那些 .anim（Live2D 的動作檔）。
             # 靜圖角色（那些女巫 png）沒有表情可挑，就不要給選單。
             if path.endswith('.prefab'):
+                char_prefab[cid] = path
                 folder = os.path.dirname(path)
                 exprs[cid] = sorted(f[:-5] for f in os.listdir(folder) if f.endswith('.anim'))
 
@@ -85,9 +88,43 @@ def build_assets():
             'characters': sorted(chars), 'expressions': exprs}
 
 
+def build_extra():
+    """戰鬥用的圖跟 Naninovel 的資源是兩套：怪物和對戰背景走 Resources.Load，
+    所以要另外掃 Assets/Resources。角色是 Live2D，沒有立繪可以預覽，
+    只能拿 prefab 旁邊的貼圖集當個示意。"""
+    def folder(sub, exts=('.png', '.jpg')):
+        d = os.path.join(ROOT, 'Assets', 'Resources', sub)
+        out = {}
+        if os.path.isdir(d):
+            for f in sorted(os.listdir(d)):
+                if f.lower().endswith(exts):
+                    out[os.path.splitext(f)[0]] = os.path.relpath(
+                        os.path.join(d, f), os.path.join(ROOT, 'tools')).replace(os.sep, '/')
+        return out
+
+    atlas = {}
+    for cid, path in char_prefab.items():
+        # Live2D 的貼圖有兩種放法：資料夾裡的 TextureAtlas.png，
+        # 或是 <prefab名>.2048/texture_00.png。名字最接近 prefab 的那張優先。
+        d = os.path.dirname(path)
+        stem = os.path.splitext(os.path.basename(path))[0].lower()
+        found = []
+        for root, _dirs, files in os.walk(d):
+            for f in files:
+                if f.lower().endswith('.png'):
+                    found.append(os.path.join(root, f))
+        if not found:
+            continue
+        found.sort(key=lambda f: (stem not in os.path.basename(os.path.dirname(f)).lower(), len(f)))
+        atlas[cid] = os.path.relpath(found[0], os.path.join(ROOT, 'tools')).replace(os.sep, '/')
+
+    return {'monsters': folder('monsters'), 'battleBacks': folder('background'), 'atlas': atlas}
+
+
 assets = build_assets()
+assets.update(build_extra())
 print(f"背景 {len(assets['backgrounds'])} 張、音樂 {len(assets['audio'])} 首、"
-      f"{len(assets['expressions'])} 個角色有表情")
+      f"{len(assets['expressions'])} 個角色有表情、怪物 {len(assets['monsters'])} 隻")
 
 html = io.open(SRC, encoding='utf-8').read()
 blob = json.dumps(data, ensure_ascii=False).replace('</', r'<\/')  # 避免提早關掉 <script>
