@@ -102,7 +102,7 @@
   .scene .chraw{color:#7d7898;font-size:10px}
   .scene .ch .x{cursor:pointer;color:#7d7898;padding:0 3px}
   .scene .ch .x:hover{color:#e06c75}
-  .scene .addch{padding:4px 0 2px}
+  .scene .addch{padding:5px 9px 8px;display:flex;gap:6px}
   .scene .addch button{background:#1b1925;color:var(--dim);border:1px dashed var(--line);
     border-radius:5px;font-size:11px;padding:2px 8px;cursor:pointer}
   .scene .addch button:hover{color:var(--gold);border-color:var(--gold)}
@@ -522,7 +522,11 @@ function sceneShots(sc) {
 
   sc.lines.forEach((raw, i) => {
     const t = raw.trim(), no = i + 1;
-    if (!t || t.startsWith(';')) return;
+    if (t.startsWith(';')) return;
+    if (!t) {                       // 空行：只有在一幕裡面才留著，新寫的台詞要看得到
+      if (pending) { talks.push({line: no, text: '', who: '', app: ''}); talked = true; }
+      return;
+    }
     let m;
     if (t.startsWith('#')) { flush(); label = t.slice(1).trim(); return; }
     if ((m = t.match(/^@back (\S+)/))) {
@@ -693,16 +697,64 @@ function renderScenes(v) {
             'if(event.key===&quot;Escape&quot;){this.textContent=this.dataset.was;this.blur()}"' +
             ' onfocus="this.dataset.was=this.textContent">' + esc(x.text) + '</span></div>').join('') +
           '</div>' : '') +
-        (s.events.length || s.talks.length ? '<div class="evs">' + s.events.map(x =>
+        (s.events.length ? '<div class="evs">' + s.events.map(x =>
             '<div><span class="ln">' + x.line + '</span><span class="tag t-' + x.kind + '">' +
             (EVENT_NAME[x.kind] || x.kind) + '</span>' +
             (x.kind === 'choice' ? choiceRow(x) : esc(x.text)) + '</div>').join('') +
-          '<div class="addch"><button onclick="addChoice(' + s.insertAt + ')">＋ 加一個選項</button></div>' +
           '</div>' : '') +
+        '<div class="addch">' +
+          '<button onclick="addTalk(' + s.line + ')">＋ 台詞</button>' +
+          '<button onclick="addChoice(' + s.insertAt + ')">＋ 選項</button>' +
+          '<button onclick="addShot(' + s.line + ')" title="在這一幕後面另起一幕（換背景）">＋ 新的一幕</button>' +
+        '</div>' +
       '</div>';
     }).join('') + '</div>';
 
   wireDragging();
+}
+
+// ── 寫東西進去 ──────────────────────────────────────
+// 這一幕的範圍：從第一行到下一幕開始之前
+function shotEnd(shotLine) {
+  const sc = scripts[current];
+  const next = sceneShots(sc).find(s => s.line > shotLine);
+  return next ? next.line - 1 : sc.lines.length;
+}
+
+// 加一句台詞。接在這一幕最後一句後面，說話者沿用上一句的，
+// 這樣連著寫下去不用每次都打名字。
+function addTalk(shotLine) {
+  const sc = scripts[current];
+  const shot = sceneShots(sc).find(s => s.line === shotLine);
+  const last = shot && shot.talks.length ? shot.talks[shot.talks.length - 1] : null;
+  const who = last ? (last.who || '') : '';
+  const at = last ? last.line : shotEnd(shotLine);
+
+  sc.lines.splice(at, 0, who ? who + ': ' : '');
+  dirty.add(sc.name); check(); render();
+  focusLine(at + 1);
+}
+
+// 另起一幕：插一行 @back（先沿用現在的背景）跟一句空台詞
+function addShot(shotLine) {
+  const sc = scripts[current];
+  const shot = sceneShots(sc).find(s => s.line === shotLine);
+  const at = shotEnd(shotLine);
+  sc.lines.splice(at, 0, '@back ' + (shot && shot.back ? shot.back : 'bg01'), '');
+  dirty.add(sc.name); check(); render();
+  focusLine(at + 2);
+}
+
+// 新加的那一行捲過去、游標放進去，接著就能打字
+function focusLine(line) {
+  setTimeout(() => {
+    const el = document.querySelector('.edit[data-line="' + line + '"]');
+    if (!el) return;
+    el.scrollIntoView({block: 'center'});
+    el.focus();
+    const r = document.createRange(); r.selectNodeContents(el); r.collapse(false);
+    const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  }, 0);
 }
 
 // ── 選項 ──────────────────────────────────────────────
