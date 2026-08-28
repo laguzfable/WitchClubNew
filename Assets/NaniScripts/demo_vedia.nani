@@ -13,7 +13,7 @@
 @stop
 
 # battle_intro
-薇狄亞.talking: 血月之力不是任何人都能承受的。但既然你來了——讓我讓你嘗嘗。
+薇狄亞.talk: 血月之力不是任何人都能承受的。但既然你來了——讓我讓你嘗嘗。
 
 @hide 薇狄亞
 @set RuneActive=true
@@ -31,7 +31,7 @@
 @char 薇狄亞 pos:50 time:0
 
 薇狄亞.idle: 嗯……相當不錯。
-薇狄亞.talking: 去休息吧。血月魔法的迴響在夢中仍可感受到。
+薇狄亞.talk: 去休息吧。血月魔法的迴響在夢中仍可感受到。
 
 @hide 薇狄亞
 @GotoChangeRune scriptName:demo label:aftermap
