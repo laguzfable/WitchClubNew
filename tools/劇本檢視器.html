@@ -71,10 +71,14 @@
   .scene .stage img{width:100%;height:100%;object-fit:cover;display:block}
   .scene .noimg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
         color:#4d4960;font-size:13px}
-  .actor{position:absolute;bottom:8%;transform:translateX(-50%);text-align:center}
+  .actor{position:absolute;bottom:8%;transform:translateX(-50%);text-align:center;
+        max-width:32%}
   .actor .card{background:rgba(20,19,26,.85);border:1px solid var(--gold);border-radius:6px;
-        padding:3px 7px;font-size:11px;white-space:nowrap;line-height:1.4}
-  .actor .pos{color:var(--dim);font-size:9px;margin-top:2px}
+        padding:3px 7px;font-size:11px;white-space:nowrap;line-height:1.4;
+        overflow:hidden;text-overflow:ellipsis}
+  .actor .pos{color:var(--dim);font-size:9px;margin-top:2px;white-space:nowrap;
+        overflow:hidden;text-overflow:ellipsis}
+  .actor.drag{z-index:9}
   .scene .bar{display:flex;gap:6px;align-items:center;padding:6px 9px;background:#221f2c;
         flex-wrap:wrap;font-size:12px}
   .scene .bar .ln{color:#54506a;font-family:ui-monospace,Consolas,monospace}
@@ -98,7 +102,7 @@
   .scene .addch button{background:#1b1925;color:var(--dim);border:1px dashed var(--line);
     border-radius:5px;font-size:11px;padding:2px 8px;cursor:pointer}
   .scene .addch button:hover{color:var(--gold);border-color:var(--gold)}
-  .scene .expr{display:block;margin-top:2px;max-width:128px;font-size:10px;
+  .scene .expr{display:block;margin-top:2px;width:100%;max-width:100%;font-size:10px;
     background:#1b1925;color:var(--dim);border:1px solid var(--line);border-radius:4px}
   .scene .expr.inline{display:inline-block;margin:0 6px 0 0;vertical-align:baseline;max-width:120px}
   .scene .edit{outline:none;border-bottom:1px dashed transparent;cursor:text}
@@ -624,9 +628,9 @@ function renderScenes(v) {
             ' onclick="removeActor(&quot;' + esc(id) + '&quot;,' + line + ',' +
             s.fresh.includes(id) + ',' + s.line + ')">×</span>' +
           '</div>' +
-          '<div class="pos">第 ' + (i + 1) + ' 位　pos ' + pos +
-            (app ? '　' + esc(EXPR_ZH[app] || app) : '') +
-            exprPicker(id, app, line, s.line) + '</div></div>').join('') +
+          '<div class="pos" title="左邊數來第 ' + (i + 1) + ' 位">pos ' + pos +
+            (app ? '　' + esc(EXPR_ZH[app] || app) : '') + '</div>' +
+            exprPicker(id, app, line, s.line) + '</div>').join('') +
         '</div>' +
 
         '<div class="bar">' +
@@ -676,6 +680,7 @@ function renderScenes(v) {
     }).join('') + '</div>';
 
   wireDragging();
+  destack();
 }
 
 // ── 選項 ──────────────────────────────────────────────
@@ -940,6 +945,25 @@ function applySlots(order, shotLine) {
 
   dirty.add(sc.name);
   render();
+}
+
+// 名牌會撞在一起（人多、名字長、又掛了表情選單）。
+// 位置是劇本決定的不能亂動，所以改成往上疊：撞到的排到上一列去。
+function destack() {
+  document.querySelectorAll('.scene .stage').forEach(stage => {
+    const els = [...stage.querySelectorAll('.actor')]
+      .sort((a, b) => a.getBoundingClientRect().left - b.getBoundingClientRect().left);
+    const rowRight = [];
+    els.forEach(el => {
+      el.style.transform = '';
+      const r = el.getBoundingClientRect();
+      let row = rowRight.findIndex(right => r.left > right + 6);
+      if (row < 0) { row = rowRight.length; rowRight.push(0); }
+      rowRight[row] = r.right;
+      // 用 transform 不用 bottom：bottom 的 calc(% + px) 在這裡會被瀏覽器丟掉
+      el.style.transform = 'translateX(-50%) translateY(' + (-row * (el.offsetHeight + 4)) + 'px)';
+    });
+  });
 }
 
 function wireDragging() {
