@@ -86,6 +86,18 @@
   .scene .lines .ln,.scene .evs .ln{display:inline-block;min-width:38px;color:#54506a;
     font-family:ui-monospace,Consolas,monospace}
   .scene .lab{color:var(--gold);font-size:11px}
+  .scene .ch{display:inline-flex;gap:4px;align-items:center;flex-wrap:wrap}
+  .scene .ch input,.scene .ch select{background:#1b1925;color:#cfc9e6;font-size:11px;
+    border:1px solid var(--line);border-radius:4px;padding:1px 3px}
+  .scene .chtext{min-width:190px}
+  .scene .chamt{width:52px}
+  .scene .chraw{color:#7d7898;font-size:10px}
+  .scene .ch .x{cursor:pointer;color:#7d7898;padding:0 3px}
+  .scene .ch .x:hover{color:#e06c75}
+  .scene .addch{padding:4px 0 2px}
+  .scene .addch button{background:#1b1925;color:var(--dim);border:1px dashed var(--line);
+    border-radius:5px;font-size:11px;padding:2px 8px;cursor:pointer}
+  .scene .addch button:hover{color:var(--gold);border-color:var(--gold)}
   .scene .expr{display:block;margin-top:2px;max-width:128px;font-size:10px;
     background:#1b1925;color:var(--dim);border:1px solid var(--line);border-radius:4px}
   .scene .expr.inline{display:inline-block;margin:0 6px 0 0;vertical-align:baseline;max-width:120px}
@@ -651,13 +663,101 @@ function renderScenes(v) {
             'if(event.key===&quot;Escape&quot;){this.textContent=this.dataset.was;this.blur()}"' +
             ' onfocus="this.dataset.was=this.textContent">' + esc(x.text) + '</span></div>').join('') +
           '</div>' : '') +
-        (s.events.length ? '<div class="evs">' + s.events.map(x =>
+        (s.events.length || s.talks.length ? '<div class="evs">' + s.events.map(x =>
             '<div><span class="ln">' + x.line + '</span><span class="tag t-' + x.kind + '">' +
-            (EVENT_NAME[x.kind] || x.kind) + '</span>' + esc(x.text) + '</div>').join('') + '</div>' : '') +
+            (EVENT_NAME[x.kind] || x.kind) + '</span>' +
+            (x.kind === 'choice' ? choiceRow(x) : esc(x.text)) + '</div>').join('') +
+          '<div class="addch"><button onclick="addChoice(' + s.insertAt + ')">＋ 加一個選項</button></div>' +
+          '</div>' : '') +
       '</div>';
     }).join('') + '</div>';
 
   wireDragging();
+}
+
+// ── 選項 ──────────────────────────────────────────────
+// @choice 文字 set:affinity_Eup=affinity_Eup+5 goto:.label
+// 拆成「文字／加誰的好感／加多少／跳到哪」四格，不用自己記語法。
+function parseChoice(t) {
+  const body = t.replace(/^@choice\s+/, '');
+  const g = body.match(/\sgoto:(\S+)/);
+  const st = body.match(/\sset:(\S+)/);
+  const iff = body.match(/\sif:(\S+)/);
+  let text = body.split(/\s+(?:set:|goto:|if:)/)[0].trim();
+  const quoted = /^".*"$/.test(text);
+  if (quoted) text = text.slice(1, -1);
+  const aff = st ? st[1].match(new RegExp('^(affinity_\\w+)=\\1\\+(\\d+)$')) : null;
+  return {text, quoted, goto: g ? g[1] : '',
+          who: aff ? aff[1] : '', amount: aff ? aff[2] : '',
+          rawSet: st && !aff ? st[1] : '', if: iff ? iff[1] : ''};
+}
+
+function buildChoice(c) {
+  // 選項文字有半形空格一定要用引號包起來，不然畫面上會被截斷
+  const text = (c.quoted || /\s/.test(c.text)) ? '"' + c.text + '"' : c.text;
+  let out = '@choice ' + text;
+  if (c.who && c.amount) out += ' set:' + c.who + '=' + c.who + '+' + c.amount;
+  else if (c.rawSet) out += ' set:' + c.rawSet;
+  if (c.if) out += ' if:' + c.if;
+  if (c.goto) out += ' goto:' + c.goto;
+  return out;
+}
+
+function choiceRow(x) {
+  const c = parseChoice(x.text), sc = scripts[current];
+  const labels = [...labelsOf(sc)].sort();
+  const q = s => String(s).replace(/'/g, "\'");
+
+  return '<span class="ch">' +
+    '<input class="chtext" value="' + esc(c.text) + '" placeholder="選項文字"' +
+      ' onchange="editChoice(' + x.line + ', &quot;text&quot;, this.value)">' +
+    '<select class="chwho" title="選了加誰的好感"' +
+      ' onchange="editChoice(' + x.line + ', &quot;who&quot;, this.value)">' +
+      '<option value="">（不加好感）</option>' +
+      Object.entries(CHAR).map(([k, v]) => '<option value="' + k + '"' +
+        (k === c.who ? ' selected' : '') + '>' + v + '</option>').join('') +
+    '</select>' +
+    (c.who ? '<input class="chamt" type="number" step="5" value="' + esc(c.amount || 5) + '"' +
+      ' title="加多少" onchange="editChoice(' + x.line + ', &quot;amount&quot;, this.value)">' : '') +
+    '<select class="chgoto" title="選了跳到哪個段落"' +
+      ' onchange="editChoice(' + x.line + ', &quot;goto&quot;, this.value)">' +
+      '<option value="">（不跳，往下走）</option>' +
+      (c.goto && !labels.includes(c.goto.replace(/^\./, '')) ?
+        '<option selected value="' + esc(c.goto) + '">' + esc(c.goto) + '（別支腳本）</option>' : '') +
+      labels.map(l => '<option value=".' + esc(l) + '"' +
+        (c.goto === '.' + l ? ' selected' : '') + '>' + esc(l) + '</option>').join('') +
+    '</select>' +
+    (c.rawSet ? '<span class="chraw" title="這個 set 不是單純加好感，我不動它">set:' + esc(c.rawSet) + '</span>' : '') +
+    (c.if ? '<span class="chraw" title="有條件才出現">if:' + esc(c.if) + '</span>' : '') +
+    '<span class="x" title="刪掉這個選項" onclick="delChoice(' + x.line + ')">×</span>' +
+  '</span>';
+}
+
+function editChoice(line, field, value) {
+  const sc = scripts[current], c = parseChoice(sc.lines[line - 1].trim());
+  if (field === 'who') {
+    c.who = value;
+    if (value && !c.amount) c.amount = 5;   // 沒填過就給個預設值
+    if (!value) c.amount = '';
+  } else c[field] = value;
+  const indent = (sc.lines[line - 1].match(/^\s*/) || [''])[0];
+  sc.lines[line - 1] = indent + buildChoice(c);
+  dirty.add(sc.name); check(); render();
+}
+
+function delChoice(line) {
+  const sc = scripts[current];
+  sc.lines.splice(line - 1, 1);
+  dirty.add(sc.name); check(); render();
+}
+
+// 加在這一幕最後一個 @choice 後面；沒有的話就加在這一幕的指令後面
+function addChoice(insertAt) {
+  const sc = scripts[current];
+  let at = insertAt;
+  while (at < sc.lines.length && /^\s*@choice/.test(sc.lines[at])) at++;
+  sc.lines.splice(at, 0, '@choice 新的選項');
+  dirty.add(sc.name); check(); render();
 }
 
 // 表情的中文說明。名字是 Live2D 的動作檔名，光看 blingloop、sighloop
