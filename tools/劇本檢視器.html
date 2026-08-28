@@ -88,6 +88,7 @@
   .scene .lab{color:var(--gold);font-size:11px}
   .scene .expr{display:block;margin-top:2px;max-width:96px;font-size:10px;
     background:#1b1925;color:var(--dim);border:1px solid var(--line);border-radius:4px}
+  .scene .expr.inline{display:inline-block;margin:0 6px 0 0;vertical-align:baseline;max-width:88px}
   .scene .edit{outline:none;border-bottom:1px dashed transparent;cursor:text}
   .scene .edit:hover{border-bottom-color:var(--line)}
   .scene .edit:focus{border-bottom-color:var(--gold);color:#efeaff}
@@ -531,13 +532,14 @@ function sceneShots(sc) {
     else {
       // 表情多半寫在說話者那一行（「優菲.bling: ……」），不是寫在 @char。
       // 這也是畫面變動，所以要另起一幕，不然舞台上會一路是預設表情。
-      const sp = t.match(/^([^\s:@#]+)\.([^\s:]+)\s*:/);
-      if (sp && actors.has(sp[1])) {
+      const sp = t.match(/^([^\s:@#]+?)(?:\.([^\s:]+))?\s*:/);
+      if (sp && sp[2] && actors.has(sp[1])) {
         change(no);
         const a = actors.get(sp[1]);
         actors.set(sp[1], {pos: a.pos, line: a.line, app: sp[2]});
       }
-      talks.push({line: no, text: t}); talked = true;
+      talks.push({line: no, text: t, who: sp ? sp[1] : '', app: sp ? (sp[2] || '') : ''});
+      talked = true;
       if (!pending) { firstLine = no; pending = true; }
     }
   });
@@ -637,6 +639,7 @@ function renderScenes(v) {
         '</div>' +
         (s.talks.length ? '<div class="lines">' + s.talks.map(x =>
             '<div><span class="ln">' + x.line + '</span>' +
+            talkExpr(x) +
             '<span class="edit" contenteditable="true" spellcheck="false" data-line="' + x.line + '"' +
             ' onblur="editLine(' + x.line + ', this)"' +
             ' onkeydown="if(event.key===&quot;Enter&quot;){event.preventDefault();this.blur()}' +
@@ -650,6 +653,27 @@ function renderScenes(v) {
     }).join('') + '</div>';
 
   wireDragging();
+}
+
+// 對白行的表情選單。表情多半是寫在說話者那一行，
+// 所以選單就放在那一句旁邊，不用記得有哪些可以用。
+function talkExpr(x) {
+  const list = (ASSETS.expressions || {})[x.who];
+  if (!list || list.length < 2) return '';
+  return '<select class="expr inline" title="' + esc(x.who) + ' 的表情"' +
+    ' onchange="setTalkExpr(' + x.line + ', this.value)">' +
+    '<option value=""' + (x.app ? '' : ' selected') + '>（沿用）</option>' +
+    list.map(e => '<option' + (e === x.app ? ' selected' : '') + '>' + esc(e) + '</option>').join('') +
+    '</select>';
+}
+
+// 改對白行開頭那個「名字.表情:」。選（沿用）就把表情拿掉。
+function setTalkExpr(line, app) {
+  const sc = scripts[current];
+  sc.lines[line - 1] = sc.lines[line - 1].replace(
+    /^(\s*)([^\s:@#]+?)(?:\.[^\s:]+)?(\s*:)/,
+    (_, indent, who, colon) => indent + who + (app ? '.' + app : '') + colon);
+  dirty.add(sc.name); check(); render();
 }
 
 // 表情選單。ASSETS.expressions 是角色 prefab 旁邊那些 .anim。
