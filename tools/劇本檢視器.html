@@ -79,6 +79,14 @@
         flex-wrap:wrap;font-size:12px}
   .scene .bar .ln{color:#54506a;font-family:ui-monospace,Consolas,monospace}
   .scene .line{padding:5px 9px 8px;color:var(--dim);font-size:12px}
+  .scene .bar audio{height:24px;max-width:150px}
+  .pick{background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:5px;
+        font:inherit;font-size:11px;padding:2px 4px;max-width:110px}
+  .pick:hover{border-color:var(--gold)}
+  .pick.hot{border-color:var(--gold);color:var(--gold)}
+  /* 這一幕換了曲子：整張卡的左邊立一條金線，掃過去一眼看得到 */
+  .scene.bgmchanged{border-left:3px solid var(--gold)}
+  .newbgm{color:var(--gold);font-size:11px;white-space:nowrap}
   .actor .card{cursor:grab;user-select:none}
   .actor.drag .card{cursor:grabbing;border-color:var(--rose);box-shadow:0 0 0 3px rgba(217,140,160,.25)}
   .stage.hot{outline:2px dashed var(--gold);outline-offset:-6px}
@@ -427,15 +435,18 @@ let dirty = new Set();
 function sceneShots(sc) {
   const shots = [];
   let back = null, bgm = null, actors = new Map(), pending = false,
-      firstLine = 1, talk = '', lastCmd = 1;
+      firstLine = 1, talk = '', lastCmd = 1,
+      backLine = 0, bgmLine = 0, lastBgm = null;
 
   const flush = () => {
     if (!pending) return;
     shots.push({back, bgm,
       // 依站位排序：名牌的陣列順序＝畫面上的左右順序，槽位判定才對得起來
+      backLine, bgmLine, bgmChanged: bgm !== lastBgm,
       actors: [...actors.entries()].map(([id, a]) => [id, a.pos, a.line])
                                    .sort((x, y) => x[1] - y[1]),
       line: firstLine, insertAt: lastCmd, talk});
+    lastBgm = bgm;
     pending = false; talk = '';
   };
 
@@ -444,10 +455,10 @@ function sceneShots(sc) {
     if (!t || t.startsWith(';')) return;
     let m;
     if ((m = t.match(/^@back (\S+)/))) {
-      flush(); back = m[1].split(',')[0]; firstLine = no; lastCmd = no; pending = true;
+      flush(); back = m[1].split(',')[0]; backLine = no; firstLine = no; lastCmd = no; pending = true;
     }
-    else if ((m = t.match(/^@bgm (\S+)/))) { bgm = m[1]; lastCmd = no; pending = true; }
-    else if (/^@stopBgm/.test(t)) { bgm = null; lastCmd = no; }
+    else if ((m = t.match(/^@bgm (\S+)/))) { bgm = m[1]; bgmLine = no; lastCmd = no; pending = true; }
+    else if (/^@stopBgm/.test(t)) { bgm = null; bgmLine = 0; lastCmd = no; }
     else if ((m = t.match(/^@char (\S+)/))) {
       const id = m[1].split('.')[0].split(',')[0];
       const p = t.match(/pos:(\d+)/);
@@ -489,6 +500,11 @@ function renderScenes(v) {
 
   const canSave = location.protocol.startsWith('http');
   const shots = sceneShots(sc);
+  const backNames = Object.keys(ASSETS.backgrounds).sort();
+  const bgmNames = Object.keys(ASSETS.audio).sort();
+
+  const opts = (list, sel) => list.map(x =>
+    '<option' + (x === sel ? ' selected' : '') + '>' + esc(x) + '</option>').join('');
 
   v.innerHTML =
     '<div id="bar">' +
@@ -497,7 +513,7 @@ function renderScenes(v) {
       (dirty.has(sc.name) ? '<span class="dirty">● 有未存的變更</span>' : '') +
       (canSave ? '<button class="save" onclick="saveScript()">存回 .nani</button>'
                : '<span class="txt">（唯讀。要能存檔就跑 python tools/serve.py）</span>') +
-      '<span class="txt" style="margin-left:auto">拖名牌改站位　把下面的角色拖進畫面可以加人</span>' +
+      '<span class="txt" style="margin-left:auto">拖名牌換順序　把角色拖進畫面加人</span>' +
       '<div style="flex-basis:100%;height:0"></div>' +
       allActors().map(a =>
         '<span class="chip" draggable="true" data-id="' + esc(a) + '">' + esc(a) + '</span>').join('') +
@@ -506,7 +522,9 @@ function renderScenes(v) {
       const src = ASSETS.backgrounds[s.back] ||
                   (s.back ? ASSETS.backgrounds[s.back.split('.')[0]] : null);
       const audio = ASSETS.audio[s.bgm];
-      return '<div class="scene"><div class="stage" data-insert="' + s.insertAt + '">' +
+
+      return '<div class="scene' + (s.bgmChanged ? ' bgmchanged' : '') + '">' +
+        '<div class="stage" data-insert="' + s.insertAt + '">' +
         (src ? '<img loading="lazy" src="' + src + '">'
              : '<div class="noimg">' + (s.back ? '找不到背景　' + esc(s.back) : '（沒有指定背景）') + '</div>') +
         s.actors.map(([id, pos, line], i) =>
@@ -514,17 +532,53 @@ function renderScenes(v) {
           '" data-pos="' + pos + '" data-id="' + esc(id) + '">' +
           '<div class="card">' + esc(id) + '</div>' +
           '<div class="pos">第 ' + (i + 1) + ' 位　pos ' + pos + '</div></div>').join('') +
-        '</div><div class="bar"><span class="ln">' + s.line + ' 行</span>' +
-        (s.actors.length && !isCanonical(s.actors)
-          ? '<button onclick="applySlots(' + JSON.stringify(s.actors).replace(/"/g, '&quot;') +
-            ')">站位重排</button>' : '') +
-        '<span class="tag t-map">' + esc(s.back || '—') + '</span>' +
-        (s.bgm ? '<span class="tag t-choice">♪ ' + esc(s.bgm) + '</span>' : '') +
-        (audio ? '<audio controls preload="none" style="height:26px" src="' + audio + '"></audio>' : '') +
-        '</div>' + (s.talk ? '<div class="line">' + esc(s.talk) + '</div>' : '') + '</div>';
+        '</div>' +
+
+        '<div class="bar">' +
+          '<span class="ln">' + s.line + ' 行</span>' +
+          (s.actors.length && !isCanonical(s.actors)
+            ? '<button onclick="applySlots(' +
+              JSON.stringify(s.actors).replace(/"/g, '&quot;') + ')">站位重排</button>' : '') +
+          '<select class="pick" title="換背景" onchange="setBack(' + s.backLine + ', this.value)">' +
+            opts(backNames, s.back) + '</select>' +
+          '<select class="pick' + (s.bgmChanged ? ' hot' : '') + '" title="換音樂"' +
+            ' onchange="setBgm(' + s.bgmLine + ', ' + (s.backLine || s.insertAt) + ', this.value)">' +
+            '<option value="">（不換曲）</option>' +
+            (s.bgm && !bgmNames.includes(s.bgm) ? '<option selected>' + esc(s.bgm) + '</option>' : '') +
+            opts(bgmNames, s.bgm) + '</select>' +
+          (s.bgmChanged ? '<span class="newbgm">♪ 換曲</span>' : '') +
+          (audio ? '<audio controls preload="none" src="' + audio + '"></audio>' : '') +
+        '</div>' +
+        (s.talk ? '<div class="line">' + esc(s.talk) + '</div>' : '') +
+      '</div>';
     }).join('') + '</div>';
 
   wireDragging();
+}
+
+// 換背景：直接改那一行的 @back
+function setBack(line, name) {
+  if (!line || !name) return;
+  const sc = scripts[current], i = line - 1;
+  sc.lines[i] = sc.lines[i].replace(/@back \S+/, '@back ' + name);
+  dirty.add(sc.name);
+  render();
+}
+
+// 換音樂：有 @bgm 就改那一行，沒有就插在 @back 後面——
+// 音樂要跟著換場一起響，不是等角色出來才響。
+function setBgm(line, insertAt, name) {
+  const sc = scripts[current];
+  if (!name) return render();          // 選了「不換曲」＝不動
+
+  if (line) {
+    const i = line - 1;
+    sc.lines[i] = sc.lines[i].replace(/@bgm \S+/, '@bgm ' + name);
+  } else {
+    sc.lines.splice(insertAt, 0, '@bgm ' + name);
+  }
+  dirty.add(sc.name);
+  render();
 }
 
 // ── 站位是算出來的，不是隨便擺的 ──────────────────────
