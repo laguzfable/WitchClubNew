@@ -619,7 +619,8 @@ function renderScenes(v) {
 
         '<div class="bar">' +
           '<span class="ln">' + s.line + ' 行</span>' +
-          (s.label ? '<span class="lab" title="這一幕屬於哪個段落"># ' + esc(s.label) + '</span>' : '') +
+          (s.label ? '<span class="lab" title="這一幕落在哪個段落裡（@goto 跳轉的目標）">段落 # ' +
+            esc(s.label) + '</span>' : '') +
           (s.actors.length && !isCanonical(s.actors)
             ? '<button onclick="applySlots(' +
               JSON.stringify(s.actors).replace(/"/g, '&quot;') + ')" title="這一幕的站位不合慣例， 按了會依左右順序拉回標準值">站位 → ' + slotsFor(s.actors.length).join('/') + '</button>' : '') +
