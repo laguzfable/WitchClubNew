@@ -99,7 +99,11 @@
   .ass{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#1b1925}
   .ass img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
   .ass img.mob{aspect-ratio:1;object-fit:contain;background:#100f16}
-  .ass audio{width:100%;height:30px;margin-top:6px}
+  #player{width:100%;height:34px;margin:6px 0 2px;position:sticky;top:0;z-index:5}
+  .ass .play{width:calc(100% - 14px);margin:7px;background:#241f30;color:var(--dim);
+    border:1px solid var(--line);border-radius:5px;padding:3px;font-size:11px;cursor:pointer}
+  .ass .play:hover{color:var(--gold);border-color:var(--gold)}
+  .ass .play.on{color:var(--gold);border-color:var(--gold)}
   .ass .an{padding:4px 7px 0;font-size:12px;word-break:break-all}
   .ass .au{padding:0 7px 5px;font-size:10px;color:#6b6685}
   .ass.unused{opacity:.42}
@@ -635,6 +639,17 @@ function usedIn(re) {
   return used;
 }
 
+// 一次只留一台播放器。67 首各擺一個 <audio> 的話，
+// 光是瀏覽器去要每首的長度就會把連線塞爆。
+function playBgm(src, name, btn) {
+  const p = document.getElementById('player');
+  document.querySelectorAll('.play.on').forEach(b => {b.classList.remove('on'); b.textContent = '▶ 試聽'});
+  if (p.dataset.name === name && !p.paused) { p.pause(); return; }
+  p.src = src; p.dataset.name = name; p.play();
+  btn.classList.add('on'); btn.textContent = '❚❚ ' + name;
+  p.scrollIntoView({block: 'nearest'});
+}
+
 function renderAssets(v) {
   if (!ASSETS) return v.innerHTML =
     '<div class="empty">資源清單需要「已載入」的版本。<br>在專案根目錄跑：python tools/build_viewer.py</div>';
@@ -666,8 +681,10 @@ function renderAssets(v) {
 
     sec('音樂', Object.keys(ASSETS.audio).length + ' 首。按 ▶ 直接聽。',
       missing(usedBgm, ASSETS.audio, '音樂') +
+      '<audio id="player" controls preload="none"></audio>' +
       '<div class="grid wide">' + Object.entries(ASSETS.audio).map(([n, src]) =>
-        card(n, '<audio controls preload="none" src="' + src + '"></audio>', usedBgm)).join('') + '</div>') +
+        card(n, '<button class="play" onclick="playBgm(&quot;' + esc(src) + '&quot;, &quot;' +
+          esc(n) + '&quot;, this)">▶ 試聽</button>', usedBgm)).join('') + '</div>') +
 
     sec('怪物', Object.keys(ASSETS.monsters || {}).length + ' 隻。@battle 的 target 就是這些名字。',
       missing(usedMob, ASSETS.monsters || {}, '怪物') +

@@ -17,6 +17,7 @@ import http.server
 import json
 import os
 import posixpath
+import re
 import threading
 import sys
 import urllib.parse
@@ -35,6 +36,23 @@ SCRIPTS = os.path.join(ROOT, 'Assets', 'NaniScripts')
 PORT = 8777
 
 
+class _Slice:
+    """只讓 copyfile 讀到指定長度的那一段。"""
+
+    def __init__(self, f, length):
+        self.f, self.left = f, length
+
+    def read(self, n=-1):
+        if self.left <= 0:
+            return b''
+        data = self.f.read(self.left if n < 0 else min(n, self.left))
+        self.left -= len(data)
+        return data
+
+    def close(self):
+        self.f.close()
+
+
 class Handler(http.server.SimpleHTTPRequestHandler):
     def translate_path(self, path):
         # 以專案根目錄為基準，這樣網頁才讀得到 ../Assets/... 的背景與音樂
@@ -42,6 +60,53 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         path = posixpath.normpath(urllib.parse.unquote(path))
         parts = [p for p in path.split('/') if p and p not in ('.', '..')]
         return os.path.join(ROOT, *parts)
+
+    def send_head(self):
+        """媒體檔要支援 Range（分段下載）。
+
+        瀏覽器播音樂時不會整首抓完才播，它會先要前面一段，拖進度條再要中間那段。
+        內建的 handler 不理 Range，一律回整包 200——十幾 MB 的 mp3 就會卡住，
+        而且每動一次就重抓一次，開著音樂列表沒多久連線就塞滿了。
+        """
+        rng = self.headers.get('Range')
+        if not rng:
+            return super().send_head()
+
+        path = self.translate_path(self.path)
+        if not os.path.isfile(path):
+            return super().send_head()
+
+        m = re.match(r'bytes=(\d*)-(\d*)$', rng.strip())
+        if not m:
+            return super().send_head()
+
+        size = os.path.getsize(path)
+        start, end = m.group(1), m.group(2)
+        if start == '':                      # bytes=-500 → 最後 500 個位元組
+            start, end = max(0, size - int(end or 0)), size - 1
+        else:
+            start = int(start)
+            end = int(end) if end else size - 1
+        end = min(end, size - 1)
+        if start > end:
+            self.send_response(416)
+            self.send_header('Content-Range', f'bytes */{size}')
+            self.end_headers()
+            return None
+
+        f = open(path, 'rb')
+        f.seek(start)
+        self.send_response(206)
+        self.send_header('Content-Type', self.guess_type(path))
+        self.send_header('Accept-Ranges', 'bytes')
+        self.send_header('Content-Range', f'bytes {start}-{end}/{size}')
+        self.send_header('Content-Length', str(end - start + 1))
+        self.end_headers()
+        return _Slice(f, end - start + 1)
+
+    def end_headers(self):
+        self.send_header('Accept-Ranges', 'bytes')   # 先告訴瀏覽器我們支援分段
+        super().end_headers()
 
     def do_POST(self):
         if self.path != '/save':
