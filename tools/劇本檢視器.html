@@ -86,9 +86,9 @@
   .scene .lines .ln,.scene .evs .ln{display:inline-block;min-width:38px;color:#54506a;
     font-family:ui-monospace,Consolas,monospace}
   .scene .lab{color:var(--gold);font-size:11px}
-  .scene .expr{display:block;margin-top:2px;max-width:96px;font-size:10px;
+  .scene .expr{display:block;margin-top:2px;max-width:128px;font-size:10px;
     background:#1b1925;color:var(--dim);border:1px solid var(--line);border-radius:4px}
-  .scene .expr.inline{display:inline-block;margin:0 6px 0 0;vertical-align:baseline;max-width:88px}
+  .scene .expr.inline{display:inline-block;margin:0 6px 0 0;vertical-align:baseline;max-width:120px}
   .scene .edit{outline:none;border-bottom:1px dashed transparent;cursor:text}
   .scene .edit:hover{border-bottom-color:var(--line)}
   .scene .edit:focus{border-bottom-color:var(--gold);color:#efeaff}
@@ -613,6 +613,7 @@ function renderScenes(v) {
             s.fresh.includes(id) + ',' + s.line + ')">×</span>' +
           '</div>' +
           '<div class="pos">第 ' + (i + 1) + ' 位　pos ' + pos +
+            (app ? '　' + esc(EXPR_ZH[app] || app) : '') +
             exprPicker(id, app, line, s.line) + '</div></div>').join('') +
         '</div>' +
 
@@ -622,11 +623,14 @@ function renderScenes(v) {
           (s.actors.length && !isCanonical(s.actors)
             ? '<button onclick="applySlots(' +
               JSON.stringify(s.actors).replace(/"/g, '&quot;') + ')" title="這一幕的站位不合慣例， 按了會依左右順序拉回標準值">站位 → ' + slotsFor(s.actors.length).join('/') + '</button>' : '') +
-          (s.ownBack
-            ? '<select class="pick" title="換這一幕的背景" onchange="setBack(' + s.backLine + ', this.value)">' +
-              opts(backNames, s.back) + '</select>'
-            : '<span class="inherit" title="這一幕沒有自己的 @back，背景是從第 ' + s.backLine +
-              ' 行沿用下來的。要改就去改那一幕。">沿用 ' + esc(s.back || '—') + '</span>') +
+          '<select class="pick' + (s.ownBack ? '' : ' inherit') + '"' +
+            ' title="' + (s.ownBack ? '換掉這一幕的背景'
+                                    : '這一幕沿用前面的背景。選了會插一行 @back，從這裡開始換景') + '"' +
+            ' onchange="setBack(' + (s.ownBack ? s.backLine : 0) + ', ' +
+            (s.ownBack ? 0 : s.line) + ', this.value)">' +
+            (s.ownBack ? '' : '<option value="">沿用 ' + esc(s.back || '—') + '</option>') +
+            (s.back && !backNames.includes(s.back) ? '<option selected>' + esc(s.back) + '</option>' : '') +
+            opts(backNames, s.ownBack ? s.back : null) + '</select>' +
           '<select class="pick' + (s.bgmChanged ? ' hot' : '') + '"' +
             ' title="' + (s.ownBgm ? '換掉這一幕的曲子' : '選了會在這一幕插一行 @bgm，從這裡開始換曲') + '"' +
             ' onchange="setBgm(' + (s.ownBgm ? s.bgmLine : 0) + ', ' +
@@ -655,6 +659,26 @@ function renderScenes(v) {
   wireDragging();
 }
 
+// 表情的中文說明。名字是 Live2D 的動作檔名，光看 blingloop、sighloop
+// 想不起來是什麼臉，所以選單上兩個都顯示。loop 結尾的會一直循環播。
+const EXPR_ZH = {
+  idle:'待機（預設）', idle2:'待機 2', talk:'講話', talking:'講話', talkloop:'講話（循環）',
+  happy:'開心', happy2:'開心 2', smile:'微笑', angry:'生氣', angry2:'生氣 2',
+  angryloop:'生氣（循環）', angrytalk:'生氣地講話', RAGE:'暴怒', sad:'難過', sad2:'難過 2',
+  sadloop:'難過（循環）', scared:'害怕', scaredloop:'害怕（循環）',
+  scaredloop2:'害怕（循環）2', scaredloop3:'害怕（循環）3',
+  thinking:'思考', thinkingloop:'思考（循環）', thinkingloop3:'思考（循環）3',
+  question:'疑問（問號）', hmm:'疑惑', noway:'不會吧', what:'什麼？！',
+  exclamation:'驚訝（驚嘆號）', suprised:'嚇一跳', sigh:'嘆氣', sighloop:'嘆氣（循環）',
+  heart:'心心', love:'戀愛', love2:'戀愛 2', love3:'戀愛 3',
+  lovestart:'戀愛（開始）', loveloop:'戀愛（循環）',
+  bling:'閃亮亮', blingloop:'閃亮亮（循環）', goodgood:'讚讚', yummy:'好吃',
+  eee:'欸欸欸', '666':'666', proud:'得意', ghost:'鬼樣子', sirious:'認真',
+  beer:'喝酒', cat:'貓', cat2:'貓 2', wave:'揮手', Scene1:'場景 1',
+  test:'測試用', 'idle 复制':'待機（重複的檔，別用）'
+};
+const exprLabel = e => EXPR_ZH[e] ? EXPR_ZH[e] + '　' + e : e;
+
 // 對白行的表情選單。表情多半是寫在說話者那一行，
 // 所以選單就放在那一句旁邊，不用記得有哪些可以用。
 function talkExpr(x) {
@@ -663,7 +687,8 @@ function talkExpr(x) {
   return '<select class="expr inline" title="' + esc(x.who) + ' 的表情"' +
     ' onchange="setTalkExpr(' + x.line + ', this.value)">' +
     '<option value=""' + (x.app ? '' : ' selected') + '>（沿用）</option>' +
-    list.map(e => '<option' + (e === x.app ? ' selected' : '') + '>' + esc(e) + '</option>').join('') +
+    list.map(e => '<option value="' + esc(e) + '"' + (e === x.app ? ' selected' : '') + '>' +
+      esc(exprLabel(e)) + '</option>').join('') +
     '</select>';
 }
 
@@ -684,7 +709,8 @@ function exprPicker(id, app, line, shotLine) {
     ' onpointerdown="event.stopPropagation()"' +
     ' onchange="setExpr(&quot;' + esc(id) + '&quot;,' + line + ',' + shotLine + ', this.value)">' +
     '<option value=""' + (app ? '' : ' selected') + '>（沿用）</option>' +
-    list.map(x => '<option' + (x === app ? ' selected' : '') + '>' + esc(x) + '</option>').join('') +
+    list.map(x => '<option value="' + esc(x) + '"' + (x === app ? ' selected' : '') + '>' +
+      esc(exprLabel(x)) + '</option>').join('') +
     '</select>';
 }
 
@@ -744,10 +770,14 @@ function removeActor(id, line, fresh, shotLine) {
 }
 
 // 換背景：直接改那一行的 @back
-function setBack(line, name) {
-  if (!line || !name) return;
-  const sc = scripts[current], i = line - 1;
-  sc.lines[i] = sc.lines[i].replace(/@back \S+/, '@back ' + name);
+// 換背景：這一幕有自己的 @back 就改那一行；沒有的話，
+// 在這一幕開頭插一行——從這裡開始換景，前面幾幕不受影響。
+function setBack(line, insertAt, name) {
+  const sc = scripts[current];
+  if (!name) return render();
+
+  if (line) sc.lines[line - 1] = sc.lines[line - 1].replace(/@back \S+/, '@back ' + name);
+  else sc.lines.splice(Math.max(0, insertAt - 1), 0, '@back ' + name);
   dirty.add(sc.name);
   render();
 }
