@@ -102,7 +102,9 @@
   .scene .chraw{color:#7d7898;font-size:10px}
   .scene .ch .x{cursor:pointer;color:#7d7898;padding:0 3px}
   .scene .ch .x:hover{color:#e06c75}
-  .scene .addch{padding:5px 9px 8px;display:flex;gap:6px}
+  .scene .addch{padding:5px 9px 8px;display:flex;gap:6px;flex-wrap:wrap}
+  .scene .addch .more{background:#1b1925;color:var(--dim);border:1px dashed var(--line);
+    border-radius:5px;font-size:11px;padding:2px 4px}
   .scene .addch button{background:#1b1925;color:var(--dim);border:1px dashed var(--line);
     border-radius:5px;font-size:11px;padding:2px 8px;cursor:pointer}
   .scene .addch button:hover{color:var(--gold);border-color:var(--gold)}
@@ -700,17 +702,79 @@ function renderScenes(v) {
         (s.events.length ? '<div class="evs">' + s.events.map(x =>
             '<div><span class="ln">' + x.line + '</span><span class="tag t-' + x.kind + '">' +
             (EVENT_NAME[x.kind] || x.kind) + '</span>' +
-            (x.kind === 'choice' ? choiceRow(x) : esc(x.text)) + '</div>').join('') +
+            (x.kind === 'choice' ? choiceRow(x)
+              : x.kind === 'goto' ? gotoRow(x) : esc(x.text)) + '</div>').join('') +
           '</div>' : '') +
         '<div class="addch">' +
           '<button onclick="addTalk(' + s.line + ')">＋ 台詞</button>' +
           '<button onclick="addChoice(' + s.insertAt + ')">＋ 選項</button>' +
           '<button onclick="addShot(' + s.line + ')" title="在這一幕後面另起一幕（換背景）">＋ 新的一幕</button>' +
+          '<select class="more" onchange="addMore(' + s.line + ', this.value); this.value=&quot;&quot;">' +
+            '<option value="">＋ 其他…</option>' +
+            '<option value="label">段落（# 標籤，給 @goto 跳過來）</option>' +
+            '<option value="goto">跳轉（@goto）</option>' +
+            '<option value="map_day">進地圖：白天</option>' +
+            '<option value="map_night">進地圖：夜晚</option>' +
+          '</select>' +
         '</div>' +
       '</div>';
     }).join('') + '</div>';
 
   wireDragging();
+}
+
+// @goto 的目標改成選單，跟選項那邊一樣不用自己打
+function gotoRow(x) {
+  const m = x.text.match(/^@goto\s+(\S+)/);
+  const target = m ? m[1] : '';
+  if (target && !target.startsWith('.')) return esc(x.text);   // 跳去別支腳本的不動它
+  const labels = [...labelsOf(scripts[current])].sort();
+  return '<select class="chgoto" onchange="setGoto(' + x.line + ', this.value)">' +
+    labels.map(l => '<option value=".' + esc(l) + '"' +
+      (target === '.' + l ? ' selected' : '') + '>' + esc(l) + '</option>').join('') +
+    '</select>';
+}
+
+function setGoto(line, target) {
+  const sc = scripts[current];
+  sc.lines[line - 1] = sc.lines[line - 1].replace(/^(\s*@goto\s+)\S+/, '$1' + target);
+  dirty.add(sc.name); check(); render();
+}
+
+// 「＋ 其他」選單
+function addMore(shotLine, what) {
+  if (!what) return;
+  const sc = scripts[current], at = shotEnd(shotLine);
+
+  if (what === 'label') {
+    const name = newLabel('new_label');
+    sc.lines.splice(at, 0, '', '# ' + name);
+  } else if (what === 'goto') {
+    const first = [...labelsOf(sc)].sort()[0];
+    if (!first) return alert('這支腳本還沒有任何段落，先加一個段落再跳。');
+    sc.lines.splice(at, 0, '@goto .' + first);
+  } else {
+    // 進地圖是一整組：關音樂、記白天還是晚上、記回來要接哪裡、換場景、
+    // 然後停住等地圖那邊叫回來，回來會落在下面那個段落。
+    const isDay = what === 'map_day';
+    const back = newLabel(isDay ? 'aftermap_day' : 'aftermap_night');
+    sc.lines.splice(at, 0,
+      '@stopBgm',
+      '@saveMapDayNight isDay:' + isDay,
+      '@SaveReturnPoint script:"' + sc.name + '" label:"' + back + '"',
+      '@GotoUnityScene sceneName:MapTest',
+      '@stop',
+      '# ' + back,
+      '');
+  }
+  dirty.add(sc.name); check(); render();
+}
+
+// 取一個沒被用過的段落名
+function newLabel(base) {
+  const used = labelsOf(scripts[current]);
+  if (!used.has(base)) return base;
+  for (let i = 2; ; i++) if (!used.has(base + i)) return base + i;
 }
 
 // ── 寫東西進去 ──────────────────────────────────────
