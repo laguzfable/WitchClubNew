@@ -107,7 +107,13 @@
   #floatplayer .pn b{color:var(--gold);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   #floatplayer .px{margin-left:auto;cursor:pointer;color:#7d7898;padding:0 3px}
   #floatplayer .px:hover{color:var(--red)}
-  #floatplayer .pl{display:block;margin-top:5px;font-size:11px;color:var(--dim)}
+  #floatplayer .pl{font-size:11px;color:var(--dim);margin-left:auto}
+  #floatplayer #ppick{width:100%;margin-bottom:6px;background:#1b1925;color:#cfc9e6;
+    border:1px solid var(--line);border-radius:5px;font-size:11px;padding:2px 3px}
+  #floatplayer .pf{display:flex;align-items:center;gap:5px;margin-top:6px}
+  #floatplayer .pb{background:#1b1925;color:var(--dim);border:1px solid var(--line);
+    border-radius:5px;font-size:11px;padding:1px 8px;cursor:pointer}
+  #floatplayer .pb:hover{color:var(--gold);border-color:var(--gold)}
   #player{width:100%;height:32px}
   .play{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .ass .play{width:calc(100% - 14px);margin:7px;background:#241f30;color:var(--dim);
@@ -660,11 +666,26 @@ function player() {
   if (el) return el;
   el = document.createElement('div');
   el.id = 'floatplayer';
+  const kind = (ASSETS && ASSETS.audioKind) || {};
+  const list = ASSETS ? Object.keys(ASSETS.audio) : [];
+  const group = (label, want) => {
+    const items = list.filter(n => (kind[n] === 'sfx') === want).sort();
+    return items.length ? '<optgroup label="' + label + '">' +
+      items.map(n => '<option>' + esc(n) + '</option>').join('') + '</optgroup>' : '';
+  };
+
   el.innerHTML =
     '<div class="pn"><b id="pname">—</b>' +
       '<span class="px" title="關掉" onclick="stopBgm()">×</span></div>' +
+    '<select id="ppick" title="直接挑一首來聽" onchange="pickBgm(this.value)">' +
+      '<option value="">選一首…</option>' + group('音樂', false) + group('音效', true) +
+    '</select>' +
     '<audio id="player" controls preload="none"></audio>' +
-    '<label class="pl"><input type="checkbox" id="ploop" checked> 循環</label>';
+    '<div class="pf">' +
+      '<button class="pb" title="上一首" onclick="stepBgm(-1)">◀</button>' +
+      '<button class="pb" title="下一首" onclick="stepBgm(1)">▶</button>' +
+      '<label class="pl"><input type="checkbox" id="ploop" checked> 循環</label>' +
+    '</div>';
   document.body.appendChild(el);
   const a = el.querySelector('#player');
   a.addEventListener('ended', () => {
@@ -688,6 +709,23 @@ function stopBgm() {
   markPlaying(null);
 }
 
+// 從浮動面板直接挑曲
+function pickBgm(name) {
+  if (!name || !ASSETS) return;
+  playBgm(ASSETS.audio[name], name, null);
+}
+
+// 上一首／下一首，照面板選單的順序走（音樂在前、音效在後）
+function stepBgm(dir) {
+  const sel = document.getElementById('ppick');
+  if (!sel) return;
+  const names = [...sel.options].map(o => o.value).filter(Boolean);
+  if (!names.length) return;
+  const a = document.getElementById('player');
+  const i = names.indexOf(a && a.dataset.name);
+  pickBgm(names[(i + dir + names.length) % names.length]);
+}
+
 // 一次只留一台播放器。67 首各擺一個 <audio> 的話，
 // 光是瀏覽器去要每首的長度就會把連線塞爆。
 function playBgm(src, name, btn) {
@@ -696,6 +734,8 @@ function playBgm(src, name, btn) {
   if (a.dataset.name === name && !a.paused) { a.pause(); markPlaying(null); return; }
   if (a.dataset.name !== name) { a.src = src; a.dataset.name = name; }
   document.getElementById('pname').textContent = name;
+  const sel = document.getElementById('ppick');
+  if (sel) sel.value = name;
   a.play();
   markPlaying(name);
 }

@@ -163,8 +163,21 @@ if __name__ == '__main__':
 
     # 一定要多執行緒：瀏覽器會同時開好幾條連線抓圖和音訊，
     # 單執行緒的話第一條沒結束就卡住，整個網頁會停在載入中。
-    http.server.ThreadingHTTPServer.allow_reuse_address = True
-    with http.server.ThreadingHTTPServer(('127.0.0.1', PORT), Handler) as httpd:
+    # Windows 的 SO_REUSEADDR 會讓第二台直接搶同一個埠（跟 Linux 不一樣），
+    # 兩台同時在聽就會亂。關掉它，這樣重複啟動才會走下面那條友善的分支。
+    http.server.ThreadingHTTPServer.allow_reuse_address = False
+    try:
+        httpd = http.server.ThreadingHTTPServer(('127.0.0.1', PORT), Handler)
+    except OSError:
+        # 已經有一台在跑了（多半是上一個視窗還開著）。不用再開一台，
+        # 直接把網頁叫出來——但那台載的是它啟動當下的劇本。
+        print(f'{PORT} 這個埠已經有東西在跑了，應該是另一個視窗還開著。')
+        print('直接用那台就好，網頁已經幫你打開。')
+        print('（劇本改過而畫面沒更新的話，把舊視窗關掉再跑一次。）')
+        webbrowser.open(url)
+        raise SystemExit(0)
+
+    with httpd:
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:
