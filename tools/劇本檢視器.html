@@ -684,10 +684,11 @@ function player() {
     '<div class="pf">' +
       '<button class="pb" title="上一首" onclick="stepBgm(-1)">◀</button>' +
       '<button class="pb" title="下一首" onclick="stepBgm(1)">▶</button>' +
-      '<label class="pl"><input type="checkbox" id="ploop" checked> 循環</label>' +
+      '<label class="pl"><input type="checkbox" id="ploop"> 循環</label>' +
     '</div>';
   document.body.appendChild(el);
   const a = el.querySelector('#player');
+  a.volume = 0.5;                  // 突然全音量嚇人
   a.addEventListener('ended', () => {
     if (document.getElementById('ploop').checked) { a.currentTime = 0; a.play(); }
     else markPlaying(null);
