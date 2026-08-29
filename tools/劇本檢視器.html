@@ -208,7 +208,6 @@
       <div class="pg" data-tab="endings">結局</div>
       <div class="pg" data-tab="assets">資源</div>
     </div>
-    <div class="sec">腳本</div>
     <div id="list"></div>
   </aside>
   <main>
@@ -276,7 +275,7 @@ async function load(files) {
   renderList();
   tab = 'scenes';
   syncTabs();
-  select(Object.keys(scripts).sort()[0]);
+  select(Object.keys(scripts).sort(scriptOrder)[0]);
 }
 
 // ── 解析 ──────────────────────────────────────────────
@@ -419,6 +418,38 @@ function check() {
 function bad(file, line, msg, warn) {issues.push({file, line, msg, warn: !!warn})}
 
 // ── 畫面 ──────────────────────────────────────────────
+// ── 腳本排序 ────────────────────────────────────────
+// 照玩的順序排：主線 → 地圖 → 結局 → 系統 → 測試備份。
+// 純字母排的話 badend 會跑到最上面、chapter6red 夾在 chat 中間，很難找。
+const STORY = ['chapter0', 'chapter1', 'chapter2', 'chapter3', 'chapter4',
+               'chapter4green', 'chapter4red', 'chapter5', 'chapter5common',
+               'chapter5blue', 'chapter5red', 'chapter5yellow', 'chapter6red'];
+
+function groupOf(n) {
+  if (/^(demo|Test$|MainStory_Test|111|222|datetest|test_)/.test(n) || /備份/.test(n))
+    return [8, '測試與備份'];
+  if (STORY.includes(n)) return [0, '主線'];
+  if (/^chapter/.test(n)) return [0, '主線'];
+  if (/_day\d+$/.test(n)) return [1, '地圖：白天約會'];
+  if (/^(blue|red|green|yellow)\d+$/.test(n)) return [2, '地圖：夜晚儀式'];
+  if (/clue\d+$/.test(n) || /^chat_/.test(n) || /farewell|guidance/.test(n))
+    return [3, '地圖：其他事件'];
+  if (/^badend|_end$/.test(n)) return [4, '結局'];
+  if (/^(title|System_UI|dreams)$/.test(n)) return [6, '系統'];
+  return [5, '其他'];
+}
+
+// 同一組裡面：主線照劇情順序，其餘照名字（數字要當數字比，不然 10 會排在 2 前面）
+function scriptOrder(a, b) {
+  const ga = groupOf(a), gb = groupOf(b);
+  if (ga[0] !== gb[0]) return ga[0] - gb[0];
+  if (ga[0] === 0) {
+    const ia = STORY.indexOf(a), ib = STORY.indexOf(b);
+    if (ia >= 0 || ib >= 0) return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+  }
+  return a.localeCompare(b, 'zh-Hant', {numeric: true});
+}
+
 function renderList() {
   const bad = issues.filter(i => !i.warn).length;
   const badge = document.getElementById('badge-issues');
@@ -427,9 +458,17 @@ function renderList() {
   const q = document.getElementById('q').value.trim();
   const el = document.getElementById('list');
   el.innerHTML = '';
-  Object.keys(scripts).sort().forEach(n => {
+  let lastGroup = null;
+  Object.keys(scripts).sort(scriptOrder).forEach(n => {
     const s = scripts[n];
     if (q && !n.includes(q) && !s.lines.some(l => l.includes(q))) return;
+    const g = groupOf(n)[1];
+    if (g !== lastGroup) {
+      lastGroup = g;
+      const h = document.createElement('div');
+      h.className = 'sec'; h.textContent = g;
+      el.appendChild(h);
+    }
     const errs = issues.filter(i => i.file === n && !i.warn).length;
     const ends = s.lines.filter(l => l.trim().startsWith('@achieve')).length;
     const div = document.createElement('div');
@@ -1422,6 +1461,6 @@ if (EMBEDDED) {
   document.getElementById('app').classList.add('show');
   renderList();
   syncTabs();
-  select(Object.keys(scripts).sort()[0]);
+  select(Object.keys(scripts).sort(scriptOrder)[0]);
 }
 </script>
