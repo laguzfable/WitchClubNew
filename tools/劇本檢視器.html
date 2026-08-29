@@ -99,7 +99,17 @@
   .ass{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#1b1925}
   .ass img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
   .ass img.mob{aspect-ratio:1;object-fit:contain;background:#100f16}
-  #player{width:100%;height:34px;margin:6px 0 2px;position:sticky;top:0;z-index:5}
+  #floatplayer{position:fixed;right:14px;bottom:14px;z-index:50;width:270px;display:none;
+    background:#221f2c;border:1px solid var(--gold);border-radius:10px;padding:8px 10px;
+    box-shadow:0 6px 22px rgba(0,0,0,.5)}
+  #floatplayer.show{display:block}
+  #floatplayer .pn{display:flex;align-items:center;gap:6px;font-size:12px;padding-bottom:5px}
+  #floatplayer .pn b{color:var(--gold);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #floatplayer .px{margin-left:auto;cursor:pointer;color:#7d7898;padding:0 3px}
+  #floatplayer .px:hover{color:var(--red)}
+  #floatplayer .pl{display:block;margin-top:5px;font-size:11px;color:var(--dim)}
+  #player{width:100%;height:32px}
+  .play{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .ass .play{width:calc(100% - 14px);margin:7px;background:#241f30;color:var(--dim);
     border:1px solid var(--line);border-radius:5px;padding:3px;font-size:11px;cursor:pointer}
   .ass .play:hover{color:var(--gold);border-color:var(--gold)}
@@ -419,6 +429,10 @@ document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
 
 function render() {
   const v = document.getElementById('view');
+  setTimeout(() => {                       // 重畫會把 .on 洗掉，畫完再標一次
+    const a = document.getElementById('player');
+    markPlaying(a && !a.paused ? a.dataset.name : null);
+  }, 0);
   if (tab === 'issues') return renderIssues(v);
   if (tab === 'affinity') return renderAffinity(v);
   if (tab === 'endings') return renderEndings(v);
@@ -639,19 +653,56 @@ function usedIn(re) {
   return used;
 }
 
+// 浮動播放器：貼在右下角，換分頁、捲到哪裡都在，
+// 一邊看劇本一邊確認配樂用的。整個網頁共用這一台。
+function player() {
+  let el = document.getElementById('floatplayer');
+  if (el) return el;
+  el = document.createElement('div');
+  el.id = 'floatplayer';
+  el.innerHTML =
+    '<div class="pn"><b id="pname">—</b>' +
+      '<span class="px" title="關掉" onclick="stopBgm()">×</span></div>' +
+    '<audio id="player" controls preload="none"></audio>' +
+    '<label class="pl"><input type="checkbox" id="ploop" checked> 循環</label>';
+  document.body.appendChild(el);
+  const a = el.querySelector('#player');
+  a.addEventListener('ended', () => {
+    if (document.getElementById('ploop').checked) { a.currentTime = 0; a.play(); }
+    else markPlaying(null);
+  });
+  return el;
+}
+
+// 正在播的那顆按鈕標起來（換分頁重畫之後也要重標）
+function markPlaying(name) {
+  document.querySelectorAll('.play').forEach(b =>
+    b.classList.toggle('on', b.dataset.name === name));
+}
+
+function stopBgm() {
+  const a = document.getElementById('player');
+  if (a) { a.pause(); a.removeAttribute('src'); a.load(); }
+  const el = document.getElementById('floatplayer');
+  if (el) el.classList.remove('show');
+  markPlaying(null);
+}
+
 // 一次只留一台播放器。67 首各擺一個 <audio> 的話，
 // 光是瀏覽器去要每首的長度就會把連線塞爆。
 function playBgm(src, name, btn) {
-  const p = document.getElementById('player');
-  document.querySelectorAll('.play.on').forEach(b => {b.classList.remove('on'); b.textContent = '▶ 試聽'});
-  if (p.dataset.name === name && !p.paused) { p.pause(); return; }
-  p.src = src; p.dataset.name = name; p.play();
-  btn.classList.add('on'); btn.textContent = '❚❚ ' + name;
-  p.scrollIntoView({block: 'nearest'});
+  const el = player(), a = document.getElementById('player');
+  el.classList.add('show');
+  if (a.dataset.name === name && !a.paused) { a.pause(); markPlaying(null); return; }
+  if (a.dataset.name !== name) { a.src = src; a.dataset.name = name; }
+  document.getElementById('pname').textContent = name;
+  a.play();
+  markPlaying(name);
 }
 
-const playBtn = (n, src) => '<button class="play" onclick="playBgm(&quot;' + esc(src) +
-  '&quot;, &quot;' + esc(n) + '&quot;, this)">▶ 試聽</button>';
+const playBtn = (n, src) => '<button class="play" data-name="' + esc(n) +
+  '" onclick="playBgm(&quot;' + esc(src) + '&quot;, &quot;' + esc(n) + '&quot;, this)">▶ ' +
+  esc(n) + '</button>';
 
 function renderAssets(v) {
   if (!ASSETS) return v.innerHTML =
@@ -684,8 +735,6 @@ function renderAssets(v) {
       missing(usedBack, ASSETS.backgrounds, '背景') +
       '<div class="grid">' + Object.entries(ASSETS.backgrounds).map(([n, src]) =>
         card(n, '<img loading="lazy" src="' + src + '">', usedBack)).join('') + '</div>') +
-
-    '<audio id="player" controls preload="none"></audio>' +
 
     sec('音樂（BGM）', bgmList.length + ' 首，寫成 <code>@bgm 名字</code>。按 ▶ 試聽。',
       missing(usedBgm, ASSETS.audio, '音樂') +
@@ -801,7 +850,7 @@ function renderScenes(v) {
             (s.bgm && !bgmNames.includes(s.bgm) ? '<option selected>' + esc(s.bgm) + '</option>' : '') +
             opts(bgmNames, s.bgm) + '</select>' +
           (s.bgmChanged ? '<span class="newbgm">♪ 換曲</span>' : '') +
-          (audio ? '<audio controls preload="none" src="' + audio + '"></audio>' : '') +
+          (audio ? playBtn(s.bgm, audio) : '') +
         '</div>' +
         (s.talks.length ? '<div class="lines">' + s.talks.map(x =>
             '<div><span class="ln">' + x.line + '</span>' +
