@@ -386,8 +386,8 @@ CG上菜
 薇狄亞: 抱歉，這麼晚還來打擾{PlayerName}……
 薇狄亞: 因為梅伊主人突然宣布要離開了，我想趁今晚趕緊做一個旅行用的護符給她。
 薇狄亞: 夜色太黑了我不敢一個人出門，所以{PlayerName}……陪我好嗎？
-@choice 當然好 (加薇狄亞好感) goto:.ved_yes
-@choice 還是算了 (無法進薇狄亞線) set:affinity_Ved=affinity_Ved+5 goto:.ved_no
+@choice "當然好 (加薇狄亞好感)" goto:.ved_yes
+@choice "還是算了 (無法進薇狄亞線)" set:affinity_Ved=affinity_Ved+5 goto:.ved_no
 @stop
 # ved_yes
 @set affinity_Ved=affinity_Ved+15
