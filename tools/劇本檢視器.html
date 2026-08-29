@@ -888,7 +888,9 @@ function renderScenes(v) {
   const canSave = location.protocol.startsWith('http');
   const shots = sceneShots(sc);
   const backNames = Object.keys(ASSETS.backgrounds).sort();
-  const bgmNames = Object.keys(ASSETS.audio).sort();
+  // 換場景配樂的選單只列 BGM。26 個音效混進來會變成一長串，反而難挑
+  const bgmNames = Object.keys(ASSETS.audio)
+    .filter(n => (ASSETS.audioKind || {})[n] !== 'sfx').sort();
 
   const opts = (list, sel) => list.map(x =>
     '<option' + (x === sel ? ' selected' : '') + '>' + esc(x) + '</option>').join('');
