@@ -105,6 +105,7 @@
   .scene .lines div{padding:1px 0;display:flex;align-items:baseline;gap:4px}
   .scene .lines .edit{flex:1}
   .scene .lines .dx{color:#4a465c;cursor:pointer;padding:0 3px;font-size:12px}
+  .scene .lines .blank{color:#403c52;font-size:11px}
   .scene .lines div:hover .dx{color:#7d7898}
   .scene .lines .dx:hover{color:var(--red)}
   .scene .evs{padding:2px 9px 8px;font-size:12px;border-top:1px dashed var(--line)}
@@ -986,6 +987,8 @@ function renderScenes(v) {
     '<div id="bar">' +
       '<b>' + esc(sc.name) + '</b>' +
       '<span class="txt">' + shots.length + ' 個畫面</span>' +
+      (blankCount(sc) ? '<button onclick="dropBlanks()" title="這支腳本裡的空行，' +
+        '在遊戲裡沒有作用，只是讓編輯畫面變得零零落落">清掉空行（' + blankCount(sc) + '）</button>' : '') +
       (dirty.has(sc.name) ? '<span class="dirty">● 有未存的變更</span>' : '') +
       (canSave ? '<button class="save" onclick="saveScript()">存回 .nani</button>'
                : '<span class="txt">（唯讀。要能存檔就跑 python tools/serve.py）</span>') +
@@ -1063,6 +1066,7 @@ function renderScenes(v) {
             ' onkeydown="if(event.key===&quot;Enter&quot;){event.preventDefault();this.blur()}' +
             'if(event.key===&quot;Escape&quot;){this.textContent=this.dataset.was;this.blur()}"' +
             ' onfocus="this.dataset.was=this.textContent">' + esc(x.text) + '</span>' +
+            (x.text ? '' : '<span class="blank">（空行）</span>') +
             '<span class="dx" title="刪掉這一行" onclick="delLine(' + x.line + ')">×</span>' +
             '</div>').join('') +
           '</div>' : '') +
@@ -1391,6 +1395,26 @@ function setExpr(id, line, shotLine, app) {
     const me = shot && shot.actors.find(a => a[0] === id);
     sc.lines.splice(shotLine - 1, 0, '@char ' + token + (me ? ' pos:' + me[1] : ''));
   }
+  dirty.add(sc.name); check(); render();
+}
+
+// 空行在 Naninovel 裡沒有作用，只是把編輯畫面撐得零零落落。
+// 一鍵清掉這支腳本的空行——段落之間留一行，那個是給人看的。
+function blankCount(sc) {
+  return sc.lines.filter((l, i) => !l.trim() && !isSeparator(sc, i)).length;
+}
+
+// 「# 段落」前面那一行空白留著，看起來比較好斷
+function isSeparator(sc, i) {
+  const next = (sc.lines[i + 1] || '').trim();
+  return next.startsWith('#') && (sc.lines[i - 1] || '').trim() !== '';
+}
+
+function dropBlanks() {
+  const sc = scripts[current];
+  const before = sc.lines.length;
+  sc.lines = sc.lines.filter((l, i) => l.trim() || isSeparator(sc, i));
+  if (sc.lines.length === before) return;
   dirty.add(sc.name); check(); render();
 }
 
