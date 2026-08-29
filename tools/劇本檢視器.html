@@ -211,6 +211,8 @@
   #bar .chip:hover{border-color:var(--gold)}
   #bar .dirty{color:var(--gold)}
   #bar button.save{border-color:var(--gold);color:var(--gold)}
+  #bar button.undo{border-color:#5a4652;color:#c78d9c}
+  #bar button.undo:hover{border-color:var(--red);color:var(--red)}
 </style>
 
 <div id="drop">
@@ -989,7 +991,11 @@ function renderScenes(v) {
       '<span class="txt">' + shots.length + ' 個畫面</span>' +
       (blankCount(sc) ? '<button onclick="dropBlanks()" title="這支腳本裡的空行，' +
         '在遊戲裡沒有作用，只是讓編輯畫面變得零零落落">清掉空行（' + blankCount(sc) + '）</button>' : '') +
-      (dirty.has(sc.name) ? '<span class="dirty">● 有未存的變更</span>' : '') +
+      (dirty.has(sc.name)
+        ? '<span class="dirty">● 有未存的變更</span>' +
+          '<button class="undo" onclick="revertScript()"' +
+          ' title="把這支腳本丟回上次存檔的樣子，這次的修改全部不要">取消變更</button>'
+        : '') +
       (canSave ? '<button class="save" onclick="saveScript()">存回 .nani</button>'
                : '<span class="txt">（唯讀。要能存檔就跑 python tools/serve.py）</span>') +
       '<span class="txt" style="margin-left:auto">拖名牌換順序　把角色拖進畫面加人</span>' +
@@ -1396,6 +1402,18 @@ function setExpr(id, line, shotLine, app) {
     sc.lines.splice(shotLine - 1, 0, '@char ' + token + (me ? ' pos:' + me[1] : ''));
   }
   dirty.add(sc.name); check(); render();
+}
+
+// 取消這支腳本這一輪的所有修改，回到上次存檔（或剛載入）的樣子。
+// original 是那個基準：存檔成功時會更新它。
+function revertScript() {
+  const sc = scripts[current];
+  const n = sc.lines.length - sc.original.split(NL).length;
+  const how = n > 0 ? '多了 ' + n + ' 行' : n < 0 ? '少了 ' + (-n) + ' 行' : '行數沒變';
+  if (!confirm('「' + sc.name + '」這次的修改（' + how + '）全部不要，回到上次存檔的樣子？')) return;
+  sc.lines = sc.original.split(NL);
+  dirty.delete(sc.name);
+  check(); render();
 }
 
 // 空行在 Naninovel 裡沒有作用，只是把編輯畫面撐得零零落落。
