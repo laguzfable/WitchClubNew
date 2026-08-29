@@ -137,6 +137,22 @@
   .ass .an{padding:4px 7px 0;font-size:12px;word-break:break-all}
   .ass .au{padding:0 7px 5px;font-size:10px;color:#6b6685}
   .ass.unused{opacity:.42}
+  .ass[onclick]{cursor:pointer}
+  .ass[onclick]:hover{border-color:var(--gold)}
+  .scene.flash{outline:2px solid var(--gold);outline-offset:2px}
+  #uses{position:fixed;right:14px;bottom:150px;z-index:60;width:300px;max-height:52vh;overflow:auto;
+    display:none;background:#221f2c;border:1px solid var(--gold);border-radius:10px;padding:9px 11px;
+    box-shadow:0 6px 22px rgba(0,0,0,.5);font-size:12px}
+  #uses.show{display:block}
+  #uses .uh{display:flex;align-items:center;padding-bottom:6px;color:var(--gold)}
+  #uses .uh span{color:var(--dim);font-size:11px}
+  #uses .ux{margin-left:auto;cursor:pointer;color:#7d7898;padding:0 3px}
+  #uses .ux:hover{color:var(--red)}
+  #uses .ur{padding:3px 0;border-top:1px solid var(--line)}
+  #uses .uf{color:var(--ink);margin-right:6px}
+  #uses .ul{color:#9d97b8;cursor:pointer;margin-right:6px;font-size:11px;
+    border-bottom:1px dashed var(--line)}
+  #uses .ul:hover{color:var(--gold)}
   .miss{border:1px solid var(--red);border-radius:8px;padding:7px 10px;margin:8px 0;
     color:#e0a0a8;font-size:12px}
   .chars{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;margin:10px 0 22px}
@@ -738,6 +754,50 @@ function gapAt(actors, i) {
   return Math.max(12, Math.min(32, Math.floor(Math.min(left, right) * 0.9)));
 }
 
+let USES = {};
+
+// 點資源卡 → 列出用到它的地方，點一下就跳過去
+function showUses(name) {
+  const list = USES[name] || [];
+  const box = document.getElementById('uses') || (() => {
+    const d = document.createElement('div');
+    d.id = 'uses';
+    document.body.appendChild(d);
+    return d;
+  })();
+
+  const byFile = {};
+  list.forEach(x => {
+    const [f, l] = x.split(':');
+    (byFile[f] = byFile[f] || []).push(+l);
+  });
+
+  box.innerHTML =
+    '<div class="uh"><b>' + esc(name) + '</b>　<span>' + list.length + ' 處</span>' +
+      '<span class="ux" onclick="document.getElementById(&quot;uses&quot;).remove()">×</span></div>' +
+    Object.keys(byFile).sort(scriptOrder).map(f =>
+      '<div class="ur"><span class="uf">' + esc(f) + '</span>' +
+      byFile[f].map(l => '<span class="ul" onclick="goUse(&quot;' + esc(f) + '&quot;,' + l + ')">' +
+        l + ' 行</span>').join('') + '</div>').join('');
+  box.classList.add('show');
+}
+
+// 跳到那一行所在的那一幕
+function goUse(file, line) {
+  select(file);                       // select 會切到場景頁
+  setTimeout(() => {
+    const shots = sceneShots(scripts[file]);
+    let idx = shots.findIndex((s, i) =>
+      s.line <= line && (i === shots.length - 1 || shots[i + 1].line > line));
+    if (idx < 0) idx = 0;
+    const el = document.querySelectorAll('.scene')[idx];
+    if (!el) return;
+    el.scrollIntoView({behavior: 'smooth', block: 'center'});
+    el.classList.add('flash');
+    setTimeout(() => el.classList.remove('flash'), 1600);
+  }, 60);
+}
+
 // ── 資源清單 ────────────────────────────────────────
 // 有哪些背景、音樂、怪物、角色跟表情，一頁看完。
 // 順便標出劇本裡用到、但檔案找不到的（那些在遊戲裡會是黑畫面或沒聲音）。
@@ -843,12 +903,16 @@ function renderAssets(v) {
 
   const usedBack = usedIn(/^@back (\S+)/), usedBgm = usedIn(/^@bgm (\S+)/),
         usedSfx = usedIn(/^@sfx (\S+)/), usedMob = usedIn(/^@battle .*?target:(\S+)/);
+  // 給 showUses 查的：名字 → 用在哪些地方
+  USES = Object.assign({}, usedBack, usedBgm, usedSfx, usedMob);
   const kind = ASSETS.audioKind || {};
   const bgmList = Object.entries(ASSETS.audio).filter(([n]) => kind[n] !== 'sfx');
   const sfxList = Object.entries(ASSETS.audio).filter(([n]) => kind[n] === 'sfx');
 
   const card = (name, inner, used, extra) =>
-    '<div class="ass' + (used && !used[name] ? ' unused' : '') + '">' + inner +
+    '<div class="ass' + (used && !used[name] ? ' unused' : '') +
+      (used && used[name] ? '" onclick="showUses(&quot;' + esc(name).replace(/"/g, '') +
+        '&quot;)" title="點一下看用在哪裡' : '') + '">' + inner +
     '<div class="an">' + esc(name) + '</div>' +
     (extra ? '<div class="ax">' + extra + '</div>' : '') +
     (used ? '<div class="au">' + (used[name] ? used[name].length + ' 處用到' : '沒有用到') + '</div>' : '') +
