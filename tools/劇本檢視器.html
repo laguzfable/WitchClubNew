@@ -102,7 +102,11 @@
   .scene .bar .ln{color:#54506a;font-family:ui-monospace,Consolas,monospace}
   .scene .line{padding:5px 9px 8px;color:var(--dim);font-size:12px}
   .scene .lines{padding:5px 9px 6px;color:var(--dim);font-size:12px;max-height:190px;overflow:auto}
-  .scene .lines div{padding:1px 0}
+  .scene .lines div{padding:1px 0;display:flex;align-items:baseline;gap:4px}
+  .scene .lines .edit{flex:1}
+  .scene .lines .dx{color:#4a465c;cursor:pointer;padding:0 3px;font-size:12px}
+  .scene .lines div:hover .dx{color:#7d7898}
+  .scene .lines .dx:hover{color:var(--red)}
   .scene .evs{padding:2px 9px 8px;font-size:12px;border-top:1px dashed var(--line)}
   .scene .evs div{padding:2px 0;color:#9d97b8}
   .scene .lines .ln,.scene .evs .ln{display:inline-block;min-width:38px;color:#54506a;
@@ -1058,7 +1062,9 @@ function renderScenes(v) {
             ' onblur="editLine(' + x.line + ', this)"' +
             ' onkeydown="if(event.key===&quot;Enter&quot;){event.preventDefault();this.blur()}' +
             'if(event.key===&quot;Escape&quot;){this.textContent=this.dataset.was;this.blur()}"' +
-            ' onfocus="this.dataset.was=this.textContent">' + esc(x.text) + '</span></div>').join('') +
+            ' onfocus="this.dataset.was=this.textContent">' + esc(x.text) + '</span>' +
+            '<span class="dx" title="刪掉這一行" onclick="delLine(' + x.line + ')">×</span>' +
+            '</div>').join('') +
           '</div>' : '') +
         (s.events.length ? '<div class="evs">' + s.events.map(x =>
             '<div><span class="ln">' + x.line + '</span><span class="tag t-' + x.kind + '">' +
@@ -1385,6 +1391,13 @@ function setExpr(id, line, shotLine, app) {
     const me = shot && shot.actors.find(a => a[0] === id);
     sc.lines.splice(shotLine - 1, 0, '@char ' + token + (me ? ' pos:' + me[1] : ''));
   }
+  dirty.add(sc.name); check(); render();
+}
+
+// 刪掉一整行。空行、多餘的括號那種，用改的改不掉，要整行拿走。
+function delLine(line) {
+  const sc = scripts[current];
+  sc.lines.splice(line - 1, 1);
   dirty.add(sc.name); check(); render();
 }
 
