@@ -110,6 +110,8 @@
   .scene .lines .dx:hover{color:var(--red)}
   .scene .evs{padding:2px 9px 8px;font-size:12px;border-top:1px dashed var(--line)}
   .scene .evs div{padding:2px 0;color:#9d97b8}
+  .scene .cnt{color:var(--gold);font-size:11px;margin-right:6px;white-space:nowrap}
+  .scene .cnt i{color:#7d7898;font-style:normal}
   .scene .lines .ln,.scene .evs .ln{display:inline-block;min-width:38px;color:#54506a;
     font-family:ui-monospace,Consolas,monospace}
   .scene .lab{color:var(--gold);font-size:11px}
@@ -366,6 +368,7 @@ function parse(s) {
 
 // ── 檢查（規則跟 Unity 那支一致）────────────────────────
 function check() {
+  ROUTE = null;          // 劇本動過，路線要重算
   issues = [];
   const labels = {};
   for (const n in scripts) labels[n] = labelsOf(scripts[n]);
@@ -805,7 +808,68 @@ function goUse(file, line) {
   }, 60);
 }
 
-// ── 資源清單 ────────────────────────────────────────
+// ── 戰鬥與地圖的編號 ──────────────────────────────
+// 「本章第幾個」好算；「全遊戲第幾個」要有路線才算得出來，
+// 所以用腳本之間的 @goto 建一張圖，從 chapter0 走最短路徑過來，
+// 把路上經過的腳本裡的戰鬥／地圖全部加起來。
+// 走不到的（demo、備份、單獨的地圖事件）就只給本章編號。
+let ROUTE = null;
+
+function isBattle(t) { return /^@battle\b/.test(t); }
+function isMap(t) { return /^@Goto(UnityScene|MapDemo)\b/.test(t) && /MapTest/.test(t); }
+
+function routeInfo() {
+  if (ROUTE) return ROUTE;
+  const edges = {}, count = {};
+
+  for (const n in scripts) {
+    edges[n] = new Set();
+    count[n] = {battle: 0, map: 0};
+    scripts[n].lines.forEach(l => {
+      const t = l.trim();
+      if (isBattle(t)) count[n].battle++;
+      else if (isMap(t)) count[n].map++;
+      // 跳去別支腳本有三種寫法：@goto chapter1（整支）、
+      // @goto syb_end.end1（跳到某段）、還有地圖回來用的 scriptName/script
+      for (const re of [/(?:@goto |goto:)([\w-]+)(?=[.\s]|$)/g,
+                        /(?:scriptName|script):"?([\w-]+)/g])
+        for (const m of t.matchAll(re))
+          if (m[1] !== n && !t.startsWith('@goto .')) edges[n].add(m[1]);
+    });
+  }
+
+  // 從 chapter0 出發，記下每支腳本是「經過哪些腳本」才到得了的
+  const before = {chapter0: {battle: 0, map: 0}}, seen = new Set(['chapter0']);
+  const queue = ['chapter0'];
+  while (queue.length) {
+    const cur = queue.shift();
+    for (const nx of edges[cur] || []) {
+      if (seen.has(nx) || !scripts[nx]) continue;
+      seen.add(nx);
+      before[nx] = {battle: before[cur].battle + count[cur].battle,
+                    map: before[cur].map + count[cur].map};
+      queue.push(nx);
+    }
+  }
+  return (ROUTE = {before, count});
+}
+
+// 這一行是這支腳本裡的第幾個戰鬥／地圖，以及全遊戲第幾個
+function battleTag(line, kind) {
+  const sc = scripts[current], {before} = routeInfo();
+  const test = kind === 'battle' ? isBattle : isMap;
+  let inChapter = 0;
+  for (let i = 0; i < line; i++) if (test(sc.lines[i].trim())) inChapter++;
+
+  const what = kind === 'battle' ? '戰鬥' : '進地圖';
+  const b = before[current];
+  return '<span class="cnt">本章第 ' + inChapter + ' 個' + what +
+    (b ? '　全遊戲第 ' + (b[kind] + inChapter) + ' 個'
+       : '　<i title="從 chapter0 一路 @goto 走不到這支腳本，所以算不出全遊戲的編號">支線</i>') +
+    '</span>';
+}
+
+// ── 資源清單 ──────────────────────────────────────
 // 有哪些背景、音樂、怪物、角色跟表情，一頁看完。
 // 順便標出劇本裡用到、但檔案找不到的（那些在遊戲裡會是黑畫面或沒聲音）。
 function usedIn(re) {
@@ -1079,7 +1143,10 @@ function renderScenes(v) {
         (s.events.length ? '<div class="evs">' + s.events.map(x =>
             '<div><span class="ln">' + x.line + '</span><span class="tag t-' + x.kind + '">' +
             (EVENT_NAME[x.kind] || x.kind) + '</span>' +
-            (x.kind === 'choice' ? choiceRow(x)
+            (x.kind === 'battle' ? battleTag(x.line, 'battle') + esc(x.text)
+              : (x.kind === 'GotoUnityScene' || x.kind === 'GotoMapDemo') && /MapTest/.test(x.text)
+                ? battleTag(x.line, 'map') + esc(x.text)
+              : x.kind === 'choice' ? choiceRow(x)
               : x.kind === 'goto' ? gotoRow(x)
               : (x.kind === 'restroom' || x.kind === 'SaveReturnPoint' ||
                  x.kind === 'GotoChangeRune') ? targetRow(x) : esc(x.text)) + '</div>').join('') +
