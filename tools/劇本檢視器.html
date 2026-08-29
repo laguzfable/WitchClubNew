@@ -37,6 +37,14 @@
   .file .m .err{color:var(--red)}
   main{overflow-y:auto;padding:20px 26px 80px}
   .tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+  .pages{padding:6px 8px 8px;border-bottom:1px solid var(--line)}
+  .pg{display:flex;align-items:center;padding:5px 9px;border-radius:6px;font-size:12px;
+      color:var(--dim);cursor:pointer}
+  .pg:hover{background:#241f30;color:var(--ink)}
+  .pg.on{background:#2b2438;color:var(--gold)}
+  .pg .badge{margin-left:auto;font-size:10px;color:var(--red)}
+  .pg .badge.on::before{content:'✕'}
+  .sec{padding:8px 10px 4px;font-size:10px;color:#54506a;letter-spacing:1px}
   h2{font-size:17px;margin:0 0 4px}
   .sub{color:var(--dim);font-size:12px;margin-bottom:18px}
   .block{border:1px solid var(--line);border-radius:10px;margin-bottom:12px;overflow:hidden}
@@ -194,16 +202,19 @@
 <div id="app">
   <aside>
     <div class="head"><input id="q" placeholder="搜尋腳本或台詞"></div>
+    <div class="pages">
+      <div class="pg" data-tab="issues">檢查<span class="badge" id="badge-issues"></span></div>
+      <div class="pg" data-tab="affinity">好感總覽</div>
+      <div class="pg" data-tab="endings">結局</div>
+      <div class="pg" data-tab="assets">資源</div>
+    </div>
+    <div class="sec">腳本</div>
     <div id="list"></div>
   </aside>
   <main>
-    <div class="tabs">
-      <button data-tab="outline" class="on">結構</button>
-      <button data-tab="issues">檢查</button>
-      <button data-tab="affinity">好感總覽</button>
-      <button data-tab="scenes">場景</button>
-      <button data-tab="endings">結局</button>
-      <button data-tab="assets">資源</button>
+    <div class="tabs" id="viewtabs">
+      <button data-tab="scenes" class="on">場景</button>
+      <button data-tab="outline">結構</button>
     </div>
     <div id="view"></div>
   </main>
@@ -220,7 +231,7 @@ const ASSETS = null;
 let scripts = {};      // name -> {name, lines}
 let issues = [];
 let current = null;
-let tab = 'outline';
+let tab = 'scenes';
 
 // ── 讀檔 ──────────────────────────────────────────────
 const drop = document.getElementById('drop');
@@ -263,6 +274,8 @@ async function load(files) {
   drop.classList.add('hide');
   document.getElementById('app').classList.add('show');
   renderList();
+  tab = 'scenes';
+  syncTabs();
   select(Object.keys(scripts).sort()[0]);
 }
 
@@ -407,6 +420,10 @@ function bad(file, line, msg, warn) {issues.push({file, line, msg, warn: !!warn}
 
 // ── 畫面 ──────────────────────────────────────────────
 function renderList() {
+  const bad = issues.filter(i => !i.warn).length;
+  const badge = document.getElementById('badge-issues');
+  if (badge) { badge.textContent = bad || ''; badge.className = 'badge' + (bad ? ' on' : ''); }
+
   const q = document.getElementById('q').value.trim();
   const el = document.getElementById('list');
   el.innerHTML = '';
@@ -424,12 +441,29 @@ function renderList() {
   });
 }
 
-function select(n) {current = n; renderList(); render()}
+// 點左邊的腳本就是要編它，一律進場景頁
+function select(n) {
+  current = n;
+  tab = 'scenes';
+  syncTabs();
+  renderList();
+  render();
+}
+
+// 把上面兩顆按鈕跟左邊的全域頁標成目前這個
+function syncTabs() {
+  document.querySelectorAll('#viewtabs button').forEach(b =>
+    b.classList.toggle('on', b.dataset.tab === tab));
+  document.querySelectorAll('.pages .pg').forEach(b =>
+    b.classList.toggle('on', b.dataset.tab === tab));
+  document.getElementById('viewtabs').style.display =
+    (tab === 'scenes' || tab === 'outline') ? '' : 'none';
+}
 
 document.getElementById('q').addEventListener('input', renderList);
-document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
+document.querySelectorAll('#viewtabs button, .pages .pg').forEach(b => b.onclick = () => {
   tab = b.dataset.tab;
-  document.querySelectorAll('.tabs button').forEach(x => x.classList.toggle('on', x === b));
+  syncTabs();
   render();
 });
 
@@ -1387,6 +1421,7 @@ if (EMBEDDED) {
   drop.classList.add('hide');
   document.getElementById('app').classList.add('show');
   renderList();
+  syncTabs();
   select(Object.keys(scripts).sort()[0]);
 }
 </script>
