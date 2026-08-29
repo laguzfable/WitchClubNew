@@ -45,6 +45,12 @@
   .pg .badge{margin-left:auto;font-size:10px;color:var(--red)}
   .pg .badge.on::before{content:'✕'}
   .sec{padding:8px 10px 4px;font-size:10px;color:#54506a;letter-spacing:1px}
+  .file.undone .n{color:var(--gold)}
+  .file .dot{color:var(--gold);font-size:9px;margin-right:5px;vertical-align:1px}
+  #saveall{margin-top:7px}
+  #saveall button{width:100%;background:#2b2438;color:var(--gold);border:1px solid var(--gold);
+    border-radius:6px;padding:4px;font-size:12px;cursor:pointer}
+  #saveall button:hover{background:#352c46}
   h2{font-size:17px;margin:0 0 4px}
   .sub{color:var(--dim);font-size:12px;margin-bottom:18px}
   .block{border:1px solid var(--line);border-radius:10px;margin-bottom:12px;overflow:hidden}
@@ -201,7 +207,7 @@
 
 <div id="app">
   <aside>
-    <div class="head"><input id="q" placeholder="搜尋腳本或台詞"></div>
+    <div class="head"><input id="q" placeholder="搜尋腳本或台詞"><div id="saveall"></div></div>
     <div class="pages">
       <div class="pg" data-tab="issues">檢查<span class="badge" id="badge-issues"></span></div>
       <div class="pg" data-tab="affinity">好感總覽</div>
@@ -227,6 +233,7 @@ const EMBEDDED = null;
 // 背景與音樂的檔案路徑（build_viewer.py 從 EditorResources 對出來的）
 const ASSETS = null;
 
+const NL = String.fromCharCode(10);
 let scripts = {};      // name -> {name, lines}
 let issues = [];
 let current = null;
@@ -455,6 +462,11 @@ function renderList() {
   const badge = document.getElementById('badge-issues');
   if (badge) { badge.textContent = bad || ''; badge.className = 'badge' + (bad ? ' on' : ''); }
 
+  // 有沒存的就在搜尋框下面擺一顆「存全部」
+  const box = document.getElementById('saveall');
+  if (box) box.innerHTML = dirty.size
+    ? '<button onclick="saveAll()">存全部（' + dirty.size + ' 支）</button>' : '';
+
   const q = document.getElementById('q').value.trim();
   const el = document.getElementById('list');
   el.innerHTML = '';
@@ -472,9 +484,10 @@ function renderList() {
     const errs = issues.filter(i => i.file === n && !i.warn).length;
     const ends = s.lines.filter(l => l.trim().startsWith('@achieve')).length;
     const div = document.createElement('div');
-    div.className = 'file' + (n === current ? ' sel' : '');
-    div.innerHTML = `<span class="n">${n}</span><span class="m">${
-      errs ? `<span class="err">✕${errs}</span> ` : ''}${ends ? `結局${ends} ` : ''}${s.lines.length}行</span>`;
+    div.className = 'file' + (n === current ? ' sel' : '') + (dirty.has(n) ? ' undone' : '');
+    div.innerHTML = '<span class="n">' + (dirty.has(n) ? '<b class="dot">●</b>' : '') + esc(n) +
+      '</span><span class="m">' + (errs ? '<span class="err">✕' + errs + '</span> ' : '') +
+      (ends ? '結局' + ends + ' ' : '') + s.lines.length + '行</span>';
     div.onclick = () => select(n);
     el.appendChild(div);
   });
@@ -499,6 +512,11 @@ function syncTabs() {
     (tab === 'scenes' || tab === 'outline') ? '' : 'none';
 }
 
+window.addEventListener('beforeunload', e => {
+  if (!dirty.size) return;
+  e.preventDefault(); e.returnValue = '';
+});
+
 document.getElementById('q').addEventListener('input', renderList);
 document.querySelectorAll('#viewtabs button, .pages .pg').forEach(b => b.onclick = () => {
   tab = b.dataset.tab;
@@ -508,6 +526,7 @@ document.querySelectorAll('#viewtabs button, .pages .pg').forEach(b => b.onclick
 
 function render() {
   const v = document.getElementById('view');
+  renderList();                    // 左邊的未存標記和「存全部」跟著更新
   setTimeout(() => {                       // 重畫會把 .on 洗掉，畫完再標一次
     const a = document.getElementById('player');
     markPlaying(a && !a.paused ? a.dataset.name : null);
@@ -981,7 +1000,9 @@ function renderScenes(v) {
             '<div><span class="ln">' + x.line + '</span><span class="tag t-' + x.kind + '">' +
             (EVENT_NAME[x.kind] || x.kind) + '</span>' +
             (x.kind === 'choice' ? choiceRow(x)
-              : x.kind === 'goto' ? gotoRow(x) : esc(x.text)) + '</div>').join('') +
+              : x.kind === 'goto' ? gotoRow(x)
+              : (x.kind === 'restroom' || x.kind === 'SaveReturnPoint' ||
+                 x.kind === 'GotoChangeRune') ? targetRow(x) : esc(x.text)) + '</div>').join('') +
           '</div>' : '') +
         '<div class="addch">' +
           '<button onclick="addTalk(' + s.line + ')">＋ 台詞</button>' +
@@ -999,6 +1020,53 @@ function renderScenes(v) {
     }).join('') + '</div>';
 
   wireDragging();
+}
+
+// 「去哪支腳本的哪個段落」——@restroom、@SaveReturnPoint、@GotoChangeRune
+// 都是這個形狀，只是參數名字不一樣。做成兩個選單，不用背參數怎麼寫。
+const TARGET_PARAM = {restroom: ['scriptName', 'label'],
+                      SaveReturnPoint: ['script', 'label'],
+                      GotoChangeRune: ['scriptName', 'label']};
+
+function targetRow(x) {
+  const [sp, lp] = TARGET_PARAM[x.kind];
+  const g = v => {
+    const m = x.text.match(new RegExp(v + ':("[^"]*"|[^ ]+)'));
+    return m ? m[1].replace(/"/g, '') : '';
+  };
+  const script = g(sp), label = g(lp);
+  const names = Object.keys(scripts).sort(scriptOrder);
+  const labels = scripts[script] ? [...labelsOf(scripts[script])].sort() : [];
+
+  return '<span class="ch">' +
+    '<select class="chgoto" title="回到哪一支腳本"' +
+      ' onchange="setTarget(' + x.line + ', &quot;' + x.kind + '&quot;, &quot;script&quot;, this.value)">' +
+      (script ? '' : '<option value="">（沒寫，會留在原地）</option>') +
+      names.map(n => '<option' + (n === script ? ' selected' : '') + '>' + esc(n) + '</option>').join('') +
+    '</select>' +
+    '<select class="chgoto" title="接到哪個段落"' +
+      ' onchange="setTarget(' + x.line + ', &quot;' + x.kind + '&quot;, &quot;label&quot;, this.value)">' +
+      (labels.includes(label) ? '' : '<option selected>' + esc(label || '（沒寫）') + '</option>') +
+      labels.map(l => '<option' + (l === label ? ' selected' : '') + '>' + esc(l) + '</option>').join('') +
+    '</select>' +
+    (script && !scripts[script] ? '<span class="chraw">找不到這支腳本</span>' :
+     script && label && !labels.includes(label) ? '<span class="chraw" style="color:#e0a0a8">'
+       + esc(script) + ' 裡沒有這個段落</span>' : '') +
+  '</span>';
+}
+
+function setTarget(line, kind, which, value) {
+  const sc = scripts[current];
+  const [sp, lp] = TARGET_PARAM[kind];
+  const param = which === 'script' ? sp : lp;
+  let l = sc.lines[line - 1];
+  const re = new RegExp('(' + param + ':)("[^"]*"|[^ ]+)');
+  const val = '"' + value + '"';
+  // 換了腳本的話，原本的段落多半就不存在了，順手清掉免得指到不存在的地方
+  if (which === 'script') l = l.replace(new RegExp('\\s' + lp + ':("[^"]*"|[^ ]+)'), '');
+  l = re.test(l) ? l.replace(re, '$1' + val) : l.trimEnd() + ' ' + param + ':' + val;
+  sc.lines[line - 1] = l;
+  dirty.add(sc.name); check(); render();
 }
 
 // @goto 的目標改成選單，跟選項那邊一樣不用自己打
@@ -1438,17 +1506,34 @@ function wireDragging() {
   });
 }
 
-async function saveScript() {
-  const sc = scripts[current];
+async function saveOne(name) {
+  const sc = scripts[name];
+  const text = sc.lines.join(NL);
   const res = await fetch('/save', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({file: sc.name + '.nani', content: sc.lines.join('\n'),
-                          original: sc.original})
+    body: JSON.stringify({file: sc.name + '.nani', content: text, original: sc.original})
   }).then(r => r.json()).catch(err => ({ok: false, error: err.message}));
 
-  if (res.ok) { sc.original = sc.lines.join('\n'); dirty.delete(sc.name); render(); }
-  else alert('存檔失敗：' + (res.error || '？'));
+  if (res.ok) { sc.original = text; dirty.delete(name); }
+  return res;
+}
+
+async function saveScript() {
+  const res = await saveOne(current);
+  if (!res.ok) alert('存檔失敗：' + (res.error || '？'));
+  renderList(); render();
+}
+
+// 一鍵存掉所有沒存的
+async function saveAll() {
+  const bad = [];
+  for (const n of [...dirty]) {
+    const res = await saveOne(n);
+    if (!res.ok) bad.push(n + '：' + (res.error || '？'));
+  }
+  renderList(); render();
+  if (bad.length) alert('有 ' + bad.length + ' 支沒存成功：' + NL + bad.join(NL));
 }
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
