@@ -23,6 +23,17 @@ public class CombatSystem : MonoBehaviour
     /// <summary>沒有用 @battle 的 bgm: 指定時，戰鬥要放的曲子。</summary>
     const string DefaultBattleBgm = "energetic";
 
+    /// <summary>女巫競技場每一場隨機挑一首。劇本沒有辦法替競技場指定音樂
+    /// （那邊不是 @battle 叫起來的），一路聽同一首太單調。
+    /// 這些都確認過有註冊在 EditorResources 裡，載得到。</summary>
+    static readonly string[] TowerBattleBgm = {
+        "energetic", "battle02", "battle03", "bluebattle", "extreme",
+        "superextreme", "thehunter", "thequeen", "onfire", "intense",
+    };
+
+    /// <summary>上一場放的，用來避免連續兩場同一首。</summary>
+    static string lastTowerBgm;
+
     PlayerController pc;
     public EnvironmentEffect envEffect { private set; get; }
     UICombatTextPanel combatTxtPanel;
@@ -307,7 +318,11 @@ public class MobRuneUnlockData
                 // 那就是「戰鬥要放這首」的意思，只是以前被寫死的 battle01 蓋掉了。
                 var battleBgm = DataService.Instance?.scriptParameter?.combatBgm;
                 var track = string.IsNullOrEmpty(battleBgm) ? DefaultBattleBgm : (string)battleBgm;
-                Debug.Log($"[SwitchStateToCombatMode] 戰鬥 BGM：{track}");
+                // 競技場沒辦法用 @battle 指定音樂（那邊不是劇本叫起來的），
+                // 一路聽同一首太單調，所以每一場隨機挑
+                if (TowerModeManager.IsActive) track = PickTowerBgm();
+                Debug.Log($"[SwitchStateToCombatMode] 戰鬥 BGM：{track}" +
+                          (TowerModeManager.IsActive ? "（競技場隨機）" : ""));
 
                 audioManager.PlayBgmAsync(track, volume: 1f, fadeTime: 0.5f, loop: true).Forget();
             }
@@ -718,6 +733,20 @@ public void BackToNani()
     Debug.Log("[BackToNani] LoadSceneAsync 已發出");
 }
 
+
+/// <summary>競技場：隨機挑一首，但不會跟上一場同一首。</summary>
+static string PickTowerBgm ()
+{
+    if (TowerBattleBgm.Length == 0) return DefaultBattleBgm;
+    if (TowerBattleBgm.Length == 1) return TowerBattleBgm[0];
+
+    string pick;
+    do { pick = TowerBattleBgm[UnityEngine.Random.Range(0, TowerBattleBgm.Length)]; }
+    while (pick == lastTowerBgm);
+
+    lastTowerBgm = pick;
+    return pick;
+}
 
 /// <summary>把戰鬥曲收掉。競技場回大廳、一般戰鬥回劇本都會先做這件事。</summary>
 static async UniTaskVoid StopBattleBgmAsync()
