@@ -12,9 +12,13 @@ using Hexe.TowerMode;
 
 public class CombatSystem : MonoBehaviour
 {
-    /// <summary>進戰鬥前放的那首 BGM，打完要還原。
+    /// <summary>進戰鬥前放的那首 BGM，打完要還原（null＝當時本來就沒音樂）。
     /// 用 static 是因為中間會換場景，一般欄位活不過去。</summary>
     static string bgmBeforeCombat;
+
+    /// <summary>這次載入劇本場景是不是從戰鬥回來的。
+    /// 不能只看 bgmBeforeCombat 是否為 null——戰鬥前本來就無聲時它也是 null。</summary>
+    static bool returningFromCombat;
 
     PlayerController pc;
     public EnvironmentEffect envEffect { private set; get; }
@@ -609,6 +613,11 @@ void FinishBattle(bool isLose)
         if (playerUnit != null)
             TowerModeManager.RecordBattleEndHP(isLose, playerUnit.HP.Value, playerUnit.HP.GetTotalValue());
 
+        // 競技場回的是大廳、不是劇本，沒有要還原的東西，戰鬥曲自己收掉
+        bgmBeforeCombat = null;
+        returningFromCombat = false;
+        StopBattleBgmAsync().Forget();
+
         TowerModeManager.HandleBattleResult(isLose);
     }
     else
@@ -682,8 +691,13 @@ public void BackToNani()
     }
     catch (Exception ex) { Debug.LogWarning($"[BackToNani] ContinueInputUI 操作失敗：{ex.Message}"); }
 
-    // ── BGM 還原 ──────────────────────────────────────────────
-    RestoreBgmAsync().Forget();
+    // ── BGM ───────────────────────────────────────────────────
+    // 這裡只把戰鬥曲收掉。還原留到劇本場景載好之後再做
+    // （NaniScriptLoader_HEX 會呼叫 RestoreBgmAfterCombat），
+    // 不然淡出淡入會被場景切換打斷，battle01 收不乾淨就會跟
+    // 劇本後面的 @bgm 疊在一起。
+    returningFromCombat = true;
+    StopBattleBgmAsync().Forget();
 
     // ── 載入 NaniDialogTest ────────────────────────────────────
     // scriptParameter 是開戰前指定好的續播點，回去時要明確優先於 MapReturnPoint，
@@ -695,28 +709,43 @@ public void BackToNani()
 }
 
 
-/// <summary>把戰鬥曲收掉，換回進戰鬥前那首。
-///
-/// 要先停再放：Naninovel 的 BGM 可以疊著放，只放新的不會把 battle01 蓋掉。
-/// 寫成 static 是因為呼叫完馬上就 LoadScene，這個物件會被銷毀——
-/// 不依附在它身上，淡出淡入才跑得完。</summary>
-static async UniTaskVoid RestoreBgmAsync()
+/// <summary>把戰鬥曲收掉。競技場回大廳、一般戰鬥回劇本都會先做這件事。</summary>
+static async UniTaskVoid StopBattleBgmAsync()
 {
+    try
+    {
+        var audioManager = Engine.GetService<IAudioManager>();
+        if (audioManager != null) await audioManager.StopAllBgmAsync(0.4f);
+    }
+    catch (Exception ex) { Debug.LogWarning($"[FinishBattle] 停戰鬥曲失敗：{ex.Message}"); }
+}
+
+/// <summary>換回進戰鬥前那首 BGM。由劇本場景載好之後呼叫
+/// （NaniScriptLoader_HEX），不是在切場景前——那時候淡出淡入會被打斷。
+///
+/// 要先停再放：Naninovel 的 BGM 可以疊著放，只放新的不會把 battle01 蓋掉。</summary>
+public static async UniTaskVoid RestoreBgmAfterCombat()
+{
+    if (!returningFromCombat) return;     // 不是從戰鬥回來的，別亂動音樂
+    returningFromCombat = false;
+
     try
     {
         var audioManager = Engine.GetService<IAudioManager>();
         if (audioManager == null) return;
 
-        await audioManager.StopBgmAsync("battle01", 0.4f);
+        // 停全部而不是只停 battle01：Naninovel 的 BGM 可以疊著放，
+        // 只要有一首沒收乾淨，等劇本下一次 @bgm 就會變成兩首一起響。
+        await audioManager.StopAllBgmAsync(0.4f);
 
         if (!string.IsNullOrEmpty(bgmBeforeCombat))
         {
             await audioManager.PlayBgmAsync(bgmBeforeCombat, volume: 1f, fadeTime: 0.4f, loop: true);
-            Debug.Log($"[BackToNani] BGM 還原成 {bgmBeforeCombat}");
+            Debug.Log($"[BGM] 戰鬥結束，還原成 {bgmBeforeCombat}");
         }
-        else Debug.Log("[BackToNani] 戰鬥前本來就沒有 BGM，不還原");
+        else Debug.Log("[BGM] 戰鬥前本來就沒有音樂，只把戰鬥曲收掉");
     }
-    catch (Exception ex) { Debug.LogWarning($"[BackToNani] BGM 還原失敗：{ex.Message}"); }
+    catch (Exception ex) { Debug.LogWarning($"[BGM] 還原失敗：{ex.Message}"); }
     finally { bgmBeforeCombat = null; }
 }
 

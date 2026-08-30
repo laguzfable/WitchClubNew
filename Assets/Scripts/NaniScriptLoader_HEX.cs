@@ -94,6 +94,11 @@ public class NaniScriptLoader_HEX : MonoBehaviour
             return;
         }
 
+        // 從戰鬥回來的話，把戰鬥前那首 BGM 放回去。
+        // 放在這裡而不是 BackToNani：那邊喊完馬上就切場景，淡出淡入會被打斷，
+        // battle01 收不乾淨就會跟劇本後面的 @bgm 疊在一起。
+        CombatSystem.RestoreBgmAfterCombat().Forget();
+
         // Story scene after tutorial: clear the static flags so the next scene
         // load (if any) doesn't mistakenly skip again.
         if (TutorialController.isTutorial || TutorialController.isTutorial2)
