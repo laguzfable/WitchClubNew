@@ -715,7 +715,9 @@ function sceneShots(sc) {
       firstLine = no; lastCmd = no; pending = true;
     }
     else if ((m = t.match(/^@bgm (\S+)/))) { change(no); bgm = m[1]; bgmLine = no; ownBgm = true; }
-    else if (/^@stopBgm/i.test(t)) { change(no); bgm = null; bgmLine = 0; }
+    // @stopBgm 也是這一幕自己的音樂設定，行號要留著——
+    // 歸零的話換曲會找不到要改哪一行，之前會插到檔案最前面去。
+    else if (/^@stopBgm/i.test(t)) { change(no); bgm = null; bgmLine = no; ownBgm = true; }
     else if ((m = t.match(/^@char (\S+)/))) {
       change(no);
       const tok = m[1].split(',')[0];
@@ -1142,9 +1144,9 @@ function renderScenes(v) {
             opts(backNames, s.ownBack ? s.back : null) + '</select>' +
           '<select class="pick' + (s.bgmChanged ? ' hot' : '') + '"' +
             ' title="' + (s.ownBgm ? '換掉這一幕的曲子' : '選了會在這一幕插一行 @bgm，從這裡開始換曲') + '"' +
-            ' onchange="setBgm(' + (s.ownBgm ? s.bgmLine : 0) + ', ' +
-            (s.ownBgm ? 0 : s.line) + ', this.value)">' +
-            '<option value="">' + (s.ownBgm ? '（不換）' : '沿用 ' + (s.bgm || '無聲')) + '</option>' +
+            ' onchange="setBgm(' + (s.ownBgm ? s.bgmLine : 0) + ', ' + s.line + ', this.value)">' +
+            '<option value="">' + (s.ownBgm ? (s.bgm ? '（不換）' : '（這裡停掉音樂）')
+                                              : '沿用 ' + (s.bgm || '無聲')) + '</option>' +
             (s.bgm && !bgmNames.includes(s.bgm) ? '<option selected>' + esc(s.bgm) + '</option>' : '') +
             opts(bgmNames, s.bgm) + '</select>' +
           (s.bgmChanged ? '<span class="newbgm">♪ 換曲</span>' : '') +
@@ -1589,12 +1591,17 @@ function setBgm(line, insertAt, name) {
   const sc = scripts[current];
   if (!name) return render();          // 選了「不換曲」＝不動
 
-  if (line) {
-    const i = line - 1;
-    sc.lines[i] = sc.lines[i].replace(/@bgm \S+/, '@bgm ' + name);
-  } else {
+  const cur = line ? sc.lines[line - 1] : '';
+  if (/@bgm\s+\S+/.test(cur)) {
+    sc.lines[line - 1] = cur.replace(/@bgm\s+\S+/, '@bgm ' + name);
+  } else if (/@stopBgm/i.test(cur)) {
+    // 這一幕原本是「停掉音樂」，改成從這裡放這首
+    sc.lines[line - 1] = cur.replace(/@stopBgm\S*/i, '@bgm ' + name);
+  } else if (insertAt > 0) {
     // 從這一幕開始換曲：插在這一幕的第一行之前
-    sc.lines.splice(Math.max(0, insertAt - 1), 0, '@bgm ' + name);
+    sc.lines.splice(insertAt - 1, 0, '@bgm ' + name);
+  } else {
+    return;                            // 不知道要改哪裡就什麼都別做，別亂插
   }
   dirty.add(sc.name);
   render();
