@@ -108,6 +108,22 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.send_header('Accept-Ranges', 'bytes')   # 先告訴瀏覽器我們支援分段
         super().end_headers()
 
+    def do_GET(self):
+        # /raw?file=chapter4.nani → 直接把硬碟上的內容給網頁，
+        # 這樣過期的分頁可以只更新那一支，不用重烤整個檔案再重開。
+        if self.path.startswith('/raw?'):
+            try:
+                query = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+                name = os.path.basename(query.get('file', [''])[0])
+                if not name.endswith('.nani'):
+                    raise ValueError('只能讀 .nani')
+                target = os.path.join(SCRIPTS, name)
+                content = open(target, encoding='utf-8-sig', errors='ignore').read()
+                return self._json({'ok': True, 'content': content})
+            except Exception as e:
+                return self._json({'ok': False, 'error': str(e)}, 404)
+        return super().do_GET()
+
     def do_POST(self):
         if self.path != '/save':
             return self.send_error(404)
@@ -129,9 +145,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 now = open(target, encoding='utf-8-sig', errors='ignore').read()
                 crlf, lf = chr(13) + chr(10), chr(10)
                 if now.replace(crlf, lf) != data['original'].replace(crlf, lf):
-                    raise ValueError('這個檔案在你載入之後被改過了。'
-                                     '請重跑 python tools/build_viewer.py 再改一次，'
-                                     '不然會蓋掉編輯器裡的修改。')
+                    # 不要只丟一句錯誤就算了——把硬碟上的內容一起送回去，
+                    # 網頁就能自己判斷要重新載入還是覆蓋過去。
+                    self._json({'ok': False, 'stale': True, 'content': now,
+                                'error': '這個檔案在你載入之後被別的地方改過了。'}, 409)
+                    print(f'  {name} 有衝突（硬碟上的版本比較新）')
+                    return
 
             with open(target, 'w', encoding='utf-8', newline='') as f:
                 f.write(data['content'])

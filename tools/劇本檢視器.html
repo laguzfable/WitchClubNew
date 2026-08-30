@@ -543,6 +543,12 @@ function syncTabs() {
     (tab === 'scenes' || tab === 'outline') ? '' : 'none';
 }
 
+// 切回這個分頁就順手對一下目前這支腳本
+window.addEventListener('focus', async () => {
+  if (!location.protocol.startsWith('http') || !current) return;
+  if (await refreshFromDisk(current)) { check(); render(); }
+});
+
 window.addEventListener('beforeunload', e => {
   if (!dirty.size) return;
   e.preventDefault(); e.returnValue = '';
@@ -1708,17 +1714,55 @@ function wireDragging() {
   });
 }
 
-async function saveOne(name) {
+async function saveOne(name, force) {
   const sc = scripts[name];
   const text = sc.lines.join(NL);
   const res = await fetch('/save', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({file: sc.name + '.nani', content: text, original: sc.original})
+    body: JSON.stringify({file: sc.name + '.nani', content: text,
+                          original: force ? undefined : sc.original})
   }).then(r => r.json()).catch(err => ({ok: false, error: err.message}));
 
-  if (res.ok) { sc.original = text; dirty.delete(name); }
+  if (res.ok) { sc.original = text; dirty.delete(name); return res; }
+
+  // 檔案在外面被改過了。以前只丟一句「請重跑 build_viewer.py」，
+  // 但那要關掉分頁重開，很煩。現在直接讓你挑。
+  if (res.stale) {
+    if (!dirty.has(name)) {          // 自己沒改過 → 直接吃下硬碟的版本，不用問
+      adopt(name, res.content);
+      return await saveOne(name);
+    }
+    const keep = confirm('「' + name + '」在別的地方被改過了。' + NL + NL +
+      '按「確定」＝用你現在編輯器裡的版本蓋過去' + NL +
+      '按「取消」＝丟掉你這次的修改，載入硬碟上的版本');
+    if (keep) return await saveOne(name, true);
+    adopt(name, res.content);
+    renderList(); render();
+    return {ok: true, reloaded: true};
+  }
   return res;
+}
+
+// 把硬碟上的內容吃進來當成新的基準
+function adopt(name, content) {
+  const sc = scripts[name];
+  sc.lines = content.split(new RegExp('\\r?\\n'));
+  sc.original = sc.lines.join(NL);
+  dirty.delete(name);
+}
+
+// 回到這個分頁時，把沒在編輯的腳本悄悄更新成硬碟上的版本，
+// 這樣就不會一存檔才發現整份都過期了。
+async function refreshFromDisk(name) {
+  if (dirty.has(name)) return false;
+  const res = await fetch('/raw?file=' + encodeURIComponent(name + '.nani'))
+    .then(r => r.json()).catch(() => null);
+  if (!res || !res.ok) return false;
+  const strip = x => x.split(String.fromCharCode(13)).join('');
+  if (strip(res.content) === strip(scripts[name].original)) return false;
+  adopt(name, res.content);
+  return true;
 }
 
 async function saveScript() {
