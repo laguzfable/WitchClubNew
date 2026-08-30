@@ -127,6 +127,17 @@ def build_extra():
 
 assets = build_assets()
 assets.update(build_extra())
+
+# 尺度標註（人工看過的結果，可以直接編輯 tools/尺度標註.json）
+try:
+    review = json.load(io.open(os.path.join(ROOT, 'tools', '尺度標註.json'), encoding='utf-8'))
+    review.pop('_說明', None)
+    assets['review'] = review
+    n = sum(len(v) for v in review.values())
+    print(f'尺度標註 {n} 筆')
+except Exception as e:
+    print(f'（沒有尺度標註：{e}）')
+    assets['review'] = {}
 print(f"背景 {len(assets['backgrounds'])} 張、音樂 {len(assets['audio'])} 首、"
       f"{len(assets['expressions'])} 個角色有表情、怪物 {len(assets['monsters'])} 隻")
 print(f"  音樂裡 BGM {sum(1 for v in assets['audioKind'].values() if v == 'bgm')} 首、"

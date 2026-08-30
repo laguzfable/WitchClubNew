@@ -155,6 +155,13 @@
   .ass .an{padding:4px 7px 0;font-size:12px;word-break:break-all}
   .ass .au{padding:0 7px 5px;font-size:10px;color:#6b6685}
   .ass.unused{opacity:.42}
+  .ass .rv{font-size:10px;padding:3px 7px;line-height:1.35}
+  .ass .rv.nude{background:#4a1f28;color:#ffb3bf}
+  .ass .rv.borderline{background:#4a3f1f;color:#f0d79a}
+  .rvsum{border:1px solid var(--line);border-left:3px solid var(--red);border-radius:8px;
+    padding:7px 10px;margin:8px 0;font-size:12px;color:#d9cfe0}
+  .rvsum b{color:#e08a99}
+  .rvsum span{display:block;margin-top:3px;color:#6b6685;font-size:11px}
   .ass[onclick]{cursor:pointer}
   .ass[onclick]:hover{border-color:var(--gold)}
   .scene.flash{outline:2px solid var(--gold);outline-offset:2px}
@@ -1092,12 +1099,21 @@ function renderAssets(v) {
   const bgmList = Object.entries(ASSETS.audio).filter(([n]) => kind[n] !== 'sfx');
   const sfxList = Object.entries(ASSETS.audio).filter(([n]) => kind[n] === 'sfx');
 
-  const card = (name, inner, used, extra) =>
+  // 尺度標註：裸露的紅底、邊緣的黃底，滑上去看理由
+  const rv = (group, name) => {
+    const r = ((ASSETS.review || {})[group] || {})[name];
+    if (!r) return '';
+    return '<div class="rv ' + r.level + '" title="' + esc(r.note || '') + '">' +
+      (r.level === 'nude' ? '裸露' : '邊緣') + '　' + esc(r.note || '') + '</div>';
+  };
+
+  const card = (name, inner, used, extra, group) =>
     '<div class="ass' + (used && !used[name] ? ' unused' : '') +
       (used && used[name] ? '" onclick="showUses(&quot;' + esc(name).replace(/"/g, '') +
         '&quot;)" title="點一下看用在哪裡' : '') + '">' + inner +
     '<div class="an">' + esc(name) + '</div>' +
     (extra ? '<div class="ax">' + extra + '</div>' : '') +
+    (group ? rv(group, name) : '') +
     (used ? '<div class="au">' + (used[name] ? used[name].length + ' 處用到' : '沒有用到') + '</div>' : '') +
     '</div>';
 
@@ -1107,14 +1123,27 @@ function renderAssets(v) {
       bad.map(b => esc(b) + '（' + used[b][0] + ' 等 ' + used[b].length + ' 處）').join('、') + '</div>' : '';
   };
 
-  const sec = (title, sub, body) =>
-    '<h2>' + title + '</h2><div class="sub">' + sub + '</div>' + body;
+  const sec = (title, sub, body, group) => {
+    let warn = '';
+    if (group) {
+      const r = (ASSETS.review || {})[group] || {};
+      const nude = Object.keys(r).filter(k => r[k].level === 'nude');
+      const edge = Object.keys(r).filter(k => r[k].level === 'borderline');
+      if (nude.length || edge.length)
+        warn = '<div class="rvsum">尺度：' +
+          (nude.length ? '<b>裸露 ' + nude.length + ' 張</b>（' + nude.join('、') + '）　' : '') +
+          (edge.length ? '邊緣 ' + edge.length + ' 張（' + edge.join('、') + '）' : '') +
+          '<span>基準：Steam 不打成人標記。改 tools/尺度標註.json 可以調整</span></div>';
+    }
+    return '<h2>' + title + '</h2><div class="sub">' + sub + '</div>' + warn + body;
+  };
 
   v.innerHTML =
     sec('背景', Object.keys(ASSETS.backgrounds).length + ' 張。灰的是劇本裡沒用到的。',
       missing(usedBack, ASSETS.backgrounds, '背景') +
       '<div class="grid">' + Object.entries(ASSETS.backgrounds).map(([n, src]) =>
-        card(n, '<img loading="lazy" src="' + src + '">', usedBack)).join('') + '</div>') +
+        card(n, '<img loading="lazy" src="' + src + '">', usedBack, '', 'backgrounds')).join('') + '</div>',
+      'backgrounds') +
 
     sec('音樂（BGM）', bgmList.length + ' 首，寫成 <code>@bgm 名字</code>。按 ▶ 試聽。',
       missing(usedBgm, ASSETS.audio, '音樂') +
@@ -1130,7 +1159,8 @@ function renderAssets(v) {
     sec('怪物', Object.keys(ASSETS.monsters || {}).length + ' 隻。@battle 的 target 就是這些名字。',
       missing(usedMob, ASSETS.monsters || {}, '怪物') +
       '<div class="grid">' + Object.entries(ASSETS.monsters || {}).map(([n, src]) =>
-        card(n, '<img loading="lazy" class="mob" src="' + src + '">', usedMob)).join('') + '</div>') +
+        card(n, '<img loading="lazy" class="mob" src="' + src + '">', usedMob, '', 'monsters')).join('') + '</div>',
+      'monsters') +
 
     sec('角色與表情',
       '角色是 Live2D，沒有立繪可以預覽——圖是 prefab 旁邊的貼圖集，只能當個示意。' +

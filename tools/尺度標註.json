@@ -1,0 +1,22 @@
+{
+  "_說明": "資源頁上的尺度標註。level 有三種：nude（裸露，不打成人標記會過不了）、borderline（邊緣，可以出貨）、ok（不標）。改這個檔之後重跑 build_viewer.py 就會更新。判斷基準：Steam 不打成人標記。",
+
+  "monsters": {
+    "yellow05": { "level": "nude", "note": "上空，胸部完全裸露" },
+    "yellow01": { "level": "nude", "note": "全裸，胸與臀可見" },
+    "yellow02": { "level": "nude", "note": "全裸，背面與臀部可見" },
+    "yellow03": { "level": "nude", "note": "多人全裸" },
+    "yellow04": { "level": "nude", "note": "多人全裸" },
+    "red01":    { "level": "nude", "note": "全裸背面，臀部可見" },
+    "red02":    { "level": "nude", "note": "上衣下拉，乳房大部分外露" },
+    "yellow00": { "level": "nude", "note": "全裸（目前沒有戰鬥用到）" },
+    "monsterez":  { "level": "nude", "note": "半裸（目前沒有戰鬥用到）" },
+    "monsterez2": { "level": "nude", "note": "半裸（目前沒有戰鬥用到）" }
+  },
+
+  "backgrounds": {
+    "CG/cg19": { "level": "borderline", "note": "背對鏡頭，短褲露出臀部下緣" },
+    "CG/cg09": { "level": "borderline", "note": "襯衫側躺，雙腿裸露" },
+    "CG/cg12": { "level": "borderline", "note": "兩人親密躺臥，衣著完整" }
+  }
+}
