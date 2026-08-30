@@ -34,8 +34,6 @@
 涅莉: 沒時間解釋了，總之趕緊過去吧！
 @hide 涅莉
 @back bg03
-@stopBgm
-@bgm energetic
 @battle background:bg02 target:monster02 label:ch5bt1
 @stop
 
@@ -208,8 +206,6 @@
 艾札蘭: 哈哈哈－－真是弱得可以。
 優菲: 別再這樣子了啦，{PlayerName}，幫忙一下！
 @back bg03
-@stopBgm
-@bgm energetic
 @battle background:bg02 target:monster02 label:ch5bt2
 @stop
 
@@ -290,9 +286,7 @@
 西碧爾: 呼，終於完成整桌菜了～
 西碧爾: 來來來，大家開動了。
 (爆炸聲)
-@stopBgm
-@bgm extreme
-@battle background:bg02 target:monster02 label:ch5bt6
+@battle background:bg02 target:monster02 label:ch5bt6 bgm:extreme
 @stop
 
 # ch5bt6
@@ -516,9 +510,7 @@
 優菲: 我要在這裡將這個叛徒就地正法—－
 @back bg03
 @hide chl,梅爾,優菲
-@stopBgm
-@bgm onfire
-@battle background:bg03 target:monster02 label:ch5bt3
+@battle background:bg03 target:monster02 label:ch5bt3 bgm:onfire
 @stop
 
 # ch5bt3
@@ -598,9 +590,7 @@
 涅莉: {PlayerName}，這是最後了。
 涅莉: 使盡全力替女朋友報仇吧。
 @hide syb,涅莉
-@stopBgm
-@bgm superextreme
-@battle background:bg03 target:monster02 label:ch5bt4
+@battle background:bg03 target:monster02 label:ch5bt4 bgm:superextreme
 @stop
 
 # ch5bt4

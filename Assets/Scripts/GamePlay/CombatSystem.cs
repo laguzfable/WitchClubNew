@@ -20,6 +20,9 @@ public class CombatSystem : MonoBehaviour
     /// 不能只看 bgmBeforeCombat 是否為 null——戰鬥前本來就無聲時它也是 null。</summary>
     static bool returningFromCombat;
 
+    /// <summary>沒有用 @battle 的 bgm: 指定時，戰鬥要放的曲子。</summary>
+    const string DefaultBattleBgm = "energetic";
+
     PlayerController pc;
     public EnvironmentEffect envEffect { private set; get; }
     UICombatTextPanel combatTxtPanel;
@@ -299,9 +302,11 @@ public class MobRuneUnlockData
                 bgmBeforeCombat = playing != null ? playing.FirstOrDefault() : null;
                 Debug.Log($"[SwitchStateToCombatMode] 記住戰鬥前的 BGM：{bgmBeforeCombat ?? "（無聲）"}");
 
-                // @battle 可以用 bgm: 指定這場的曲子，沒指定就用預設的 battle01
+                // @battle 可以用 bgm: 指定這場的曲子，沒指定就用預設的戰鬥曲。
+                // 預設是 energetic：劇本一直在戰鬥前寫 @bgm energetic，
+                // 那就是「戰鬥要放這首」的意思，只是以前被寫死的 battle01 蓋掉了。
                 var battleBgm = DataService.Instance?.scriptParameter?.combatBgm;
-                var track = string.IsNullOrEmpty(battleBgm) ? "battle01" : (string)battleBgm;
+                var track = string.IsNullOrEmpty(battleBgm) ? DefaultBattleBgm : (string)battleBgm;
                 Debug.Log($"[SwitchStateToCombatMode] 戰鬥 BGM：{track}");
 
                 audioManager.PlayBgmAsync(track, volume: 1f, fadeTime: 0.5f, loop: true).Forget();
@@ -699,7 +704,7 @@ public void BackToNani()
     // ── BGM ───────────────────────────────────────────────────
     // 這裡只把戰鬥曲收掉。還原留到劇本場景載好之後再做
     // （NaniScriptLoader_HEX 會呼叫 RestoreBgmAfterCombat），
-    // 不然淡出淡入會被場景切換打斷，battle01 收不乾淨就會跟
+    // 不然淡出淡入會被場景切換打斷，戰鬥曲收不乾淨就會跟
     // 劇本後面的 @bgm 疊在一起。
     returningFromCombat = true;
     StopBattleBgmAsync().Forget();

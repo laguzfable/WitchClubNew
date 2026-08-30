@@ -61,8 +61,6 @@
 @sfx bark loop:false
 獵犬: 汪汪汪！
 涅莉: ……真是看不下去了，{PlayerName}，幫忙一下吧。
-@stopBgm
-@bgm energetic
 @hide 薇狄亞,涅莉,梅爾
 @set RuneActive=false
 @set YellowActive=false
@@ -160,8 +158,6 @@
 @char 鬱鬱 pos:35
 ？？？: 要打架可以去別的地方嗎，我們這裡還要做生意的！
 @hide 陰陰,鬱鬱
-@stopBgm
-@bgm energetic
 @back black
 @battle background:bg02 target:monster01 label:afterbattle3
 @stop
@@ -320,9 +316,7 @@
 @char 涅莉 pos:50
 涅莉.yummy: 矮額，有黑黑的東西出來了！
 @hide 涅莉
-@stopBgm
-@bgm battle03
-@battle background:bg05 target:monster03 label:afterbattle4
+@battle background:bg05 target:monster03 label:afterbattle4 bgm:battle03
 @stop
 # afterbattle4
 @stopBgm

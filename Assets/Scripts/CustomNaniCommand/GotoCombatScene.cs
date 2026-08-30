@@ -20,8 +20,8 @@ public class GotoCombatScene : Command, Command.IForceWait
     [ParameterAlias("label")]      public StringParameter Label;
 
     /// <summary>這場仗要放哪首 BGM（Audio 資源名，例如 thequeen）。
-    /// 不寫就用 battle01。寫在 @battle 前一行的 @bgm 是沒用的——
-    /// 進戰鬥時會被戰鬥音樂蓋掉。</summary>
+    /// 不寫就用預設的 energetic。寫在 @battle 前一行的 @bgm 是沒用的——
+    /// 那是劇本的音樂，進戰鬥時會被戰鬥音樂蓋掉。</summary>
     [ParameterAlias("bgm")]        public StringParameter Bgm;
 
     public async override UniTask ExecuteAsync (AsyncToken asyncToken = default)

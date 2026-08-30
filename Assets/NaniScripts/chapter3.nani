@@ -52,9 +52,7 @@ may: 將妳們曾有的能力引導回來的儀式。
 蘇菲亞: 我覺得這個好像不太對耶……
 may: 我們先來示範一次吧，蘇菲亞。
 @hide 蘇菲亞,優菲,may
-@stopBgm 
-@bgm battle02
-@battle background:bg05 target:monster05 label:afterbattle6
+@battle background:bg05 target:monster05 label:afterbattle6 bgm:battle02
 @stop
 #afterbattle6
 @stopBgm 
@@ -179,9 +177,7 @@ chl: 妳們的大門根本沒有裝好啊。
 chl.happy: 哈，這個樣子真是可悲耶。
 chl: 我的狗閉著眼睛都能打贏妳們。
 @hide 梅爾,chl,優菲
-@stopBgm 
-@bgm thehunter
-@battle background:bg05 target:monster05 label:afterbattle7
+@battle background:bg05 target:monster05 label:afterbattle7 bgm:thehunter
 @stop
 # afterbattle7
 @stopBgm 

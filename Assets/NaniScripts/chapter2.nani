@@ -282,8 +282,6 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 @char 優菲 pos:75
 優菲: 啊啊啊有埋伏！
 @hide 莉莉娜,梅爾,優菲
-@stopBgm
-@bgm energetic
 @battle background:bg02 target:monster02 label:ch2bt1
 @stop
 # ch2bt1
@@ -361,9 +359,7 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 涅莉: 矮額，有股熟悉的詭異氣息呢。
 ？？？: 尤芙蘿絲！給我滾出來！
 @hide 涅莉
-@stopBgm
-@bgm battle03
-@battle background:bg11 target:monster04 label:afterbattle5
+@battle background:bg11 target:monster04 label:afterbattle5 bgm:battle03
 @stop
 # afterbattle5
 @back bg11
@@ -491,9 +487,7 @@ syb.happy: 特別嗎？嘻嘻，妳才是吧。
 ？？？: 挺有架式的嘛，血巫結社就是不一樣唷……我看看，四個系都到齊了嘛，居然還有異鄉人，這下有趣了。
 may.happy: 來吧，讓我瞧瞧那異域之力－－
 @hide may
-@stopBgm
-@bgm battle02
-@battle background:bg05 target:monster05 label:afterbattle6
+@battle background:bg05 target:monster05 label:afterbattle6 bgm:battle02
 @stop
 # afterbattle6
 @hide may

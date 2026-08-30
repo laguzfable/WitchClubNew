@@ -104,8 +104,6 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 涅莉: 沒時間解釋了，總之趕緊過去吧！
 @hide 涅莉
 @back bg03
-@stopBgm
-@bgm energetic
 @battle background:bg02 target:monster02 label:ch5bt1
 @stop
 # ch5bt1
@@ -307,8 +305,6 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 艾札蘭: 哈哈哈－－真是弱得可以。
 優菲: 別再這樣子了啦，{PlayerName}，幫忙一下！
 @back bg03
-@stopBgm
-@bgm energetic
 @battle background:bg02 target:monster02 label:ch5bt2
 @stop
 # ch5bt2
@@ -390,9 +386,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 西碧兒: 來來來，大家開動了。
 @hide 薇狄亞,syb
 (爆炸聲)
-@stopBgm
-@bgm sol
-@battle background:bg02 target:monster02 label:ch5bt6
+@battle background:bg02 target:monster02 label:ch5bt6 bgm:sol
 @stop
 # ch5bt6
 @stopBgm
@@ -714,8 +708,6 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 優菲: 我要在這裡將這個叛徒就地正法—－
 @back bg03
 @hide chl,梅爾,優菲
-@stopBgm
-@bgm energetic
 @battle background:bg03 target:monster02 label:ch5bt_mel
 @stop
 # ch5bt_mel
@@ -766,8 +758,6 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 優菲: ……
 @hide chl,薇狄亞,優菲,梅爾
 轟隆隆隆隆－－
-@stopBgm
-@bgm energetic
 @battle background:bg03 target:micha_final label:ch5bt_micha
 @stop
 # ch5bt_micha
