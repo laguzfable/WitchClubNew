@@ -213,7 +213,7 @@ public class AffinityChoicePanel : MonoBehaviour
         {
             var script = Script.FromScriptText("蝕之聖典 星塵開場", text.ToString());
             var playlist = new ScriptPlaylist(script);
-            await playlist.ExecuteAsync();
+            await PlayWaitingForInputAsync(playlist);
         }
         catch (Exception e)
         {
@@ -223,6 +223,35 @@ public class AffinityChoicePanel : MonoBehaviour
 
         if (this == null) return; // 播到一半被關掉了
         ShowChoices();
+    }
+
+    /// <summary>
+    /// 一句一句播，每句等玩家點過再繼續。
+    ///
+    /// 不能直接用 ScriptPlaylist.ExecuteAsync()：@print 的「等玩家點」其實只是
+    /// 呼叫 ScriptPlayer.SetWaitingForInputEnabled(true) 把旗標打開，真正在等的是
+    /// ScriptPlayer 的播放迴圈。我們沒有跑那個迴圈，所以整段會一口氣衝到底。
+    /// 這裡就是把那段等待補回來。
+    /// </summary>
+    async UniTask PlayWaitingForInputAsync (ScriptPlaylist playlist)
+    {
+        var player = Engine.GetService<IScriptPlayer>();
+        var config = Engine.GetConfiguration<ScriptPlayerConfiguration>();
+
+        foreach (var command in playlist)
+        {
+            if (!command.ShouldExecute) continue;
+
+            if (config.ShouldWait(command)) await command.ExecuteAsync();
+            else command.ExecuteAsync().Forget();
+
+            // 跳過模式下 Naninovel 根本不會把旗標打開，所以這個迴圈自然不會卡住。
+            while (player != null && player.WaitingForInput)
+            {
+                if (this == null) return;   // 面板被關掉就別再等了
+                await UniTask.Yield();
+            }
+        }
     }
 
     // ============================================================
