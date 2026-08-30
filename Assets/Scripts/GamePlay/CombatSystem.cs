@@ -12,6 +12,10 @@ using Hexe.TowerMode;
 
 public class CombatSystem : MonoBehaviour
 {
+    /// <summary>進戰鬥前放的那首 BGM，打完要還原。
+    /// 用 static 是因為中間會換場景，一般欄位活不過去。</summary>
+    static string bgmBeforeCombat;
+
     PlayerController pc;
     public EnvironmentEffect envEffect { private set; get; }
     UICombatTextPanel combatTxtPanel;
@@ -283,7 +287,16 @@ public class MobRuneUnlockData
         {
             var audioManager = Engine.GetService<IAudioManager>();
             if (audioManager != null)
+            {
+                // 先記下現在放的是哪一首，打完才還原得回去。
+                // 不記的話，戰鬥曲會一路放到劇本下一次換曲為止——
+                // 打完架回到日常對話還在放戰鬥音樂就是這樣來的。
+                var playing = audioManager.GetPlayedBgmPaths();
+                bgmBeforeCombat = playing != null ? playing.FirstOrDefault() : null;
+                Debug.Log($"[SwitchStateToCombatMode] 記住戰鬥前的 BGM：{bgmBeforeCombat ?? "（無聲）"}");
+
                 audioManager.PlayBgmAsync("battle01", volume: 1f, fadeTime: 0.5f, loop: true).Forget();
+            }
         }
         catch (Exception ex) { Debug.LogWarning($"[SwitchStateToCombatMode] BGM 例外：{ex.Message}"); }
 
@@ -669,6 +682,9 @@ public void BackToNani()
     }
     catch (Exception ex) { Debug.LogWarning($"[BackToNani] ContinueInputUI 操作失敗：{ex.Message}"); }
 
+    // ── BGM 還原 ──────────────────────────────────────────────
+    RestoreBgmAsync().Forget();
+
     // ── 載入 NaniDialogTest ────────────────────────────────────
     // scriptParameter 是開戰前指定好的續播點，回去時要明確優先於 MapReturnPoint，
     // 不然地圖事件裡打完仗會被還沒用掉的主線返回點拉走，事件後半直接被跳過
@@ -678,6 +694,31 @@ public void BackToNani()
     Debug.Log("[BackToNani] LoadSceneAsync 已發出");
 }
 
+
+/// <summary>把戰鬥曲收掉，換回進戰鬥前那首。
+///
+/// 要先停再放：Naninovel 的 BGM 可以疊著放，只放新的不會把 battle01 蓋掉。
+/// 寫成 static 是因為呼叫完馬上就 LoadScene，這個物件會被銷毀——
+/// 不依附在它身上，淡出淡入才跑得完。</summary>
+static async UniTaskVoid RestoreBgmAsync()
+{
+    try
+    {
+        var audioManager = Engine.GetService<IAudioManager>();
+        if (audioManager == null) return;
+
+        await audioManager.StopBgmAsync("battle01", 0.4f);
+
+        if (!string.IsNullOrEmpty(bgmBeforeCombat))
+        {
+            await audioManager.PlayBgmAsync(bgmBeforeCombat, volume: 1f, fadeTime: 0.4f, loop: true);
+            Debug.Log($"[BackToNani] BGM 還原成 {bgmBeforeCombat}");
+        }
+        else Debug.Log("[BackToNani] 戰鬥前本來就沒有 BGM，不還原");
+    }
+    catch (Exception ex) { Debug.LogWarning($"[BackToNani] BGM 還原失敗：{ex.Message}"); }
+    finally { bgmBeforeCombat = null; }
+}
 
 void TryUnlockRune(string mobID)
 {
