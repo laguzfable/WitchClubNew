@@ -38,6 +38,7 @@
 @battle background:bg02 target:monster02 label:ch6bt1
 @stop
 #ch6bt1
+@stopBgm
 @bgm chill
 @char 梅爾 pos:35
 @char chl pos:65
@@ -70,6 +71,7 @@
 @battle background:bg02 target:monster02 label:ch6bt2
 @stop
 #ch6bt2
+@stopBgm
 @bgm micha
 @char micha pos:50
 米夏: 我名為米夏。
@@ -221,6 +223,7 @@
 @endif
 
 ; ── 打輸：墮星石的光暗下去，她改用最後那個辦法 ──（草稿，待潤飾）
+@stopBgm
 @bgm sad
 @char 梅爾 pos:50
 
@@ -246,6 +249,7 @@
 
 ; ── 打贏：她撐住了 ──
 # mel_wins
+@stopBgm
 @bgm serious
 
 （強光爆發，兩股力量在梅爾體內激烈拉扯）

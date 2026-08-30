@@ -459,6 +459,19 @@ function check() {
           bad(n, no, '角色「' + id + '」沒有註冊，這行叫不出人來');
       }
 
+      // Naninovel 的 BGM 會疊著放：只下 @bgm 不會停掉正在放的那首。
+      if (/^@bgm\s/.test(t)) {
+        let stopped = false;
+        for (let k = i - 1; k >= 0; k--) {
+          const prev = s.lines[k].trim();
+          if (!prev) continue;
+          stopped = /^@stopBgm/i.test(prev);
+          break;
+        }
+        if (!stopped)
+          bad(n, no, '前面沒有 @stopBgm：這首會跟正在放的那首疊在一起', true);
+      }
+
       // 戰鬥會把音樂換成 battle01，而且打完不會還原（CombatSystem.cs）。
       // 所以戰鬥前一刻設的 BGM 是白設的，戰鬥後如果沒重設，battle01 會一直放下去。
       if (/^@battle\b/.test(t)) {
@@ -1663,6 +1676,19 @@ function setBack(line, insertAt, name) {
 
 // 換音樂：有 @bgm 就改那一行，沒有就插在 @back 後面——
 // 音樂要跟著換場一起響，不是等角色出來才響。
+// 這行 @bgm 前面要有 @stopBgm，沒有就補一行。
+// 全劇本 251 行 @bgm 裡有 219 行本來就是這樣寫的，這是這個專案的慣例。
+function ensureStopBefore(idx) {
+  const sc = scripts[current];
+  for (let k = idx - 1; k >= 0; k--) {
+    const t = sc.lines[k].trim();
+    if (!t) continue;
+    if (/^@stopBgm/i.test(t)) return;          // 已經有了
+    break;
+  }
+  sc.lines.splice(idx, 0, '@stopBgm');
+}
+
 function setBgm(line, insertAt, name) {
   const sc = scripts[current];
   if (!name) return render();          // 選了「不換曲」＝不動
@@ -1670,12 +1696,16 @@ function setBgm(line, insertAt, name) {
   const cur = line ? sc.lines[line - 1] : '';
   if (/@bgm\s+\S+/.test(cur)) {
     sc.lines[line - 1] = cur.replace(/@bgm\s+\S+/, '@bgm ' + name);
+    ensureStopBefore(line - 1);
   } else if (/@stopBgm/i.test(cur)) {
     // 這一幕原本是「停掉音樂」，改成從這裡放這首
     sc.lines[line - 1] = cur.replace(/@stopBgm\S*/i, '@bgm ' + name);
+    ensureStopBefore(line - 1);
   } else if (insertAt > 0) {
-    // 從這一幕開始換曲：插在這一幕的第一行之前
-    sc.lines.splice(insertAt - 1, 0, '@bgm ' + name);
+    // 從這一幕開始換曲：插在這一幕的第一行之前。
+    // 一定要連 @stopBgm 一起寫——Naninovel 的 BGM 會疊著放，
+    // 只下 @bgm 的話舊的那首不會停，兩首一起響。
+    sc.lines.splice(insertAt - 1, 0, '@stopBgm', '@bgm ' + name);
   } else {
     return;                            // 不知道要改哪裡就什麼都別做，別亂插
   }

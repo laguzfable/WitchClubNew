@@ -214,7 +214,8 @@
 @stop
 
 # ch5bt2
-@bgm energetic
+@stopBgm
+@bgm ivory
 @back bg05
 @char nic pos:35
 @char 優菲 pos:65
@@ -232,6 +233,9 @@
 妮可: 這才是我的學姊嘛！
 (晚上)
 @hide nic,優菲
+@stopBgm
+@stopBgm
+@bgm strange
 @back bg08
 @char 優菲 pos:50
 優菲: 今天晚上的配置……是不是和平常有點不太一樣？
@@ -287,12 +291,13 @@
 西碧爾: 來來來，大家開動了。
 (爆炸聲)
 @stopBgm
-@bgm energetic
+@bgm extreme
 @battle background:bg02 target:monster02 label:ch5bt6
 @stop
 
 # ch5bt6
-@bgm energetic
+@stopBgm
+@bgm ima
 ㄅㄆㄇ
 @char ima pos:20
 @char 薇狄亞 pos:40
@@ -303,6 +308,7 @@
 西碧爾: 妳們選了一個很不好的時間來訪呢。
 @hide ima,薇狄亞,syb,sol
 @stopBgm
+@bgm ima
 @char ima pos:20
 @char sol pos:50
 @char syb pos:75
@@ -429,6 +435,10 @@
 優菲: 噢噢，{PlayerName}終於來了。
 優菲: 趕快把早餐吃一吃吧，然後陪我一起出門，我可是準備了驚喜的唷。
 @hide syb,薇狄亞,優菲
+@stopBgm
+@stopBgm
+@stopBgm
+@bgm peace
 @back bg022
 @char nic pos:35
 @char 優菲 pos:65
@@ -462,6 +472,8 @@
 (這邊應該是也要有個夢境穿插)
 @back bg06
 ？？？: 呀啊啊啊啊啊－－
+@stopBgm
+@bgm ima
 @char 涅莉 pos:50
 涅莉: 又是一個不得安寧的早上啊……
 涅莉: 可是……可是……太不祥了。
@@ -505,7 +517,7 @@
 @back bg03
 @hide chl,梅爾,優菲
 @stopBgm
-@bgm energetic
+@bgm onfire
 @battle background:bg03 target:monster02 label:ch5bt3
 @stop
 
@@ -560,6 +572,8 @@
 (CG 米夏附身在優菲身上)
 (優菲正式消失)
 @hide 優菲,涅莉
+@stopBgm
+@bgm stardust
 @back star1
 (閃亮音效)
 (特效...etc...)
@@ -585,13 +599,13 @@
 涅莉: 使盡全力替女朋友報仇吧。
 @hide syb,涅莉
 @stopBgm
-@bgm energetic
+@bgm superextreme
 @battle background:bg03 target:monster02 label:ch5bt4
 @stop
 
 # ch5bt4
 @stopBgm
-@bgm serious
+@bgm ima
 @char 涅莉 pos:25
 @char 薇狄亞 pos:50
 @char 梅爾 pos:75

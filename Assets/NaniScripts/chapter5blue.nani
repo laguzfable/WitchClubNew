@@ -279,6 +279,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 # afterpetday_blue
 
 (翌日)
+@stopBgm
 @bgm ima
 @back bg06
 轟隆隆－－
@@ -311,6 +312,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 @battle background:bg02 target:monster02 label:ch5bt2
 @stop
 # ch5bt2
+@stopBgm
 @bgm ivory
 @back bg05
 @char nic pos:35
@@ -331,6 +333,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 妮可: 這才是我的學姊嘛！
 (晚上)
 @hide nic,優菲
+@stopBgm
 @bgm strange
 @back bg08
 @char 優菲 pos:50
@@ -392,6 +395,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 @battle background:bg02 target:monster02 label:ch5bt6
 @stop
 # ch5bt6
+@stopBgm
 @bgm sol
 @back bg08
 @char ima pos:20
@@ -401,9 +405,11 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 ？？？: 那我們就不客氣囉～～
 薇狄亞: ？！
 西碧兒: 妳們選了一個很不好的時間來訪呢。
+@stopBgm
 @bgm ima
 @hide ima,薇狄亞,syb,sol
 @stopBgm
+@bgm sol
 @char ima pos:20
 @char sol pos:50
 @char syb pos:75
@@ -456,6 +462,9 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 薇狄亞: 別太勉強自己喔。
 優菲: 嗯，為了大家，我會振作的。
 @hide 薇狄亞,優菲
+@stopBgm
+@stopBgm
+@bgm ivory
 @back bg03b
 @char nic pos:35
 @char 優菲 pos:65
@@ -528,6 +537,8 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 @hide nic,優菲
 @back bg06
 ……
+@stopBgm
+@bgm fun
 @back bg08
 @char syb pos:25       
 @char 優菲 pos:50
@@ -631,6 +642,8 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 @stop
 # afternight_blue
 
+@stopBgm
+@bgm emotional
 (這邊應該是也要有個夢境穿插)
 第一次見到梅爾的時候，我的心裡好激動喔。
 她大概是我見過，這個世界上最純真的人了。
@@ -655,6 +668,8 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 無論發生什麼事。
 ……
 一起毀滅的話，可以嗎？
+@stopBgm
+@bgm intense
 @back bg06
 ？？？: 呀啊啊啊啊啊－－
 @char 涅莉 pos:50
@@ -821,6 +836,8 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 妮可: Vinculum lucis, nos transfer---
 優菲: 不要啊！！！
 @hide 梅爾,nic,優菲
+@stopBgm
+@bgm quiet
 @back black
 （一陣白光。）
 （白光散掉之前，那個方向亮了第二次——那一次是紅色的。）

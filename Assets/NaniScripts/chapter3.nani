@@ -90,6 +90,7 @@ may: ……妳應該早就會了吧，我就不多說了。
 @set RuneActive=true
 @stopbgm
 @back bg05
+@stopBgm
 @bgm peace
 @char may pos:50
 @char 優菲 pos:25
@@ -185,6 +186,7 @@ chl: 我的狗閉著眼睛都能打贏妳們。
 # afterbattle7
 @stopBgm 
 @back bg12
+@stopBgm
 @bgm serious
 @char chl pos:50
 chl.angry: ……是嗎，原來那突然出現的魔力……還真的是妳們的啊。
@@ -456,6 +458,7 @@ syb: 有空再一起研究藥草吧。
 @hide 薇狄亞
 @stopBgm 
 (隔天)
+@stopBgm
 @bgm chill
 (大廳)
 @back bg01
