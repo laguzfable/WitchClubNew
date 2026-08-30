@@ -85,4 +85,7 @@ public class ScriptParameter
     public StringParameter combatTarget;
     public StringParameter scriptName;
     public StringParameter scriptLabel;
+
+    /// <summary>這場戰鬥要放的 BGM。沒填就用預設的 battle01。</summary>
+    public StringParameter combatBgm;
 }

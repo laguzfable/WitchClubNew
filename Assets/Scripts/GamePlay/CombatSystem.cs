@@ -299,7 +299,12 @@ public class MobRuneUnlockData
                 bgmBeforeCombat = playing != null ? playing.FirstOrDefault() : null;
                 Debug.Log($"[SwitchStateToCombatMode] 記住戰鬥前的 BGM：{bgmBeforeCombat ?? "（無聲）"}");
 
-                audioManager.PlayBgmAsync("battle01", volume: 1f, fadeTime: 0.5f, loop: true).Forget();
+                // @battle 可以用 bgm: 指定這場的曲子，沒指定就用預設的 battle01
+                var battleBgm = DataService.Instance?.scriptParameter?.combatBgm;
+                var track = string.IsNullOrEmpty(battleBgm) ? "battle01" : (string)battleBgm;
+                Debug.Log($"[SwitchStateToCombatMode] 戰鬥 BGM：{track}");
+
+                audioManager.PlayBgmAsync(track, volume: 1f, fadeTime: 0.5f, loop: true).Forget();
             }
         }
         catch (Exception ex) { Debug.LogWarning($"[SwitchStateToCombatMode] BGM 例外：{ex.Message}"); }

@@ -479,7 +479,7 @@ function check() {
           const prev = s.lines[k].trim();
           if (!prev || prev.startsWith(';')) continue;
           if (/^@bgm\s/.test(prev))
-            bad(n, k + 1, '這行 BGM 會被戰鬥蓋掉：戰鬥固定放 battle01，而且打完不會還原', true);
+            bad(n, k + 1, '這行 BGM 會被戰鬥蓋掉。要指定戰鬥音樂請用 @battle 的 bgm: 參數', true);
           if (!prev.startsWith('@')) break;
         }
         const label = (t.match(/label:("[^"]*"|\S+)/) || [])[1];
@@ -1256,7 +1256,7 @@ function renderScenes(v) {
         (s.events.length ? '<div class="evs">' + s.events.map(x =>
             '<div><span class="ln">' + x.line + '</span><span class="tag t-' + x.kind + '">' +
             (EVENT_NAME[x.kind] || x.kind) + '</span>' +
-            (x.kind === 'battle' ? battleTag(x.line, 'battle') + esc(x.text)
+            (x.kind === 'battle' ? battleTag(x.line, 'battle') + battleBgmPicker(x) + esc(x.text)
               : (x.kind === 'GotoUnityScene' || x.kind === 'GotoMapDemo') && /MapTest/.test(x.text)
                 ? battleTag(x.line, 'map') + esc(x.text)
               : x.kind === 'choice' ? choiceRow(x)
@@ -1280,6 +1280,29 @@ function renderScenes(v) {
     }).join('') + '</div>';
 
   wireDragging();
+}
+
+// 這場仗放哪首。@battle 的 bgm: 參數沒寫就是預設的 battle01。
+function battleBgmPicker(x) {
+  if (!ASSETS) return '';
+  const cur = (x.text.match(/bgm:("[^"]*"|\S+)/) || [])[1];
+  const now = cur ? cur.replace(/"/g, '') : '';
+  const kind = ASSETS.audioKind || {};
+  const list = Object.keys(ASSETS.audio).filter(n => kind[n] !== 'sfx').sort();
+  return '<select class="chgoto" title="這場戰鬥要放的音樂"' +
+    ' onchange="setBattleBgm(' + x.line + ', this.value)">' +
+    '<option value=""' + (now ? '' : ' selected') + '>battle01（預設）</option>' +
+    list.map(n => '<option' + (n === now ? ' selected' : '') + '>' + esc(n) + '</option>').join('') +
+    '</select>';
+}
+
+function setBattleBgm(line, name) {
+  const sc = scripts[current];
+  let l = sc.lines[line - 1];
+  l = l.replace(/\s*bgm:("[^"]*"|\S+)/, '');
+  if (name) l = l.trimEnd() + ' bgm:' + name;
+  sc.lines[line - 1] = l;
+  dirty.add(sc.name); check(); render();
 }
 
 // 「去哪支腳本的哪個段落」——@restroom、@SaveReturnPoint、@GotoChangeRune
