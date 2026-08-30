@@ -91,9 +91,11 @@
   /* 人多的時候整個縮一號，擠得下 */
   .actor.tight .card{padding:2px 4px;font-size:10px}
   .actor.tight .pos{font-size:8px}
+  /* 名字自己縮，× 永遠留在外面——不然名字一長，叉叉會被裁掉按不到 */
   .actor .card{background:rgba(20,19,26,.85);border:1px solid var(--gold);border-radius:6px;
         padding:3px 7px;font-size:11px;white-space:nowrap;line-height:1.4;
-        overflow:hidden;text-overflow:ellipsis}
+        display:flex;align-items:center;gap:2px;overflow:hidden}
+  .actor .card .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
   .actor .pos{color:var(--dim);font-size:9px;margin-top:2px;white-space:nowrap;
         overflow:hidden;text-overflow:ellipsis}
   .actor.drag{z-index:9}
@@ -199,7 +201,7 @@
   /* 這一幕換了曲子：整張卡的左邊立一條金線，掃過去一眼看得到 */
   .scene.bgmchanged{border-left:3px solid var(--gold)}
   .newbgm{color:var(--gold);font-size:11px;white-space:nowrap}
-  .actor .x{margin-left:6px;color:#7a7590;cursor:pointer;font-size:12px}
+  .actor .x{flex:none;margin-left:4px;color:#7a7590;cursor:pointer;font-size:12px}
   .actor .x:hover{color:var(--red)}
   .inherit{color:#6b6780;font-size:11px;white-space:nowrap;border:1px dashed var(--line);
         border-radius:5px;padding:2px 6px}
@@ -1083,7 +1085,7 @@ function renderScenes(v) {
           '<div class="actor' + (gapAt(s.actors, i) < 24 ? ' tight' : '') +
           '" style="left:' + pos + '%;max-width:' + gapAt(s.actors, i) + '%" data-line="' + line +
           '" data-pos="' + pos + '" data-id="' + esc(id) + '">' +
-          '<div class="card">' + esc(id) +
+          '<div class="card"><span class="nm" title="' + esc(id) + '">' + esc(id) + '</span>' +
             '<span class="x" title="' + (s.fresh.includes(id)
               ? '這一幕才上場，拿掉＝刪掉那行 @char'
               : '她是前面就在場的，拿掉＝在這一幕插一行 @hide') + '"' +
