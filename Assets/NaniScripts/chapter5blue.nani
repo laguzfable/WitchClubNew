@@ -279,6 +279,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 # afterpetday_blue
 
 (翌日)
+@bgm ima
 @back bg06
 轟隆隆－－
 ？？？: 住手！住手！住手！艾札蘭妳真的是瘋了！
@@ -310,6 +311,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 @battle background:bg02 target:monster02 label:ch5bt2
 @stop
 # ch5bt2
+@bgm ivory
 @back bg05
 @char nic pos:35
 @char 優菲 pos:65
@@ -329,6 +331,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 妮可: 這才是我的學姊嘛！
 (晚上)
 @hide nic,優菲
+@bgm strange
 @back bg08
 @char 優菲 pos:50
 優菲: 今天晚上的配置……是不是和平常有點不太一樣？
@@ -385,10 +388,11 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 @hide 薇狄亞,syb
 (爆炸聲)
 @stopBgm
-@bgm energetic
+@bgm sol
 @battle background:bg02 target:monster02 label:ch5bt6
 @stop
 # ch5bt6
+@bgm sol
 @back bg08
 @char ima pos:20
 @char 薇狄亞 pos:40
@@ -397,12 +401,12 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 ？？？: 那我們就不客氣囉～～
 薇狄亞: ？！
 西碧兒: 妳們選了一個很不好的時間來訪呢。
+@bgm ima
 @hide ima,薇狄亞,syb,sol
 @stopBgm
 @char ima pos:20
 @char sol pos:50
 @char syb pos:75
-？？？: 很厲害嘛，拍拍手。
 ？？？: 我不想浪費時間了，把那個女人交出來。
 西碧兒: 妳說的是誰呢？
 ？？？: 那個曾經是我們同伴的叛徒啊。
