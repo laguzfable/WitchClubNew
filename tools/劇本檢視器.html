@@ -1117,6 +1117,17 @@ function renderAssets(v) {
     (used ? '<div class="au">' + (used[name] ? used[name].length + ' 處用到' : '沒有用到') + '</div>' : '') +
     '</div>';
 
+  // 其他圖庫：純展示＋尺度標註，沒有「用在哪」可以對（它們是程式在用的）
+  const imgSection = (title, group, sub) => {
+    const list = ASSETS[group] || {};
+    const names = Object.keys(list);
+    if (!names.length) return '';
+    return sec(title, names.length + ' 張。' + sub,
+      '<div class="grid">' + names.map(n =>
+        card(n, '<img loading="lazy" class="mob" src="' + list[n] + '">', null, '', group)).join('') +
+      '</div>', group);
+  };
+
   const missing = (used, have, what) => {
     const bad = Object.keys(used).filter(k => !have[k] && !have[k.split('.')[0]]);
     return bad.length ? '<div class="miss">劇本裡用到但找不到檔案的' + what + '：' +
@@ -1161,6 +1172,12 @@ function renderAssets(v) {
       '<div class="grid">' + Object.entries(ASSETS.monsters || {}).map(([n, src]) =>
         card(n, '<img loading="lazy" class="mob" src="' + src + '">', usedMob, '', 'monsters')).join('') + '</div>',
       'monsters') +
+
+    imgSection('符文立繪', 'runePortraits', '地圖上拿到符文時的立繪。') +
+    imgSection('符文卡', 'runeCards', '戰鬥中的符文卡面。') +
+    imgSection('路人女巫', 'witches', '背景角色、卡面、換裝。') +
+    imgSection('連段', 'combo', '連段演出圖。') +
+    imgSection('教學', 'tutorial', '教學場景用的圖與說明板。') +
 
     sec('角色與表情',
       '角色是 Live2D，沒有立繪可以預覽——圖是 prefab 旁邊的貼圖集，只能當個示意。' +

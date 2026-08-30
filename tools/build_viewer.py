@@ -122,7 +122,29 @@ def build_extra():
         found.sort(key=lambda f: (stem not in os.path.basename(os.path.dirname(f)).lower(), len(f)))
         atlas[cid] = os.path.relpath(found[0], os.path.join(ROOT, 'tools')).replace(os.sep, '/')
 
-    return {'monsters': folder('monsters'), 'battleBacks': folder('background'), 'atlas': atlas}
+    # 其他要一起登記的圖庫。key 要跟 尺度標註.json 裡的分組名字一致。
+    def gather(dirs):
+        out = {}
+        for d in dirs:
+            full = os.path.join(ROOT, *d.split('/'))
+            if not os.path.isdir(full):
+                continue
+            for f in sorted(os.listdir(full)):
+                if not f.lower().endswith(('.png', '.jpg')):
+                    continue
+                name = os.path.splitext(f)[0]
+                out[name] = os.path.relpath(os.path.join(full, f),
+                                            os.path.join(ROOT, 'tools')).replace(os.sep, '/')
+        return out
+
+    return {'monsters': folder('monsters'), 'battleBacks': folder('background'), 'atlas': atlas,
+            'runePortraits': gather(['Assets/Resources/RunePortraits']),
+            'runeCards':     gather(['Assets/Sprites/RuneCards']),
+            'witches':       gather(['Assets/Resources/Witches', 'Assets/character/witches',
+                                     'Assets/Resources/AltSkin_Witch']),
+            'combo':         gather(['Assets/Sprites/combo']),
+            'tutorial':      gather(['Assets/Sprites/Tutorial',
+                                     'Assets/Sprites/Tutorial/rune_tutorial'])}
 
 
 assets = build_assets()
