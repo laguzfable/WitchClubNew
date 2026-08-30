@@ -47,6 +47,12 @@
   .sec{padding:8px 10px 4px;font-size:10px;color:#54506a;letter-spacing:1px}
   .file.undone .n{color:var(--gold)}
   .file .dot{color:var(--gold);font-size:9px;margin-right:5px;vertical-align:1px}
+  #newbuild{position:fixed;left:50%;transform:translateX(-50%);top:0;z-index:99;
+    background:var(--gold);color:#221f2c;padding:6px 14px;border-radius:0 0 9px 9px;
+    font-size:12px;display:flex;align-items:center;gap:8px;box-shadow:0 3px 14px rgba(0,0,0,.45)}
+  #newbuild button{background:#221f2c;color:var(--gold);border:0;border-radius:5px;
+    padding:3px 10px;font-size:12px;cursor:pointer}
+  #newbuild span{cursor:pointer;font-size:14px}
   #saveall{margin-top:7px}
   #saveall button{width:100%;background:#2b2438;color:var(--gold);border:1px solid var(--gold);
     border-radius:6px;padding:4px;font-size:12px;cursor:pointer}
@@ -264,6 +270,8 @@ const EMBEDDED = null;
 const ASSETS = null;
 
 const NL = String.fromCharCode(10);
+// build_viewer.py 每次產生時會把時間戳寫進來，用來認出「你開著的是舊程式」
+const BUILD = '';
 let scripts = {};      // name -> {name, lines}
 let issues = [];
 let current = null;
@@ -420,6 +428,34 @@ function check() {
           bad(n, no, '角色「' + id + '」沒有註冊，這行叫不出人來');
       }
 
+      // 戰鬥會把音樂換成 battle01，而且打完不會還原（CombatSystem.cs）。
+      // 所以戰鬥前一刻設的 BGM 是白設的，戰鬥後如果沒重設，battle01 會一直放下去。
+      if (/^@battle\b/.test(t)) {
+        for (let k = i - 1; k >= 0 && k >= i - 4; k--) {
+          const prev = s.lines[k].trim();
+          if (!prev || prev.startsWith(';')) continue;
+          if (/^@bgm\s/.test(prev))
+            bad(n, k + 1, '這行 BGM 會被戰鬥蓋掉：戰鬥固定放 battle01，而且打完不會還原', true);
+          if (!prev.startsWith('@')) break;
+        }
+        const label = (t.match(/label:("[^"]*"|\S+)/) || [])[1];
+        if (label) {
+          const want = '#' + label.replace(/"/g, '');
+          const at = s.lines.findIndex(l => l.trim().replace(/\s+/g, '') === want);
+          if (at >= 0) {
+            let reset = false;
+            for (let k = at + 1; k < s.lines.length; k++) {
+              const line = s.lines[k].trim();
+              if (!line || line.startsWith(';')) continue;
+              if (/^@(bgm\s|stopBgm)/i.test(line)) { reset = true; break; }
+              if (!line.startsWith('@')) break;      // 開始講話了還沒重設
+            }
+            if (!reset)
+              bad(n, at + 1, '戰鬥回來這裡沒有重設 BGM，battle01 會一直放下去', true);
+          }
+        }
+      }
+
       // 表情打錯 → 遊戲裡不會換臉，但也不會報錯，很難發現
       if (ASSETS && ASSETS.expressions) {
         for (const m of t.matchAll(/(?:^|@char )([^\s:@#,]+)\.([^\s:,]+)\s*[:\s]/g)) {
@@ -543,11 +579,26 @@ function syncTabs() {
     (tab === 'scenes' || tab === 'outline') ? '' : 'none';
 }
 
-// 切回這個分頁就順手對一下目前這支腳本
+// 切回這個分頁就順手做兩件事：對一下目前這支腳本，
+// 以及看看編輯器本身有沒有被重新產生過（你開著的可能是舊程式）。
 window.addEventListener('focus', async () => {
-  if (!location.protocol.startsWith('http') || !current) return;
-  if (await refreshFromDisk(current)) { check(); render(); }
+  if (!location.protocol.startsWith('http')) return;
+  if (current && await refreshFromDisk(current)) { check(); render(); }
+  checkBuild();
 });
+
+async function checkBuild() {
+  if (!BUILD) return;
+  const res = await fetch('/build').then(r => r.json()).catch(() => null);
+  if (!res || !res.ok || !res.build || res.build === BUILD) return;
+  if (document.getElementById('newbuild')) return;
+  const bar = document.createElement('div');
+  bar.id = 'newbuild';
+  bar.innerHTML = '編輯器有更新（你開著的是舊版）　' +
+    '<button onclick="location.reload(true)">重新整理</button>' +
+    '<span onclick="this.parentNode.remove()">×</span>';
+  document.body.appendChild(bar);
+}
 
 window.addEventListener('beforeunload', e => {
   if (!dirty.size) return;

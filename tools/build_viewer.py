@@ -132,7 +132,11 @@ print(f"背景 {len(assets['backgrounds'])} 張、音樂 {len(assets['audio'])} 
 print(f"  音樂裡 BGM {sum(1 for v in assets['audioKind'].values() if v == 'bgm')} 首、"
       f"音效 {sum(1 for v in assets['audioKind'].values() if v == 'sfx')} 個")
 
+import time
+BUILD = str(int(time.time()))
+
 html = io.open(SRC, encoding='utf-8').read()
+html = html.replace("const BUILD = '';", "const BUILD = '" + BUILD + "';", 1)
 blob = json.dumps(data, ensure_ascii=False).replace('</', r'<\/')  # 避免提早關掉 <script>
 html = html.replace('const EMBEDDED = null;', 'const EMBEDDED = ' + blob + ';', 1)
 html = html.replace('const ASSETS = null;',

@@ -111,6 +111,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         # /raw?file=chapter4.nani → 直接把硬碟上的內容給網頁，
         # 這樣過期的分頁可以只更新那一支，不用重烤整個檔案再重開。
+        # /build → 現在硬碟上那份編輯器的版本。網頁拿它跟自己比，
+        # 不一樣就表示「你開著的是舊程式」，會跳出重新整理的提示。
+        if self.path == '/build':
+            try:
+                out = os.path.join(ROOT, 'tools', '劇本檢視器_已載入.html')
+                head = open(out, encoding='utf-8', errors='ignore').read()
+                m = re.search(r"const BUILD = '(\d*)'", head)
+                return self._json({'ok': True, 'build': m.group(1) if m else ''})
+            except Exception as e:
+                return self._json({'ok': False, 'error': str(e)}, 404)
+
         if self.path.startswith('/raw?'):
             try:
                 query = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
