@@ -7,7 +7,7 @@
 改過劇本之後重跑一次就好。原本那支 劇本檢視器.html 不會被動到，
 它仍然是「拖資料夾進去」的通用版。
 """
-import codecs, glob, io, json, os
+import codecs, glob, hashlib, io, json, os
 
 BACKSLASH = chr(92)
 char_prefab = {}
@@ -151,12 +151,36 @@ assets = build_assets()
 assets.update(build_extra())
 
 # 尺度標註（人工看過的結果，可以直接編輯 tools/尺度標註.json）
+#
+# 每一筆會記下當時那張圖的內容雜湊。圖片重畫之後雜湊就對不上，
+# 資源頁會把它標成「已更新，待重看」——這樣改完圖不用記得回來改標註，
+# 它自己會提醒。重看過覺得沒問題就把那一筆刪掉，還是有問題就更新 note，
+# 然後跑 tools/尺度標註.py 重新蓋章。
+REVIEW_PATH = os.path.join(ROOT, 'tools', '尺度標註.json')
 try:
-    review = json.load(io.open(os.path.join(ROOT, 'tools', '尺度標註.json'), encoding='utf-8'))
+    review = json.load(io.open(REVIEW_PATH, encoding='utf-8'))
     review.pop('_說明', None)
+
+    stale = 0
+    for group, items in review.items():
+        paths = assets.get(group, {})
+        for name, item in items.items():
+            rel = paths.get(name)
+            if not rel:
+                continue
+            full = os.path.normpath(os.path.join(ROOT, 'tools', rel))
+            try:
+                now = hashlib.sha1(open(full, 'rb').read()).hexdigest()[:12]
+            except OSError:
+                continue
+            item['now'] = now
+            if item.get('hash') and item['hash'] != now:
+                item['stale'] = True
+                stale += 1
+
     assets['review'] = review
     n = sum(len(v) for v in review.values())
-    print(f'尺度標註 {n} 筆')
+    print(f'尺度標註 {n} 筆' + (f'，其中 {stale} 張圖已經被改過（待重看）' if stale else ''))
 except Exception as e:
     print(f'（沒有尺度標註：{e}）')
     assets['review'] = {}
