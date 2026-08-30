@@ -834,7 +834,9 @@ function sceneShots(sc) {
       // 這也是畫面變動，所以要另起一幕，不然舞台上會一路是預設表情。
       const sp = t.match(/^([^\s:@#]+?)(?:\.([^\s:]+))?\s*:/);
       if (sp && sp[2] && actors.has(sp[1])) {
-        change(no);
+        // 只更新她現在的表情，不另起一幕——表情是逐句的東西，
+        // 每換一次就切一張卡的話，一段對話會被剁成好幾格，很難讀。
+        // 每一句旁邊本來就有表情選單，看得到也改得到。
         const a = actors.get(sp[1]);
         actors.set(sp[1], {pos: a.pos, line: a.line, app: sp[2]});
       }
