@@ -555,6 +555,7 @@ function groupOf(n) {
     return [3, '地圖：其他事件'];
   if (/^badend|_end$/.test(n)) return [4, '結局'];
   if (/^(title|System_UI|dreams)$/.test(n)) return [6, '系統'];
+  if (/^待查明/.test(n)) return [7, '待查明'];
   return [5, '其他'];
 }
 
