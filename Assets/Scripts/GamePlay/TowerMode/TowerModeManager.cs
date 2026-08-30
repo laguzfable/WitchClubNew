@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -272,6 +272,7 @@ namespace Hexe.TowerMode
             // 不清的話會變成——滿血贏一場拿到加成後，之後每次打不順就退出重來，
             // 加成永遠留著，等於無限次帶著 2 張角色卡重試同一層。
             ResetLilyBonus();
+            StopBgm();          // 中途退出時戰鬥曲還在放，不收會跟著進大廳
 
             BackToHub();
         }
@@ -312,6 +313,18 @@ namespace Hexe.TowerMode
         /// 戰敗／退出／回標題／放棄挑戰／打贏一場都會呼叫——記的是「到達過的最高層」，
         /// 不是通關層數，所以死在第 30 層也算到達過 30。
         /// </summary>
+        /// <summary>把音樂收掉。競技場的曲子是直接 PlayBgmAsync 放的，
+        /// 不在 Naninovel 的狀態裡，換場景不會自己停。</summary>
+        static void StopBgm()
+        {
+            try
+            {
+                var audio = Engine.GetService<IAudioManager>();
+                if (audio != null) audio.StopAllBgmAsync(0.3f).Forget();
+            }
+            catch (System.Exception ex) { Debug.LogWarning($"[TowerMode] 停 BGM 失敗：{ex.Message}"); }
+        }
+
         static void RecordBestFloor()
         {
             if (CurrentFloor > BestFloor)
@@ -450,6 +463,17 @@ namespace Hexe.TowerMode
         static async UniTask GoToTitleScene()
         {
             Engine.GetService<IScriptPlayer>()?.Stop();
+
+            // 戰鬥音樂要自己收掉。ResetStateAsync 清的是 Naninovel 自己記錄的狀態，
+            // 而競技場的曲子是我們直接 PlayBgmAsync 放的，不在那份狀態裡——
+            // 不停的話會一路跟著玩家回到標題畫面。
+            try
+            {
+                var audio = Engine.GetService<IAudioManager>();
+                if (audio != null) await audio.StopAllBgmAsync(0.3f);
+            }
+            catch (System.Exception ex) { Debug.LogWarning($"[TowerMode] 停 BGM 失敗：{ex.Message}"); }
+
             var stateManager = Engine.GetService<IStateManager>();
             if (stateManager != null)
                 await stateManager.ResetStateAsync();
