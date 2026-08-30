@@ -741,6 +741,9 @@ function sceneShots(sc) {
 
   const flush = () => {
     if (!pending) return;
+    // 只有換景／換曲、沒有台詞也沒有指令的一幕，不要自己佔一張卡——
+    // 它的狀態（背景、曲子、誰在台上）留給下一幕，看起來就是同一格。
+    if (!talks.length && !events.length) { pending = false; return; }
     shots.push({back, bgm, label,
       backLine, bgmLine, bgmChanged: bgm !== lastBgm, ownBack, ownBgm,
       // 這一幕才上場的人：拿掉他們是刪 @char，其餘是插 @hide
