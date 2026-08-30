@@ -361,16 +361,16 @@
 @unlock CG/cg06
 優菲: 這樣{PlayerName}就能盡情體驗生活了。
 梅爾: 也可以幫忙抄寫咒文了。
-@choice 原來這是妳打的主意嗎…… set:affinity_Eup=affinity_Eup+10 goto:.c1a_a
-@choice 有了身體當然要到處去玩呀！ set:affinity_Mel=affinity_Mel+10 goto:.c1a_b
+@choice 原來這是妳打的主意嗎…… set:affinity_Mel=affinity_Mel+10 goto:.c1a_a
+@choice 有了身體當然要到處去玩呀！ goto:.c1a_b
 @stop
 
 # c1a_a
-優菲: 嘿嘿，被發現了。總得讓{PlayerName}有個能自己走路的樣子嘛。
+優菲: 畢竟梅爾是我們裡面最積極的嘛。
 @goto .c1a_join
 
 # c1a_b
-梅爾: 才剛有身體就想著往外跑，真有你的。
+梅爾: 只想玩啊……
 @goto .c1a_join
 
 # c1a_join
