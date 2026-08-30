@@ -96,6 +96,9 @@
         padding:3px 7px;font-size:11px;white-space:nowrap;line-height:1.4;
         display:flex;align-items:center;gap:2px;overflow:hidden}
   .actor .card .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  /* 中間隔了可以跳進來的段落：她在不在台上要看玩家怎麼走 */
+  .actor .card.guess{border-style:dashed;border-color:#7d7898}
+  .actor .card .q{color:#c9a227;margin-left:3px;font-style:normal}
   .actor .pos{color:var(--dim);font-size:9px;margin-top:2px;white-space:nowrap;
         overflow:hidden;text-overflow:ellipsis}
   .actor.drag{z-index:9}
@@ -664,8 +667,9 @@ function sceneShots(sc) {
       // 這一幕才上場的人：拿掉他們是刪 @char，其餘是插 @hide
       fresh: [...actors.keys()].filter(id => !prevIds.has(id)),
       // 依站位排序：名牌的陣列順序＝畫面上的左右順序，槽位判定才對得起來
-      actors: [...actors.entries()].map(([id, a]) => [id, a.pos, a.line, a.app || ''])
-                                   .sort((x, y) => x[1] - y[1]),
+      actors: [...actors.entries()]
+        .map(([id, a]) => [id, a.pos, a.line, a.app || '', a.jumpedLabel || ''])
+        .sort((x, y) => x[1] - y[1]),
       line: firstLine, insertAt: lastCmd, talks, events,
       talk: talks.length ? talks[0].text : ''});
     lastBgm = bgm;
@@ -693,7 +697,13 @@ function sceneShots(sc) {
       return;
     }
     let m;
-    if (t.startsWith('#')) { flush(); label = t.slice(1).trim(); return; }
+    if (t.startsWith('#')) {
+      flush(); label = t.slice(1).trim();
+      // 這裡是別處 @goto 跳得進來的地方。在場的人如果是更早宣告的，
+      // 玩家從那邊跳進來時就不一定在台上——記一下，畫面上會標出來。
+      actors.forEach(a => { if (!a.jumpedLabel) a.jumpedLabel = label; });
+      return;
+    }
     if ((m = t.match(/^@back (\S+)/))) {
       flush(); back = m[1].split(',')[0]; backLine = no; ownBack = true;
       firstLine = no; lastCmd = no; pending = true;
@@ -708,7 +718,8 @@ function sceneShots(sc) {
       const before = actors.get(id);
       // 表情跟站位一樣，沒寫就是延續上一次的
       actors.set(id, {pos: p ? Math.round(+p[1]) : (before ? before.pos : 50),
-                      line: no, app: app !== null ? app : (before ? before.app : '')});
+                      line: no, app: app !== null ? app : (before ? before.app : ''),
+                      jumpedLabel: ''});
     }
     else if ((m = t.match(/^@hide (\S+)/))) {
       change(no);
@@ -1078,14 +1089,17 @@ function renderScenes(v) {
         '<div class="stage" data-insert="' + s.insertAt + '" data-line="' + s.line + '">' +
         (src ? '<img loading="lazy" src="' + src + '">'
              : '<div class="noimg">' + (s.back ? '找不到背景　' + esc(s.back) : '（沒有指定背景）') + '</div>') +
-        s.actors.map(([id, pos, line, app], i) =>
+        s.actors.map(([id, pos, line, app, jumped], i) =>
           // 人越多名牌越窄，這樣才不會互相蓋住又不用把它們排成階梯
           // 名牌寬度看的是左右鄰居離多遠，不是人數——
           // 兩個人站 40/60 也會擠，人數少不代表寬得下
           '<div class="actor' + (gapAt(s.actors, i) < 24 ? ' tight' : '') +
           '" style="left:' + pos + '%;max-width:' + gapAt(s.actors, i) + '%" data-line="' + line +
           '" data-pos="' + pos + '" data-id="' + esc(id) + '">' +
-          '<div class="card"><span class="nm" title="' + esc(id) + '">' + esc(id) + '</span>' +
+          '<div class="card' + (jumped ? ' guess' : '') + '"><span class="nm" title="' + esc(id) +
+            (jumped ? '　（她是第 ' + line + ' 行叫上場的，中間經過段落 #' + esc(jumped) +
+              '。玩家如果是從那裡跳進來的，她其實不在台上——這裡只是照順序讀下來的推測）' : '') +
+            '">' + esc(id) + (jumped ? '<i class="q">?</i>' : '') + '</span>' +
             '<span class="x" title="' + (s.fresh.includes(id)
               ? '這一幕才上場，拿掉＝刪掉那行 @char'
               : '她是前面就在場的，拿掉＝在這一幕插一行 @hide') + '"' +
