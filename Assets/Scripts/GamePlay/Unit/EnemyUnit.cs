@@ -228,12 +228,38 @@ public class EnemyUnit : BaseCombatUnit
         }
 
         ShuffleCards(true);
+
+        SayIfAny(mobData.talk?.battleStart);
+    }
+
+    // ── 怪物講話 ────────────────────────────────────────────────
+    // 台詞在 MobData 的「台詞」欄位。時機分開場／出手前／被打到／剩下不多／被打倒，
+    // 每次隨機挑一句。出手前跟被打到不是每次都講——每回合都吵一句會很煩。
+
+    /// <summary>出手前開口的機率。</summary>
+    const float ActTalkChance = 0.35f;
+    /// <summary>被打到開口的機率。</summary>
+    const float HurtTalkChance = 0.3f;
+    /// <summary>兩句之間至少隔幾秒，免得連續被打時洗版。</summary>
+    const float TalkGap = 4f;
+
+    float nextTalkTime;
+    bool saidLowHp;
+
+    void SayIfAny (string[] lines, bool force = true)
+    {
+        if (lines == null || lines.Length == 0) return;
+        if (!force && Time.time < nextTalkTime) return;
+
+        nextTalkTime = Time.time + TalkGap;
+        MonsterTalkBubble.Say(transform, lines[Random.Range(0, lines.Length)]);
     }
 
     protected override void OnDefeated()
     {
         combatSystem.isContinue = false;
         isMovable = false;
+        SayIfAny(mobData.talk?.defeated);
         sprRend.DOFade(0f, 1f).OnComplete(() => combatSystem.GameOver(false));
         //combatSystem.GameOver(false);
     }
@@ -446,6 +472,8 @@ public class EnemyUnit : BaseCombatUnit
         actResult.Reset();
         if(!HasEffect(EAbilityEffectType.Stun))
         {
+            if (Random.value < ActTalkChance) SayIfAny(mobData.talk?.act, force: false);
+
             DecideCostAbility();
             ShuffleCards(false);
             actResult.attr = SelectCards(MakeDecision());
@@ -664,6 +692,15 @@ public class EnemyUnit : BaseCombatUnit
             transform.DOShakePosition(0.7f, new Vector3(2f, 0f, 0f)).onComplete += ()=> isMovable = true;
             
             DamagedFlash().Forget();
+
+            // 血量第一次掉到三成以下：講「剩下不多」那組，優先於一般的挨打台詞
+            var lowNow = HP.GetTotalValue() > 0 && HP.Value / HP.GetTotalValue() <= 0.3f;
+            if (lowNow && !saidLowHp && mobData.talk?.lowHp != null && mobData.talk.lowHp.Length > 0)
+            {
+                saidLowHp = true;
+                SayIfAny(mobData.talk.lowHp);
+            }
+            else if (Random.value < HurtTalkChance) SayIfAny(mobData.talk?.hurt, force: false);
 
             if (audioClipList.Count > 0)
             {
