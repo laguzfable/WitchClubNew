@@ -324,7 +324,9 @@ public class MobRuneUnlockData
                 Debug.Log($"[SwitchStateToCombatMode] 戰鬥 BGM：{track}" +
                           (TowerModeManager.IsActive ? "（競技場隨機）" : ""));
 
-                audioManager.PlayBgmAsync(track, volume: 1f, fadeTime: 0.5f, loop: true).Forget();
+                // 一定要先停再放。Naninovel 的 BGM 是疊著放的，
+                // 只放戰鬥曲的話，劇本那首會繼續響，變成兩首一起。
+                SwitchToBattleBgmAsync(track).Forget();
             }
         }
         catch (Exception ex) { Debug.LogWarning($"[SwitchStateToCombatMode] BGM 例外：{ex.Message}"); }
@@ -746,6 +748,21 @@ static string PickTowerBgm ()
 
     lastTowerBgm = pick;
     return pick;
+}
+
+/// <summary>把劇本的音樂收掉，換成戰鬥曲。順序不能顛倒——
+/// Naninovel 的 BGM 可以疊著放，只放新的不會停掉舊的。</summary>
+static async UniTaskVoid SwitchToBattleBgmAsync (string track)
+{
+    try
+    {
+        var audioManager = Engine.GetService<IAudioManager>();
+        if (audioManager == null) return;
+
+        await audioManager.StopAllBgmAsync(0.3f);
+        await audioManager.PlayBgmAsync(track, volume: 1f, fadeTime: 0.4f, loop: true);
+    }
+    catch (Exception ex) { Debug.LogWarning($"[BGM] 切戰鬥曲失敗：{ex.Message}"); }
 }
 
 /// <summary>把戰鬥曲收掉。競技場回大廳、一般戰鬥回劇本都會先做這件事。</summary>
