@@ -125,7 +125,8 @@
   .scene .cnt i{color:#7d7898;font-style:normal}
   .scene .lines .ln,.scene .evs .ln{display:inline-block;min-width:38px;color:#54506a;
     font-family:ui-monospace,Consolas,monospace}
-  .scene .lab{color:var(--gold);font-size:11px}
+  .scene .lab{color:var(--gold);font-size:11px;cursor:pointer;border-bottom:1px dashed transparent}
+  .scene .lab:hover{border-bottom-color:var(--gold)}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:10px 0 22px}
   .grid.wide{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
   .ass{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#1b1925}
@@ -1559,7 +1560,8 @@ function renderScenes(v) {
 
         '<div class="bar">' +
           '<span class="ln">' + s.line + ' 行</span>' +
-          (s.label ? '<span class="lab" title="這一幕落在哪個段落裡（@goto 跳轉的目標）">段落 # ' +
+          (s.label ? '<span class="lab" title="點一下改名字。所有跳到這裡的 @goto 會一起改"' +
+            ' onclick="renameLabel(&quot;' + esc(s.label) + '&quot;)">段落 # ' +
             esc(s.label) + '</span>' : '') +
           (br ? '<span class="brtag br' + br.idx + '" title="從第 ' + br.from + ' 行那組選項的第 ' +
             br.idx + ' 個過來的">' + (br.merged ? '合流' : '分歧 ' + '①②③④⑤'[br.idx - 1]) +
@@ -1724,7 +1726,8 @@ function addMore(shotLine, what) {
   const sc = scripts[current], at = shotEnd(shotLine);
 
   if (what === 'label') {
-    const name = newLabel('new_label');
+    const name = askLabel('新段落的名字', newLabel('new_label'));
+    if (!name) return;
     sc.lines.splice(at, 0, '', '# ' + name);
   } else if (what === 'goto') {
     const first = [...labelsOf(sc)].sort()[0];
@@ -1745,6 +1748,58 @@ function addMore(shotLine, what) {
       '');
   }
   dirty.add(sc.name); check(); render();
+}
+
+// 段落名只能用英數、底線、減號——@goto 是用空白斷詞的，
+// 名字裡有空白或中文會讓跳轉找不到目標。
+function askLabel(prompt_, suggest) {
+  const raw = prompt(prompt_ + '（英數、底線、減號）', suggest);
+  if (raw === null) return '';
+  const name = raw.trim();
+  if (!name) return '';
+  if (!/^[\w-]+$/.test(name)) { alert('名字只能用英數、底線、減號：' + name); return ''; }
+  if (labelsOf(scripts[current]).has(name)) { alert('這個名字已經有人用了：' + name); return ''; }
+  return name;
+}
+
+// 改段落名字。跳到這裡的 @goto／goto:／label: 一起改，
+// 包含別支腳本用「檔名.段落」指過來的。
+function renameLabel(oldName) {
+  const name = askLabel('把「' + oldName + '」改成', oldName);
+  if (!name) return;
+
+  const sc = scripts[current];
+  const esc2 = x => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const o = esc2(oldName);
+  let hits = 0;
+
+  sc.lines = sc.lines.map(l => {
+    const before = l;
+    l = l.replace(new RegExp('^(\\s*)#\\s*' + o + '\\s*$'), '$1# ' + name);
+    l = l.replace(new RegExp('(@goto\\s+|goto:)\\.' + o + '(?=\\s|$)', 'g'), '$1.' + name);
+    l = l.replace(new RegExp('(label:")' + o + '(")', 'g'), '$1' + name + '$2');
+    l = l.replace(new RegExp('(label:)' + o + '(?=\\s|$)', 'g'), '$1' + name);
+    if (l !== before) hits++;
+    return l;
+  });
+
+  // 別支腳本：@goto 這支.段落
+  for (const n in scripts) {
+    if (n === current) continue;
+    const other = scripts[n];
+    let touched = false;
+    other.lines = other.lines.map(l => {
+      const before = l;
+      l = l.replace(new RegExp('(@goto\\s+|goto:)' + esc2(current) + '\\.' + o + '(?=\\s|$)', 'g'),
+                    '$1' + current + '.' + name);
+      if (l !== before) { touched = true; hits++; }
+      return l;
+    });
+    if (touched) dirty.add(n);
+  }
+
+  dirty.add(sc.name); check(); render();
+  console.log('[改名] ' + oldName + ' → ' + name + '，動到 ' + hits + ' 行');
 }
 
 // 取一個沒被用過的段落名
@@ -1851,6 +1906,7 @@ function choiceRow(x) {
         '<option selected value="' + esc(c.goto) + '">' + esc(c.goto) + '（別支腳本）</option>' : '') +
       labels.map(l => '<option value=".' + esc(l) + '"' +
         (c.goto === '.' + l ? ' selected' : '') + '>' + esc(l) + '</option>').join('') +
+      '<option value="__new__">＋ 新段落…</option>' +
     '</select>' +
     (c.rawSet ? '<span class="chraw" title="這個 set 不是單純加好感，我不動它">set:' + esc(c.rawSet) + '</span>' : '') +
     (c.if ? '<span class="chraw" title="有條件才出現">if:' + esc(c.if) + '</span>' : '') +
@@ -1859,7 +1915,19 @@ function choiceRow(x) {
 }
 
 function editChoice(line, field, value) {
-  const sc = scripts[current], c = parseChoice(sc.lines[line - 1].trim());
+  const sc = scripts[current];
+
+  // 「＋ 新段落…」：當場開一個段落，接在這一幕後面，然後把選項指過去
+  if (field === 'goto' && value === '__new__') {
+    const name = askLabel('這個選項要跳到的新段落', newLabel('branch'));
+    if (!name) return render();
+    const shot = sceneShots(sc).find(x => x.events.some(e => e.line === line));
+    const at = shot ? shotEnd(shot.line) : sc.lines.length;
+    sc.lines.splice(at, 0, '', '# ' + name);
+    value = '.' + name;
+  }
+
+  const c = parseChoice(sc.lines[line - 1].trim());
   if (field === 'who') {
     c.who = value;
     if (value && !c.amount) c.amount = 5;   // 沒填過就給個預設值
