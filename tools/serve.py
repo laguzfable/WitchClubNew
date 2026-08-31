@@ -138,6 +138,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         return super().do_GET()
 
     def do_POST(self):
+        if self.path == '/savemusic':
+            return self.save_music()
         if self.path == '/savemob':
             return self.save_mob()
         if self.path != '/save':
@@ -174,6 +176,37 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self._json({'ok': True})
         except Exception as e:
             print(f'  寫檔失敗：{e}')
+            self._json({'ok': False, 'error': str(e)}, 500)
+
+    def save_music(self):
+        """把某一首歌的分類寫回 tools/音樂分類.json。"""
+        try:
+            size = int(self.headers.get('Content-Length', 0))
+            data = json.loads(self.rfile.read(size).decode('utf-8'))
+            path = os.path.join(ROOT, 'tools', '音樂分類.json')
+
+            doc = json.load(open(path, encoding='utf-8')) if os.path.isfile(path) \
+                else {'tags': {}}
+            tags = doc.setdefault('tags', {})
+
+            name, tag = data['name'], (data.get('tag') or '').strip()
+            if tag:
+                tags[name] = tag
+            else:
+                tags.pop(name, None)
+
+            # 照類別再照名字排，這樣檔案本身也看得懂
+            order = {'戰鬥': 0, '感人': 1, '平靜': 2, '熱鬧': 3, '神秘': 4}
+            doc['tags'] = dict(sorted(tags.items(),
+                                      key=lambda kv: (order.get(kv[1], 9), kv[0])))
+
+            with open(path, 'w', encoding='utf-8', newline='') as f:
+                f.write(json.dumps(doc, ensure_ascii=False, indent=2) + NEWLINE)
+
+            print('  音樂分類：' + name + ' → ' + (tag or '（清掉）'))
+            self._json({'ok': True})
+        except Exception as e:
+            print('  音樂分類存檔失敗：' + str(e))
             self._json({'ok': False, 'error': str(e)}, 500)
 
     def save_mob(self):

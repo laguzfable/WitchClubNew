@@ -291,6 +291,15 @@ html = io.open(SRC, encoding='utf-8').read()
 html = html.replace("const BUILD = '';", "const BUILD = '" + BUILD + "';", 1)
 blob = json.dumps(data, ensure_ascii=False).replace('</', r'<\/')  # 避免提早關掉 <script>
 html = html.replace('const EMBEDDED = null;', 'const EMBEDDED = ' + blob + ';', 1)
+# 音樂分類（人工聽完標的，可以直接編輯 tools/音樂分類.json）
+try:
+    tags = json.load(io.open(os.path.join(ROOT, 'tools', '音樂分類.json'), encoding='utf-8'))
+    assets['musicTag'] = tags.get('tags', {})
+    print(f"音樂分類 {len(assets['musicTag'])} 首")
+except Exception as e:
+    print(f'（沒有音樂分類：{e}）')
+    assets['musicTag'] = {}
+
 mobs = build_mobs()
 print(f'怪物資料 {len(mobs)} 隻')
 html = html.replace('const MOBS = null;', 'const MOBS = ' + json.dumps(mobs, ensure_ascii=False) + ';', 1)

@@ -152,6 +152,9 @@
     border:1px solid var(--line);border-radius:5px;padding:3px;font-size:11px;cursor:pointer}
   .ass .play:hover{color:var(--gold);border-color:var(--gold)}
   .ass .play.on{color:var(--gold);border-color:var(--gold)}
+  .ass .mtag{width:calc(100% - 14px);margin:0 7px 7px;background:#241f30;color:var(--dim);
+    border:1px solid var(--line);border-radius:5px;font-size:11px;padding:2px}
+  .ass .mtag:hover{color:var(--gold);border-color:var(--gold)}
   .ass .an{padding:4px 7px 0;font-size:12px;word-break:break-all}
   .ass .au{padding:0 7px 5px;font-size:10px;color:#6b6685}
   .ass.unused{opacity:.42}
@@ -1032,6 +1035,40 @@ function battleTag(line, kind) {
     '</span>';
 }
 
+// ── 音樂分類 ────────────────────────────────────────
+// 分類是人工聽完標的，存在 tools/音樂分類.json。
+// 標完之後，凡是要挑曲子的地方都顯示成「（神秘）ima」，
+// 而且照類別排在一起，比一長串英文檔名好找。
+const MUSIC_TAGS = ['戰鬥', '感人', '平靜', '熱鬧', '神秘'];
+const tagOf = n => (ASSETS && ASSETS.musicTag ? ASSETS.musicTag[n] : '') || '';
+const bgmLabel = n => (tagOf(n) ? '（' + tagOf(n) + '）' : '') + n;
+
+// 先照類別（未分類排最後），再照名字
+function byTag(a, b) {
+  const ia = tagOf(a) ? MUSIC_TAGS.indexOf(tagOf(a)) : 99;
+  const ib = tagOf(b) ? MUSIC_TAGS.indexOf(tagOf(b)) : 99;
+  return ia !== ib ? ia - ib : a.localeCompare(b);
+}
+
+function tagPicker(name) {
+  return '<select class="mtag" onchange="setMusicTag(&quot;' + esc(name) + '&quot;, this.value)">' +
+    '<option value="">（未分類）</option>' +
+    MUSIC_TAGS.map(t => '<option' + (t === tagOf(name) ? ' selected' : '') + '>' + t + '</option>').join('') +
+    '</select>';
+}
+
+async function setMusicTag(name, tag) {
+  ASSETS.musicTag = ASSETS.musicTag || {};
+  if (tag) ASSETS.musicTag[name] = tag; else delete ASSETS.musicTag[name];
+  render();
+
+  const res = await fetch('/savemusic', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({name, tag})
+  }).then(r => r.json()).catch(err => ({ok: false, error: err.message}));
+  if (!res.ok) alert('分類存檔失敗：' + (res.error || '？'));
+}
+
 // ── 怪物編輯器 ──────────────────────────────────────
 // 資料來自 Assets/Resources/MobData/*.asset，存檔會寫回同一份。
 // 只改動到的欄位，Unity 那些 m_ 開頭的東西原封不動。
@@ -1200,9 +1237,10 @@ function player() {
   const kind = (ASSETS && ASSETS.audioKind) || {};
   const list = ASSETS ? Object.keys(ASSETS.audio) : [];
   const group = (label, want) => {
-    const items = list.filter(n => (kind[n] === 'sfx') === want).sort();
+    const items = list.filter(n => (kind[n] === 'sfx') === want).sort(byTag);
     return items.length ? '<optgroup label="' + label + '">' +
-      items.map(n => '<option>' + esc(n) + '</option>').join('') + '</optgroup>' : '';
+      items.map(n => '<option value="' + esc(n) + '">' + esc(bgmLabel(n)) + '</option>').join('') +
+      '</optgroup>' : '';
   };
 
   el.innerHTML =
@@ -1354,8 +1392,8 @@ function renderAssets(v) {
 
     sec('音樂（BGM）', bgmList.length + ' 首，寫成 <code>@bgm 名字</code>。按 ▶ 試聽。',
       missing(usedBgm, ASSETS.audio, '音樂') +
-      '<div class="grid wide">' + bgmList.map(([n, src]) =>
-        card(n, playBtn(n, src), usedBgm)).join('') + '</div>') +
+      '<div class="grid wide">' + bgmList.sort((a, b) => byTag(a[0], b[0])).map(([n, src]) =>
+        card(n, playBtn(n, src), usedBgm, tagPicker(n))).join('') + '</div>') +
 
     sec('音效（SE）', sfxList.length + ' 個，寫成 <code>@sfx 名字</code>。' +
       '放在 Sound/SE、UI、Magic、HitSound 這些資料夾底下。',
@@ -1399,10 +1437,12 @@ function renderScenes(v) {
   const backNames = Object.keys(ASSETS.backgrounds).sort();
   // 換場景配樂的選單只列 BGM。26 個音效混進來會變成一長串，反而難挑
   const bgmNames = Object.keys(ASSETS.audio)
-    .filter(n => (ASSETS.audioKind || {})[n] !== 'sfx').sort();
+    .filter(n => (ASSETS.audioKind || {})[n] !== 'sfx').sort(byTag);
 
-  const opts = (list, sel) => list.map(x =>
-    '<option' + (x === sel ? ' selected' : '') + '>' + esc(x) + '</option>').join('');
+  // 背景用原名，音樂加上分類前綴（值還是原名，寫進 .nani 的不變）
+  const opts = (list, sel, label) => list.map(x =>
+    '<option value="' + esc(x) + '"' + (x === sel ? ' selected' : '') + '>' +
+    esc(label ? label(x) : x) + '</option>').join('');
 
   v.innerHTML =
     '<div id="bar">' +
@@ -1480,9 +1520,9 @@ function renderScenes(v) {
             ' title="' + (s.ownBgm ? '換掉這一幕的曲子' : '選了會在這一幕插一行 @bgm，從這裡開始換曲') + '"' +
             ' onchange="setBgm(' + (s.ownBgm ? s.bgmLine : 0) + ', ' + s.line + ', this.value)">' +
             '<option value="">' + (s.ownBgm ? (s.bgm ? '（不換）' : '（這裡停掉音樂）')
-                                              : '沿用 ' + (s.bgm || '無聲')) + '</option>' +
+                                              : '沿用 ' + (s.bgm ? bgmLabel(s.bgm) : '無聲')) + '</option>' +
             (s.bgm && !bgmNames.includes(s.bgm) ? '<option selected>' + esc(s.bgm) + '</option>' : '') +
-            opts(bgmNames, s.bgm) + '</select>' +
+            opts(bgmNames, s.bgm, bgmLabel) + '</select>' +
           (s.bgmChanged ? '<span class="newbgm">♪ 換曲</span>' : '') +
           (audio ? playBtn(s.bgm, audio) : '') +
         '</div>' +
@@ -1536,8 +1576,9 @@ function battleBgmPicker(x) {
   const list = Object.keys(ASSETS.audio).filter(n => kind[n] !== 'sfx').sort();
   return '<select class="chgoto" title="這場戰鬥要放的音樂"' +
     ' onchange="setBattleBgm(' + x.line + ', this.value)">' +
-    '<option value=""' + (now ? '' : ' selected') + '>battle01（預設）</option>' +
-    list.map(n => '<option' + (n === now ? ' selected' : '') + '>' + esc(n) + '</option>').join('') +
+    '<option value=""' + (now ? '' : ' selected') + '>energetic（預設）</option>' +
+    list.sort(byTag).map(n => '<option value="' + esc(n) + '"' + (n === now ? ' selected' : '') +
+      '>' + esc(bgmLabel(n)) + '</option>').join('') +
     '</select>';
 }
 
