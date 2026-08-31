@@ -31,6 +31,8 @@ for stream in (sys.stdout, sys.stderr):
     except Exception:
         pass
 
+BS = chr(92)
+NEWLINE = chr(10)
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRIPTS = os.path.join(ROOT, 'Assets', 'NaniScripts')
 PORT = 8777
@@ -136,6 +138,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         return super().do_GET()
 
     def do_POST(self):
+        if self.path == '/savemob':
+            return self.save_mob()
         if self.path != '/save':
             return self.send_error(404)
 
@@ -170,6 +174,93 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self._json({'ok': True})
         except Exception as e:
             print(f'  寫檔失敗：{e}')
+            self._json({'ok': False, 'error': str(e)}, 500)
+
+    def save_mob(self):
+        """把怪物編輯器改的欄位寫回 .asset。
+
+        只動指定的那幾行，其餘原封不動——Unity 的 .asset 還有一堆
+        m_ 開頭的欄位跟 fileID，整份重寫風險太高。
+        """
+        try:
+            size = int(self.headers.get('Content-Length', 0))
+            data = json.loads(self.rfile.read(size).decode('utf-8'))
+            name = os.path.basename(data['name'])
+            target = os.path.join(ROOT, 'Assets', 'Resources', 'MobData', name + '.asset')
+            if not os.path.isfile(target):
+                raise ValueError('找不到 ' + name + '.asset')
+
+            text = open(target, encoding='utf-8', errors='ignore').read()
+
+            def esc(v):
+                """中文要寫成 Unity 慣用的 uXXXX 逃脫碼，不然它自己存檔時會改寫，diff 很難看。"""
+                out = ''
+                for ch in v:
+                    out += (BS + 'u%04X') % ord(ch) if ord(ch) > 126 else ch   # Unity 寫大寫
+                return '"' + out + '"'
+
+            def num(v):
+                f = float(v)
+                return str(int(f)) if f == int(f) else str(f)
+
+            # ── 單值欄位 ──
+            for key in ('HP', 'EN', 'levelUpMaxBonusValue', 'maxSelectCardCount'):
+                if key in data:
+                    text = re.sub(r'(?m)^  ' + key + r': .*$',
+                                  '  ' + key + ': ' + num(data[key]), text)
+            if 'displayName' in data:
+                # 用 lambda 當取代字串：esc() 產生的 uXXXX 逃脫碼裡有反斜線，
+                # 直接丟給 re.sub 會被當成正規表示式的跳脫序列而炸掉
+                want = '  displayName: ' + esc(data['displayName'])
+                text = re.sub(r'(?m)^  displayName: .*$', lambda m: want, text)
+            if 'spriteGuid' in data and data['spriteGuid']:
+                text = re.sub(r'(?m)^  sprite: \{fileID: \d+, guid: \w+, type: \d+\}$',
+                              '  sprite: {fileID: 21300000, guid: ' + data['spriteGuid'] + ', type: 3}',
+                              text)
+            # isBoss 只在「本來就有這一行」或「要設成 true」時才寫，
+            # 不然每隻沒動過的怪都會多一行 isBoss: 0，diff 很吵
+            if 'isBoss' in data:
+                want = '  isBoss: ' + ('1' if data['isBoss'] else '0')
+                if re.search(r'(?m)^  isBoss: ', text):
+                    text = re.sub(r'(?m)^  isBoss: .*$', lambda m: want, text)
+                elif data['isBoss']:
+                    text = re.sub(r'(?m)^  maxSelectCardCount: (.*)$',
+                                  lambda m: m.group(0) + NEWLINE + want, text, count=1)
+
+            # ── 四個屬性 ──
+            for el in data.get('elements', []):
+                pat = (r'(  - element: ' + str(el['element']) + r'\s+attribute:\s+ATK: )(-?[\d.]+)'
+                       r'(\s+DEF: )(-?[\d.]+)(\s+HEAL: )(-?[\d.]+)(\s+EN: )(-?[\d.]+)'
+                       r'(\s+randomWeight: )(-?\d+)(\s+decisionWeight: )(-?\d+)')
+
+                def sub(m, el=el):
+                    return (m.group(1) + num(el['ATK']) + m.group(3) + num(el['DEF']) +
+                            m.group(5) + num(el['HEAL']) + m.group(7) + num(el['EN']) +
+                            m.group(9) + str(int(el['randomWeight'])) +
+                            m.group(11) + str(int(el['decisionWeight'])))
+                text = re.sub(pat, sub, text, count=1)
+
+            # ── 台詞：整段重寫（原本沒有的話就補在最後）──
+            if 'talk' in data:
+                block = ''
+                for group in ('battleStart', 'act', 'hurt', 'lowHp', 'defeated'):
+                    lines = [x for x in data['talk'].get(group, []) if x.strip()]
+                    if not lines:
+                        continue
+                    block += '    ' + group + ':' + NEWLINE
+                    for line in lines:
+                        block += '    - ' + esc(line) + NEWLINE
+                if block:
+                    block = '  talk:' + NEWLINE + block
+                text = re.sub(r'(?m)^  talk:' + NEWLINE + r'(?:    .*' + NEWLINE + r'?)*', '', text)
+                text = text.rstrip(NEWLINE) + NEWLINE + block
+
+            with open(target, 'w', encoding='utf-8', newline='') as f:
+                f.write(text)
+            print('  已寫回 ' + name + '.asset')
+            self._json({'ok': True})
+        except Exception as e:
+            print('  怪物存檔失敗：' + str(e))
             self._json({'ok': False, 'error': str(e)}, 500)
 
     def _json(self, obj, code=200):

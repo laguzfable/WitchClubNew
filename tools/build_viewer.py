@@ -11,6 +11,7 @@ import codecs, glob, hashlib, io, json, os
 
 BACKSLASH = chr(92)
 char_prefab = {}
+guid_to_file = {}   # guid → 檔案路徑，build_assets 掃出來，build_extra 也要用
 audio_kind = {}
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -31,7 +32,7 @@ def build_assets():
     """
     import re
 
-    guid_to_file = {}
+    guid_to_file.clear()
     for root, _dirs, files in os.walk(os.path.join(ROOT, 'Assets')):
         for f in files:
             if not f.endswith('.meta'):
@@ -137,7 +138,26 @@ def build_extra():
                                             os.path.join(ROOT, 'tools')).replace(os.sep, '/')
         return out
 
+    # guid → 圖檔路徑：怪物編輯器要靠它把 MobData 的 sprite guid 對回圖。
+    # 只收兩種：怪物圖庫（換立繪的選單要用），以及 MobData 現在指到的那些
+    # （有幾隻的立繪不在 monsters 資料夾，例如教學那隻）。全部圖都收的話檔案會爆掉。
+    import re as _re2
+    wanted = set()
+    for a in glob.glob(os.path.join(ROOT, 'Assets', 'Resources', 'MobData', '*.asset')):
+        m = _re2.search(r'sprite: \{fileID: \d+, guid: (\w+)',
+                        io.open(a, encoding='utf-8', errors='ignore').read())
+        if m:
+            wanted.add(m.group(1))
+
+    g2p = {}
+    for guid, path in guid_to_file.items():
+        if not path.lower().endswith(('.png', '.jpg')):
+            continue
+        if 'monsters' in path.replace(os.sep, '/') or guid in wanted:
+            g2p[guid] = os.path.relpath(path, os.path.join(ROOT, 'tools')).replace(os.sep, '/')
+
     return {'monsters': folder('monsters'), 'battleBacks': folder('background'), 'atlas': atlas,
+            'guidToPath': g2p,
             'runePortraits': gather(['Assets/Resources/RunePortraits']),
             'runeCards':     gather(['Assets/Sprites/RuneCards']),
             'witches':       gather(['Assets/Resources/Witches', 'Assets/character/witches',
@@ -146,6 +166,81 @@ def build_extra():
             'tutorial':      gather(['Assets/Sprites/Tutorial',
                                      'Assets/Sprites/Tutorial/rune_tutorial'])}
 
+
+def build_mobs():
+    """把 Assets/Resources/MobData 的 .asset 讀成可編輯的資料。
+
+    Unity 的 .asset 是 YAML，但欄位固定、格式規律，所以用 regex 讀就夠了——
+    寫回去的時候也只動指定的那幾行，其餘原封不動（見 serve.py 的 /savemob）。
+    """
+    import re as _re
+
+    def un(x):
+        x = x.strip()
+        if x.startswith('"') and x.endswith('"'):
+            x = x[1:-1]
+            if BACKSLASH + 'u' in x:
+                try:
+                    return codecs.decode(x, 'unicode_escape')
+                except Exception:
+                    return x
+        return x
+
+    mobs = {}
+    for path in sorted(glob.glob(os.path.join(ROOT, 'Assets', 'Resources', 'MobData', '*.asset'))):
+        name = os.path.splitext(os.path.basename(path))[0]
+        text = io.open(path, encoding='utf-8', errors='ignore').read()
+
+        def num(key, default=0):
+            m = _re.search(r'^  ' + key + r': (-?[\d.]+)', text, _re.M)
+            return float(m.group(1)) if m else default
+
+        def word(key):
+            m = _re.search(r'^  ' + key + r': (.*)$', text, _re.M)
+            return un(m.group(1)) if m else ''
+
+        # 四個屬性各一組（0 藍 1 紅 2 黃 3 綠）
+        elements = []
+        for block in _re.finditer(
+                r'  - element: (\d+)\s+attribute:\s+ATK: (-?[\d.]+)\s+DEF: (-?[\d.]+)'
+                r'\s+HEAL: (-?[\d.]+)\s+EN: (-?[\d.]+)\s+randomWeight: (-?\d+)'
+                r'\s+decisionWeight: (-?\d+)', text):
+            g = block.groups()
+            elements.append({'element': int(g[0]), 'ATK': float(g[1]), 'DEF': float(g[2]),
+                             'HEAL': float(g[3]), 'EN': float(g[4]),
+                             'randomWeight': int(g[5]), 'decisionWeight': int(g[6])})
+
+        # 台詞（可能整段不存在）
+        talk = {}
+        tm = _re.search(r'^  talk:' + '\\n' + r'((?:    .*' + '\\n' + r'?)*)', text, _re.M)
+        if tm:
+            group = None
+            for line in tm.group(1).split(chr(10)):
+                gm = _re.match(r'    (\w+):\s*$', line)
+                if gm:
+                    group = gm.group(1)
+                    talk[group] = []
+                    continue
+                im = _re.match(r'    - (.*)$', line)
+                if im and group:
+                    talk[group].append(un(im.group(1)))
+
+        sprite_guid = ''
+        sm = _re.search(r'^  sprite: \{fileID: \d+, guid: (\w+)', text, _re.M)
+        if sm:
+            sprite_guid = sm.group(1)
+
+        mobs[name] = {
+            'displayName': word('displayName'),
+            'HP': num('HP'), 'EN': num('EN'),
+            'levelUpMaxBonusValue': num('levelUpMaxBonusValue'),
+            'maxSelectCardCount': num('maxSelectCardCount'),
+            'isBoss': '  isBoss: 1' in text,
+            'spriteGuid': sprite_guid,
+            'elements': elements,
+            'talk': talk,
+        }
+    return mobs
 
 assets = build_assets()
 assets.update(build_extra())
@@ -196,6 +291,10 @@ html = io.open(SRC, encoding='utf-8').read()
 html = html.replace("const BUILD = '';", "const BUILD = '" + BUILD + "';", 1)
 blob = json.dumps(data, ensure_ascii=False).replace('</', r'<\/')  # 避免提早關掉 <script>
 html = html.replace('const EMBEDDED = null;', 'const EMBEDDED = ' + blob + ';', 1)
+mobs = build_mobs()
+print(f'怪物資料 {len(mobs)} 隻')
+html = html.replace('const MOBS = null;', 'const MOBS = ' + json.dumps(mobs, ensure_ascii=False) + ';', 1)
+
 html = html.replace('const ASSETS = null;',
                     'const ASSETS = ' + json.dumps(assets, ensure_ascii=False) + ';', 1)
 

@@ -161,6 +161,42 @@
   .ass .rv.stale{background:#2b3a4a;color:#a9cbe8}
   .rvsum i{color:#a9cbe8;font-style:normal}
   .rvsum.hasstale{border-left-color:#6a9bc3}
+  .mobbar{display:flex;gap:10px;align-items:center;margin:10px 0 16px;flex-wrap:wrap}
+  .mobbar select{background:var(--panel);color:var(--ink);border:1px solid var(--line);
+    border-radius:6px;padding:4px 8px;font-size:13px}
+  .mobbar .txt{color:var(--dim);font-size:12px}
+  .mobgrid{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+  .mobcard{width:230px}
+  .mobcard img{width:100%;aspect-ratio:1;object-fit:contain;background:#100f16;
+    border:1px solid var(--line);border-radius:8px}
+  .mobcard .pick{width:100%;margin-top:6px;max-width:none}
+  .mobfields{flex:1;min-width:260px;display:flex;flex-direction:column;gap:8px}
+  .mf{display:flex;align-items:center;gap:8px;font-size:13px}
+  .mf span{width:104px;color:var(--dim)}
+  .mf input{background:var(--panel);color:var(--ink);border:1px solid var(--line);
+    border-radius:6px;padding:4px 8px;width:130px}
+  .mf input[type=checkbox]{width:auto}
+  .mf i{color:#6b6685;font-size:11px;font-style:normal}
+  .mobtab{border-collapse:collapse;margin:10px 0 22px;font-size:13px}
+  .mobtab th{color:var(--dim);font-weight:normal;padding:4px 8px;font-size:12px}
+  .mobtab td{padding:3px 5px}
+  .mobtab td:first-child{color:var(--ink);padding-right:12px}
+  .mobtab input{width:74px;background:var(--panel);color:var(--ink);
+    border:1px solid var(--line);border-radius:5px;padding:3px 6px}
+  .mobtab tr.bluecard td:first-child{color:#8fc7e8}
+  .mobtab tr.redcard td:first-child{color:#e896a4}
+  .mobtab tr.yellowcard td:first-child{color:#e8cf8f}
+  .mobtab tr.greencard td:first-child{color:#9fd8a4}
+  .talkgroup{margin:8px 0 14px}
+  .talkgroup b{display:block;color:var(--gold);font-size:12px;margin-bottom:4px}
+  .talkline{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+  .talkline input{flex:1;max-width:620px;background:var(--panel);color:var(--ink);
+    border:1px solid var(--line);border-radius:6px;padding:4px 8px;font-size:13px}
+  .talkline .x{color:#4a465c;cursor:pointer;padding:0 4px}
+  .talkline .x:hover{color:var(--red)}
+  .addtalk{background:#1b1925;color:var(--dim);border:1px dashed var(--line);
+    border-radius:5px;font-size:11px;padding:2px 10px;cursor:pointer}
+  .addtalk:hover{color:var(--gold);border-color:var(--gold)}
   .rvsum{border:1px solid var(--line);border-left:3px solid var(--red);border-radius:8px;
     padding:7px 10px;margin:8px 0;font-size:12px;color:#d9cfe0}
   .rvsum b{color:#e08a99}
@@ -259,6 +295,7 @@
       <div class="pg" data-tab="affinity">好感總覽</div>
       <div class="pg" data-tab="endings">結局</div>
       <div class="pg" data-tab="assets">資源</div>
+      <div class="pg" data-tab="mobs">怪物</div>
     </div>
     <div id="list"></div>
   </aside>
@@ -278,6 +315,8 @@ const CHAR = {affinity_Eup:'優菲', affinity_Mel:'梅爾', affinity_Ved:'薇狄
 const EMBEDDED = null;
 // 背景與音樂的檔案路徑（build_viewer.py 從 EditorResources 對出來的）
 const ASSETS = null;
+// 怪物資料（build_viewer.py 從 Resources/MobData 讀出來的）
+const MOBS = null;
 
 const NL = String.fromCharCode(10);
 // build_viewer.py 每次產生時會把時間戳寫進來，用來認出「你開著的是舊程式」
@@ -670,6 +709,7 @@ function render() {
   if (tab === 'endings') return renderEndings(v);
   if (tab === 'scenes') return renderScenes(v);
   if (tab === 'assets') return renderAssets(v);
+  if (tab === 'mobs') return renderMobs(v);
   renderOutline(v);
 }
 
@@ -990,6 +1030,151 @@ function battleTag(line, kind) {
     (b ? '　全遊戲第 ' + (b[kind] + inChapter) + ' 個'
        : '　<i title="從 chapter0 一路 @goto 走不到這支腳本，所以算不出全遊戲的編號">支線</i>') +
     '</span>';
+}
+
+// ── 怪物編輯器 ──────────────────────────────────────
+// 資料來自 Assets/Resources/MobData/*.asset，存檔會寫回同一份。
+// 只改動到的欄位，Unity 那些 m_ 開頭的東西原封不動。
+const ELEM = ['藍（學院）', '紅（鮮血）', '黃（惡魔）', '綠（自然）'];
+const ELEM_CLASS = ['bluecard', 'redcard', 'yellowcard', 'greencard'];
+const TALK_GROUP = [['battleStart', '開場'], ['act', '出手前'], ['hurt', '被打到'],
+                    ['lowHp', '剩下不多'], ['defeated', '被打倒']];
+let mobDirty = new Set();
+let mobPick = null;
+
+function renderMobs(v) {
+  if (!MOBS) return v.innerHTML =
+    '<div class="empty">怪物編輯需要「已載入」的版本。<br>在專案根目錄跑：python tools/build_viewer.py</div>';
+
+  const names = Object.keys(MOBS).sort();
+  if (!mobPick || !MOBS[mobPick]) mobPick = names[0];
+  const m = MOBS[mobPick];
+  const used = usedIn(/^@battle .*?target:(\S+)/);
+
+  const num = (label, key, hint) =>
+    '<label class="mf"><span>' + label + '</span>' +
+    '<input type="number" value="' + m[key] + '"' +
+    ' onchange="setMob(&quot;' + key + '&quot;, this.value)">' +
+    (hint ? '<i>' + hint + '</i>' : '') + '</label>';
+
+  v.innerHTML =
+    '<h2>怪物</h2><div class="sub">' + names.length + ' 隻。改完按「存回 .asset」，回 Unity 會自動重新匯入。</div>' +
+
+    '<div class="mobbar">' +
+      '<select onchange="mobPick=this.value; render()">' +
+        names.map(n => '<option' + (n === mobPick ? ' selected' : '') + '>' + esc(n) + '</option>').join('') +
+      '</select>' +
+      (mobDirty.has(mobPick)
+        ? '<span class="dirty">● 有未存的變更</span><button class="save" onclick="saveMob()">存回 .asset</button>'
+        : '') +
+      '<span class="txt">' + (used[mobPick]
+        ? used[mobPick].length + ' 場戰鬥用到：' + used[mobPick].slice(0, 6).join('、')
+        : '沒有戰鬥用到') + '</span>' +
+    '</div>' +
+
+    '<div class="mobgrid">' +
+      '<div class="mobcard">' +
+        (mobSprite(m) ? '<img src="' + mobSprite(m) + '">' : '<div class="noimg">找不到立繪</div>') +
+        '<select class="pick" onchange="setMob(&quot;spriteGuid&quot;, this.value)">' +
+          spriteOptions(m.spriteGuid) + '</select>' +
+      '</div>' +
+
+      '<div class="mobfields">' +
+        '<label class="mf"><span>名字</span><input value="' + esc(m.displayName) + '"' +
+          ' onchange="setMob(&quot;displayName&quot;, this.value)"></label>' +
+        num('血量', 'HP') +
+        num('起始能量', 'EN', '之後每回合加上出的牌的能量') +
+        num('升級加值上限', 'levelUpMaxBonusValue', '牌升級時最多加幾點') +
+        num('每回合出幾張', 'maxSelectCardCount') +
+        '<label class="mf"><span>王級</span>' +
+          '<input type="checkbox"' + (m.isBoss ? ' checked' : '') +
+          ' onchange="setMob(&quot;isBoss&quot;, this.checked)">' +
+          '<i>勾了就不會被抽進女巫競技場的隨機池</i></label>' +
+      '</div>' +
+    '</div>' +
+
+    '<h2>四色數值</h2>' +
+    '<div class="sub">怪物每回合從這四種牌裡抽、再挑一張出。抽牌看「抽中權重」，' +
+      '挑哪張出看「決策權重」，兩個都是 0 等於沒有這種牌。</div>' +
+    '<table class="mobtab"><tr><th></th><th>攻擊</th><th>防禦</th><th>治療</th><th>能量</th>' +
+      '<th>抽中權重</th><th>決策權重</th></tr>' +
+      m.elements.map((e, i) =>
+        '<tr class="' + ELEM_CLASS[e.element] + '"><td>' + ELEM[e.element] + '</td>' +
+        ['ATK', 'DEF', 'HEAL', 'EN', 'randomWeight', 'decisionWeight'].map(k =>
+          '<td><input type="number" value="' + e[k] + '"' +
+          ' onchange="setElem(' + i + ', &quot;' + k + '&quot;, this.value)"></td>').join('') +
+        '</tr>').join('') +
+    '</table>' +
+
+    '<h2>台詞</h2>' +
+    '<div class="sub">戰鬥中會講的話，每格一句、隨機挑一句講，留空就不講。' +
+      '出手前 35%、被打到 30% 才開口，兩句之間至少隔 4 秒。</div>' +
+    TALK_GROUP.map(function (g) {
+      const key = g[0], label = g[1];
+      const lines = (m.talk && m.talk[key]) || [];
+      return '<div class="talkgroup"><b>' + label + '</b>' +
+        lines.map((line, i) =>
+          '<div class="talkline"><input value="' + esc(line) + '"' +
+          ' onchange="setTalk(&quot;' + key + '&quot;, ' + i + ', this.value)">' +
+          '<span class="x" onclick="delTalk(&quot;' + key + '&quot;, ' + i + ')">×</span></div>').join('') +
+        '<button class="addtalk" onclick="addMobTalk(&quot;' + key + '&quot;)">＋ 加一句</button></div>';
+    }).join('');
+}
+
+function mobSprite(m) {
+  if (!m.spriteGuid || !ASSETS.guidToPath) return null;
+  return ASSETS.guidToPath[m.spriteGuid] || null;
+}
+
+// 立繪選單：怪物圖庫裡每一張的 guid（Unity 是靠 guid 指到圖的）
+function spriteOptions(cur) {
+  const list = ASSETS.monsters || {}, g2p = ASSETS.guidToPath || {}, byPath = {};
+  for (const guid in g2p) byPath[g2p[guid]] = guid;
+  return '<option value="">（不改）</option>' +
+    Object.keys(list).sort().map(n => {
+      const guid = byPath[list[n]];
+      if (!guid) return '';
+      return '<option value="' + guid + '"' + (guid === cur ? ' selected' : '') + '>' + esc(n) + '</option>';
+    }).join('');
+}
+
+function setMob(key, value) {
+  const m = MOBS[mobPick];
+  m[key] = (key === 'displayName' || key === 'spriteGuid') ? value
+         : (key === 'isBoss' ? !!value : +value);
+  mobDirty.add(mobPick); render();
+}
+
+function setElem(i, key, value) {
+  MOBS[mobPick].elements[i][key] = +value;
+  mobDirty.add(mobPick); render();
+}
+
+function setTalk(group, i, value) {
+  const t = MOBS[mobPick].talk = MOBS[mobPick].talk || {};
+  (t[group] = t[group] || [])[i] = value;
+  mobDirty.add(mobPick); render();
+}
+
+function delTalk(group, i) {
+  MOBS[mobPick].talk[group].splice(i, 1);
+  mobDirty.add(mobPick); render();
+}
+
+function addMobTalk(group) {
+  const t = MOBS[mobPick].talk = MOBS[mobPick].talk || {};
+  (t[group] = t[group] || []).push('');
+  mobDirty.add(mobPick); render();
+}
+
+async function saveMob() {
+  const res = await fetch('/savemob', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(Object.assign({name: mobPick}, MOBS[mobPick]))
+  }).then(r => r.json()).catch(err => ({ok: false, error: err.message}));
+
+  if (res.ok) { mobDirty.delete(mobPick); render(); }
+  else alert('存檔失敗：' + (res.error || '？'));
 }
 
 // ── 資源清單 ──────────────────────────────────────
