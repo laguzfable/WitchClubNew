@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- 這份是 Artifact 的離線版本，內容一樣。
+     線上版：https://claude.ai/code/artifact/a19ba333-dd82-4bdb-b3f8-c1a86b7c4a61 -->
+<title>女巫俱樂部結局圖解</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+
+</head>
+<body>
+<style>
+  :root {
+    --ground: #F4F2F8;
+    --panel: #FFFFFF;
+    --panel-2: #FAF8FD;
+    --line: #E2DCEF;
+    --line-soft: #EFEBF7;
+    --ink: #221D30;
+    --dim: #6B6485;
+    --faint: #948CAE;
+    --gold: #8A6410;
+    --gold-bg: #F7EFD8;
+    --blue: #2F6FAF;
+    --red: #B33F58;
+    --yellow: #9A6D0E;
+    --green: #2F7A4C;
+    --blue-bg: #E8F0FA;
+    --red-bg: #FBEAEE;
+    --yellow-bg: #FAF0DC;
+    --green-bg: #E6F4EB;
+    --bad: #8C3A4A;
+    --bad-bg: #F9E9EC;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #16131E;
+      --panel: #1D1929;
+      --panel-2: #221D30;
+      --line: #322B45;
+      --line-soft: #272134;
+      --ink: #EDE9F5;
+      --dim: #A79FC0;
+      --faint: #766E90;
+      --gold: #D8B15A;
+      --gold-bg: #2C2415;
+      --blue: #7FB2E8;
+      --red: #E68CA0;
+      --yellow: #E0B65C;
+      --green: #78C795;
+      --blue-bg: #1A2634;
+      --red-bg: #2F1D24;
+      --yellow-bg: #2C2415;
+      --green-bg: #16291E;
+      --bad: #E08696;
+      --bad-bg: #2C1A20;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #16131E;
+    --panel: #1D1929;
+    --panel-2: #221D30;
+    --line: #322B45;
+    --line-soft: #272134;
+    --ink: #EDE9F5;
+    --dim: #A79FC0;
+    --faint: #766E90;
+    --gold: #D8B15A;
+    --gold-bg: #2C2415;
+    --blue: #7FB2E8;
+    --red: #E68CA0;
+    --yellow: #E0B65C;
+    --green: #78C795;
+    --blue-bg: #1A2634;
+    --red-bg: #2F1D24;
+    --yellow-bg: #2C2415;
+    --green-bg: #16291E;
+    --bad: #E08696;
+    --bad-bg: #2C1A20;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Noto Sans TC", system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  .wrap { max-width: 980px; margin: 0 auto; padding: 48px 22px 96px; }
+
+  /* ── 開頭 ───────────────────────────── */
+  header { border-bottom: 1px solid var(--line); padding-bottom: 26px; margin-bottom: 34px; }
+
+  .eyebrow {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 10px;
+  }
+
+  h1 {
+    font-family: "Noto Serif TC", serif; font-weight: 700;
+    font-size: clamp(30px, 5vw, 44px); line-height: 1.25;
+    margin: 0 0 12px; text-wrap: balance; letter-spacing: .01em;
+  }
+
+  .lede { color: var(--dim); max-width: 62ch; margin: 0; }
+
+  .stats { display: flex; flex-wrap: wrap; gap: 26px; margin-top: 22px; }
+  .stat b {
+    display: block; font-family: "Noto Serif TC", serif; font-size: 26px;
+    line-height: 1.1; font-variant-numeric: tabular-nums;
+  }
+  .stat span { font-size: 12px; color: var(--faint); }
+
+  h2 {
+    font-family: "Noto Serif TC", serif; font-weight: 600;
+    font-size: 21px; margin: 46px 0 6px; text-wrap: balance;
+  }
+  h2 .n {
+    font-family: "JetBrains Mono", monospace; font-size: 12px;
+    color: var(--faint); margin-right: 10px; font-weight: 400;
+  }
+  .sub { color: var(--dim); font-size: 14px; margin: 0 0 20px; max-width: 66ch; }
+
+  /* ── 流程鏈 ─────────────────────────── */
+  .chain { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; margin: 0 0 6px; }
+
+  .node {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 9px;
+    padding: 9px 13px; font-size: 13.5px; line-height: 1.5; min-width: 0;
+  }
+  .node .k {
+    display: block; font-family: "JetBrains Mono", monospace;
+    font-size: 10px; letter-spacing: .08em; color: var(--faint); text-transform: uppercase;
+  }
+  .node.cond { background: var(--panel-2); border-style: dashed; }
+  .node.cond b { font-weight: 500; }
+
+  .arrow { align-self: center; color: var(--faint); font-size: 15px; }
+
+  .end {
+    display: inline-flex; align-items: baseline; gap: 8px;
+    background: var(--gold-bg); border: 1px solid var(--gold);
+    color: var(--gold); border-radius: 9px; padding: 9px 13px;
+    font-weight: 700; font-size: 13.5px; white-space: nowrap;
+  }
+  .end i { font-family: "JetBrains Mono", monospace; font-style: normal; font-size: 11px; opacity: .8; }
+  .end.bad { background: var(--bad-bg); border-color: var(--bad); color: var(--bad); }
+
+  /* ── 路線區塊 ───────────────────────── */
+  .route {
+    border: 1px solid var(--line); border-top-width: 3px; border-radius: 12px;
+    padding: 20px 22px 22px; margin-bottom: 18px; background: var(--panel);
+  }
+  .route.blue { border-top-color: var(--blue); }
+  .route.red { border-top-color: var(--red); }
+  .route.yellow { border-top-color: var(--yellow); }
+  .route.green { border-top-color: var(--green); }
+
+  .route h3 {
+    font-family: "Noto Serif TC", serif; font-size: 18px; margin: 0 0 3px;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .route.blue h3 { color: var(--blue); }
+  .route.red h3 { color: var(--red); }
+  .route.yellow h3 { color: var(--yellow); }
+  .route.green h3 { color: var(--green); }
+
+  .gate {
+    font-family: "JetBrains Mono", monospace; font-size: 11px; font-weight: 500;
+    padding: 2px 9px; border-radius: 20px; letter-spacing: .02em;
+  }
+  .route.blue .gate { background: var(--blue-bg); color: var(--blue); }
+  .route.red .gate { background: var(--red-bg); color: var(--red); }
+  .route.yellow .gate { background: var(--yellow-bg); color: var(--yellow); }
+  .route.green .gate { background: var(--green-bg); color: var(--green); }
+
+  .route .where {
+    font-family: "JetBrains Mono", monospace; font-size: 11.5px;
+    color: var(--faint); margin: 0 0 16px;
+  }
+
+  .step { margin: 14px 0 0; }
+  .step .label {
+    font-size: 12px; color: var(--faint); margin-bottom: 6px;
+    font-weight: 500; letter-spacing: .02em;
+  }
+
+  /* ── 表格 ───────────────────────────── */
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; min-width: 560px; }
+  th {
+    text-align: left; font-weight: 500; font-size: 11px; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--faint);
+    padding: 0 12px 8px 0; border-bottom: 1px solid var(--line);
+  }
+  td { padding: 9px 12px 9px 0; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  td.id { font-family: "JetBrains Mono", monospace; color: var(--faint); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.name { font-weight: 700; white-space: nowrap; }
+  td.src { font-family: "JetBrains Mono", monospace; font-size: 11.5px; color: var(--faint); white-space: nowrap; }
+
+  /* ── 提醒 ───────────────────────────── */
+  .notes { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .note {
+    border: 1px solid var(--line); border-left: 3px solid var(--gold);
+    border-radius: 9px; padding: 14px 16px; background: var(--panel);
+  }
+  .note b { display: block; margin-bottom: 4px; font-size: 14px; }
+  .note p { margin: 0; font-size: 13.5px; color: var(--dim); }
+
+  code {
+    font-family: "JetBrains Mono", monospace; font-size: .88em;
+    background: var(--panel-2); border: 1px solid var(--line-soft);
+    border-radius: 4px; padding: 1px 5px;
+  }
+
+  footer {
+    margin-top: 54px; padding-top: 18px; border-top: 1px solid var(--line);
+    color: var(--faint); font-size: 12.5px;
+  }
+</style>
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Witch Club · Ending Map</div>
+    <h1>女巫俱樂部　結局圖解</h1>
+    <p class="lede">20 個結局怎麼來的：第四章一個分歧點決定你走哪條線，線內的選擇與勝敗決定你落在哪一個結局。</p>
+    <div class="stats">
+      <div class="stat"><b>20</b><span>結局</span></div>
+      <div class="stat"><b>4</b><span>路線</span></div>
+      <div class="stat"><b>3</b><span>每條線的符文門檻</span></div>
+      <div class="stat"><b>7</b><span>壞結局</span></div>
+    </div>
+  </header>
+
+  <h2><span class="n">01</span>總分歧：第四章的那個晚上</h2>
+  <p class="sub">開完會，優菲離席。你選擇跟誰走——但真正決定路線的是<strong>符文數</strong>，不是選項。符文不夠就落單，四條路都通向同一個失敗結局。</p>
+
+  <div class="chain">
+    <div class="node"><span class="k">chapter4</span>開會結束</div>
+    <div class="arrow">→</div>
+    <div class="node"><span class="k">三選一</span>安慰優菲　追梅爾　跟著涅莉</div>
+    <div class="arrow">→</div>
+    <div class="node cond"><span class="k">檢查</span><b>該色符文 ≥ 3</b></div>
+  </div>
+  <div class="chain" style="margin-top:8px">
+    <div class="node cond"><span class="k">不足</span>你走過去，但你不是那個該在的人</div>
+    <div class="arrow">→</div>
+    <div class="end bad"><i>18</i>終焉</div>
+  </div>
+
+  <p class="sub" style="margin-top:22px">薇狄亞不在選單裡——她會自己來。走向任何一個人時，只要<strong>綠符文 ≥ 3 而且她的好感 ≥ 40</strong>，她會從後面拉住你的袖子；推得開，跟她走就進綠線。</p>
+
+  <h2><span class="n">02</span>四條線</h2>
+
+  <div class="route blue">
+    <h3>藍線　優菲<span class="gate">RunesBlue ≥ 3</span></h3>
+    <p class="where">chapter5blue</p>
+
+    <div class="step">
+      <div class="label">最終戰・米夏</div>
+      <div class="chain">
+        <div class="node cond"><span class="k">打贏</span>你改寫了她的結局</div>
+        <div class="arrow">→</div>
+        <div class="end"><i>10</i>改寫命運</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="label">打輸之後　那股力量朝妮可衝過去</div>
+      <div class="chain">
+        <div class="node"><span class="k">選擇</span>衝過去擋住</div>
+        <div class="arrow">→</div>
+        <div class="node"><span class="k">最後一問</span>優菲該成為什麼</div>
+        <div class="arrow">→</div>
+        <div class="end"><i>01</i>緋紅替身</div>
+        <div class="end"><i>02</i>純藍之冠</div>
+      </div>
+      <div class="chain" style="margin-top:8px">
+        <div class="node"><span class="k">選擇</span>被震開了，動不了</div>
+        <div class="arrow">→</div>
+        <div class="end bad"><i>11</i>殉道</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="route red">
+    <h3>紅線　梅爾<span class="gate">RunesRed ≥ 3</span></h3>
+    <p class="where">chapter4red → chapter5red → chapter6red</p>
+
+    <div class="step">
+      <div class="label">入口・女巫獵人</div>
+      <div class="chain">
+        <div class="node"><span class="k">選擇</span>把她就地解決掉</div>
+        <div class="arrow">→</div>
+        <div class="end bad"><i>12</i>異端</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="label">終幕・米夏降臨</div>
+      <div class="chain">
+        <div class="node"><span class="k">選擇</span>沒有動</div>
+        <div class="arrow">→</div>
+        <div class="end"><i>04</i>穢血新神</div>
+      </div>
+      <div class="chain" style="margin-top:8px">
+        <div class="node"><span class="k">選擇</span>擋在優菲和米夏之間</div>
+        <div class="arrow">→</div>
+        <div class="node"><span class="k">再選</span>提醒她握著墮星石</div>
+        <div class="arrow">→</div>
+        <div class="node cond"><span class="k">梅爾戰</span>贏／輸</div>
+        <div class="arrow">→</div>
+        <div class="end"><i>19</i>墮星之主</div>
+        <div class="end"><i>03</i>在妳身邊</div>
+      </div>
+      <div class="chain" style="margin-top:8px">
+        <div class="node"><span class="k">或</span>什麼也沒說，讓她去</div>
+        <div class="arrow">→</div>
+        <div class="end"><i>03</i>在妳身邊</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="route yellow">
+    <h3>黃線　涅莉<span class="gate">RunesYellow ≥ 3</span></h3>
+    <p class="where">chapter5yellow</p>
+
+    <div class="step">
+      <div class="label">米夏戰之後　她問你還要不要再來一次</div>
+      <div class="chain">
+        <div class="node"><span class="k">選擇</span>為了其他人，我可以再試一遍</div>
+        <div class="arrow">→</div>
+        <div class="end"><i>07</i>輪迴の鑰匙</div>
+      </div>
+      <div class="chain" style="margin-top:8px">
+        <div class="node"><span class="k">選擇</span>累了的話就和我走吧</div>
+        <div class="arrow">→</div>
+        <div class="node cond"><span class="k">黃符文 &lt; 3</span>會被導回上面那個</div>
+        <div class="arrow">→</div>
+        <div class="end"><i>08</i>背棄世界</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="label">在戰鬥之前就分岔的隱藏路</div>
+      <div class="chain">
+        <div class="node cond"><span class="k">條件</span><b>二週目　且　黃符文 ≥ 5</b></div>
+        <div class="arrow">→</div>
+        <div class="end"><i>09</i>小精靈，飛走了</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="route green">
+    <h3>綠線　薇狄亞<span class="gate">RunesGreen ≥ 3　＋　好感 ≥ 40</span></h3>
+    <p class="where">chapter4green</p>
+
+    <div class="step">
+      <div class="label">開場・克蘿伊</div>
+      <div class="chain">
+        <div class="node cond"><span class="k">打輸</span>——</div>
+        <div class="arrow">→</div>
+        <div class="end bad"><i>15</i>肅清</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="label">儀式當天　路線在這裡才真正分開</div>
+      <div class="chain">
+        <div class="node cond"><span class="k">西碧兒好感 ≥ 50</span>她跟你約好了</div>
+        <div class="arrow">→</div>
+        <div class="node cond"><span class="k">薇狄亞好感 ≥ 45</span>被撞見／沒被撞見</div>
+        <div class="arrow">→</div>
+        <div class="end bad"><i>13</i>唯一</div>
+        <div class="end"><i>20</i>私奔</div>
+      </div>
+      <div class="chain" style="margin-top:8px">
+        <div class="node"><span class="k">否則・選擇</span>按住梅爾，站到西碧兒那邊</div>
+        <div class="arrow">→</div>
+        <div class="end"><i>06</i>火中的樂園</div>
+      </div>
+      <div class="chain" style="margin-top:8px">
+        <div class="node"><span class="k">否則・選擇</span>放開梅爾的手</div>
+        <div class="arrow">→</div>
+        <div class="node cond"><span class="k">薇狄亞好感 ≥ 45</span>三天的搜查</div>
+        <div class="arrow">→</div>
+        <div class="end"><i>05</i>深春</div>
+        <div class="end"><i>06</i>火中的樂園</div>
+      </div>
+    </div>
+  </div>
+
+  <h2><span class="n">03</span>七個壞結局在哪裡踩到</h2>
+  <p class="sub">五個來自打輸，兩個來自選錯。</p>
+  <div class="scroll">
+    <table>
+      <tr><th>編號</th><th>名稱</th><th>踩到的地方</th><th>腳本</th></tr>
+      <tr><td class="id">11</td><td class="name">殉道</td><td>藍線最終戰打輸後，選了「被震開了，動不了」</td><td class="src">badend01</td></tr>
+      <tr><td class="id">12</td><td class="name">異端</td><td>紅線開頭選「把女巫獵人就地解決掉」</td><td class="src">badend12</td></tr>
+      <tr><td class="id">13</td><td class="name">唯一</td><td>綠線私奔當晚被薇狄亞撞見（她好感 ≥ 45）</td><td class="src">badend13</td></tr>
+      <tr><td class="id">14</td><td class="name">壞滅</td><td>第四章梅爾戰打輸，而且先前也輸過一場</td><td class="src">badend14</td></tr>
+      <tr><td class="id">15</td><td class="name">肅清</td><td>綠線開場的克蘿伊戰打輸</td><td class="src">badend15</td></tr>
+      <tr><td class="id">16</td><td class="name">魔蝕</td><td>第四章梅爾戰打輸（先前沒輸過）</td><td class="src">badend16</td></tr>
+      <tr><td class="id">17</td><td class="name">蘇生</td><td>第四章煙霧鎮壓戰打輸</td><td class="src">badend17</td></tr>
+    </table>
+  </div>
+
+  <h2><span class="n">04</span>20 個結局一覽</h2>
+  <div class="scroll">
+    <table>
+      <tr><th>編號</th><th>名稱</th><th>條件</th><th>腳本</th></tr>
+      <tr><td class="id">01</td><td class="name">緋紅替身</td><td>藍線・最終戰打輸後擋住力量，選「成為血巫結社的族母」</td><td class="src">chapter5blue:885</td></tr>
+      <tr><td class="id">02</td><td class="name">純藍之冠</td><td>藍線・同上，選「回象牙塔」</td><td class="src">chapter5blue:907</td></tr>
+      <tr><td class="id">03</td><td class="name">在妳身邊</td><td>紅線・讓梅爾去，或梅爾戰打輸</td><td class="src">chapter6red:512</td></tr>
+      <tr><td class="id">04</td><td class="name">穢血新神</td><td>紅線・終幕選「沒有動」</td><td class="src">chapter6red:462</td></tr>
+      <tr><td class="id">05</td><td class="name">深春</td><td>綠線・放開梅爾的手 ＋ 薇狄亞好感 ≥ 45 ＋ 三天搜查</td><td class="src">chapter4green:384</td></tr>
+      <tr><td class="id">06</td><td class="name">火中的樂園</td><td>綠線・按住梅爾，或搜查條件不足</td><td class="src">chapter4green:796</td></tr>
+      <tr><td class="id">07</td><td class="name">輪迴の鑰匙</td><td>黃線・選「再試一遍」　<strong>解鎖蝕之聖典</strong></td><td class="src">chapter5yellow:279</td></tr>
+      <tr><td class="id">08</td><td class="name">背棄世界</td><td>黃線・選「和我走」＋ 黃符文 ≥ 3</td><td class="src">chapter5yellow:312</td></tr>
+      <tr><td class="id">09</td><td class="name">小精靈，飛走了</td><td>黃線・二週目 ＋ 黃符文 ≥ 5（在米夏戰之前就分岔）</td><td class="src">chapter5yellow:372</td></tr>
+      <tr><td class="id">10</td><td class="name">改寫命運</td><td>藍線・最終戰打贏</td><td class="src">euphie_end:15</td></tr>
+      <tr><td class="id">11</td><td class="name">殉道</td><td>見上表</td><td class="src">badend01:118</td></tr>
+      <tr><td class="id">12</td><td class="name">異端</td><td>見上表</td><td class="src">badend12:39</td></tr>
+      <tr><td class="id">13</td><td class="name">唯一</td><td>見上表</td><td class="src">badend13:32</td></tr>
+      <tr><td class="id">14</td><td class="name">壞滅</td><td>見上表</td><td class="src">badend14:27</td></tr>
+      <tr><td class="id">15</td><td class="name">肅清</td><td>見上表</td><td class="src">badend15:29</td></tr>
+      <tr><td class="id">16</td><td class="name">魔蝕</td><td>見上表</td><td class="src">badend16:30</td></tr>
+      <tr><td class="id">17</td><td class="name">蘇生</td><td>見上表</td><td class="src">badend17:31</td></tr>
+      <tr><td class="id">18</td><td class="name">終焉</td><td>第四章符文不足 → 落單（五個入口，同一個結局）</td><td class="src">chapter5common</td></tr>
+      <tr><td class="id">19</td><td class="name">墮星之主</td><td>紅線・提醒梅爾她握著墮星石，然後打贏</td><td class="src">mel_end:36</td></tr>
+      <tr><td class="id">20</td><td class="name">私奔</td><td>綠線・西碧兒好感 ≥ 50，而薇狄亞好感 &lt; 45</td><td class="src">syb_end:70</td></tr>
+    </table>
+  </div>
+
+  <h2><span class="n">05</span>符文：一輪有幾次機會</h2>
+  <p class="sub">符文只從<strong>夜晚儀式打贏</strong>來。地圖的白天是約會（加好感），夜晚才是儀式。每個角色有五場儀式，第 N 場需要好感 ≥ N×20。</p>
+
+  <div class="scroll">
+    <table>
+      <tr><th>階段</th><th>夜晚</th><th>白天</th><th>說明</th></tr>
+      <tr><td class="name">第三章</td><td class="id">4</td><td class="id">1</td><td>四條線共用</td></tr>
+      <tr><td class="name">第四章・分歧前</td><td class="id">2</td><td class="id">1</td><td>四條線共用</td></tr>
+      <tr><td class="name">分歧後・藍線</td><td class="id">6</td><td class="id">1</td><td>chapter4 後半 4 ＋ chapter5blue 2</td></tr>
+      <tr><td class="name">分歧後・綠線</td><td class="id">8</td><td class="id">4</td><td>最長的一條</td></tr>
+      <tr><td class="name">分歧後・紅線</td><td class="id">1</td><td class="id">4</td><td>chapter5red</td></tr>
+      <tr><td class="name">分歧後・黃線</td><td class="id">1</td><td class="id">1</td><td>chapter5yellow</td></tr>
+    </table>
+  </div>
+  <p class="sub" style="margin-top:14px"><strong>決定路線的只有分歧前那 6 個夜晚。</strong>分歧後再拿的符文，這一輪用不到了——但會記進「曾經拿過」，之後蝕之聖典借得到。</p>
+
+  <h2><span class="n">06</span>第一輪這樣走最划算</h2>
+  <p class="sub">目標只有一個：拿到 <strong>07 輪迴の鑰匙</strong> 解鎖蝕之聖典。之後所有路線的好感都用送的，就不必再從零養一次。</p>
+
+  <div class="route yellow">
+    <h3>先湊 3 顆黃符文　→　涅莉線　→　07</h3>
+    <p class="where">3 個夜晚 ＋ 2 個白天，剛好卡在門檻上</p>
+    <div class="chain">
+      <div class="node"><span class="k">劇情選項</span>涅莉 20</div>
+      <div class="arrow">→</div>
+      <div class="node"><span class="k">夜 1</span>需 20　→ 好感 30</div>
+      <div class="arrow">→</div>
+      <div class="node"><span class="k">日 1</span>→ 40</div>
+      <div class="arrow">→</div>
+      <div class="node"><span class="k">夜 2</span>需 40　→ 55</div>
+      <div class="arrow">→</div>
+      <div class="node"><span class="k">日 2</span>→ 70</div>
+      <div class="arrow">→</div>
+      <div class="node"><span class="k">夜 3</span>需 60　→ 90</div>
+      <div class="arrow">→</div>
+      <div class="end"><i>黃</i>3 顆</div>
+    </div>
+    <p class="sub" style="margin:14px 0 0">涅莉的劇情好感上限只有 20，剛好等於第一場儀式的門檻——<strong>兩個白天都得給她</strong>，不然第二場就卡住。</p>
+  </div>
+
+  <div class="route red">
+    <h3>剩下的 3 個夜晚給梅爾</h3>
+    <p class="where">她的劇情好感可以同時養到 50，三場儀式一路過關</p>
+    <div class="chain">
+      <div class="node"><span class="k">劇情選項</span>梅爾 50</div>
+      <div class="arrow">→</div>
+      <div class="node"><span class="k">夜 4</span>需 20　→ 60</div>
+      <div class="arrow">→</div>
+      <div class="node"><span class="k">夜 5</span>需 40　→ 75</div>
+      <div class="arrow">→</div>
+      <div class="node"><span class="k">夜 6</span>需 60　→ 95</div>
+      <div class="arrow">→</div>
+      <div class="end"><i>紅</i>3 顆</div>
+    </div>
+    <p class="sub" style="margin:14px 0 0">第一輪結束時：黃 3 ＋ 紅 3。聖典打開後，這兩條線立刻可以進去收結局。</p>
+  </div>
+
+  <div class="note" style="margin-top:16px">
+    <b>想早點拿 09 小精靈，飛走了的話</b>
+    <p>它要「二週目 ＋ 黃符文 ≥ 5」。第一輪把 5 個夜晚全給涅莉也走得完（夜4 需 80、夜5 需 100，靠儀式自己給的好感就夠），代價是只剩 1 個夜晚給別人。</p>
+  </div>
+
+  <h2><span class="n">07</span>三件容易卡住的事</h2>
+  <div class="notes">
+    <div class="note">
+      <b>符文決定路線，好感只決定儀式做不做得成</b>
+      <p>好感高但符文不夠，第四章一樣會落單進「終焉」。符文只有打贏夜晚儀式才拿得到。</p>
+    </div>
+    <div class="note">
+      <b>蝕之聖典借你符文，但不借好感</b>
+      <p>它把「曾經拿過」的符文全借給你，所以路線門檻自動達標；好感則是選誰誰就 100、其餘 0。這也是為什麼要選人。</p>
+    </div>
+    <div class="note">
+      <b>09 小精靈，飛走了　聖典拿不到</b>
+      <p>它的分歧點在米夏戰之前，而聖典進去的位置在那之後。只能靠正規二週目 ＋ 黃符文 5 顆。</p>
+    </div>
+  </div>
+
+  <footer>
+    條件與行號取自現行腳本（<code>Assets/NaniScripts</code>）。薇狄亞的攔截條件已於本次更新為「綠符文 ≥ 3 且好感 ≥ 40」——先前只看符文，導致在蝕之聖典裡沒選她也會被攔。
+  </footer>
+
+</div>
+
+</body>
+</html>
