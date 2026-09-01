@@ -157,6 +157,10 @@ nic:  我來抄寫降靈術的咒語，在這同時，學姐，請把邪靈給�
 涅莉: 這我知道，打到她投降就對了！
 @hide nic,優菲,涅莉
 ; 梅爾戰的勝敗分歧（打贏續劇情／打輸→ 壞滅 or 魔蝕）※ 壞結局不開放地圖捷徑
+; ── 先讓玩家知道這一場的賭注：輸了就是壞結局 ──
+涅莉: 等等，{PlayerName}。
+涅莉: 我先說清楚——這不是把她打醒就好的那種。
+涅莉: 妳要是壓不住她，梅爾就回不來了。
 # branch_ch4bt2
 @battle background:bg02 target:monster02 label:ch4bt2
 @stop
@@ -455,6 +459,16 @@ syb: 嘻嘻，多得是機會呢。
 @GotoUnityScene sceneName:MapTest
 
 # afterdate6
+
+; 分歧前的白天。夜晚是儀式（拿符文），白天是約會（補好感），
+; 而好感決定下一場儀式做不做得成——兩者要交錯著用。
+（外面還亮著。趁事情還沒開始，去找個人吧。）
+@saveMapDayNight isDay:true
+@SaveReturnPoint script:"chapter4" label:"afterday_ch4b"
+@GotoUnityScene sceneName:MapTest
+@stop
+# afterday_ch4b
+
 (翌日)
 (走廊)
 @back bg06
@@ -794,6 +808,9 @@ witchc: 迷霧草是最棒的！
 優菲: ……先鎮壓再說！
 @hide 優菲,nic
 ; 煙霧鎮壓戰的勝敗分歧（打贏續劇情／打輸→ 蘇生）※ 壞結局不開放地圖捷徑
+; ── 先讓玩家知道這一場的賭注：輸了就是壞結局 ──
+妮可: 學姊，這股煙已經吃掉半條街了。
+妮可: 鎮壓不下來的話，這裡的人……我不敢想。
 # branch_ch4bt3
 @battle background:bg02 target:monster02 label:ch4bt3
 @stop

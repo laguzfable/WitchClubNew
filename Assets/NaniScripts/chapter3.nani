@@ -491,6 +491,16 @@ may: 來來來，一人一個。
 @GotoUnityScene sceneName:MapTest
 @stop
 # afterdate3
+
+; 分歧前的白天。夜晚是儀式（拿符文），白天是約會（補好感），
+; 而好感決定下一場儀式做不做得成——兩者要交錯著用。
+（睡了一整個上午。窗外的天色告訴我，還有半天可以用。）
+@saveMapDayNight isDay:true
+@SaveReturnPoint script:"chapter3" label:"afterday_ch3b"
+@GotoUnityScene sceneName:MapTest
+@stop
+# afterday_ch3b
+
 @hide 涅莉,薇狄亞,may,蘇菲亞
 (隔天)
 @stopBgm

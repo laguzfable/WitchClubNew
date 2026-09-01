@@ -75,6 +75,16 @@ public static class RitualGate
     }
 
     /// <summary>
+    /// 現在的好感。沒掛門檻或讀不到時回 -1。
+    /// 地圖上顯示「好感 45/60」用的——同一份數字，只是提前給玩家看。
+    /// </summary>
+    public static int CurrentAffinity (string characterName)
+    {
+        if (!Table.TryGetValue(characterName, out var entry)) return -1;
+        return ReadAffinity(entry.variable);
+    }
+
+    /// <summary>
     /// 儀式打贏之後推進夜晚進度。由 CombatSystem 在勝利結算時呼叫，
     /// monsterID 就是儀式的 target（blue01～green05）。
     ///

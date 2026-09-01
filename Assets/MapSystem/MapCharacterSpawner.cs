@@ -330,7 +330,7 @@ if (MapSpecialOverride.TryGet(c.characterName, out var special))
 
         var txt = iconGO.GetComponentInChildren<Text>(true);
         if (txt != null)
-            txt.text = $"{(currentTimeOfDay == TimeOfDay.Day ? "白天" : "晚上")}：{evt.eventName}";
+            txt.text = IconLabel(c, evt);
 
         var animator = iconGO.GetComponentInChildren<Animator>(true);
         if (animator != null && evt.animatorController != null)
@@ -400,6 +400,44 @@ button.onClick.AddListener(() =>
             logMsg += "❌ 找不到 GirlButton\n";
             MarkRed(iconGO);
         }
+    }
+
+    // ==========================================================
+    // ⑤-2 icon 上的標籤
+    //
+    // 玩家最需要知道的是「今晚做得成儀式嗎」。好感不夠時 RitualGate 會把
+    // 儀式換成閒聊，但那是點下去才發生的——等於一個晚上已經花掉了。
+    // 把同一份判斷提前寫在標籤上，玩家就能自己決定要先去約會還是直接來。
+    // ==========================================================
+    string IconLabel (CharacterEventList c, CharacterEvent evt)
+    {
+        var when = currentTimeOfDay == TimeOfDay.Day ? "白天" : "晚上";
+
+        // 特殊事件是劇情排好的，沒有進度也沒有門檻
+        if (c.specialEvents.Contains(evt))
+            return $"{when}　{evt.eventName}";
+
+        if (currentTimeOfDay == TimeOfDay.Day)
+        {
+            var done = StoryProgressManager.Instance.GetDayProgress(c.characterName);
+            var total = c.dayEvents != null ? c.dayEvents.Count : 0;
+            return total > 0 ? $"{when}　約會 {done + 1}/{total}" : $"{when}　{evt.eventName}";
+        }
+
+        var stage = StoryProgressManager.Instance.GetNightProgress(c.characterName);
+        var nights = c.nightEvents != null ? c.nightEvents.Count : 0;
+
+        if (!RitualGate.HasGate(c.characterName))
+            return nights > 0 ? $"{when}　{evt.eventName} {stage + 1}/{nights}" : $"{when}　{evt.eventName}";
+
+        if (RitualGate.CanPerform(c.characterName, stage))
+            return $"{when}　儀式 {stage + 1}/{nights}";
+
+        var have = RitualGate.CurrentAffinity(c.characterName);
+        var need = RitualGate.RequiredAffinity(stage);
+        return have >= 0
+            ? $"{when}　只能聊天（好感 {have}/{need}）"
+            : $"{when}　只能聊天";
     }
 
     // ==========================================================
