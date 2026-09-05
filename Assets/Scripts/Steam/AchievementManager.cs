@@ -258,11 +258,18 @@ public class AchievementManager : MonoSingleton<AchievementManager>
             yield break;
         }
 
+        // 先逐一清。ClearAchievement 是針對單一成就的，比 ResetAllStats 直接，
+        // 而且哪一個沒清掉看得出來——ResetAllStats 失敗時只會回一個 false。
+        var names = AllAchievementApiNames();
+        var failed = names.Where(n => !SteamUserStats.ClearAchievement(n)).ToArray();
+        if (failed.Length > 0)
+            Debug.LogWarning("[AchievementManager] 這幾個 ClearAchievement 回 false（多半是後台沒建"
+                           + "或名字拼錯）：" + string.Join("、", failed));
+
+        // 統計也要歸零，不然靠統計累積的成就會馬上被 Steam 重新判定成達成
         if (!SteamUserStats.ResetAllStats(true))
-        {
-            Debug.LogError("[AchievementManager] ResetAllStats 失敗，什麼都沒清。");
-            yield break;
-        }
+            Debug.LogWarning("[AchievementManager] ResetAllStats 失敗（統計沒歸零），"
+                           + "但上面的逐一清除可能已經生效。");
 
         if (!SteamUserStats.StoreStats())
         {
@@ -289,7 +296,10 @@ public class AchievementManager : MonoSingleton<AchievementManager>
         foreach (var apiName in AllAchievementApiNames())
             if (SteamUserStats.GetAchievement(apiName, out bool got) && got) left++;
 
-        if (left == 0) Debug.Log("[AchievementManager] Steam 成就與統計都清乾淨了。");
+        if (left == 0)
+            Debug.Log("[AchievementManager] Steam 成就與統計都清乾淨了。"
+                    + "（這是直接跟 Steam 要來的狀態，準的就是這個。"
+                    + "Steam 用戶端的成就頁面／個人檔案是另外一份快取，會晚一點才更新）");
         else Debug.LogWarning($"[AchievementManager] 清完之後還有 {left} 個成就是解鎖狀態——"
                             + "多半是遊戲同時又發了一次（例如標題畫面重新判定），"
                             + "或 Steam 端還在同步。");
