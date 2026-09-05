@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 162e32e7dd45d4284a4b24d47dc3603c, type: 3}
+  m_Name: grimoire06
+  m_EditorClassIdentifier: 
+  HP: 65
+  EN: 8
+  levelUpMaxBonusValue: 1
+  maxSelectCardCount: 1
+  isBoss: 0
+  noteIds: lich
+  displayName: "\u9b54\u66f8\u30fb\u9678"
+  sprite: {fileID: 0}
+  elementData:
+  - element: 0
+    attribute: {ATK: 3, DEF: 5, HEAL: 0, EN: 0}
+    randomWeight: 1000
+    decisionWeight: 1000
+    fx: {fileID: 0}
+  - element: 1
+    attribute: {ATK: 4, DEF: 0, HEAL: 0, EN: 0}
+    randomWeight: 1000
+    decisionWeight: 1000
+    fx: {fileID: 0}
+  - element: 2
+    attribute: {ATK: 3, DEF: 2, HEAL: 0, EN: 1}
+    randomWeight: 1000
+    decisionWeight: 1000
+    fx: {fileID: 0}
+  - element: 3
+    attribute: {ATK: 2, DEF: 3, HEAL: 2, EN: 0}
+    randomWeight: 1000
+    decisionWeight: 1000
+    fx: {fileID: 0}
+  ability: []
+  talk:
+    battleStart:
+    - "\u9019\u4e00\u672c\u6c92\u6709\u4f5c\u8005\u3002\u5beb\u5b83\u7684\u4eba\u5df2\u7d93\u4e0d\u7b97\u4eba\u4e86\u3002"
+    act:
+    - "\u57f7\u5ff5\u662f\u53ef\u4ee5\u7d2f\u7a4d\u7684\u3002\u591a\u6578\u4eba\u5230\u6b7b\u90fd\u6c92\u6522\u5920\u3002"
+    - "\u6522\u5920\u7684\u90a3\u4e9b\uff0c\u6b7b\u7684\u6642\u5019\u4e0d\u6703\u8d70\u3002"
+    - "\u66f8\u4e0a\u7ba1\u90a3\u500b\u53eb\u5deb\u5996\u3002"
+    - "\u5deb\u5996\u6c92\u6709\u8eab\u9ad4\uff0c\u6240\u4ee5\u8eab\u9ad4\u58de\u6389\u5c0d\u5979\u6c92\u6709\u610f\u7fa9\u3002"
+    - "\u5979\u8981\u7684\u53ea\u662f\u4e00\u5177\u5bb9\u5668\u3002\u6709\u5bb9\u5668\uff0c\u5c31\u80fd\u518d\u4f86\u4e00\u6b21\u3002"
+    - "\u6240\u4ee5\u6bba\u4e0d\u6b7b\u5979\u3002\u59b3\u53ea\u80fd\u628a\u5bb9\u5668\u5f9e\u5979\u624b\u4e0a\u62ff\u8d70\u3002"
+    - "\u2014\u2014\u6216\u8005\uff0c\u8b93\u90a3\u5177\u5bb9\u5668\u8b8a\u5f97\u4e0d\u503c\u5f97\u4f4f\u3002"
+    hurt:
+    - "\u6253\u6211\u6c92\u6709\u7528\u3002\u59b3\u4e5f\u77e5\u9053\u6253\u6211\u6c92\u6709\u7528\u3002"
+    - "\u66f8\u53ef\u4ee5\u71d2\u3002\u88e1\u9762\u5beb\u7684\u6771\u897f\u4e0d\u884c\u3002"
+    lowHp:
+    - "\u59b3\u770b\uff0c\u5c31\u7b97\u73fe\u5728\u71d2\u4e86\u6211\u2014\u2014"
+    defeated:
+    - "\u2026\u2026\u59b3\u8a18\u4f4f\u4e86\u55ce\uff1f\u6c92\u6709\u8a18\u4f4f\u7684\u8a71\uff0c\u5979\u9084\u6703\u518d\u4f86\u4e00\u6b21\u3002"

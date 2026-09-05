@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 162e32e7dd45d4284a4b24d47dc3603c, type: 3}
+  m_Name: grimoire02
+  m_EditorClassIdentifier: 
+  HP: 50
+  EN: 8
+  levelUpMaxBonusValue: 1
+  maxSelectCardCount: 1
+  isBoss: 0
+  displayName: "\u9b54\u66f8\u30fb\u8cb3"
+  sprite: {fileID: 0}
+  elementData:
+  - element: 0
+    attribute: {ATK: 2, DEF: 6, HEAL: 0, EN: 0}
+    randomWeight: 1000
+    decisionWeight: 1000
+    fx: {fileID: 0}
+  - element: 1
+    attribute: {ATK: 3, DEF: 0, HEAL: 0, EN: 0}
+    randomWeight: 1000
+    decisionWeight: 800
+    fx: {fileID: 0}
+  - element: 2
+    attribute: {ATK: 0, DEF: 4, HEAL: 0, EN: 1}
+    randomWeight: 1000
+    decisionWeight: 1000
+    fx: {fileID: 0}
+  - element: 3
+    attribute: {ATK: 0, DEF: 8, HEAL: 2, EN: 0}
+    randomWeight: 600
+    decisionWeight: 600
+    fx: {fileID: 0}
+  noteIds: war_witch
+  ability: []
+  talk:
+    battleStart:
+    - "\u9019\u4e00\u672c\u6bd4\u8f03\u8584\u3002\u56e0\u70ba\u6d3b\u4e0b\u4f86\u7684\u4eba\u4e0d\u591a\u3002"
+    act:
+    - "\u6de8\u5316\u4e0d\u662f\u6230\u722d\u3002\u662f\u6e05\u9ede\u3002"
+    - "\u8c61\u7259\u5854\u5217\u4e86\u4e00\u5f35\u540d\u55ae\uff0c\u4e0a\u9762\u662f\u300c\u4e0d\u8a72\u5b58\u5728\u7684\u6771\u897f\u300d\u3002"
+    - "\u540d\u55ae\u4e0a\u7b2c\u4e00\u9805\uff0c\u662f\u6703\u8aaa\u8a71\u7684\u66f8\u3002"
+    - "\u2026\u2026\u59b3\u73fe\u5728\u61c2\u6211\u70ba\u4ec0\u9ebc\u8981\u8dd1\u4e86\u5427\u3002"
+    - "\u7b2c\u4e8c\u9805\u662f\u7cbe\u9748\u3002\u7b2c\u4e09\u9805\u6211\u4e0d\u80fd\u5538\u3002"
+    hurt:
+    - "\u59b3\u8ddf\u4ed6\u5011\u4e00\u6a23\u3002"
+    lowHp:
+    - "\u53c8\u4f86\u4e86\u3002\u6bcf\u4e00\u6b21\u90fd\u662f\u9019\u6a23\u3002"
+    defeated:
+    - "\u540d\u55ae\u2026\u2026\u53c8\u9577\u4e86\u4e00\u884c\u3002"
+    actInOrder: 1
