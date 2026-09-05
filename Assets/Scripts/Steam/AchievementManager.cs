@@ -3,6 +3,7 @@
 #endif
 
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 #if !DISABLESTEAMWORKS
 using Steamworks;
@@ -211,18 +212,100 @@ public class AchievementManager : MonoSingleton<AchievementManager>
         SteamUserStats.StoreStats();
     }
 
+    /// <summary>Steam 已經把這位玩家的成就狀態送回來了沒。沒有的話任何讀寫都會失敗。</summary>
+    public bool StatsReady => m_StatsValid;
+
 #if UNITY_EDITOR
     // Dev-only: wipe achievements/stats on Steam so they can be re-tested from scratch.
     [ContextMenu("Debug/Reset All Achievements And Stats")]
     public void DebugResetAll()
     {
-        if (!SteamManager.Initialized)
-            return;
+        StartCoroutine(DebugResetAllRoutine());
+    }
 
-        SteamUserStats.ResetAllStats(true);
-        SteamUserStats.StoreStats();
+    /// <summary>
+    /// 清空 Steam 上的成就與統計。
+    ///
+    /// ★ 為什麼要寫成協程 ★
+    /// ResetAllStats 在「Steam 還沒把成就狀態送回來」時會直接失敗（回 false）。
+    /// 剛進 Play mode 就按最容易踩到——舊版把回傳值丟掉、照樣印「已清空」，
+    /// 所以看起來成功、實際上一個都沒清，就是「常常清不乾淨」的原因。
+    /// 這裡改成：等 stats 就緒才動手、檢查回傳值、清完再等 Steam 回話一次才回報。
+    /// </summary>
+    public System.Collections.IEnumerator DebugResetAllRoutine()
+    {
+        if (!SteamManager.Initialized)
+        {
+            Debug.LogWarning("[AchievementManager] Steam 沒初始化，沒有清。"
+                           + "（Steam 客戶端要開著，steam_appid.txt 要在專案根目錄）");
+            yield break;
+        }
+
+        // 等 Steam 把成就狀態送回來，最多 5 秒
+        if (!m_StatsValid)
+        {
+            RequestStats();
+            var deadline = Time.realtimeSinceStartup + 5f;
+            while (!m_StatsValid && Time.realtimeSinceStartup < deadline)
+                yield return null;
+        }
+
+        if (!m_StatsValid)
+        {
+            Debug.LogError("[AchievementManager] Steam 一直沒回傳成就狀態，什麼都沒清。"
+                         + "隔幾秒再按一次；還是不行的話多半是 Steam 客戶端沒開，"
+                         + "或這個帳號沒有這個 App 的授權。");
+            yield break;
+        }
+
+        if (!SteamUserStats.ResetAllStats(true))
+        {
+            Debug.LogError("[AchievementManager] ResetAllStats 失敗，什麼都沒清。");
+            yield break;
+        }
+
+        if (!SteamUserStats.StoreStats())
+        {
+            Debug.LogError("[AchievementManager] StoreStats 失敗——清除還沒送到 Steam。");
+            yield break;
+        }
+
+        // 送出去之後再要一次，確認 Steam 那邊真的變了才回報成功
+        m_StatsValid = false;
         RequestStats();
-        Debug.Log("[AchievementManager] All stats/achievements reset.");
+
+        var wait = Time.realtimeSinceStartup + 5f;
+        while (!m_StatsValid && Time.realtimeSinceStartup < wait)
+            yield return null;
+
+        if (!m_StatsValid)
+        {
+            Debug.LogWarning("[AchievementManager] 已經送出清除，但 Steam 還沒回話。"
+                           + "用「印出目前成就狀態」確認一下。");
+            yield break;
+        }
+
+        var left = 0;
+        foreach (var apiName in AllAchievementApiNames())
+            if (SteamUserStats.GetAchievement(apiName, out bool got) && got) left++;
+
+        if (left == 0) Debug.Log("[AchievementManager] Steam 成就與統計都清乾淨了。");
+        else Debug.LogWarning($"[AchievementManager] 清完之後還有 {left} 個成就是解鎖狀態——"
+                            + "多半是遊戲同時又發了一次（例如標題畫面重新判定），"
+                            + "或 Steam 端還在同步。");
+    }
+
+    /// <summary>這個類別上所有 ACH_ 開頭的常數。清完之後拿來驗收。</summary>
+    static string[] AllAchievementApiNames()
+    {
+        return typeof(AchievementManager)
+            .GetFields(System.Reflection.BindingFlags.Public |
+                       System.Reflection.BindingFlags.Static |
+                       System.Reflection.BindingFlags.FlattenHierarchy)
+            .Where(f => f.IsLiteral && f.FieldType == typeof(string) && f.Name.StartsWith("ACH_"))
+            .Select(f => (string)f.GetRawConstantValue())
+            .Distinct()
+            .ToArray();
     }
 #endif
 

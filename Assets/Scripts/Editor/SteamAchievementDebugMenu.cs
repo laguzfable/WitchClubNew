@@ -28,9 +28,10 @@ public static class SteamAchievementDebugMenu
         var manager = RequireManager();
         if (manager == null) return;
 
-        manager.DebugResetAll();
+        // 本地那半先做（同步的），Steam 那半是協程，等它自己跑完並在 Console 回報
         EndingRecord.Clear(); // 不清的話下次跑到結局會被判定成「已經拿過」，成就不會重發
         Hexe.UI.TitleMenuUnlockInjector.Refresh();
+        manager.DebugResetAll();
     }
 
     [MenuItem("Tools/Witch Club/Steam 成就/全部清乾淨（Steam 成就 + 本地進度）")]
@@ -47,15 +48,22 @@ public static class SteamAchievementDebugMenu
                 "清掉", "取消"))
             return;
 
-        manager.DebugResetAll();          // Steam（雲端）
         ProgressResetter.ResetLocalProgress(); // 本地，跟 F10 同一份步驟
-        Debug.Log("[SteamAchievement] Steam 成就與本地進度都清掉了。");
+        manager.DebugResetAll();               // Steam（雲端）——協程，結果會自己印在 Console
+        Debug.Log("[SteamAchievement] 本地進度已清空；Steam 那邊清完會再印一行。");
     }
 
     [MenuItem("Tools/Witch Club/Steam 成就/印出目前成就狀態")]
     static void DumpStatus ()
     {
-        if (RequireManager() == null) return;
+        var manager = RequireManager();
+        if (manager == null) return;
+
+        if (!manager.StatsReady)
+        {
+            Debug.LogWarning("[SteamAchievement] Steam 還沒把成就狀態送回來，"
+                           + "下面印的是空的或舊的。隔一兩秒再按一次。");
+        }
 
         foreach (var apiName in AllApiNames())
         {
