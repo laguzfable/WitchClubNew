@@ -69,3 +69,9 @@ Assets/Plugins/RainbowAssets/RainbowFolders/Editor/Data/RainbowFoldersRuleset.as
 
 # 產生出來的檢視器（跑 python tools/build_viewer.py 重生）
 tools/劇本檢視器_已載入.html
+
+# 工具的 Python 快取
+tools/__pycache__/
+
+# Claude Code 的暫時 worktree
+.claude/worktrees/
