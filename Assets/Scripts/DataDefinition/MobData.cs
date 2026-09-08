@@ -27,6 +27,11 @@ public class MobData : ScriptableObject
 
     public MobAbility[] ability;
 
+    [LabelText("打倒後登記的筆記")]
+    [Tooltip("打倒這隻怪之後自動記進筆記本的條目代號，對應 Notes.txt 裡的那一行。"
+             + "多條用半形逗號隔開；空著＝不記。魔書系列用這個欄位。")]
+    public string noteIds;
+
     [Title("台詞")]
     [InfoBox("戰鬥中怪物會在這些時機講話。每一格填幾句，實際會隨機挑一句；留空就不講。")]
     public MobTalkLines talk = new MobTalkLines();
@@ -69,6 +74,12 @@ public class MobTalkLines
     public string[] lowHp;
 
     [LabelText("被打倒")] public string[] defeated;
+
+    [LabelText("出手前照順序講")]
+    [Tooltip("勾起來＝「出手前」那組照陣列順序一句一句唸，唸完就不再講，而且不擲機率。"
+             + "魔書那種要唸完一整段歷史的用這個——隨機跳句會讓玩家永遠拼不齊。"
+             + "取消＝每次隨機挑一句（一般怪物）。")]
+    public bool actInOrder;
 
     public bool Any =>
         (battleStart != null && battleStart.Length > 0) ||

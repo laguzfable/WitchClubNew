@@ -41,7 +41,7 @@ namespace Hexe.UI
         /// 生出控制列。重複呼叫是安全的（已經有就不重做）。
         /// 想少放某顆就把對應參數設成 false——例如競技場選單頁本來就有自己的「回標題」。
         /// </summary>
-        public static void Show (bool settings = true, bool log = true, bool title = true)
+        public static void Show (bool settings = true, bool log = true, bool title = true, bool notes = false)
         {
             if (GameObject.Find(RootName) != null) return;
 
@@ -65,6 +65,9 @@ namespace Hexe.UI
             var x = -Margin;
 
             if (title) x = AddButton(rootGO, font, x, "TITLE", ExitToTitle);
+            // 筆記本預設不放這裡——它現在長在蝕之聖典裡（見 NotebookTabInjector）。
+            // 之後若想讓地圖或休息室也開得到，呼叫時傳 notes:true 就會多出這一顆。
+            if (notes) x = AddButton(rootGO, font, x, "NOTES", NotebookPanel.Open);
             if (log) x = AddButton(rootGO, font, x, "LOG", () => ShowUI<IBacklogUI>());
             if (settings) AddButton(rootGO, font, x, "SETTINGS", () => ShowUI<ISettingsUI>());
         }
