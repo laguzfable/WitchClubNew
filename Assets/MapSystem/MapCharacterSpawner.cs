@@ -159,18 +159,18 @@ if (MapSpecialOverride.TryGet(c.characterName, out var special))
     // 從 inspector 清單抓真正的設定
     var spEvt = c.specialEvents.Find(e => e.eventName == special.eventName);
 
-    if (spEvt == null)
+    if (spEvt == null || string.IsNullOrEmpty(spEvt.naninovelScript))
     {
-        Debug.LogWarning($"❌ 特殊事件 '{special.eventName}' 在 {c.characterName} 的 specialEvents 找不到！");
+        Debug.LogError($"特殊事件 '{special.eventName}' 在 {c.characterName} 缺少有效劇本；保留預約，不跳過主線。");
     }
     else
     {
         // 用 inspector 的資料生成 icon（包括動畫、offset）
+        count++;
         StartCoroutine(CreateCharacterIcon(c, spEvt));
     }
 
-    // ✨ 保證一次性：呼叫後馬上清掉
-    MapSpecialOverride.Clear(c.characterName);
+    // 到實際點擊才消耗預約，重建地圖不會遺失必經劇情。
 
     // ✨ 跳過該角色的所有 day/night 事件（不生成）
     continue;
@@ -276,6 +276,7 @@ if (MapSpecialOverride.TryGet(c.characterName, out var special))
 
         if (count == 0)
         {
+            if (soloNames.Count > 0) return;
             logMsg += "⭐ 所有角色事件都已播畢\n";
             Debug.Log(logMsg);
             ReturnToStory();
@@ -382,6 +383,9 @@ button.onClick.AddListener(() =>
     }
     else
     {
+        if (MapSpecialOverride.TryGet(c.characterName, out var pending)
+            && pending.eventName == evt.eventName)
+            MapSpecialOverride.Clear(c.characterName);
         Debug.Log($"⭐ 特殊事件 → 不推進 {c.characterName} 的事件序號");
     }
 });

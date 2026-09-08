@@ -18,17 +18,13 @@ public static class RuneCollection
     /// <summary>指定顏色已解鎖的符文數。color 可以用 blue/red/yellow/green（大小寫不拘）。</summary>
     public static int Count (string color)
     {
-        if (string.IsNullOrEmpty(color)) return 0;
+        if (string.IsNullOrWhiteSpace(color)) return 0;
 
         var key = "UnlockedRunes_" + Normalize(color);
         var raw = PlayerPrefs.GetString(key, "");
         if (string.IsNullOrEmpty(raw)) return 0;
 
-        return raw.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                  .Select(x => x.Trim())
-                  .Where(x => x.Length > 0)
-                  .Distinct()
-                  .Count();
+        return CountRituals(color, raw);
     }
 
     /// <summary>這個顏色是不是全收了。</summary>
@@ -41,7 +37,16 @@ public static class RuneCollection
     public static readonly string[] Colors = { "blue", "red", "yellow", "green" };
 
     /// <summary>「曾經拿過」的數量（跨周目，開新遊戲不會清）。</summary>
-    public static int CountEver (string color) => RunRecord.CountEver(KeyFor(color));
+    public static int CountEver (string color) => string.IsNullOrWhiteSpace(color) ? 0
+        : CountRituals(color, PlayerPrefs.GetString("Ever_" + KeyFor(color), ""));
+
+    // 基礎戰鬥給的 00 仍可裝備，但不代表完成夜晚儀式。
+    static int CountRituals (string color, string raw)
+    {
+        var prefix = color.Trim().ToLowerInvariant();
+        var ids = RunRecord.Split(raw);
+        return Enumerable.Range(1, PerColor).Count(i => ids.Contains(prefix + i.ToString("00")));
+    }
 
     /// <summary>把曾經拿過的符文還原到這一輪（進聖典節點時用）。</summary>
     public static void RestoreEver ()

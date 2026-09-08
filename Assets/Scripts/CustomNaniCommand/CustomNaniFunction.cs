@@ -56,4 +56,40 @@ public static class CustomNaniFunction
     public static int RunesRed () => RuneCollection.Count("red");
     public static int RunesYellow () => RuneCollection.Count("yellow");
     public static int RunesGreen () => RuneCollection.Count("green");
+
+    // 正常遊戲須親自完成第五場與最後引導；聖典只借回已取得的五枚儀式符文。
+    public static bool YellowRescueReady () => RuneCollection.IsComplete("yellow")
+        && (SanctumLoan.Active || (StoryFlag("YellowFifthComplete") && StoryFlag("YellowGuidanceComplete")));
+
+    static bool StoryFlag (string name)
+    {
+        if (!Naninovel.Engine.Initialized) return false;
+        var raw = Naninovel.Engine.GetService<Naninovel.ICustomVariableManager>()?.GetVariableValue(name);
+        return bool.TryParse(raw, out var value) && value;
+    }
+
+    // ── 誰跟玩家最親近 ──────────────────────────────────────
+    //
+    // 用 C# 比而不是在劇本裡寫 affinity_Ved>affinity_Eup，是因為 NCalc 碰到
+    // 沒被 @set 過的變數會整條運算式求值失敗，而且失敗是靜悄悄的
+    // （綠線的西碧兒就這樣被吃掉過一次）。這裡讀不到的一律當 0，不會炸。
+
+    /// <summary>薇狄亞是不是四個人裡好感最高的。同分不算——平手就照原本的三選一走。</summary>
+    public static bool VediaIsClosest ()
+    {
+        var ved = Affinity("affinity_Ved");
+        return ved > Affinity("affinity_Eup")
+            && ved > Affinity("affinity_Mel")
+            && ved > Affinity("affinity_Nel");
+    }
+
+    /// <summary>讀一個好感度變數。沒設過或讀不到都算 0。</summary>
+    static int Affinity (string variableName)
+    {
+        if (!Naninovel.Engine.Initialized) return 0;
+
+        var vars = Naninovel.Engine.GetService<Naninovel.ICustomVariableManager>();
+        var raw = vars?.GetVariableValue(variableName);
+        return int.TryParse(raw, out var value) ? value : 0;
+    }
 }
