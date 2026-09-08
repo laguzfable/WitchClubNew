@@ -73,8 +73,13 @@ public void Init(BranchNode data, BranchMapUI owner)
     }
     else
     {
-        // 有未解鎖圖的話就靠那張圖表達鎖住的狀態，不必再調暗
-        cg.alpha = lockedIcon ? lockedAlpha : 0.4f;
+        // 未解鎖＝看得到位置、但點不了。
+        //
+        // 以前這裡是 lockedIcon ? lockedAlpha : 0.4f——沒指定未解鎖圖的話，
+        // prefab 上設的 lockedAlpha 會被整個略過，一律壓成 0.4。
+        // 結果是還沒走過的節點淡到幾乎看不見（CROWN 壓在星形中央特別明顯），
+        // 而那個設定值明明就是拿來調這個的。現在一律照 lockedAlpha 走。
+        cg.alpha = lockedAlpha;
         btn.interactable = false;
         cg.interactable = false;
         cg.blocksRaycasts = false;
@@ -83,6 +88,52 @@ public void Init(BranchNode data, BranchMapUI owner)
     btn.onClick.RemoveAllListeners();
     if (visited)
         btn.onClick.AddListener(OnNodeClick);
+
+    ShowNewBadge(visited && NewItemTracker.IsNewThisVisit(NewItemTracker.CodexNodes, data.Key));
+}
+
+/// <summary>
+/// 「亮了但還沒點進去過」的角標。節點是照書頁美術擺的，所以角標貼在節點右上角，
+/// 跟著節點一起縮放，不用另外對位。第一次點進去就消失（見 OnNodeClick）。
+/// </summary>
+void ShowNewBadge (bool show)
+{
+    var existing = transform.Find("NewBadge");
+
+    if (!show)
+    {
+        if (existing != null) existing.gameObject.SetActive(false);
+        return;
+    }
+
+    if (existing != null)
+    {
+        existing.gameObject.SetActive(true);
+        return;
+    }
+
+    var go = new GameObject("NewBadge", typeof(RectTransform));
+    go.transform.SetParent(transform, false);
+
+    var text = go.AddComponent<UnityEngine.UI.Text>();
+    text.text = "NEW";
+    text.fontSize = 14;
+    text.fontStyle = FontStyle.Bold;
+    text.color = new Color(1f, 0.86f, 0.45f);
+    text.alignment = TextAnchor.UpperRight;
+    text.horizontalOverflow = HorizontalWrapMode.Overflow;
+    text.verticalOverflow = VerticalWrapMode.Overflow;
+    text.raycastTarget = false;
+    // 沿用節點自己標籤的字型，沒有的話退回內建
+    text.font = labelText != null && labelText.font != null
+        ? labelText.font
+        : Resources.GetBuiltinResource<Font>("Arial.ttf");
+
+    // 節點本身很小，角標貼在右上角外緣一點點，不要壓在圖上。
+    var rect = (RectTransform)go.transform;
+    rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(1f, 1f);
+    rect.sizeDelta = new Vector2(44f, 20f);
+    rect.anchoredPosition = new Vector2(6f, 6f);
 }
 
 
@@ -202,6 +253,11 @@ public void Init(BranchNode data, BranchMapUI owner)
         // 劇情地圖是全破後給玩家收結局用的機制，從這裡進入戰鬥時符文系統直接全開，
         // 不需要照劇情腳本原本的順序判斷（場景重載會讓 RuneActive 被重置成預設值 false）
         vars?.SetVariableValue("RuneActive", "True");
+        // 直接進入戰後節點時沒有本場戰果；不可借用上一場勝利或未定義值。
+        vars?.SetVariableValue("CombatWin", "False");
+        vars?.SetVariableValue("MichaBeaten", "False");
+        vars?.SetVariableValue("YellowFifthComplete", "False");
+        vars?.SetVariableValue("YellowGuidanceComplete", "False");
 
         // 把「曾經打贏過」的符文和卡片型態借給玩家。開新遊戲會把這一輪的清掉，
         // 不借的話開過新遊戲的人再進聖典，chapter4 的分歧、黃線的救援線會全部關上。

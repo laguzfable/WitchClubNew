@@ -434,6 +434,9 @@ public class BranchMapUI : CustomUI
             return;
         }
 
+        // NEW 角標：每次重排節點就是玩家又打開了一次聖典，算一輪新的瀏覽。
+        NewItemTracker.BeginVisit(NewItemTracker.CodexNodes);
+
         var placed = 0;
         var missing = new List<string>();
 

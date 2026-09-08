@@ -210,14 +210,14 @@ MonoBehaviour:
     slotName: UNMASK
     variableOverrides: []
     endingIds: []
-    askAffinity: 0
+    askAffinity: 1
     stardustLine: 
     parentId: chapter5red
   - nodeId: chapter6red
     displayName: CHALICE
     scriptName: chapter6red
     label: finalchoice_red
-    icon: {fileID: 21300000, guid: ec7e76d5fe231ec489d55560975216af, type: 3}
+    icon: {fileID: 21300000, guid: 97f3ade5d4a5694489a831dd58b5de09, type: 3}
     variantId: 
     preview: {fileID: 21300000, guid: c57d21e24e3f2287eb0ce2c703a4d363, type: 3}
     keywords:
@@ -232,7 +232,7 @@ MonoBehaviour:
     - ACH_END_03
     - ACH_END_04
     - ACH_END_19
-    askAffinity: 0
+    askAffinity: 1
     stardustLine: 
     parentId: chapter6red
   - nodeId: chapter5blue
@@ -293,7 +293,7 @@ MonoBehaviour:
     endingIds:
     - ACH_END_01
     - ACH_END_02
-    askAffinity: 0
+    askAffinity: 1
     stardustLine: 
     parentId: chapter5blue#beforefinal_blue
   - nodeId: chapter5yellow
@@ -314,6 +314,66 @@ MonoBehaviour:
     endingIds:
     - ACH_END_07
     - ACH_END_08
-    askAffinity: 0
+    askAffinity: 1
+    stardustLine:
+    parentId: chapter5yellow#branch_nel_affinity
+  - nodeId: chapter5yellow
+    displayName: HAZE
+    scriptName: chapter5yellow
+    label:
+    icon: {fileID: 21300000, guid: 9adce7557e7e18c43be49873e9778d7a, type: 3}
+    variantId:
+    preview: {fileID: 0}
+    keywords:
+    - "\u7159\u9727"
+    - "\u6703\u5408"
+    - "\u8017\u7AED"
+    alwaysUnlocked: 0
+    buttonPrefab: {fileID: 0}
+    slotName: HAZE
+    variableOverrides: []
+    endingIds: []
+    askAffinity: 1
     stardustLine: 
     parentId: chapter4#branch_ch4route
+  - nodeId: chapter5yellow
+    displayName: WANE
+    scriptName: chapter5yellow
+    label: branch_nel_affinity
+    icon: {fileID: 21300000, guid: 9adce7557e7e18c43be49873e9778d7a, type: 3}
+    variantId:
+    preview: {fileID: 0}
+    keywords:
+    - "\u6D85\u8389"
+    - "\u529B\u91CF"
+    - "\u4E0D\u5920"
+    alwaysUnlocked: 0
+    buttonPrefab: {fileID: 0}
+    slotName: WANE
+    variableOverrides: []
+    endingIds:
+    - ACH_END_09
+    askAffinity: 1
+    stardustLine:
+    parentId: chapter5yellow
+  - nodeId: chapter4green
+    displayName: VESPERS
+    scriptName: chapter4green
+    label: syb_revisit
+    icon: {fileID: 21300000, guid: 0e314714aaf1f0e4bad41a99cb9c3e78, type: 3}
+    variantId:
+    preview: {fileID: 0}
+    keywords:
+    - "\u897F\u78A7\u5152"
+    - "\u64C1\u62B1"
+    - "\u5100\u5F0F\u7576\u5929"
+    alwaysUnlocked: 0
+    buttonPrefab: {fileID: 0}
+    slotName: VESPERS
+    variableOverrides: []
+    endingIds:
+    - ACH_END_13
+    - ACH_END_20
+    askAffinity: 1
+    stardustLine:
+    parentId: chapter4green#branch_green_tell
