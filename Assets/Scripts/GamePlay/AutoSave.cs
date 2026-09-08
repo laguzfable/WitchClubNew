@@ -51,6 +51,10 @@ public class AutoSave : MonoBehaviour
     /// <summary>上一個執行過指令的劇本名，用來認出「換章了」。</summary>
     string lastScript;
 
+    /// <summary>正在存檔中。存檔本身是非同步的，中間劇本還會往下跑，
+    /// 兩次疊在一起的話輪替檔名會撞在一起（Windows 會丟 Sharing violation）。</summary>
+    bool saving;
+
     /// <summary>剛回到劇本場景，下一個指令之前要存一次。
     /// 不在場景載好的當下存——那時候劇本還在回到定位，存下去的位置不一定對。</summary>
     string pendingReason;
@@ -101,12 +105,49 @@ public class AutoSave : MonoBehaviour
 
         var stateManager = Engine.GetService<IStateManager>();
         if (stateManager == null) return;
+        if (saving) return;                      // 上一次還沒寫完，這次跳過
 
-        lastSaved = spot;
         Debug.Log($"[AutoSave] {reason}：{spot}");
+        await SaveAsync(stateManager, spot);
+    }
 
-        // 存檔會叫醒 RunSnapshot 把 PlayerPrefs 那些進度一起打包進去
-        await stateManager.QuickSaveAsync();
+    /// <summary>
+    /// 真的去存。存檔會叫醒 RunSnapshot 把 PlayerPrefs 那些進度一起打包進去。
+    ///
+    /// ★ 為什麼整段包在 try 裡 ★
+    /// 這支是掛在 ScriptPlayer 的 pre-execution task 上，例外會一路往上炸穿
+    /// PlayRoutineAsync——劇本會當場停住，玩家看到的是遊戲卡死。
+    /// 自動存檔失敗頂多是少一格存檔，絕對不值得把整個劇本帶走。
+    ///
+    /// ★ 為什麼要重試一次 ★
+    /// 快速存檔是用「把 001 改名成 002」的方式輪替的，而 Editor 底下存檔就寫在
+    /// Assets/NaninovelData/Saves——Unity 的匯入器正好在看那個資料夾，
+    /// 檔案偶爾會被鎖住（Sharing violation）。那是一瞬間的事，隔幾幀再試就過了。
+    /// </summary>
+    async UniTask SaveAsync (IStateManager stateManager, PlaybackSpot spot)
+    {
+        saving = true;
+        try
+        {
+            try
+            {
+                await stateManager.QuickSaveAsync();
+            }
+            catch (System.Exception first)
+            {
+                Debug.LogWarning($"[AutoSave] 存檔失敗，隔一下再試一次：{first.Message}");
+                await UniTask.Delay(System.TimeSpan.FromSeconds(0.5f));
+                await stateManager.QuickSaveAsync();
+            }
+
+            lastSaved = spot;
+        }
+        catch (System.Exception ex)
+        {
+            // 重試也失敗就放過這一格。下一個存檔點還會再存一次。
+            Debug.LogWarning($"[AutoSave] 這一格跳過（劇本照常進行）：{ex.Message}");
+        }
+        finally { saving = false; }
     }
 
     /// <summary>這個指令前面該不該存？該的話回一句給 log 看的理由，不該就回 null。</summary>
