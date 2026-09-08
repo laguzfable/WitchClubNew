@@ -315,6 +315,16 @@ except Exception as e:
 html = html.replace('const GUIDE = null;',
                     'const GUIDE = ' + json.dumps(guide, ensure_ascii=False) + ';', 1)
 
+# 戰鬥對照（人工標的「這一場對手該是誰」，遊戲不讀）
+try:
+    battles = json.load(io.open(os.path.join(ROOT, 'tools', '戰鬥對照.json'), encoding='utf-8-sig'))
+    print(f"戰鬥標註 {len(battles.get('notes', {}))} 筆")
+except Exception as e:
+    print(f'（沒有戰鬥標註：{e}）')
+    battles = {'notes': {}}
+html = html.replace('const BATTLENOTES = null;',
+                    'const BATTLENOTES = ' + json.dumps(battles, ensure_ascii=False) + ';', 1)
+
 html = html.replace('const ASSETS = null;',
                     'const ASSETS = ' + json.dumps(assets, ensure_ascii=False) + ';', 1)
 

@@ -198,6 +198,14 @@
   .mobtab tr.redcard td:first-child{color:#e896a4}
   .mobtab tr.yellowcard td:first-child{color:#e8cf8f}
   .mobtab tr.greencard td:first-child{color:#9fd8a4}
+  .bwarn{font-size:12px;padding:3px 8px;border-radius:5px;margin:3px 0;
+    border:1px solid var(--line);background:#1b1925}
+  .bwarn.bad{color:#e08a99;border-left:3px solid var(--red)}
+  .bwarn.warn{color:#d8c08a;border-left:3px solid var(--gold)}
+  .bwarn.info{color:#6b6685}
+  .bline{font-family:Consolas,monospace;font-size:12px;color:#6b6685;cursor:pointer;
+    padding:3px 8px;border-radius:5px;background:#16141e}
+  .bline:hover{color:var(--gold)}
   .talkgroup{margin:8px 0 14px}
   .talkgroup b{display:block;color:var(--gold);font-size:12px;margin-bottom:4px}
   .talkline{display:flex;align-items:center;gap:6px;margin-bottom:4px}
@@ -342,6 +350,7 @@
       <div class="pg" data-tab="assets">資源</div>
       <div class="pg" data-tab="mobs">怪物</div>
       <div class="pg" data-tab="guide">星塵</div>
+      <div class="pg" data-tab="battles">戰鬥<span class="badge" id="badge-battles"></span></div>
     </div>
     <div id="list"></div>
   </aside>
@@ -365,6 +374,8 @@ const ASSETS = null;
 const MOBS = null;
 // 星塵在分歧前每個夜晚講的話（Assets/Resources/Guide/GuideHints.json，遊戲直接讀那一份）
 const GUIDE = null;
+// 每一場戰鬥的對手該是誰（tools/戰鬥對照.json，人工標的，遊戲不讀）
+const BATTLENOTES = null;
 
 const NL = String.fromCharCode(10);
 // build_viewer.py 每次產生時會把時間戳寫進來，用來認出「你開著的是舊程式」
@@ -669,6 +680,16 @@ function renderList() {
     dbadge.style.color = 'var(--gold)';
   }
 
+  // 戰鬥頁的數字：幾場的對手有問題（指到不存在的怪，或標註說跟劇本對不上）
+  const bbadge = document.getElementById('badge-battles');
+  if (bbadge && MOBS) {
+    const notes = (BATTLENOTES && BATTLENOTES.notes) || {};
+    const n = battleList().filter(b =>
+      battleWarnings(b, notes[battleKey(b)]).some(w => w[0] !== 'info')).length;
+    bbadge.textContent = n || '';
+    bbadge.className = 'badge' + (n ? ' on' : '');
+  }
+
   // 有沒存的就在搜尋框下面擺一顆「存全部」
   const box = document.getElementById('saveall');
   if (box) box.innerHTML = dirty.size
@@ -767,6 +788,7 @@ function render() {
   if (tab === 'assets') return renderAssets(v);
   if (tab === 'mobs') return renderMobs(v);
   if (tab === 'guide') return renderGuide(v);
+  if (tab === 'battles') return renderBattles(v);
   renderOutline(v);
 }
 
@@ -1415,6 +1437,202 @@ async function saveMob() {
 
   if (res.ok) { mobDirty.delete(mobPick); render(); }
   else alert('存檔失敗：' + (res.error || '？'));
+}
+
+// ── 戰鬥 ──────────────────────────────────────────
+// 每一場 @battle 的對手跟音樂。@battle 那一行直接在這裡改（存回 .nani 走
+// 左上角的「存全部」），旁邊那欄「劇本裡的對手」是人工標的，存回
+// tools/戰鬥對照.json——那個沒辦法從程式判斷，只能有人讀過劇本才知道。
+//
+// 警告分兩種：
+//   ❌ 程式看得出來的：target 指到不存在的 MobData（實際會 fallback 成教學怪）
+//   ⚠️ 標註說的：現在跑出來的跟劇本裡的對手對不上（status = todo）
+let battleDirty = false;
+
+/// 備份、測試、demo 那些不列——它們不是正在跑的劇本。
+const BATTLE_SKIP = /^(Test|demo|第|待查明|111)/;
+
+function battleKey (b) {
+  return b.script + '#' + (b.params.label || ('line' + (b.line + 1)));
+}
+
+/// 把 @battle 那一行拆成參數。值裡面不會有空白（背景、怪名、label 都是單字）。
+function parseBattleLine (text) {
+  const params = {};
+  text.trim().split(/\s+/).slice(1).forEach(tok => {
+    const i = tok.indexOf(':');
+    if (i > 0) params[tok.slice(0, i)] = tok.slice(i + 1);
+  });
+  return params;
+}
+
+/// 掃過所有劇本，把 @battle 撿出來（不吃烤好的快取，改完劇本立刻反映）。
+function battleList () {
+  const out = [];
+  for (const name of Object.keys(scripts).sort(scriptOrder)) {
+    if (BATTLE_SKIP.test(name)) continue;
+    scripts[name].lines.forEach((line, i) => {
+      if (!/^@battle\b/i.test(line.trim())) return;
+      out.push({script: name, line: i, params: parseBattleLine(line)});
+    });
+  }
+  return out;
+}
+
+/// 這一場有什麼問題？回一個陣列，空的就是沒問題。
+function battleWarnings (b, note) {
+  const out = [];
+  const target = b.params.target;
+
+  if (!target) out.push(['bad', '沒有指定 target']);
+  else if (MOBS && !MOBS[target])
+    out.push(['bad', '找不到 ' + target + ' 這隻怪，實際會用教學怪 TestMobData']);
+
+  if (note && note.status === 'todo')
+    out.push(['warn', '劇本裡是「' + (note.expected || '？') + '」，跟現在跑出來的對不上']);
+  if (note && note.status === 'check')
+    out.push(['warn', '劇本沒點名對手，要人決定：' + (note.expected || '')]);
+
+  if (!b.params.bgm) out.push(['info', '沒指定音樂，會用預設的 energetic']);
+
+  return out;
+}
+
+function renderBattles (v) {
+  if (!MOBS) return v.innerHTML =
+    '<div class="empty">戰鬥頁需要「已載入」的版本。<br>在專案根目錄跑：python tools/build_viewer.py</div>';
+
+  const notes = (BATTLENOTES && BATTLENOTES.notes) || {};
+  const list = battleList();
+  const mobNames = Object.keys(MOBS).sort();
+  const bgms = Object.keys(ASSETS.audio || {})
+    .filter(n => (ASSETS.audioKind || {})[n] === 'bgm').sort();
+  const backs = Object.keys(ASSETS.backgrounds || {}).sort();
+
+  const pick = (list, cur, blank, onchange) =>
+    '<select onchange="' + onchange + '">' +
+      '<option value="">' + blank + '</option>' +
+      // 現在寫的值不在清單裡（打錯字、或圖還沒進來）也要看得到，不然會被靜靜換掉
+      (cur && list.indexOf(cur) < 0
+        ? '<option selected value="' + esc(cur) + '">' + esc(cur) + '（找不到）</option>' : '') +
+      list.map(n => '<option' + (n === cur ? ' selected' : '') + '>' + esc(n) + '</option>').join('') +
+    '</select>';
+
+  const bad = list.filter((b, i) => battleWarnings(b, notes[battleKey(b)])
+    .some(w => w[0] === 'bad')).length;
+  const warn = list.filter(b => battleWarnings(b, notes[battleKey(b)])
+    .some(w => w[0] === 'warn')).length;
+
+  v.innerHTML =
+    '<h2>戰鬥</h2><div class="sub">' + list.length + ' 場（備份與測試劇本不列）。' +
+      'target 跟音樂改完走左上角的「存全部」寫回 .nani；' +
+      '「劇本裡的對手」是人工標的，按它自己那顆存。' +
+      (bad ? '　<b style="color:var(--red)">' + bad + ' 場指到不存在的怪</b>' : '') +
+      (warn ? '　<b style="color:var(--gold)">' + warn + ' 場跟劇本對不上</b>' : '') +
+    '</div>' +
+
+    '<div class="mobbar">' +
+      (battleDirty
+        ? '<span class="dirty">● 標註有未存的變更</span>' +
+          '<button class="save" onclick="saveBattleNotes()">存回 戰鬥對照.json</button>'
+        : '<span class="txt">標註只有人看，遊戲不讀</span>') +
+    '</div>' +
+
+    list.map((b, i) => {
+      const key = battleKey(b);
+      const note = notes[key] || {expected: '', status: 'check', note: ''};
+      const warns = battleWarnings(b, note);
+      const mob = MOBS[b.params.target];
+
+      return '<div class="talkgroup">' +
+        '<b>' + esc(key) + '　·　' + esc(b.script) + ':' + (b.line + 1) + '</b>' +
+
+        warns.map(w =>
+          '<div class="bwarn ' + w[0] + '">' +
+            (w[0] === 'bad' ? '❌' : w[0] === 'warn' ? '⚠️' : 'ℹ️') + ' ' + esc(w[1]) +
+          '</div>').join('') +
+
+        '<div class="mobfields" style="margin:6px 0 8px">' +
+          '<label class="mf"><span>對手</span>' +
+            pick(mobNames, b.params.target, '（沒有）',
+                 'setBattle(' + i + ', &quot;target&quot;, this.value)') +
+            '<i>' + (mob ? esc(mob.displayName || '') + '　HP ' + mob.HP : '') + '</i></label>' +
+
+          '<label class="mf"><span>音樂</span>' +
+            pick(bgms, b.params.bgm, '（預設 energetic）',
+                 'setBattle(' + i + ', &quot;bgm&quot;, this.value)') + '</label>' +
+
+          '<label class="mf"><span>背景</span>' +
+            pick(backs, b.params.background, '（沒有）',
+                 'setBattle(' + i + ', &quot;background&quot;, this.value)') + '</label>' +
+
+          '<label class="mf"><span>劇本裡的對手</span>' +
+            '<input style="width:280px" value="' + esc(note.expected) + '"' +
+            ' onchange="setBattleNote(&quot;' + key + '&quot;, &quot;expected&quot;, this.value)">' +
+            '<select onchange="setBattleNote(&quot;' + key + '&quot;, &quot;status&quot;, this.value)">' +
+              ['ok', 'todo', 'check'].map(s =>
+                '<option value="' + s + '"' + (note.status === s ? ' selected' : '') + '>' +
+                ({ok: '對得上', todo: '要改', check: '待確認'})[s] + '</option>').join('') +
+            '</select></label>' +
+
+          '<label class="mf"><span>備註</span>' +
+            '<input style="width:420px" value="' + esc(note.note) + '"' +
+            ' onchange="setBattleNote(&quot;' + key + '&quot;, &quot;note&quot;, this.value)"></label>' +
+        '</div>' +
+
+        '<div class="bline" onclick="jumpToBattle(&quot;' + b.script + '&quot;, ' + b.line + ')">' +
+          esc(scripts[b.script].lines[b.line].trim()) + '</div>' +
+      '</div>';
+    }).join('');
+}
+
+/// 改 @battle 那一行的某個參數。空值＝把那個參數整個拿掉。
+function setBattle (index, key, value) {
+  const b = battleList()[index];
+  if (!b) return;
+
+  const sc = scripts[b.script];
+  const raw = sc.lines[b.line];
+  const indent = raw.match(/^\s*/)[0];
+  const params = parseBattleLine(raw);
+
+  // 保留原本的參數順序，只換掉（或拿掉）這一個
+  const order = raw.trim().split(/\s+/).slice(1)
+    .map(t => t.slice(0, t.indexOf(':'))).filter(k => k);
+  if (value) { params[key] = value; if (order.indexOf(key) < 0) order.push(key); }
+  else delete params[key];
+
+  sc.lines[b.line] = indent + '@battle ' +
+    order.filter(k => params[k] !== undefined).map(k => k + ':' + params[k]).join(' ');
+
+  dirty.add(b.script); check(); render();
+}
+
+function setBattleNote (key, field, value) {
+  const notes = BATTLENOTES.notes = BATTLENOTES.notes || {};
+  const note = notes[key] = notes[key] || {expected: '', status: 'check', note: ''};
+  note[field] = value;
+  battleDirty = true; render();
+}
+
+async function saveBattleNotes () {
+  const res = await fetch('/savebattle', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({notes: BATTLENOTES.notes})
+  }).then(r => r.json()).catch(err => ({ok: false, error: err.message}));
+
+  if (res.ok) { battleDirty = false; render(); }
+  else alert('存檔失敗：' + (res.error || '？'));
+}
+
+/// 跳到劇本裡那一行，看看前後在講什麼。
+function jumpToBattle (name, line) {
+  select(name);            // 會切到場景頁
+  setTimeout(() => {
+    // 場景頁把每一行畫成 .edit[data-line]，跟加台詞那邊用的是同一個標記
+    const el = document.querySelector('.edit[data-line="' + line + '"]');
+    if (el) el.scrollIntoView({block: 'center'});
+  }, 60);
 }
 
 // ── 星塵的提示 ────────────────────────────────────

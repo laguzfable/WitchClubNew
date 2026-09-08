@@ -263,6 +263,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.save_mob()
         if self.path == '/saveguide':
             return self.save_guide()
+        if self.path == '/savebattle':
+            return self.save_battle()
         if self.path != '/save':
             return self.send_error(404)
 
@@ -328,6 +330,44 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self._json({'ok': True})
         except Exception as e:
             print('  音樂分類存檔失敗：' + str(e))
+            self._json({'ok': False, 'error': str(e)}, 500)
+
+    def save_battle(self):
+        """把戰鬥頁的標註寫回 tools/戰鬥對照.json。
+
+        這一份只有人看，遊戲不讀——它記的是「這一場劇本裡的對手該是誰」，
+        沒辦法從程式判斷，只能人工標。改 target 那種會動到劇本的，走 /save。
+        """
+        try:
+            size = int(self.headers.get('Content-Length', 0))
+            data = json.loads(self.rfile.read(size).decode('utf-8'))
+            path = os.path.join(ROOT, 'tools', '戰鬥對照.json')
+
+            note = ''
+            if os.path.isfile(path):
+                note = json.load(open(path, encoding='utf-8-sig')).get('_說明', '')
+
+            notes = {}
+            for key, item in (data.get('notes') or {}).items():
+                status = (item.get('status') or 'check').strip()
+                if status not in ('ok', 'todo', 'check'):
+                    raise ValueError('status 只能是 ok／todo／check，收到 ' + status)
+                notes[key] = {
+                    'expected': (item.get('expected') or '').strip(),
+                    'status': status,
+                    'note': (item.get('note') or '').strip(),
+                }
+
+            doc = {'_說明': note, 'notes': dict(sorted(notes.items()))} if note \
+                else {'notes': dict(sorted(notes.items()))}
+
+            with open(path, 'w', encoding='utf-8', newline='') as f:
+                f.write(json.dumps(doc, ensure_ascii=False, indent=2) + NEWLINE)
+
+            print('  已寫回 戰鬥對照.json（' + str(len(notes)) + ' 筆）')
+            self._json({'ok': True})
+        except Exception as e:
+            print('  戰鬥標註存檔失敗：' + str(e))
             self._json({'ok': False, 'error': str(e)}, 500)
 
     def save_guide(self):
