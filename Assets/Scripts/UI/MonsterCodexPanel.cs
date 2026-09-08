@@ -42,6 +42,7 @@ namespace Hexe.UI
         const float CGCellAspect = 16f / 9f;
 
         static readonly Vector2 CellSpacing = new Vector2(10, 10);
+        static readonly Color NewBadgeColor = new Color(1f, 0.86f, 0.45f);
 
         static readonly Color TabSelectedColor = new Color(1f, 1f, 1f, 0.32f);
         static readonly Color TabNormalColor = new Color(1f, 1f, 1f, 0.08f);
@@ -91,6 +92,7 @@ namespace Hexe.UI
             public Image back;
             public Image portrait;
             public Text label;
+            public Text newBadge;
             public MobData mob;
         }
 
@@ -103,6 +105,11 @@ namespace Hexe.UI
 
         void OnEnable ()
         {
+            // NEW 角標：每次打開都算一次新的瀏覽。這裡不能寫在 Awake——
+            // 面板注入之後就一直活著，只是被開開關關，Awake 整場遊戲只跑一次，
+            // 寫在那裡的話角標會一直停在第一次的狀態，關掉再開也不會消。
+            NewItemTracker.BeginVisit(NewItemTracker.Monsters);
+
             // 每次重新打開回憶模式都回到 CG 分頁，並且把解鎖狀態重刷一次
             currentPage = 1;
             SelectTab(false);
@@ -112,10 +119,31 @@ namespace Hexe.UI
             CGGalleryProgress.CheckAchievement(GetComponentInParent<Naninovel.UI.CGGalleryPanel>());
         }
 
+        // NEW 角標用的：Naninovel 的 UI 是靠透明度隱藏的，不是 SetActive，
+        // 所以關掉再打開不會觸發 OnEnable。要自己盯著可見狀態的變化，
+        // 否則「一次瀏覽」整場遊戲只會開始一次，角標要重開遊戲才會消。
+        Naninovel.UI.CGGalleryPanel gallery;
+        bool wasVisible;
+
         void Update ()
         {
             if (overlay != null && overlay.IsShown && Input.GetKeyDown(KeyCode.Escape))
                 overlay.Hide();
+
+            WatchVisibility();
+        }
+
+        void WatchVisibility ()
+        {
+            if (gallery == null) gallery = GetComponentInParent<Naninovel.UI.CGGalleryPanel>();
+
+            var visibleNow = gallery != null && gallery.Visible;
+            if (visibleNow && !wasVisible)
+            {
+                NewItemTracker.BeginVisit(NewItemTracker.Monsters);
+                Refresh();   // 重畫才會照新的一輪重算角標
+            }
+            wasVisible = visibleNow;
         }
 
         void LateUpdate ()
@@ -344,6 +372,17 @@ namespace Hexe.UI
             portraitRect.offsetMin = new Vector2(12, 40);
             portraitRect.offsetMax = new Vector2(-12, -12);
 
+            // 「解鎖了但還沒點開過」的角標。壓在格子右上角，不擋立繪。
+            slot.newBadge = CreateText(slot.root.transform, "New", "NEW", 18, FontStyle.Bold, TextAnchor.UpperRight);
+            slot.newBadge.color = NewBadgeColor;
+            slot.newBadge.raycastTarget = false;
+            var badgeRect = slot.newBadge.rectTransform;
+            badgeRect.anchorMin = Vector2.zero;
+            badgeRect.anchorMax = Vector2.one;
+            badgeRect.offsetMin = new Vector2(0f, 0f);
+            badgeRect.offsetMax = new Vector2(-8f, -6f);
+            slot.newBadge.gameObject.SetActive(false);
+
             slot.label = CreateText(slot.root.transform, "Name", string.Empty, 22, FontStyle.Normal, TextAnchor.MiddleCenter);
             // 名字可能很長（例如「黑黑的（開始有點人形）」），讓它自己縮小塞進格子裡
             slot.label.horizontalOverflow = HorizontalWrapMode.Wrap;
@@ -468,6 +507,7 @@ namespace Hexe.UI
                     slot.back.color = Color.clear;
                     slot.portrait.enabled = false;
                     slot.label.text = string.Empty;
+                    if (slot.newBadge != null) slot.newBadge.gameObject.SetActive(false);
                     continue;
                 }
 
@@ -482,6 +522,10 @@ namespace Hexe.UI
 
                 slot.label.text = unlocked ? DisplayNameOf(slot.mob) : "???";
                 slot.label.color = unlocked ? Color.white : TabNormalTextColor;
+
+                if (slot.newBadge != null)
+                    slot.newBadge.gameObject.SetActive(
+                        unlocked && NewItemTracker.IsNewThisVisit(NewItemTracker.Monsters, slot.mob.name));
             }
 
             if (pageLabel != null) pageLabel.text = $"{currentPage} / {PageCount}";
@@ -503,6 +547,7 @@ namespace Hexe.UI
             if (overlay == null) return;
 
             overlay.Show(slot.mob.sprite, DisplayNameOf(slot.mob));
+
         }
 
         // ===================== 小工具 =====================

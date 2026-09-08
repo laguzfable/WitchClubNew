@@ -57,7 +57,12 @@ namespace Hexe.UI
             }
 
             browserPanel.gameObject.AddComponent<MonsterCodexPanel>();
-            Debug.Log("[MonsterCodexInjector] ✅ 怪物圖鑑分頁注入完成");
+
+            // CG 格子的 NEW 角標也掛在同一個地方——它要掃的就是 BrowserPanel 底下那些格子。
+            if (browserPanel.GetComponent<CGNewBadge>() == null)
+                browserPanel.gameObject.AddComponent<CGNewBadge>();
+
+            Debug.Log("[MonsterCodexInjector] ✅ 怪物圖鑑分頁與 CG NEW 角標注入完成");
             return true;
         }
 
