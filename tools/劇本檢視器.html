@@ -159,6 +159,11 @@
     border:1px solid var(--line);border-radius:5px;font-size:11px;padding:2px}
   .ass .mtag:hover{color:var(--gold);border-color:var(--gold)}
   .ass .an{padding:4px 7px 0;font-size:12px;word-break:break-all}
+  .ass .an{display:flex;align-items:flex-start;gap:4px;justify-content:space-between}
+  .ass .fo{flex:none;cursor:pointer;border:0;background:none;padding:0 1px;font-size:12px;
+    line-height:1.2;opacity:.45;color:inherit}
+  .ass .fo:hover{opacity:1}
+  .ass .fo.bad{opacity:1;color:#ff9aa8}
   .ass .au{padding:0 7px 5px;font-size:10px;color:#6b6685}
   .ass.unused{opacity:.42}
   .ass .rv{font-size:10px;padding:3px 7px;line-height:1.35}
@@ -291,6 +296,26 @@
   #bar button.save{border-color:var(--gold);color:var(--gold)}
   #bar button.undo{border-color:#5a4652;color:#c78d9c}
   #bar button.undo:hover{border-color:var(--red);color:var(--red)}
+  .dline{display:flex;gap:8px;padding:2px 10px;font-size:13px;align-items:baseline;
+        white-space:pre-wrap;word-break:break-word}
+  .dline .ln{color:#54506a;min-width:44px;text-align:right;flex:none;
+        font-family:ui-monospace,Consolas,monospace;font-size:11px;
+        font-variant-numeric:tabular-nums;user-select:none}
+  .dline .sg{flex:none;width:10px;color:#54506a;user-select:none}
+  .dline.ctx{color:#6f6b85}
+  .dline.del{background:#2e1d20}
+  .dline.del .sg,.dline.del .tx{color:var(--red)}
+  .dline.add{background:#1c2a20}
+  .dline.add .sg,.dline.add .tx{color:var(--green)}
+  .dline .tx{flex:1;min-width:0}
+  .dline em{font-style:normal;border-radius:3px;padding:0 2px}
+  .dline.del em{background:#5d2b30;color:#ffd7d7}
+  .dline.add em{background:#2c5535;color:#d3f2dd}
+  .dhunk{padding:5px 12px;background:#201d2a;color:#6a6580;font-size:11px;
+        border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .dhunk:first-child{border-top:0}
+  .dfoot{padding:4px 12px 8px;color:#54506a;font-size:11px}
+  .dnew{color:var(--gold);font-size:11px;margin-left:6px}
 </style>
 
 <div id="drop">
@@ -311,10 +336,12 @@
     <div class="head"><input id="q" placeholder="搜尋腳本或台詞"><div id="saveall"></div></div>
     <div class="pages">
       <div class="pg" data-tab="issues">檢查<span class="badge" id="badge-issues"></span></div>
+      <div class="pg" data-tab="diff">改動<span class="badge" id="badge-diff"></span></div>
       <div class="pg" data-tab="affinity">好感總覽</div>
       <div class="pg" data-tab="endings">結局</div>
       <div class="pg" data-tab="assets">資源</div>
       <div class="pg" data-tab="mobs">怪物</div>
+      <div class="pg" data-tab="guide">星塵</div>
     </div>
     <div id="list"></div>
   </aside>
@@ -336,6 +363,8 @@ const EMBEDDED = null;
 const ASSETS = null;
 // 怪物資料（build_viewer.py 從 Resources/MobData 讀出來的）
 const MOBS = null;
+// 星塵在分歧前每個夜晚講的話（Assets/Resources/Guide/GuideHints.json，遊戲直接讀那一份）
+const GUIDE = null;
 
 const NL = String.fromCharCode(10);
 // build_viewer.py 每次產生時會把時間戳寫進來，用來認出「你開著的是舊程式」
@@ -633,6 +662,13 @@ function renderList() {
   const badge = document.getElementById('badge-issues');
   if (badge) { badge.textContent = bad || ''; badge.className = 'badge' + (bad ? ' on' : ''); }
 
+  // 改動頁的數字：幾支腳本還沒 commit。用金色，那不是錯誤。
+  const dbadge = document.getElementById('badge-diff');
+  if (dbadge) {
+    dbadge.textContent = diffData && diffData.length ? diffData.length : '';
+    dbadge.style.color = 'var(--gold)';
+  }
+
   // 有沒存的就在搜尋框下面擺一顆「存全部」
   const box = document.getElementById('saveall');
   if (box) box.innerHTML = dirty.size
@@ -723,12 +759,14 @@ function render() {
     const a = document.getElementById('player');
     markPlaying(a && !a.paused ? a.dataset.name : null);
   }, 0);
+  if (tab === 'diff') return renderDiff(v);
   if (tab === 'issues') return renderIssues(v);
   if (tab === 'affinity') return renderAffinity(v);
   if (tab === 'endings') return renderEndings(v);
   if (tab === 'scenes') return renderScenes(v);
   if (tab === 'assets') return renderAssets(v);
   if (tab === 'mobs') return renderMobs(v);
+  if (tab === 'guide') return renderGuide(v);
   renderOutline(v);
 }
 
@@ -763,6 +801,115 @@ function scrollTo(label) {
   [...document.querySelectorAll('.block > .t > span:first-child')]
     .find(e => e.textContent.trim() === '# ' + label)
     ?.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+// ── 改動 ──────────────────────────────────────────────────────────
+// 拿還沒 commit 的劇本改動跟原版對照。資料是 serve.py 的 /diff 給的，
+// 所以用 file:// 打開時這頁是空的——那時候根本沒有 git 可以問。
+let diffData = null;        // null=還沒拿，[]=拿到了但沒有改動
+let diffOnlyLines = true;   // 只看台詞：把純指令／註解的增刪收起來
+
+// 這行是台詞嗎？@指令、;註解、#標籤、空行都不算。
+function isTalk(t) {
+  const x = t.trim();
+  return !!x && !/^[@;#]/.test(x);
+}
+
+// 兩句話只差幾個字時，把差的那幾個字框起來。
+// 前後各咬掉一段一樣的，剩下中間那塊就是真正改掉的地方。
+function markPair(a, b) {
+  let head = 0;
+  while (head < a.length && head < b.length && a[head] === b[head]) head++;
+  let tail = 0;
+  while (tail < a.length - head && tail < b.length - head &&
+         a[a.length - 1 - tail] === b[b.length - 1 - tail]) tail++;
+  const cut = x => [x.slice(0, head), x.slice(head, x.length - tail), x.slice(x.length - tail)];
+  // 幾乎整句都不一樣就別框了，框到整行反而更難看
+  if ((a.length - head - tail) > a.length * 0.8 &&
+      (b.length - head - tail) > b.length * 0.8) return [esc(a), esc(b)];
+  const wrap = ([p, m, s]) => esc(p) + (m ? '<em>' + esc(m) + '</em>' : '') + esc(s);
+  return [wrap(cut(a)), wrap(cut(b))];
+}
+
+// 一段 hunk 裡連在一起的「刪 N 行、加 N 行」，前後條數一樣就一對一配起來，
+// 這樣才畫得出「這句改成那句」。條數不一樣就當作整段換掉。
+function pairUp(lines) {
+  const out = [];
+  for (let i = 0; i < lines.length;) {
+    if (lines[i][0] === ' ') { out.push([lines[i], null]); i++; continue; }
+    let d = i; while (d < lines.length && lines[d][0] === '-') d++;
+    let a = d; while (a < lines.length && lines[a][0] === '+') a++;
+    const dels = lines.slice(i, d), adds = lines.slice(d, a);
+    const paired = dels.length === adds.length && dels.length > 0;
+    dels.forEach((l, k) => out.push([l, paired ? adds[k][2] : null]));
+    adds.forEach((l, k) => out.push([l, paired ? dels[k][2] : null]));
+    i = a;
+  }
+  return out;
+}
+
+async function renderDiff(v) {
+  if (diffData === null) {
+    v.innerHTML = '<h2>改動</h2><div class="sub">正在跟 git 要資料……</div>';
+    if (!location.protocol.startsWith('http')) {
+      diffData = [];
+      return v.innerHTML = '<h2>改動</h2><div class="empty">' +
+        '這頁要問 git，得用 <code>python tools/serve.py</code> 開才看得到。</div>';
+    }
+    const res = await fetch('/diff').then(r => r.json()).catch(e => ({ok: false, error: e.message}));
+    if (!res.ok) {
+      diffData = [];
+      return v.innerHTML = '<h2>改動</h2><div class="empty">問不到 git：' + esc(res.error) + '</div>';
+    }
+    diffData = res.files;
+    renderList();                     // 左邊的數字跟著更新
+  }
+
+  const files = diffData;
+  const add = files.reduce((n, f) => n + f.add, 0);
+  const del = files.reduce((n, f) => n + f.del, 0);
+  let html = '<h2>改動</h2><div class="sub">' +
+    (files.length
+      ? files.length + ' 支腳本、加 ' + add + ' 行、刪 ' + del + ' 行，都還沒 commit。' +
+        '紅的是原版，綠的是現在硬碟上這版。'
+      : '跟上一次 commit 一模一樣，沒有東西要看。') + '</div>';
+  html += '<div class="tabs">' +
+    '<button class="' + (diffOnlyLines ? 'on' : '') + '" onclick="diffOnlyLines=!diffOnlyLines;render()">' +
+    '只看台詞</button>' +
+    '<button onclick="diffData=null;render()">重新讀取</button></div>';
+
+  for (const f of files) {
+    const body = [];
+    for (const h of f.hunks) {
+      const rows = pairUp(h.lines).filter(([l]) =>
+        !(diffOnlyLines && l[0] !== ' ' && !isTalk(l[2])));
+      if (!rows.some(([l]) => l[0] !== ' ')) continue;     // 濾完只剩上下文就別畫了
+      body.push('<div class="dhunk">第 ' + h.new + ' 行附近' +
+        (h.at ? '　' + esc(h.at) : '') + '</div>');
+      for (const [l, mate] of rows) {
+        const kind = l[0] === '+' ? 'add' : l[0] === '-' ? 'del' : 'ctx';
+        let txt = esc(l[2]);
+        if (mate !== null) {
+          const [dTxt, aTxt] = markPair(l[0] === '-' ? l[2] : mate, l[0] === '-' ? mate : l[2]);
+          txt = l[0] === '-' ? dTxt : aTxt;
+        }
+        body.push('<div class="dline ' + kind + '"><span class="ln">' + l[1] + '</span>' +
+          '<span class="sg">' + (l[0] === ' ' ? '' : l[0]) + '</span>' +
+          '<span class="tx">' + (txt || '&nbsp;') + '</span></div>');
+      }
+    }
+    if (!body.length) continue;
+    html += '<div class="block"><div class="t" onclick="select(\'' + f.name + '\')">' +
+      '<span>' + esc(f.name) + (f.isNew ? '<span class="dnew">新檔案</span>' : '') + '</span>' +
+      '<span class="c">＋' + f.add + '　－' + f.del + '</span></div>' +
+      '<div class="b" style="padding:0">' + body.join('') + '</div>' +
+      '<div class="dfoot">點標題可以跳去看整支腳本</div></div>';
+  }
+  if (files.length && !html.includes('class="dline')) {
+    html += '<div class="empty">改的都是指令跟註解，沒有動到台詞。' +
+      '把「只看台詞」關掉就看得到。</div>';
+  }
+  v.innerHTML = html;
 }
 
 function renderIssues(v) {
@@ -1270,6 +1417,145 @@ async function saveMob() {
   else alert('存檔失敗：' + (res.error || '？'));
 }
 
+// ── 星塵的提示 ────────────────────────────────────
+// 分歧前每個夜晚，星塵會講的那幾句。資料是 Assets/Resources/Guide/GuideHints.json，
+// 遊戲（GuideCommand）跟這一頁讀的是同一份，不是抄過來的副本。
+//
+// 每一則可以自己指定背景／立繪／站位／音樂，留空就是不動那一項。
+// 劇本那邊只寫 @guide left:N，N 就是「算上今晚還剩幾個夜晚」。
+let guideDirty = false;
+
+function renderGuide(v) {
+  if (!GUIDE) return v.innerHTML =
+    '<div class="empty">星塵的提示需要「已載入」的版本。<br>在專案根目錄跑：python tools/build_viewer.py</div>';
+
+  const hints = GUIDE.hints = GUIDE.hints || [];
+  const used = usedIn(/^@guide .*?left:(\d+)/);
+
+  const opts = (list, cur, blank) =>
+    '<option value="">' + blank + '</option>' +
+    list.map(n => '<option' + (n === cur ? ' selected' : '') + '>' + esc(n) + '</option>').join('');
+
+  const backs = Object.keys(ASSETS.backgrounds || {}).sort();
+  const bgms = Object.keys(ASSETS.audio || {})
+    .filter(n => (ASSETS.audioKind || {})[n] === 'bgm').sort();
+  const chars = (ASSETS.characters || []).slice().sort();
+
+  v.innerHTML =
+    '<h2>星塵的提示</h2>' +
+    '<div class="sub">分歧前的六個夜晚，星塵在進地圖之前講的話。' +
+      '劇本裡對應的是 <code>@guide left:N</code>，N＝算上今晚還剩幾個夜晚。' +
+      '台詞裡的 <code>{left}</code> 會換成那個數字；同一個數字放好幾則就會照順序講。</div>' +
+
+    '<div class="mobbar">' +
+      '<button class="addtalk" onclick="addGuide()">＋ 新增一則</button>' +
+      (guideDirty
+        ? '<span class="dirty">● 有未存的變更</span>' +
+          '<button class="save" onclick="saveGuide()">存回 GuideHints.json</button>'
+        : '<span class="txt">遊戲直接讀這一份，存完回 Unity 就生效</span>') +
+    '</div>' +
+
+    (hints.length ? '' : '<div class="empty">一則都沒有——這樣星塵整段都不會講話。</div>') +
+
+    hints.map((h, i) => {
+      const where = used[String(h.left)];
+      return '<div class="talkgroup">' +
+        '<b>剩 ' + h.left + ' 晚' +
+          (where ? '　·　' + esc(where.join('、')) : '　·　劇本裡沒有 @guide left:' + h.left) +
+        '</b>' +
+
+        '<div class="mobfields" style="margin-bottom:8px">' +
+          '<label class="mf"><span>剩餘夜晚</span>' +
+            '<input type="number" min="1" max="6" value="' + h.left + '"' +
+            ' onchange="setGuide(' + i + ', &quot;left&quot;, this.value)">' +
+            '<i>跟劇本的 left: 對上才會被講到</i></label>' +
+
+          '<label class="mf"><span>背景</span>' +
+            '<select onchange="setGuide(' + i + ', &quot;bg&quot;, this.value)">' +
+              opts(backs, h.bg, '（不動）') + '</select></label>' +
+
+          '<label class="mf"><span>立繪</span>' +
+            '<select onchange="setGuide(' + i + ', &quot;character&quot;, this.value)">' +
+              opts(chars, h.character, '（不出立繪）') + '</select>' +
+            '<i>講完會自動收掉</i></label>' +
+
+          '<label class="mf"><span>表情</span>' +
+            '<select onchange="setGuide(' + i + ', &quot;pose&quot;, this.value)">' +
+              opts(((ASSETS.expressions || {})[h.character] || []), h.pose, '（預設）') + '</select>' +
+            '<i>' + (h.character
+              ? (((ASSETS.expressions || {})[h.character] || []).length ? '' : '這個角色沒有表情檔')
+              : '先選立繪') + '</i></label>' +
+
+          '<label class="mf"><span>站位</span>' +
+            '<input type="number" min="0" max="100" value="' + h.pos + '"' +
+            ' onchange="setGuide(' + i + ', &quot;pos&quot;, this.value)">' +
+            '<i>跟劇本的 pos: 一樣，0～100</i></label>' +
+
+          '<label class="mf"><span>音樂</span>' +
+            '<select onchange="setGuide(' + i + ', &quot;bgm&quot;, this.value)">' +
+              opts(bgms, h.bgm, '（不動）') + '</select>' +
+            '<i>選了會先停掉現在那首</i></label>' +
+        '</div>' +
+
+        (h.lines || []).map((line, j) =>
+          '<div class="talkline"><input value="' + esc(line) + '"' +
+          ' onchange="setGuideLine(' + i + ', ' + j + ', this.value)">' +
+          '<span class="x" onclick="delGuideLine(' + i + ', ' + j + ')">×</span></div>').join('') +
+
+        '<button class="addtalk" onclick="addGuideLine(' + i + ')">＋ 加一句</button>' +
+        '<button class="addtalk" style="margin-left:6px"' +
+          ' onclick="delGuide(' + i + ')">刪掉這一則</button>' +
+      '</div>';
+    }).join('');
+}
+
+function setGuide(i, key, value) {
+  const h = GUIDE.hints[i];
+  h[key] = (key === 'left' || key === 'pos') ? +value : value;
+  guideDirty = true; render();
+}
+
+function setGuideLine(i, j, value) {
+  GUIDE.hints[i].lines[j] = value;
+  guideDirty = true; render();
+}
+
+function delGuideLine(i, j) {
+  GUIDE.hints[i].lines.splice(j, 1);
+  guideDirty = true; render();
+}
+
+function addGuideLine(i) {
+  (GUIDE.hints[i].lines = GUIDE.hints[i].lines || []).push('星塵: ');
+  guideDirty = true; render();
+}
+
+function addGuide() {
+  GUIDE.hints.push({left: 6, bg: '', character: '', pose: '', pos: 50, bgm: '',
+                    lines: ['星塵: ']});
+  guideDirty = true; render();
+}
+
+function delGuide(i) {
+  const h = GUIDE.hints[i];
+  const first = (h.lines && h.lines[0]) || '（空的）';
+  if (!confirm('刪掉「剩 ' + h.left + ' 晚」這一則？' + NL + NL + first)) return;
+  GUIDE.hints.splice(i, 1);
+  guideDirty = true; render();
+}
+
+async function saveGuide() {
+  const res = await fetch('/saveguide', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({hints: GUIDE.hints})
+  }).then(r => r.json()).catch(err => ({ok: false, error: err.message}));
+
+  if (res.ok) {
+    GUIDE.hints.sort((a, b) => b.left - a.left);   // 伺服器那邊也會排，畫面跟著對齊
+    guideDirty = false; render();
+  } else alert('存檔失敗：' + (res.error || '？'));
+}
+
 // ── 資源清單 ──────────────────────────────────────
 // 有哪些背景、音樂、怪物、角色跟表情，一頁看完。
 // 順便標出劇本裡用到、但檔案找不到的（那些在遊戲裡會是黑畫面或沒聲音）。
@@ -1366,6 +1652,24 @@ function playBgm(src, name, btn) {
   markPlaying(name);
 }
 
+// 資源卡上的 📁：請本機的 serve.py 在檔案總管裡把那個檔案選起來。
+// 用 file:// 直接開網頁的話沒有伺服器可以問，按了會提示要怎麼跑。
+function revealPath(src, btn, ev) {
+  if (ev) ev.stopPropagation();          // 別觸發卡片本身的「看用在哪」
+  fetch('/reveal?path=' + encodeURIComponent(src))
+    .then(r => r.json())
+    .then(j => { if (!j.ok) throw new Error(j.error || ''); })
+    .catch(e => {
+      btn.classList.add('bad');
+      btn.title = '開不起來：' + (e.message || '要先在專案根目錄跑 python tools/serve.py');
+      setTimeout(() => btn.classList.remove('bad'), 2000);
+    });
+}
+
+const folderBtn = src => !src ? '' :
+  '<button class="fo" title="在檔案總管裡打開　' + esc(src) +
+  '" onclick="revealPath(&quot;' + esc(src) + '&quot;, this, event)">📁</button>';
+
 const playBtn = (n, src) => '<button class="play" data-name="' + esc(n) +
   '" onclick="playBgm(&quot;' + esc(src) + '&quot;, &quot;' + esc(n) + '&quot;, this)">▶ ' +
   esc(n) + '</button>';
@@ -1395,11 +1699,11 @@ function renderAssets(v) {
       (r.level === 'nude' ? '裸露' : '邊緣') + '　' + esc(r.note || '') + '</div>';
   };
 
-  const card = (name, inner, used, extra, group) =>
+  const card = (name, inner, used, extra, group, src) =>
     '<div class="ass' + (used && !used[name] ? ' unused' : '') +
       (used && used[name] ? '" onclick="showUses(&quot;' + esc(name).replace(/"/g, '') +
         '&quot;)" title="點一下看用在哪裡' : '') + '">' + inner +
-    '<div class="an">' + esc(name) + '</div>' +
+    '<div class="an"><span>' + esc(name) + '</span>' + folderBtn(src) + '</div>' +
     (extra ? '<div class="ax">' + extra + '</div>' : '') +
     (group ? rv(group, name) : '') +
     (used ? '<div class="au">' + (used[name] ? used[name].length + ' 處用到' : '沒有用到') + '</div>' : '') +
@@ -1412,7 +1716,7 @@ function renderAssets(v) {
     if (!names.length) return '';
     return sec(title, names.length + ' 張。' + sub,
       '<div class="grid">' + names.map(n =>
-        card(n, '<img loading="lazy" class="mob" src="' + list[n] + '">', null, '', group)).join('') +
+        card(n, '<img loading="lazy" class="mob" src="' + list[n] + '">', null, '', group, list[n])).join('') +
       '</div>', group);
   };
 
@@ -1443,24 +1747,24 @@ function renderAssets(v) {
     sec('背景', Object.keys(ASSETS.backgrounds).length + ' 張。灰的是劇本裡沒用到的。',
       missing(usedBack, ASSETS.backgrounds, '背景') +
       '<div class="grid">' + Object.entries(ASSETS.backgrounds).map(([n, src]) =>
-        card(n, '<img loading="lazy" src="' + src + '">', usedBack, '', 'backgrounds')).join('') + '</div>',
+        card(n, '<img loading="lazy" src="' + src + '">', usedBack, '', 'backgrounds', src)).join('') + '</div>',
       'backgrounds') +
 
     sec('音樂（BGM）', bgmList.length + ' 首，寫成 <code>@bgm 名字</code>。按 ▶ 試聽。',
       missing(usedBgm, ASSETS.audio, '音樂') +
       '<div class="grid wide">' + bgmList.sort((a, b) => byTag(a[0], b[0])).map(([n, src]) =>
-        card(n, playBtn(n, src), usedBgm, tagPicker(n))).join('') + '</div>') +
+        card(n, playBtn(n, src), usedBgm, tagPicker(n), null, src)).join('') + '</div>') +
 
     sec('音效（SE）', sfxList.length + ' 個，寫成 <code>@sfx 名字</code>。' +
       '放在 Sound/SE、UI、Magic、HitSound 這些資料夾底下。',
       missing(usedSfx, ASSETS.audio, '音效') +
       '<div class="grid wide">' + sfxList.map(([n, src]) =>
-        card(n, playBtn(n, src), usedSfx)).join('') + '</div>') +
+        card(n, playBtn(n, src), usedSfx, '', null, src)).join('') + '</div>') +
 
     sec('怪物', Object.keys(ASSETS.monsters || {}).length + ' 隻。@battle 的 target 就是這些名字。',
       missing(usedMob, ASSETS.monsters || {}, '怪物') +
       '<div class="grid">' + Object.entries(ASSETS.monsters || {}).map(([n, src]) =>
-        card(n, '<img loading="lazy" class="mob" src="' + src + '">', usedMob, '', 'monsters')).join('') + '</div>',
+        card(n, '<img loading="lazy" class="mob" src="' + src + '">', usedMob, '', 'monsters', src)).join('') + '</div>',
       'monsters') +
 
     imgSection('符文立繪', 'runePortraits', '地圖上拿到符文時的立繪。') +

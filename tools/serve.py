@@ -18,6 +18,7 @@ import json
 import os
 import posixpath
 import re
+import subprocess
 import threading
 import sys
 import urllib.parse
@@ -53,6 +54,96 @@ class _Slice:
 
     def close(self):
         self.f.close()
+
+
+def reveal(target):
+    """在檔案總管／Finder 裡打開檔案所在的資料夾，並且把它選起來。"""
+    if sys.platform == 'win32':
+        subprocess.Popen(['explorer', '/select,' + os.path.normpath(target)])
+    elif sys.platform == 'darwin':
+        subprocess.Popen(['open', '-R', target])
+    else:
+        subprocess.Popen(['xdg-open', os.path.dirname(target)])
+
+
+def git(*args):
+    """跑一個 git 指令，回字串。劇本裡有中文，一律當 UTF-8 讀。"""
+    out = subprocess.run(('git',) + args, cwd=ROOT, stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE)
+    if out.returncode != 0:
+        raise RuntimeError(out.stderr.decode('utf-8', 'replace').strip() or 'git 失敗')
+    return out.stdout.decode('utf-8', 'replace')
+
+
+def parse_patch(text):
+    """把 git 的 unified diff 拆成一支支檔案、一段段 hunk。
+
+    只留網頁畫得到的東西：每行是刪還是加還是沒動、在舊檔新檔各是第幾行。
+    """
+    files, cur = [], None
+    for raw in text.split(NEWLINE):
+        line = raw[:-1] if raw.endswith(chr(13)) else raw
+        if line.startswith('diff --git '):
+            cur = {'name': '', 'hunks': [], 'add': 0, 'del': 0, 'isNew': False}
+            files.append(cur)
+            continue
+        if cur is None:
+            continue
+        if line.startswith('+++ '):
+            path = line[4:]
+            cur['name'] = os.path.basename(path)
+            continue
+        if line.startswith('--- '):
+            cur['isNew'] = line[4:] == '/dev/null'
+            continue
+        if line.startswith('@@'):
+            m = re.match(r'@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@(.*)', line)
+            if not m:
+                continue
+            cur['hunks'].append({'old': int(m.group(1)), 'new': int(m.group(2)),
+                                 'at': m.group(3).strip(), 'lines': []})
+            no, nn = int(m.group(1)), int(m.group(2))
+            continue
+        if not cur['hunks']:
+            continue          # index/mode 那幾行，跳過
+        h = cur['hunks'][-1]
+        if line.startswith(BS + 'No newline'):
+            continue
+        if line.startswith('+'):
+            h['lines'].append(['+', nn, line[1:]]); nn += 1
+            cur['add'] += 1
+        elif line.startswith('-'):
+            h['lines'].append(['-', no, line[1:]]); no += 1
+            cur['del'] += 1
+        elif line.startswith(' ') or line == '':
+            h['lines'].append([' ', nn, line[1:]]); no += 1; nn += 1
+    return [f for f in files if f['hunks']]
+
+
+def collect_diff():
+    """HEAD 到工作目錄的劇本改動，外加還沒進版控的新劇本。"""
+    rel = 'Assets/NaniScripts'
+    # -U6：多給幾行上下文，改台詞時看得出前後在講什麼
+    # --no-textconv/-w 都不加：空白也是改動，該看見
+    text = git('diff', '--no-color', '-U6', 'HEAD', '--', rel)
+    files = parse_patch(text)
+
+    # 沒 git add 過的新劇本，git diff 看不到，自己補上去
+    listed = git('ls-files', '--others', '--exclude-standard', '--', rel)
+    for name in listed.split(NEWLINE):
+        name = name.strip()
+        if not name.endswith('.nani'):
+            continue
+        body = open(os.path.join(ROOT, *name.split('/')), encoding='utf-8-sig',
+                    errors='replace').read().split(NEWLINE)
+        files.append({
+            'name': os.path.basename(name), 'isNew': True,
+            'add': len(body), 'del': 0,
+            'hunks': [{'old': 0, 'new': 1, 'at': '整支都是新的',
+                       'lines': [['+', i + 1, t] for i, t in enumerate(body)]}],
+        })
+    files.sort(key=lambda f: f['name'])
+    return files
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -124,6 +215,34 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             except Exception as e:
                 return self._json({'ok': False, 'error': str(e)}, 404)
 
+        # /reveal?path=../Assets/... → 在檔案總管裡把那個檔案選起來。
+        # 檢視器的資源卡點「📁」會打這支。路徑一律換算成絕對路徑再確認
+        # 它真的落在專案資料夾底下，免得有人用 ../.. 跳出去。
+        if self.path.startswith('/reveal?'):
+            try:
+                query = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+                rel = query.get('path', [''])[0]
+                if not rel:
+                    raise ValueError('沒有給 path')
+                target = os.path.realpath(os.path.join(ROOT, 'tools', rel))
+                root = os.path.realpath(ROOT)
+                if os.path.commonpath([target, root]) != root:
+                    raise ValueError('只能開專案資料夾底下的東西')
+                if not os.path.exists(target):
+                    raise ValueError('檔案不在了：' + rel)
+                reveal(target)
+                return self._json({'ok': True, 'path': target})
+            except Exception as e:
+                return self._json({'ok': False, 'error': str(e)}, 400)
+
+        # /diff → 還沒 commit 的劇本改動。網頁的「改動」頁拿它跟原版對照。
+        # 只看 Assets/NaniScripts，而且原版一律取 HEAD 那版（暫存區有沒有 add 都算改動）。
+        if self.path == '/diff':
+            try:
+                return self._json({'ok': True, 'files': collect_diff()})
+            except Exception as e:
+                return self._json({'ok': False, 'error': str(e)}, 500)
+
         if self.path.startswith('/raw?'):
             try:
                 query = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
@@ -142,6 +261,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.save_music()
         if self.path == '/savemob':
             return self.save_mob()
+        if self.path == '/saveguide':
+            return self.save_guide()
         if self.path != '/save':
             return self.send_error(404)
 
@@ -207,6 +328,56 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self._json({'ok': True})
         except Exception as e:
             print('  音樂分類存檔失敗：' + str(e))
+            self._json({'ok': False, 'error': str(e)}, 500)
+
+    def save_guide(self):
+        """把星塵頁改的提示寫回 Assets/Resources/Guide/GuideHints.json。
+
+        遊戲直接讀這個檔（GuideCommand），所以欄位要照它認得的名字寫，
+        順序也固定——不然每存一次 diff 都是整份重排。
+        """
+        try:
+            size = int(self.headers.get('Content-Length', 0))
+            data = json.loads(self.rfile.read(size).decode('utf-8'))
+            path = os.path.join(ROOT, 'Assets', 'Resources', 'Guide', 'GuideHints.json')
+
+            note = ''
+            if os.path.isfile(path):
+                note = json.load(open(path, encoding='utf-8-sig')).get('_說明', '')
+
+            hints = []
+            for h in data.get('hints', []):
+                left = int(h.get('left', 0))
+                if not 1 <= left <= 6:
+                    raise ValueError('剩餘夜晚要介於 1～6，收到 ' + str(left))
+                lines = [str(x) for x in h.get('lines', []) if str(x).strip()]
+                # 站位整數就寫整數：50.0 跟 50 對遊戲一樣，但每存一次多一個小數點
+                # 會讓 diff 看起來像改過東西
+                pos = float(h.get('pos', 50))
+                pos = int(pos) if pos == int(pos) else pos
+                hints.append({
+                    'left': left,
+                    'bg': (h.get('bg') or '').strip(),
+                    'character': (h.get('character') or '').strip(),
+                    'pose': (h.get('pose') or '').strip(),
+                    'pos': pos,
+                    'bgm': (h.get('bgm') or '').strip(),
+                    'lines': lines,
+                })
+            hints.sort(key=lambda h: -h['left'])      # 由遠到近，跟劇本走的順序一樣
+
+            doc = {'hints': hints}
+            if note:
+                doc = {'_說明': note, 'hints': hints}
+
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path, 'w', encoding='utf-8', newline='') as f:
+                f.write(json.dumps(doc, ensure_ascii=False, indent=2) + NEWLINE)
+
+            print('  已寫回 GuideHints.json（' + str(len(hints)) + ' 則）')
+            self._json({'ok': True})
+        except Exception as e:
+            print('  星塵提示存檔失敗：' + str(e))
             self._json({'ok': False, 'error': str(e)}, 500)
 
     def save_mob(self):

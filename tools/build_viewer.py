@@ -304,6 +304,17 @@ mobs = build_mobs()
 print(f'怪物資料 {len(mobs)} 隻')
 html = html.replace('const MOBS = null;', 'const MOBS = ' + json.dumps(mobs, ensure_ascii=False) + ';', 1)
 
+# 星塵的提示（遊戲跟檢視器讀同一份，不另外抄一次）
+try:
+    guide = json.load(io.open(os.path.join(ROOT, 'Assets', 'Resources', 'Guide', 'GuideHints.json'),
+                              encoding='utf-8-sig'))
+    print(f"星塵提示 {len(guide.get('hints', []))} 則")
+except Exception as e:
+    print(f'（沒有星塵提示：{e}）')
+    guide = {'hints': []}
+html = html.replace('const GUIDE = null;',
+                    'const GUIDE = ' + json.dumps(guide, ensure_ascii=False) + ';', 1)
+
 html = html.replace('const ASSETS = null;',
                     'const ASSETS = ' + json.dumps(assets, ensure_ascii=False) + ';', 1)
 
