@@ -78,6 +78,13 @@ public static class MapSpecialOverride
         PlayerPrefs.Save();
     }
 
+    /// <summary>
+    /// 丟掉記憶體裡那份，重新從 PlayerPrefs 讀。
+    /// 讀存檔時 PlayerPrefs 會被整包換掉（見 RunSnapshot），
+    /// 不重讀的話這裡還是上一輪的預約。
+    /// </summary>
+    public static void Reload () => Load();
+
     // ============================================================
     //  存讀：一行一筆，欄位用 \t 隔開（劇本名和角色名都不會有 tab）
     //  characterName \t eventName \t naninovelScript \t animatorPath \t offsetX \t offsetY
