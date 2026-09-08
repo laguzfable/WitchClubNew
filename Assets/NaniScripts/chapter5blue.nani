@@ -247,7 +247,7 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 @stop
 
 # c5b3_a
-優菲: 欸？！等、等一下，{PlayerName}你不用回答得這麼乾脆吧！
+優菲: 欸？！等、等一下，{PlayerName}不用回答得這麼乾脆吧！
 @goto .c5b3_join
 
 # c5b3_b
@@ -617,6 +617,8 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 優菲: 這可是「我們的」象牙塔啊。
 妮可: ……
 妮可: ……嗯！
+@hideChars
+@goto .beforefinal_blue
 #nexttime
 優菲: 那那那，我和{PlayerName}就下次再去吧！
 妮可: 好的，我會好好爭取金援的！
@@ -635,34 +637,60 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 @GotoUnityScene sceneName:MapTest
 @stop
 # afternight_blue
-
 @stopBgm
 @bgm emotional
-(這邊應該是也要有個夢境穿插)
-第一次見到梅爾的時候，我的心裡好激動喔。
-她大概是我見過，這個世界上最純真的人了。
-她的眼裡似乎只容得下，火焰。
-是的，那令人目眩神迷的，紅色光芒……
-到底是為什麼可以那麼專注呢？
-我啊，根本沒辦法跟她一樣。
-我自己是清楚的。
-隨便一點星塵閃耀都能令我分心。
-吶，{PlayerName}的出現也是啊。
-從商店的邂逅，到後來，一直一直都是。
-還以為只是個新鮮的玩具呢。
-想不到現在已經是我人生的一部份了。
-可是這只是暫時的吧。
-我總有一種預感。
-{PlayerName}就快要離開我了。
-我知道梅爾會離開我。
-但{PlayerName}呢？
-不離開可以嗎？
-一直留在我身邊可以嗎？
-請牽起我的手。
-無論發生什麼事。
-……
-一起毀滅的話，可以嗎？
+@back huffy_night
+@char 優菲 pos:50
+優菲: 還沒睡？我就知道。
+優菲: ……其實不知道啦。我已經在門口走第三遍了。
+優菲: 明天的事都排好了，妮可還叫我別操心。
+優菲: 可是一躺下，就開始想有沒有漏掉誰。
+優菲: 以前梅爾還在象牙塔的時候，我只要想怎麼贏她就好了。
+優菲: 現在連想找她吵個架，都不知道她會不會回來。
+優菲: {PlayerName}也是。
+優菲: 沒有儀式、沒有敵人、也沒有人需要幫忙的時候……
+優菲: 還會來敲我的門嗎？
+@choice 會。我也想見沒有事情要忙的優菲。 goto:.eve_visit
+@choice 換妳來找我也可以。 goto:.eve_find
+@stop
+# eve_visit
+優菲: 那可能很無聊唷。
+優菲: 我會挑茶、嫌書難看，還會把讀到一半的咒文念給人聽。
+優菲: ……真的願意聽啊？
+優菲: 好。這可是{PlayerName}自己說的。
+@goto .eve_promise
+# eve_find
+優菲: ……也是。
+優菲: 我怎麼老是在等啊。
+優菲: 明明第一次，是我先把{PlayerName}帶回來的。
+優菲: 那下次換我敲門。不可以裝睡喔。
+@goto .eve_promise
+# eve_promise
+優菲: 等事情結束，我們出去喝茶吧。
+優菲: 不帶公文，也不准妮可安排什麼贊助者。
+優菲: 就兩個人。坐到茶涼掉也沒關係。
+優菲: ……現在答應這種事，好像有點貪心。
+@choice 我記住了，兩個人。 goto:.eve_remember
+@choice 那妳也要好好回來。 goto:.eve_return
+@stop
+# eve_remember
+優菲: 嗯。不要到時候又說有別的事。
+優菲: 我會很小氣的，這次不讓。
+@goto .eve_close
+# eve_return
+優菲: ……好。
+優菲: 不能只要求{PlayerName}一直在，對吧。
+優菲: 我也會努力回來的。
+@goto .eve_close
+# eve_close
+優菲: 手借我一下。
+優菲: 沒有要引導。就一下。
+優菲: ……好了，去睡吧。
+優菲: 再坐下去，我又捨不得放人了。
+@hideChars
+@back black
 @stopBgm
+
 @bgm intense
 @back bg06
 ？？？: 呀啊啊啊啊啊－－
@@ -760,8 +788,9 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 ; ── 先讓玩家知道這一場的賭注：輸了就是壞結局 ──
 優菲: {PlayerName}，接下來就交給我們了。
 優菲: ……不過我還是要說。
-優菲: 如果我沒能擋住她，剩下的就靠妳了。
-轟隆隆隆隆－－
+優菲: 如果我沒能擋住她，{PlayerName}就先退到妮可那邊。
+優菲: 茶還沒喝呢。不要在這裡逞強。
+@sfx magicattack loop:false
 @battle background:bg03 target:micha_final label:ch5bt_micha
 @stop
 # ch5bt_micha
@@ -783,7 +812,9 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 @char 優菲 pos:35
 @char nic pos:65
 優菲: 妮可，妳快離開，米夏還在——
-（優菲的魔力突然失控，爆發出強烈的衝擊波）
+優菲: 不要靠近！我的魔力……收不回來！
+@sfx magicattack loop:false
+@spawn ShakeBackground
 妮可: 學姊！！
 
 @choice 衝過去擋住那股力量 goto:.player_guards
@@ -814,9 +845,9 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 梅爾: 傳到看不見火為止。
 
 ; ── 她要做的不是斷後，是點燃自己 ──
-（你看見梅爾把手按在自己胸口上）
-（血系的咒文從她指縫裡漏出來，紅得發亮）
-（那不是防禦，也不是攻擊——那是一根被點著的引線）
+優菲: 妳胸口那個咒文……老紅也是這樣的，對不對？
+優菲: 梅爾，回答我！
+梅爾: 妮可，別停。傳送一斷，大家都走不了。
 
 優菲: 梅爾——！
 優菲: 妳不要！妳給我住手！！
@@ -826,6 +857,12 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 
 梅爾: ……妳好好活著。
 梅爾: 這次換我先走了。
+梅爾: {PlayerName}，別往這裡走。
+梅爾: 我看得見。
+梅爾: ……拜託了。我現在沒辦法分心。
+梅爾: 優菲要是又逞強，就叫她休息。
+優菲: 妳自己來叫啊！
+梅爾: 她現在也會聽{PlayerName}的了。
 
 妮可: Vinculum lucis, nos transfer---
 優菲: 不要啊！！！
@@ -833,8 +870,10 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 @stopBgm
 @bgm quiet
 @back black
-（一陣白光。）
-（白光散掉之前，那個方向亮了第二次——那一次是紅色的。）
+優菲: 梅爾！
+妮可: 學姊，別回頭！
+優菲: 那個紅色的光……
+優菲: ……不要。
 @back bg01
 @char 優菲 pos:35
 @char nic pos:65
@@ -844,14 +883,51 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 妮可: 既然她有這個決心……
 妮可: 我就成全她了。
 妮可: 一切，都將回到正軌。
+優菲: 她不在了，妳還說什麼正軌？
+妮可: ……對不起。
+妮可: 我不知道該怎麼說。
+妮可: 她要我把所有人帶走，我做到了。
+妮可: 可是我閉上眼睛，就會想，是不是能再多帶一個。
+優菲: ……
+優菲: 先不要跟我說話。
+優菲: 我怕我又把不該怪的事，怪到妳身上。
+妮可: ……好。我在外面。
+@hide nic
+@char 優菲 pos:50
+優菲: {PlayerName}，那邊有沒有受傷？
+優菲: 我一直聽見東西碎掉，就怕又是義體。
+優菲: ……沒事就好。
+優菲: 剛剛我還以為，只要我叫得夠大聲，她就會停。
+優菲: 她平常明明最嫌我吵。
+@choice 她最後有聽見妳。 goto:.escape_heard
+@choice 不用現在就忍住。 goto:.escape_cry
+@stop
+# escape_heard
+優菲: 嗯。她還回嘴了。
+優菲: ……怎麼最後還是在吵架啊。
+@goto .escape_quiet
+# escape_cry
+優菲: 我沒有忍。
+優菲: ……我只是，不知道先說哪一句。
+@goto .escape_quiet
+# escape_quiet
+優菲: 出門之前，我還在想下次要去哪裡喝茶。
+優菲: 現在連自己怎麼走到這裡的，都記不清楚。
+優菲: {PlayerName}，今天先別問我要去哪裡，好不好？
+優菲: ……坐著陪我一下。
+優菲: 等我有力氣了，我們再走。
 @hide 優菲,nic
-（幾個月後）
+@back black
+@back bg01
 @char nic pos:50
-妮可: 學姐，你確定不來我的……登基儀式嗎？
+妮可: 學姊，這幾個月的重建名冊都在這裡了。
+妮可: 還有……登基儀式，妳確定不來嗎？
 @char 優菲 pos:35
 @char nic pos:65
-優菲: 我很確定。
-優菲: 下次見面我們就是敵人了。
+優菲: 血巫結社的人，也能來嗎？
+妮可: 議會還沒同意。
+優菲: 那我不能現在答應。
+優菲: 我不想站在那裡，看她們又被關在門外。
 妮可: ……
 妮可: 那我也只能加油了。
 @hide nic
@@ -864,14 +940,26 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 
 @char 優菲 pos:50
 優菲: {PlayerName}啊……
-優菲: 陪了我這麼久，我真的很感謝呢。
-優菲: 我也即將上任了，到時候，也請多指教囉。
-優菲: 為了繼承梅爾的意念……
-優菲: {PlayerName}，你覺得呢？
+優菲: 梅爾以前是不是也這樣，看到我就想嘆氣？
+優菲: 我一直說象牙塔會保護大家。
+優菲: 可是她帶著結社的人離開時，我只覺得她又要跟我作對。
+優菲: 她不在了，我才去問那些人要住哪裡。
+優菲: ……有點晚吧。
+優菲: 那邊有人希望我接下族母的位子。妮可也留了象牙塔的位置給我。
+優菲: 不管選哪裡，都有人會失望。
+優菲: 我以前一定會先問，梅爾會怎麼選。
+優菲: 可是她又不是為了讓我變成她，才把我送出來的。
+優菲: {PlayerName}，聽我說完，好不好？
 
-@choice 成為血巫結社的族母吧，那是梅爾的心願。 goto:.end_crimson
-@choice 你應該回象牙塔，那才是你的根。 goto:.end_blue_crown
+; 相處決定她願意說出什麼；兩種未來都是正常流程可選的結局。
+優菲: 接下結社，我就得先去聽那些從來沒被象牙塔聽見的人說話。
+優菲: 回到塔裡，就得當著那些老師的面，把門打開。
+優菲: 兩邊都很難。我想聽{PlayerName}怎麼想。
+# blue_final
+@choice 去結社吧。先讓她們有個家。 goto:.end_crimson
+@choice 回象牙塔吧。讓那裡也容得下她們。 goto:.end_blue_crown
 @stop
+
 # end_crimson
 @stopBgm
 @bgm title
@@ -879,13 +967,40 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 @back ed01
 
 優菲: ……嗯。
-優菲: 你說得對。
 優菲: 我要成為血巫結社的族母。
 優菲: 替梅爾，把她愛護的人好好守護起來。
-優菲: 有你在身邊，我才有勇氣說出這句話。
-優菲: 謝謝你，{PlayerName}。
+優菲: 我不會她那些魔法。有人拿我跟她比，也不一定比得過。
+優菲: 可是不能因為這樣，就讓大家繼續等。
+優菲: ……{PlayerName}，這件衣服會不會很奇怪？
+優菲: 我照了好久，還是不習慣這個顏色。
+@choice 很適合妳。 goto:.crimson_fit
+@choice 我看見的還是優菲。 goto:.crimson_name
+@stop
+# crimson_fit
+優菲: 嘻嘻，眼光不錯嘛。
+優菲: 那等一下就這樣出去，不換了。
+@goto .crimson_close
+# crimson_name
+優菲: ……嗯。
+優菲: 我剛剛最想聽的，好像就是這句。
+@goto .crimson_close
+# crimson_close
+優菲: 有人叫我族母的時候，我還是會想回頭找她。
+優菲: 然後才想到，現在是在叫我啊。
+優菲: 所以只有兩個人的時候，還是叫我的名字吧。
+優菲: 我可能會做錯很多事，也可能又跑回來哭。
+優菲: 到時候，不用先說我很厲害。
+優菲: 留個位置給我坐就好了。
+優菲: 我把明天下午空出來了。
+優菲: 她們問族母要去哪裡，我說，去赴一個欠很久的約。
+優菲: 喝茶。只有兩個人。
+優菲: 我沒有忘記喔。
+優菲: ……外面在叫了。
+優菲: {PlayerName}，陪我走到門口吧。
+優菲: 接下來，我要自己向她們介紹了。
+優菲: 我叫優菲。今後……請多指教。
 
-（END：緋紅替身）
+; END：緋紅替身
 @achieve id:ACH_END_01
 @wait i
 @exitToTitle
@@ -898,16 +1013,47 @@ Tempus retrocede, memoria retexe, orbis iterum volvatur–
 @back ed02
 
 優菲: ……
-優菲: 也許你說得對。
 優菲: 象牙塔才是我的根，那裡還有很多人需要我。
-優菲: 妮可一直都等著我……我沒有理由讓她失望。
-優菲: 梅爾……一定也希望我能做自己吧。
-優菲: {PlayerName}，謝謝你。
+優菲: 我想回去。
+優菲: 以前有人說，莉莉娜成績不好，所以不配留下來。
+優菲: 我吵過，打過，最後還是看著她走了。
+優菲: 這次總不能又說，我也沒辦法吧。
 
 @char nic pos:50
 妮可: 學姊！我就知道！
+優菲: 先別高興。我有條件。
+優菲: 血巫結社的人要有地方住。想來學的人，也不能只因為出身就被趕走。
+妮可: 議會那邊……
+優菲: 我去講。不同意就再講。
+優菲: 我以前很會煩老師的，忘記啦？
+妮可: ……沒有。那這次，我陪學姊一起。
+優菲: 還有，妮可。
+優菲: 我沒有忘記梅爾。
+妮可: 我也沒有。
+優菲: ……嗯。那就一起記著。
+@hide nic
+優菲: {PlayerName}，我有點怕。
+優菲: 走回去很容易，可是大家都會以為，一切可以照以前那樣。
+@choice 把剛剛那些話告訴大家。 goto:.crown_speak
+@choice 怕也可以慢慢來。 goto:.crown_slow
+@stop
+# crown_speak
+優菲: 嗯。這次不能只在房間裡生氣了。
+@goto .crown_close
+# crown_slow
+優菲: 那我先從讓她們把門打開開始。
+優菲: 總不能第一天就把自己關起來嘛。
+@goto .crown_close
+# crown_close
+優菲: 謝謝{PlayerName}聽我講完。
+優菲: 以後來找我，不用在門口等人通報。
+優菲: 如果有人攔，就說我欠了一頓下午茶。
+優菲: 真的欠了唷。陪了我這麼久，不能只用一句謝謝就算了。
+優菲: ……不對，我怎麼又說等了。
+優菲: 明天下午，我到門口接{PlayerName}。
+優菲: 這次換我先到。
 
-（END：純藍之冠）
+; END：純藍之冠
 @achieve id:ACH_END_02
 @wait i
 @exitToTitle

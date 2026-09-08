@@ -1,31 +1,70 @@
 @back nelly_night
 @stopBgm
 @bgm white
-
+@char 涅莉 pos:50
 涅莉: 來了啊，{PlayerName}。
-涅莉: 關上門。
-
-涅莉: 我最近會做夢。
-涅莉: 夢到很久很久以前的事，久到不像是我的記憶。
-涅莉: 但又好像……確實是我。
-涅莉: 妳能幫我看看嗎？
-涅莉: 就像妳以前做的那樣，把手放在這裡。
-
-（第六次引導，開始）
-
-（畫面模糊，破碎的光影浮現）
-（片段：無邊的星海，一名女性獨自站立的背影）
-（片段：「別再把我喚醒了……」）
-（引導中斷）
-
-涅莉: 呼……
-涅莉: 又看不清楚。
-涅莉: 感覺……就快要想起來了，但又不太對。
-涅莉: ……謝謝妳，{PlayerName}。
-涅莉: 下次再試好嗎？
-
-@set affinity_Nel=affinity_Nel+20
-@if affinity_Nel<100
-@overrideEvent char:Nelly evt:guidance
+涅莉: 門關上。今天不准笑我。
+涅莉: 剛剛我明明在找人，吸了那個煙，就忘了。
+涅莉: 還笑得比誰都開心。
+涅莉: 我以前是不是也這樣，覺得難受就先忘掉？
+@choice 妳現在還記得自己在找誰。 goto:.remember
+@choice 害怕的話，我陪妳慢慢想。 goto:.afraid
+@stop
+# remember
+涅莉: 嗯。所以才叫{PlayerName}來。
+涅莉: 不想明天又說，昨天沒什麼事呀。
+@goto .begin
+# afraid
+涅莉: ……被發現了。
+涅莉: 先說好，我如果叫停，就真的要停喔。
+@goto .begin
+# begin
+涅莉: 手放這裡。跟以前一樣。
+涅莉: ……好冷。
+涅莉: 我看見很多星星。下面有個人，抱著誰不肯放。
+涅莉: 她說，不要再叫醒我了。
+涅莉: ……是我的聲音。
+@if RunesYellow()>=5
+涅莉: 星塵上次告訴我的那些事，我都記得。
+涅莉: 可是知道自己是誰，跟願意回去，好像還差很遠。
+@else
+涅莉: 又看不清楚了。
+涅莉: 還有些地方沒有找回來，硬想就會痛。
 @endif
+涅莉: 先停。拜託。
+@choice 好，我不往前了。 goto:.pause
+@choice 我在這裡。 goto:.stay
+@stop
+# pause
+涅莉: ……謝謝。
+涅莉: 原來真的可以停啊。
+涅莉: 我還以為，只要開始想起來，就再也沒有選擇了。
+@goto .promise
+# stay
+涅莉: 嗯，聽得見。
+涅莉: 剛剛一直有人叫別的名字，差點不知道該回答誰。
+@goto .promise
+# promise
+涅莉: {PlayerName}，以後就算我變得不一樣了，還是叫涅莉好不好？
+涅莉: 那個會偷吃早餐、會嫌大家吵的小精靈。
+涅莉: 這些也都是我啊。
+涅莉: 我不想一想起以前，現在就全部不算了。
+@choice 我認識的涅莉都算數。 goto:.name
+@choice 那妳也要記得現在的我。 goto:.both
+@stop
+# name
+涅莉: 包括那些很丟臉的嗎？
+涅莉: ……算了，也留著吧。不然只剩一個很厲害的陌生人。
+@goto .close
+# both
+涅莉: 會的。
+涅莉: 不會只記得{PlayerName}幫我做過什麼。
+涅莉: 今天願意停下來陪我的事，我也會記得。
+@goto .close
+# close
+涅莉: 明天的早餐，我替{PlayerName}留一份。
+涅莉: 不偷吃。真的。
+涅莉: ……總得有一次，是我先等嘛。
+@set affinity_Nel=affinity_Nel+20
+@set YellowGuidanceComplete=true
 @restroom

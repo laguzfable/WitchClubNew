@@ -3,6 +3,8 @@
 @set affinity_Eup=0
 @set affinity_Nel=0
 @set affinity_Syb=0
+@set YellowFifthComplete=false
+@set YellowGuidanceComplete=false
 @visitNode id:chapter0
 ; bossPower 先歸零，chapter5yellow 才不會比較到未定義變數。
 ; 第二章賣書的選項在後面，會覆蓋掉這個 0。

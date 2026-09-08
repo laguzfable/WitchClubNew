@@ -1,113 +1,124 @@
 @visitNode id:chapter5common
-@stopbgm
-@back black
 @stopBgm
+@back black
 @bgm micha
-「鮮紅色的影子搖曳著……」
-「吶，灑得到處都是呢。」
-「至少說個對不起吧。」
-「說話啊，只是這樣看著我的話，太陽就要下山了。」
-「啊啊……這麼耀眼的，應該不是夕陽對吧？」
-「全部都……全部都……」
+？？？: {PlayerName}，還站得起來嗎？
+？？？: ……別急著答。先聽外面。
+優菲: 妮可，把那邊的人帶走！
+梅爾: 共鳴接不上。不要再往裡面送魔力了！
+？？？: 她們還在試呢。
+？？？: 可惜，儀式的力量沒能準備齊。這裡已經撐不住了。
 @choice 要結束了，對嗎？ goto:.end
 @choice 妳到底是誰？ goto:.who
 @stop
-
 # end
-？？？: 是的。
-？？？: 我也沒想到會這麼快呢。
-？？？: 沒有人能夠阻止這一切了。
-？？？: 就讓我們一起看這一切毀滅吧。
-（所有的光消失了）
-（END：失敗終焉）
-@achieve id:ACH_END_18
-@wait i
-@exitToTitle
+？？？: 是呀。很快就不會痛了。
+？？？: 也不用再猜，今天應該先去陪誰。
+薇狄亞: {PlayerName}？有人看見{PlayerName}嗎？
+？？？: ……還有人在找啊。
+@choice 我在這裡！ goto:.last_reply
+@choice 至少讓她知道我聽見了。 goto:.last_reply
 @stop
-
-#who
-？？？: 我也有相同的問題呢，異鄉人。
-？？？: 不過，既然干涉了他人的因果，就別期待有什麼好下場了吧。
-@choice 我不懂妳的意思。 goto:.didntget
-@choice 我不這麼認為。 goto:.notagree
+# last_reply
+？？？: 太晚了。聲音已經傳不出去了。
+？？？: 不過我聽見了。
+？？？: 這句，我會替{PlayerName}記著的。
+@goto .close
+# who
+？？？: 米夏。她們應該提過我吧？
+米夏: 每次都說得很難聽，我其實很在意呢。
+@choice 我不懂妳為什麼要這樣。 goto:.didntget
+@choice 我還要回她們那裡。 goto:.notagree
 @stop
-
-#didntget
-？？？: 沒關係……真相就快要揭曉了。
-？？？: 妳只需要閉上眼睛……
-（END：失敗終焉）
-@achieve id:ACH_END_18
-@wait i
-@exitToTitle
-@stop
-
-#notagree
-？？？: 不會吧？
-？？？: 真要憑那單薄的一己之力來對抗世界嗎？
-？？？: 那四人……和異域之力的羈絆是不夠深的。
-？？？: 不如，現在就跟我走吧？
-？？？: 不然也只是浪費時間嘛。
+# didntget
+米夏: 因為我不想再等了。
+米夏: 每個人都說有更重要的事，叫我再忍一下。
+米夏: 合在一起，就不會有人被留在外面了。
+涅莉: {PlayerName}，別聽她——
+米夏: ……看。連聲音都近了。
+米夏: 很快就不必這樣喊了唷。
+@goto .close
+# notagree
+米夏: 我知道她們在等。
+米夏: 可是這裡的門已經一扇一扇關上了。
+米夏: 不如跟我走吧。至少這一個，我還留得住。
 @choice 跟她走 goto:.yes
-@choice 拒絕 goto:.no
+@choice 拒絕，我要試著把路打開 goto:.no
 @stop
-
-#yes
-？？？: 真的嗎？
-？？？: 我真的很難想像，異鄉人會說這樣的話呢。
-？？？: 明明連我是誰都還不知道……
-？？？: 還就真的要迷迷糊糊地跟我走了啊？
-？？？: 那也滿有趣的。
-？？？: 我們走吧。
-（在異鄉人消失之後，巫術世界被米夏吞噬）
-（沒有人記得你曾經來過這裡）
-（END：失敗終焉）
-@achieve id:ACH_END_18
-@wait i
-@exitToTitle
+# yes
+米夏: ……真的？
+米夏: 我還以為，要再勸很久呢。
+米夏: 手給我。後面那些聲音，就先別聽了。
+@choice 我不會忘記她們。 goto:.keep
+@choice 妳能讓她們也過來嗎？ goto:.others
 @stop
-
-#no
-？？？: 那就真的只能決一死戰了呢。
-？？？: 來打個賭吧，以現在的狀態，若是能與我抗衡的話。
-？？？: 我將會，委身於您。
-？？？: 聽起來很不錯吧？
-？？？: 那也要您有這個本事才行，呵呵。
-
-; 設定書的「打輸米夏」。米夏自己在上面開了賭局，戰鬥就接在這裡。
-; 其餘三條分支是「你放棄了」的變體，不打。
+# keep
+米夏: 好啊。帶著吧。
+米夏: 只是以後，大概只有我肯聽了。
+@goto .close
+# others
+米夏: ……這個我沒有答應。
+米夏: {PlayerName}，已經握住我的手了，別再往後看。
+@goto .close
+# no
+米夏: 那就試吧。
+米夏: 打倒我，眼前這條路就讓開。
+米夏: 可是外面已經發生的事，我不會替誰收回去。
 @battle background:bg02 target:micha_final label:ch5c_micha
 @stop
-
 # ch5c_micha
 @stopBgm
 @bgm micha
-
 @if CombatWin
 @goto .micha_win
 @endif
-
-; ── 打輸：設定書指定的失敗終焉 ──
-？？？: 呵……果然呢。
-？？？: 連站在我面前的資格，都是要靠別人給的啊。
-（所有的光消失了）
-（END：失敗終焉）
-@achieve id:ACH_END_18
-@wait i
-@exitToTitle
+米夏: ……站不起來了？
+米夏: 我還以為，會多撐一下呢。
+@choice 再叫一次她們的名字 goto:.last_names
+@choice 朝剛才的聲音伸出手 goto:.last_reach
 @stop
-
-; ── 打贏：米夏願賭服輸，但結局不變 ──（草稿，待潤飾）
-; 這條刻意仍然收在失敗終焉：18 的核心是「羈絆不夠深」，不是打不贏。
-; 贏了她也改變不了沒有人在等你這件事。要拆成獨立結局的話再說。
+# last_names
+米夏: 我在聽。
+米夏: ……原來到最後，也不是在叫我啊。
+@goto .close
+# last_reach
+米夏: 這裡。碰得到的只剩我了。
+米夏: 不願意也沒關係。我可以等這一下。
+@goto .close
 # micha_win
-？？？: ……哎呀。
-？？？: 我輸了呢。
-？？？: 那就照約定，我委身於您吧。
-？？？: 可是啊，異鄉人——
-？？？: 您贏得了我，卻沒有任何一個人，在等您回去。
-？？？: 這樣的勝利，您真的想要嗎？
-（所有的光消失了）
-（END：失敗終焉）
+米夏: ……好痛。
+米夏: 我輸了。這副身體先讓給{PlayerName}。
+米夏: 走吧，路在後面。
+@back bg03
+@stopBgm
+米夏: 怎麼停下來了？
+米夏: 門是開了。可惜，外面已經不是剛才的地方。
+@choice 優菲？梅爾？有人聽見嗎？ goto:.ruins
+@choice 再找一遍。 goto:.search
+@stop
+# search
+米夏: 還要找啊。
+米夏: 好。我答應讓路，就不攔。
+@goto .ruins
+# ruins
+@wait 1
+米夏: ……沒有回答呢。
+米夏: 剛才打碎的，只是我站在面前的這一部分。
+米夏: 那些早已連出去的魔力，沒有因此停下。
+米夏: {PlayerName}確實贏了我。
+米夏: 只是沒能趕在她們消失以前。
+@bgm sad
+米夏: 那個杯子，還要撿起來嗎？
+米夏: 已經裂了。裝不了東西了唷。
+@choice 帶著。 goto:.remnant
+@choice 放回原來的位置。 goto:.remnant
+@stop
+# remnant
+米夏: ……真奇怪。
+米夏: 人都不在了，這些東西還能讓{PlayerName}停那麼久。
+米夏: 算了。我再等一下。
+# close
+@back black
 @achieve id:ACH_END_18
 @wait i
 @exitToTitle
