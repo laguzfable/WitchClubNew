@@ -20,6 +20,10 @@ public class CombatSystem : MonoBehaviour
     /// 不能只看 bgmBeforeCombat 是否為 null——戰鬥前本來就無聲時它也是 null。</summary>
     static bool returningFromCombat;
 
+    /// <summary>這場戰鬥有沒有讓劇本的 BGM 原樣繼續放（教學戰）。
+    /// 有的話打完不能去停、也不用還原——那會把劇本正在放的教學曲收掉。</summary>
+    static bool keptScriptBgm;
+
     /// <summary>沒有用 @battle 的 bgm: 指定時，戰鬥要放的曲子。</summary>
     const string DefaultBattleBgm = "energetic";
 
@@ -301,6 +305,20 @@ public class MobRuneUnlockData
         catch (Exception ex) { Debug.LogWarning($"[SwitchStateToCombatMode] NaniCamera 例外：{ex.Message}"); }
 
         // BGM（找不到資源時只 Log，不崩潰）
+        keptScriptBgm = false;
+        // 教學戰的音樂由劇本決定，這裡一律不碰。
+        // 劇本進教學前寫的是 @stopBgm + @bgm tutorial，那首就是教學要放的曲子，
+        // 換成戰鬥曲等於把它蓋掉。回劇本的 afterbattle 段自己有 @stopBgm，
+        // 所以留著也不會跟後面的 @bgm 疊在一起。
+        if (TutorialController.isTutorial || TutorialController.isTutorial2)
+        {
+            keptScriptBgm = true;
+            bgmBeforeCombat = null;
+            Debug.Log("[SwitchStateToCombatMode] 教學戰：BGM 交給劇本，不換戰鬥曲");
+            Debug.Log("[SwitchStateToCombatMode] ✓ 完成");
+            return;
+        }
+
         try
         {
             var audioManager = Engine.GetService<IAudioManager>();
@@ -723,8 +741,18 @@ public void BackToNani()
     // （NaniScriptLoader_HEX 會呼叫 RestoreBgmAfterCombat），
     // 不然淡出淡入會被場景切換打斷，戰鬥曲收不乾淨就會跟
     // 劇本後面的 @bgm 疊在一起。
-    returningFromCombat = true;
-    StopBattleBgmAsync().Forget();
+    // 教學戰沒換過音樂，這裡停下去停到的就是劇本的教學曲，所以整段跳過。
+    if (keptScriptBgm)
+    {
+        keptScriptBgm = false;
+        returningFromCombat = false;
+        Debug.Log("[BackToNani] 教學戰沒有換過 BGM，音樂原樣留給劇本");
+    }
+    else
+    {
+        returningFromCombat = true;
+        StopBattleBgmAsync().Forget();
+    }
 
     // ── 載入 NaniDialogTest ────────────────────────────────────
     // scriptParameter 是開戰前指定好的續播點，回去時要明確優先於 MapReturnPoint，

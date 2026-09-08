@@ -245,9 +245,16 @@ public class EnemyUnit : BaseCombatUnit
 
     float nextTalkTime;
     bool saidLowHp;
+    int actLineIndex;   // 「照順序講」的怪唸到第幾句了
+
+    /// <summary>教學戰不講話。那邊的對白是 TutorialController 裡寫死的一整串步驟，
+    /// 怪物再插嘴會蓋掉正在講解的那一句，玩家會漏掉教學。
+    /// 教學用的是 TestMobData，它身上填的是示範台詞，本來就不是給玩家看的。</summary>
+    static bool TalkMuted => TutorialController.isTutorial || TutorialController.isTutorial2;
 
     void SayIfAny (string[] lines, bool force = true)
     {
+        if (TalkMuted) return;
         if (lines == null || lines.Length == 0) return;
         if (!force && Time.time < nextTalkTime) return;
 
@@ -255,11 +262,64 @@ public class EnemyUnit : BaseCombatUnit
         MonsterTalkBubble.Say(transform, lines[Random.Range(0, lines.Length)]);
     }
 
+    /// <summary>
+    /// 打倒之後把這隻怪身上掛的筆記條目記進筆記本。
+    /// 泡泡講過的話會消失，玩家漏聽就沒了——留一份在筆記本裡可以重看。
+    /// </summary>
+    void UnlockNotes ()
+    {
+        var ids = mobData != null ? mobData.noteIds : null;
+        if (string.IsNullOrWhiteSpace(ids)) return;
+        if (!Engine.Initialized) return;
+
+        var unlockables = Engine.GetService<IUnlockableManager>();
+        var textManager = Engine.GetService<ITextManager>();
+        if (unlockables == null) return;
+
+        foreach (var part in ids.Split(','))
+        {
+            var noteId = part.Trim();
+            if (noteId.Length == 0) continue;
+
+            var unlockableId = NotebookPanel.UnlockPrefix + noteId;
+            if (unlockables.ItemUnlocked(unlockableId)) continue;
+
+            unlockables.UnlockItem(unlockableId);
+
+            var value = textManager?.GetRecordValue(noteId, NotebookPanel.Category);
+            var title = value?.Split('|')[0];
+            NoteToast.Show(string.IsNullOrWhiteSpace(title) ? noteId : title.Trim());
+        }
+    }
+
+    /// <summary>
+    /// 「出手前」那組。一般怪物是擲機率、隨機挑一句；勾了「照順序講」的怪
+    /// 則每回合固定往下唸一句，唸完就安靜——少講一句就是少一段歷史。
+    /// </summary>
+    void SayAct ()
+    {
+        if (TalkMuted) return;
+
+        var lines = mobData.talk?.act;
+        if (lines == null || lines.Length == 0) return;
+
+        if (!mobData.talk.actInOrder)
+        {
+            if (Random.value < ActTalkChance) SayIfAny(lines, force: false);
+            return;
+        }
+
+        if (actLineIndex >= lines.Length) return;
+        nextTalkTime = Time.time + TalkGap;
+        MonsterTalkBubble.Say(transform, lines[actLineIndex++]);
+    }
+
     protected override void OnDefeated()
     {
         combatSystem.isContinue = false;
         isMovable = false;
         SayIfAny(mobData.talk?.defeated);
+        UnlockNotes();
         sprRend.DOFade(0f, 1f).OnComplete(() => combatSystem.GameOver(false));
         //combatSystem.GameOver(false);
     }
@@ -472,7 +532,7 @@ public class EnemyUnit : BaseCombatUnit
         actResult.Reset();
         if(!HasEffect(EAbilityEffectType.Stun))
         {
-            if (Random.value < ActTalkChance) SayIfAny(mobData.talk?.act, force: false);
+            SayAct();
 
             DecideCostAbility();
             ShuffleCards(false);
