@@ -313,6 +313,9 @@
   #bar button.save{border-color:var(--gold);color:var(--gold)}
   #bar button.undo{border-color:#5a4652;color:#c78d9c}
   #bar button.undo:hover{border-color:var(--red);color:var(--red)}
+  /* 怪物／星塵／戰鬥那幾頁的工具列不在 #bar 裡，按鈕要自己上色 */
+  .mobbar button.undo{border-color:#5a4652;color:#c78d9c}
+  .mobbar button.undo:hover{border-color:var(--red);color:var(--red)}
   .dline{display:flex;gap:8px;padding:2px 10px;font-size:13px;align-items:baseline;
         white-space:pre-wrap;word-break:break-word}
   .dline .ln{color:#54506a;min-width:44px;text-align:right;flex:none;
@@ -385,6 +388,13 @@ const MOBS = null;
 const GUIDE = null;
 // 每一場戰鬥的對手該是誰（tools/戰鬥對照.json，人工標的，遊戲不讀）
 const BATTLENOTES = null;
+
+// 「上次存檔的樣子」。劇本靠 sc.original 記，這三份資料也要有一份，
+// 不然改壞了只能重跑 build_viewer.py。存檔成功之後會更新成剛存進去的內容。
+const deepCopy = o => o ? JSON.parse(JSON.stringify(o)) : o;
+let MOBS_SAVED = deepCopy(MOBS);
+let GUIDE_SAVED = deepCopy(GUIDE);
+let BATTLENOTES_SAVED = deepCopy(BATTLENOTES);
 
 const NL = String.fromCharCode(10);
 // build_viewer.py 每次產生時會把時間戳寫進來，用來認出「你開著的是舊程式」
@@ -1336,7 +1346,10 @@ function renderMobs(v) {
         names.map(n => '<option' + (n === mobPick ? ' selected' : '') + '>' + esc(n) + '</option>').join('') +
       '</select>' +
       (mobDirty.has(mobPick)
-        ? '<span class="dirty">● 有未存的變更</span><button class="save" onclick="saveMob()">存回 .asset</button>'
+        ? '<span class="dirty">● 有未存的變更</span>' +
+          '<button class="save" onclick="saveMob()">存回 .asset</button>' +
+          '<button class="undo" onclick="revertMob()"' +
+          ' title="把這隻怪丟回上次存檔的樣子，這次的修改全部不要">取消變更</button>'
         : '') +
       '<span class="txt">' + (used[mobPick]
         ? used[mobPick].length + ' 場戰鬥用到：' + used[mobPick].slice(0, 6).join('、')
@@ -1444,8 +1457,19 @@ async function saveMob() {
     body: JSON.stringify(Object.assign({name: mobPick}, MOBS[mobPick]))
   }).then(r => r.json()).catch(err => ({ok: false, error: err.message}));
 
-  if (res.ok) { mobDirty.delete(mobPick); render(); }
+  if (res.ok) {
+    MOBS_SAVED[mobPick] = deepCopy(MOBS[mobPick]);   // 這隻的「上次存檔」換成剛存的
+    mobDirty.delete(mobPick); render();
+  }
   else alert('存檔失敗：' + (res.error || '？'));
+}
+
+/// 把這一隻丟回上次存檔的樣子。只動目前選的這隻，跟「存回 .asset」一樣。
+function revertMob () {
+  if (!confirm('「' + mobPick + '」這次的修改全部不要，回到上次存檔的樣子？')) return;
+  MOBS[mobPick] = deepCopy(MOBS_SAVED[mobPick]);
+  mobDirty.delete(mobPick);
+  render();
 }
 
 // ── 戰鬥 ──────────────────────────────────────────
@@ -1545,8 +1569,17 @@ function renderBattles (v) {
     '<div class="mobbar">' +
       (battleDirty
         ? '<span class="dirty">● 標註有未存的變更</span>' +
-          '<button class="save" onclick="saveBattleNotes()">存回 戰鬥對照.json</button>'
+          '<button class="save" onclick="saveBattleNotes()">存回 戰鬥對照.json</button>' +
+          '<button class="undo" onclick="revertBattleNotes()"' +
+          ' title="標註丟回上次存檔的樣子">取消標註變更</button>'
         : '<span class="txt">標註只有人看，遊戲不讀</span>') +
+      // 這一頁改 target／音樂動到的是 .nani，跟著劇本那邊的存檔走，
+      // 所以取消也要能在這裡按——不然得一支一支切回場景頁按。
+      (dirty.size
+        ? '<span class="dirty">● ' + dirty.size + ' 支劇本有未存的變更</span>' +
+          '<button class="undo" onclick="revertBattleScripts()"' +
+          ' title="把這幾支腳本丟回上次存檔的樣子">取消劇本變更</button>'
+        : '') +
     '</div>' +
 
     list.map((b, i) => {
@@ -1643,8 +1676,31 @@ async function saveBattleNotes () {
     body: JSON.stringify({notes: BATTLENOTES.notes})
   }).then(r => r.json()).catch(err => ({ok: false, error: err.message}));
 
-  if (res.ok) { battleDirty = false; render(); }
-  else alert('存檔失敗：' + (res.error || '？'));
+  if (res.ok) {
+    BATTLENOTES_SAVED = deepCopy(BATTLENOTES);
+    battleDirty = false; render();
+  } else alert('存檔失敗：' + (res.error || '？'));
+}
+
+/// 標註丟回上次存檔的樣子。不動劇本。
+function revertBattleNotes () {
+  if (!confirm('戰鬥標註這次的修改全部不要，回到上次存檔的樣子？')) return;
+  BATTLENOTES.notes = deepCopy(BATTLENOTES_SAVED.notes) || {};
+  battleDirty = false; render();
+}
+
+/// 這一頁改 target／音樂改的是 .nani，取消就是把那幾支腳本整支丟回去
+/// （跟場景頁的「取消變更」同一件事，只是一次處理全部）。
+function revertBattleScripts () {
+  const names = [...dirty];
+  if (!names.length) return;
+  if (!confirm('把這 ' + names.length + ' 支腳本這次的修改全部不要，回到上次存檔的樣子？' +
+               NL + NL + names.join('、'))) return;
+  names.forEach(n => {
+    scripts[n].lines = scripts[n].original.split(NL);
+    dirty.delete(n);
+  });
+  check(); render();
 }
 
 /// 跳到劇本裡那一行，看看前後在講什麼。
@@ -1691,7 +1747,9 @@ function renderGuide(v) {
       '<button class="addtalk" onclick="addGuide()">＋ 新增一則</button>' +
       (guideDirty
         ? '<span class="dirty">● 有未存的變更</span>' +
-          '<button class="save" onclick="saveGuide()">存回 GuideHints.json</button>'
+          '<button class="save" onclick="saveGuide()">存回 GuideHints.json</button>' +
+          '<button class="undo" onclick="revertGuide()"' +
+          ' title="丟回上次存檔的樣子，這次加的、刪的、改的全部不要">取消變更</button>'
         : '<span class="txt">遊戲直接讀這一份，存完回 Unity 就生效</span>') +
     '</div>' +
 
@@ -1792,8 +1850,18 @@ async function saveGuide() {
 
   if (res.ok) {
     GUIDE.hints.sort((a, b) => b.left - a.left);   // 伺服器那邊也會排，畫面跟著對齊
+    GUIDE_SAVED = deepCopy(GUIDE);
     guideDirty = false; render();
   } else alert('存檔失敗：' + (res.error || '？'));
+}
+
+/// 全部丟回上次存檔的樣子（新增、刪除、改欄位都算）。
+function revertGuide () {
+  const now = GUIDE.hints.length, was = GUIDE_SAVED.hints.length;
+  const how = now === was ? '' : '（' + was + ' 則 → ' + now + ' 則）';
+  if (!confirm('星塵的提示這次的修改' + how + '全部不要，回到上次存檔的樣子？')) return;
+  GUIDE.hints = deepCopy(GUIDE_SAVED.hints);
+  guideDirty = false; render();
 }
 
 // ── 資源清單 ──────────────────────────────────────
