@@ -198,6 +198,15 @@
   .mobtab tr.redcard td:first-child{color:#e896a4}
   .mobtab tr.yellowcard td:first-child{color:#e8cf8f}
   .mobtab tr.greencard td:first-child{color:#9fd8a4}
+  .brow{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+  .bmob{width:96px;flex:none;text-align:center}
+  .bmob img{width:96px;height:96px;object-fit:contain;background:#100f16;
+    border:1px solid var(--line);border-radius:8px}
+  .bmob .noimg{width:96px;height:96px;display:flex;align-items:center;justify-content:center;
+    background:#100f16;border:1px dashed var(--line);border-radius:8px;
+    color:#54506a;font-size:11px}
+  .bmob span{display:block;margin-top:3px;color:#6b6685;font-size:11px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .bwarn{font-size:12px;padding:3px 8px;border-radius:5px;margin:3px 0;
     border:1px solid var(--line);background:#1b1925}
   .bwarn.bad{color:#e08a99;border-left:3px solid var(--red)}
@@ -1543,6 +1552,7 @@ function renderBattles (v) {
       const note = notes[key] || {expected: '', status: 'check', note: ''};
       const warns = battleWarnings(b, note);
       const mob = MOBS[b.params.target];
+      const img = mob ? mobSprite(mob) : null;
 
       return '<div class="talkgroup">' +
         '<b>' + esc(key) + '　·　' + esc(b.script) + ':' + (b.line + 1) + '</b>' +
@@ -1551,6 +1561,15 @@ function renderBattles (v) {
           '<div class="bwarn ' + w[0] + '">' +
             (w[0] === 'bad' ? '❌' : w[0] === 'warn' ? '⚠️' : 'ℹ️') + ' ' + esc(w[1]) +
           '</div>').join('') +
+
+        '<div class="brow">' +
+        // 現在這一場實際會跑出來的那張立繪。名字對不對是一回事，
+        // 但畫面上長什麼樣要看得到才知道對不對得上劇本。
+        '<div class="bmob">' +
+          (img ? '<img src="' + img + '" title="' + esc(b.params.target || '') + '">'
+               : '<div class="noimg">' + (mob ? '沒有立繪' : '找不到怪') + '</div>') +
+          '<span>' + esc(b.params.target || '（沒有）') + '</span>' +
+        '</div>' +
 
         '<div class="mobfields" style="margin:6px 0 8px">' +
           '<label class="mf"><span>對手</span>' +
@@ -1578,6 +1597,7 @@ function renderBattles (v) {
           '<label class="mf"><span>備註</span>' +
             '<input style="width:420px" value="' + esc(note.note) + '"' +
             ' onchange="setBattleNote(&quot;' + key + '&quot;, &quot;note&quot;, this.value)"></label>' +
+        '</div>' +
         '</div>' +
 
         '<div class="bline" onclick="jumpToBattle(&quot;' + b.script + '&quot;, ' + b.line + ')">' +
