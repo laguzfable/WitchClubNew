@@ -1458,8 +1458,9 @@ async function saveMob() {
 //   ⚠️ 標註說的：現在跑出來的跟劇本裡的對手對不上（status = todo）
 let battleDirty = false;
 
-/// 備份、測試、demo 那些不列——它們不是正在跑的劇本。
-const BATTLE_SKIP = /^(Test|demo|第|待查明|111)/;
+/// 不列的：備份、測試、demo（不是正在跑的劇本），以及四色的儀式戰
+/// blue01～green05——那些每一場都有自己的怪、名字也對得上，沒有要查的。
+const BATTLE_SKIP = /^(Test|demo|第|待查明|111)|^(blue|red|yellow|green)\d\d$/;
 
 function battleKey (b) {
   return b.script + '#' + (b.params.label || ('line' + (b.line + 1)));
@@ -1533,7 +1534,8 @@ function renderBattles (v) {
     .some(w => w[0] === 'warn')).length;
 
   v.innerHTML =
-    '<h2>戰鬥</h2><div class="sub">' + list.length + ' 場（備份與測試劇本不列）。' +
+    '<h2>戰鬥</h2><div class="sub">' + list.length + ' 場主線戰鬥' +
+      '（四色儀式戰、備份與測試劇本不列）。' +
       'target 跟音樂改完走左上角的「存全部」寫回 .nani；' +
       '「劇本裡的對手」是人工標的，按它自己那顆存。' +
       (bad ? '　<b style="color:var(--red)">' + bad + ' 場指到不存在的怪</b>' : '') +
