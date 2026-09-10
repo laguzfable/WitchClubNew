@@ -1830,14 +1830,15 @@ function delGuideLine(i, j) {
 }
 
 function addGuideLine(i) {
-  (GUIDE.hints[i].lines = GUIDE.hints[i].lines || []).push('星塵: ');
+  (GUIDE.hints[i].lines = GUIDE.hints[i].lines || []).push('？？？: ');
   guideDirty = true; render();
 }
 
 function addGuide() {
   // 預設就照序章結尾的樣子：星海背景配 stardust，講完收掉
   GUIDE.hints.push({left: 6, bg: 'star1', character: '', pose: '', pos: 50,
-                    bgm: 'stardust', stopAfter: true, lines: ['星塵: ']});
+                    // 玩家要到第五章黃線才知道這個聲音叫星塵，這裡跟著序章結尾掛「？？？」
+                    bgm: 'stardust', stopAfter: true, lines: ['？？？: ']});
   guideDirty = true; render();
 }
 
