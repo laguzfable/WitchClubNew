@@ -29,6 +29,7 @@ public class GuideCommand : Command
         public string pose;         // 表情／動作，留空＝用預設
         public float pos = 50f;     // 立繪站位，跟劇本的 pos: 一樣是 0～100
         public string bgm;          // 音樂，留空＝不動
+        public bool stopAfter;      // 講完把音樂收掉（序章結尾就是這樣收的）
         public string[] lines;      // 講的話，一行一句
     }
 
@@ -94,7 +95,23 @@ public class GuideCommand : Command
             }
 
             await HideCharacterAsync(hint, token);
+            await StopBgmAsync(hint);
         }
+    }
+
+    /// <summary>講完把音樂收掉。序章結尾（chapter0 的 hallwayMorning）就是
+    /// @bgm stardust 講完一段話再 @stopBgm，這裡照同一個收法。
+    /// 不收的話這首會一路跟著玩家進地圖。</summary>
+    static async UniTask StopBgmAsync (Hint hint)
+    {
+        if (!hint.stopAfter) return;
+
+        try
+        {
+            var audio = Engine.GetService<IAudioManager>();
+            if (audio != null) await audio.StopAllBgmAsync(0.4f);
+        }
+        catch (Exception ex) { Debug.LogWarning($"[guide] 收音樂失敗：{ex.Message}"); }
     }
 
     /// <summary>把這一則指定的背景／立繪／音樂擺好。每一項留空就跳過。</summary>

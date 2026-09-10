@@ -402,6 +402,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     'pose': (h.get('pose') or '').strip(),
                     'pos': pos,
                     'bgm': (h.get('bgm') or '').strip(),
+                    'stopAfter': bool(h.get('stopAfter')),
                     'lines': lines,
                 })
             hints.sort(key=lambda h: -h['left'])      # 由遠到近，跟劇本走的順序一樣

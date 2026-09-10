@@ -1793,6 +1793,11 @@ function renderGuide(v) {
             '<select onchange="setGuide(' + i + ', &quot;bgm&quot;, this.value)">' +
               opts(bgms, h.bgm, '（不動）') + '</select>' +
             '<i>選了會先停掉現在那首</i></label>' +
+
+          '<label class="mf"><span>講完收掉音樂</span>' +
+            '<input type="checkbox"' + (h.stopAfter ? ' checked' : '') +
+            ' onchange="setGuide(' + i + ', &quot;stopAfter&quot;, this.checked)">' +
+            '<i>不收的話這首會跟著玩家進地圖</i></label>' +
         '</div>' +
 
         (h.lines || []).map((line, j) =>
@@ -1809,7 +1814,8 @@ function renderGuide(v) {
 
 function setGuide(i, key, value) {
   const h = GUIDE.hints[i];
-  h[key] = (key === 'left' || key === 'pos') ? +value : value;
+  h[key] = (key === 'left' || key === 'pos') ? +value
+         : (key === 'stopAfter' ? !!value : value);
   guideDirty = true; render();
 }
 
@@ -1829,8 +1835,9 @@ function addGuideLine(i) {
 }
 
 function addGuide() {
-  GUIDE.hints.push({left: 6, bg: '', character: '', pose: '', pos: 50, bgm: '',
-                    lines: ['星塵: ']});
+  // 預設就照序章結尾的樣子：星海背景配 stardust，講完收掉
+  GUIDE.hints.push({left: 6, bg: 'star1', character: '', pose: '', pos: 50,
+                    bgm: 'stardust', stopAfter: true, lines: ['星塵: ']});
   guideDirty = true; render();
 }
 
