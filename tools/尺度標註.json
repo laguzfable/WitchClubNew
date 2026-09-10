@@ -1,55 +1,35 @@
 {
   "_說明": "資源頁上的尺度標註。level 有三種：nude（裸露，不打成人標記會過不了）、borderline（邊緣，可以出貨）、不列出＝沒問題。分組名字要跟資源頁一致：backgrounds／monsters／witches／combo／tutorial／runePortraits／runeCards。改完重跑 build_viewer.py 就會更新。判斷基準：Steam 不打成人標記。",
   "monsters": {
-    "yellow05": {
-      "level": "nude",
-      "note": "上空，胸部完全裸露",
-      "hash": "4c1eed26bf18"
-    },
-    "yellow01": {
-      "level": "nude",
-      "note": "全裸，胸與臀可見",
-      "hash": "ca829b8faf6c"
-    },
-    "yellow02": {
-      "level": "nude",
-      "note": "全裸，背面與臀部可見",
-      "hash": "ccbe74a5c4d0"
-    },
-    "yellow03": {
-      "level": "nude",
-      "note": "多人全裸",
-      "hash": "a9926a9a86d1"
-    },
-    "yellow04": {
-      "level": "nude",
-      "note": "多人全裸",
-      "hash": "53061559ddd6"
-    },
-    "red01": {
-      "level": "nude",
-      "note": "全裸背面，臀部可見",
-      "hash": "fdb4acf4f8b7"
-    },
-    "red02": {
-      "level": "nude",
-      "note": "上衣下拉，乳房大部分外露",
-      "hash": "c8f60d76f4d4"
-    },
-    "yellow00": {
-      "level": "nude",
-      "note": "全裸（目前沒有戰鬥用到）",
-      "hash": "ca829b8faf6c"
-    },
     "monsterez": {
       "level": "nude",
-      "note": "半裸（目前沒有戰鬥用到）",
+      "note": "半裸魔女，畫面極暗。★ 有用到 ★ MobData monster04 的立繪＝第二章祭壇戰",
       "hash": "c89128ea0073"
     },
     "monsterez2": {
       "level": "nude",
-      "note": "半裸（目前沒有戰鬥用到）",
+      "note": "半裸（沒有任何 MobData 指到它）",
       "hash": "30e167f8e5ac"
+    },
+    "red01": {
+      "level": "borderline",
+      "note": "白布覆蓋軀幹，四肢裸露；體型偏幼＋斜躺姿勢，這個組合最容易被審查盯上，建議作者自己再決定",
+      "hash": "6e38996870a0"
+    },
+    "yellow00": {
+      "level": "nude",
+      "note": "全裸兩人（yellow01 重畫前的舊圖）。★ 有用到 ★ 這是黃色起始符文的大招圖（UIWitchAbility 讀 monsters/{符文id}），開場就裝在身上，每個玩家都會看到",
+      "hash": "ca829b8faf6c"
+    },
+    "yellow05": {
+      "level": "borderline",
+      "note": "短版上衣露腰、大腿吊帶，無裸露",
+      "hash": "829a2b10b53b"
+    },
+    "yellow05-2": {
+      "level": "borderline",
+      "note": "yellow05 的暗色版，同樣露腰",
+      "hash": "3079a5c91b17"
     }
   },
   "backgrounds": {
