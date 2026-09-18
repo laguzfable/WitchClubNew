@@ -186,6 +186,7 @@ def build_mobs():
                     return x
         return x
 
+    quotes = read_monster_quotes()
     mobs = {}
     for path in sorted(glob.glob(os.path.join(ROOT, 'Assets', 'Resources', 'MobData', '*.asset'))):
         name = os.path.splitext(os.path.basename(path))[0]
@@ -230,15 +231,6 @@ def build_mobs():
         if sm:
             sprite_guid = sm.group(1)
 
-        # 圖鑑台詞（MobData.codexQuote，一種語言一行）。Unity 還沒重存過的怪沒有這段。
-        quote = {}
-        qm = _re.search(r'^  codexQuote:' + '\\n' + r'((?:    .*' + '\\n' + r'?)*)', text, _re.M)
-        if qm:
-            for line in qm.group(1).split(chr(10)):
-                lm = _re.match(r'    (\w+):(.*)$', line)
-                if lm:
-                    quote[lm.group(1)] = yaml_string(lm.group(2))
-
         mobs[name] = {
             'displayName': word('displayName'),
             'HP': num('HP'), 'EN': num('EN'),
@@ -248,23 +240,28 @@ def build_mobs():
             'spriteGuid': sprite_guid,
             'elements': elements,
             'talk': talk,
-            'codexQuote': quote,
+            'codexQuote': quotes.get(name, ''),
         }
     return mobs
 
 
-def yaml_string(x):
-    """Unity 寫字串的三種樣子：空的、裸字、雙引號加逃脫碼（中文一定是這種）。
+# 圖鑑台詞：跟筆記本（Notes.txt）同一套，是 Naninovel 的文字檔，只寫中文，
+# 翻譯另外放 Localization/語言/Text/MonsterQuotes.txt。代號＝MobData 檔名。
+# 檢視器存檔時由 serve.py 寫回同一份（見 save_mob）。
+QUOTES_FILE = os.path.join(ROOT, 'Assets', 'Naninovel', 'Resources', 'Naninovel', 'Text', 'MonsterQuotes.txt')
 
-    跟上面的 un() 不同：un() 只在看到 uXXXX 才解碼，換行（反斜線 n）跟引號不會還原；
-    圖鑑台詞可以有換行，所以這裡一律解。
-    """
-    x = x.strip()
-    if len(x) >= 2 and x[0] == '"' and x[-1] == '"':
-        return codecs.decode(x[1:-1], 'unicode_escape')
-    if len(x) >= 2 and x[0] == "'" and x[-1] == "'":
-        return x[1:-1].replace("''", "'")
-    return x
+
+def read_monster_quotes():
+    quotes = {}
+    if not os.path.isfile(QUOTES_FILE):
+        return quotes
+    for line in io.open(QUOTES_FILE, encoding='utf-8-sig').read().splitlines():
+        if line.startswith(';') or ': ' not in line:
+            continue
+        key, value = line.split(': ', 1)
+        quotes[key.strip()] = value
+    return quotes
+
 
 assets = build_assets()
 assets.update(build_extra())

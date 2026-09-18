@@ -1405,24 +1405,14 @@ function renderMobs(v) {
     }).join('') +
 
     '<h2>圖鑑台詞</h2>' +
-    '<div class="sub">回憶模式的怪物圖鑑點開這隻時，立繪上方那一句。三格都空就不顯示；' +
-      '英文或日文沒填，遊戲裡會退回中文。</div>' +
-    QUOTE_LANG.map(function (g) {
-      const key = g[0], label = g[1];
-      const value = (m.codexQuote && m.codexQuote[key]) || '';
-      return '<div class="talkgroup"><b>' + label + '</b>' +
-        '<div class="talkline"><input value="' + esc(value) + '"' +
-        ' onchange="setQuote(&quot;' + key + '&quot;, this.value)"></div></div>';
-    }).join('');
+    '<div class="sub">回憶模式的怪物圖鑑點開這隻時，立繪上方那一句，空著就不顯示。' +
+      '存在 Naninovel/Resources/Naninovel/Text/MonsterQuotes.txt（跟筆記本同一套），翻譯另外放語系資料夾。</div>' +
+    '<div class="talkgroup"><div class="talkline"><input value="' + esc(m.codexQuote || '') + '"' +
+      ' onchange="setQuote(this.value)"></div></div>';
 }
 
-// 圖鑑台詞的語言，順序＝畫面上的順序。要加語言：這裡加一組，
-// MobData.cs 的 LocalizedLine 加欄位，serve.py 的 QUOTE_LANGS 也加。
-const QUOTE_LANG = [['zh', '中文'], ['en', 'English'], ['ja', '日本語']];
-
-function setQuote(lang, value) {
-  const q = MOBS[mobPick].codexQuote = MOBS[mobPick].codexQuote || {};
-  q[lang] = value;
+function setQuote(value) {
+  MOBS[mobPick].codexQuote = value;
   mobDirty.add(mobPick); render();
 }
 

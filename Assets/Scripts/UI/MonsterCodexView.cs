@@ -1,3 +1,4 @@
+using Naninovel;
 using Naninovel.UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -160,7 +161,20 @@ namespace Hexe.UI
         {
             if (!codexActive || slot.Mob == null) return;
             if (!MonsterCodex.IsSeen(slot.Mob)) return;
-            if (overlay) overlay.Show(slot.Mob.sprite, DisplayNameOf(slot.Mob), slot.Mob.codexQuote?.Current);
+            if (overlay) overlay.Show(slot.Mob.sprite, DisplayNameOf(slot.Mob), QuoteOf(slot.Mob));
+        }
+
+        /// <summary>Naninovel 文字檔的分類名＝Resources/Naninovel/Text 底下的檔名。</summary>
+        public const string QuoteCategory = "MonsterQuotes";
+
+        /// <summary>
+        /// 圖鑑台詞，代號是 MobData 的檔名。跟筆記本（Notes.txt）同一套：原文只寫中文，
+        /// 翻譯放 Localization/語言/Text/MonsterQuotes.txt，Naninovel 會照目前語言挑。
+        /// </summary>
+        static string QuoteOf (MobData mob)
+        {
+            var text = Engine.GetService<ITextManager>()?.GetRecordValue(mob.name, QuoteCategory);
+            return string.IsNullOrWhiteSpace(text) ? null : text.Replace("<br>", "\n");
         }
 
         static string DisplayNameOf (MobData mob)

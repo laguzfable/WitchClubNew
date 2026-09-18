@@ -298,18 +298,20 @@ public static class GalleryLayoutBuilder
         var backdrop = NewImage("Background", back.transform, LoadSprite("gallery_monster_bg_01"), false);
         Stretch(backdrop.rectTransform);
 
-        // 漂的是外層 Float，立繪在裡面撐滿。要調立繪大小位置就調 Float。
+        // 立繪滿版。漂的是外層 Float，立繪在裡面撐滿；上下各多出 3%，
+        // 漂到最高／最低時邊緣才不會露出背景。要調立繪大小位置就調 Float。
         var floater = NewRect("Float", back.transform);
-        SetAnchors(floater, 0.2f, 0.15f, 0.8f, 0.8f);
+        SetAnchors(floater, 0f, -0.03f, 1f, 1.03f);
         var portrait = NewImage("Portrait", floater, null, false);
         portrait.preserveAspect = true;
         Stretch(portrait.rectTransform);
 
-        var quote = NewText("Quote", back.transform, font, 32, TextAnchor.MiddleCenter, "「……」");
+        // 台詞壓在人物中間、稍微偏右。
+        var quote = NewText("Quote", back.transform, font, 34, TextAnchor.MiddleCenter, "「……」");
         quote.color = Color.white;
         quote.horizontalOverflow = HorizontalWrapMode.Wrap;
         AddShadowOutline(quote);
-        SetAnchors(quote.rectTransform, 0.12f, 0.82f, 0.88f, 0.95f);
+        SetAnchors(quote.rectTransform, 0.45f, 0.42f, 0.85f, 0.58f);
 
         var name = NewText("Name", back.transform, font, 34, TextAnchor.MiddleCenter, "");
         name.fontStyle = FontStyle.Bold;

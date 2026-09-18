@@ -38,37 +38,38 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRIPTS = os.path.join(ROOT, 'Assets', 'NaniScripts')
 PORT = 8777
 
-# 圖鑑台詞（MobData.codexQuote）的語言，順序＝寫進 .asset 的順序。
-# 要加語言：這裡、MobData.cs 的 LocalizedLine、檢視器的 QUOTE_LANG 三處一起加。
-QUOTE_LANGS = ('zh', 'en', 'ja')
+# 圖鑑台詞：Naninovel 的文字檔，跟 Notes.txt 同一套。這裡只寫中文，
+# 翻譯另外放 Localization/語言/Text/MonsterQuotes.txt。代號＝MobData 檔名。
+QUOTES_FILE = os.path.join(ROOT, 'Assets', 'Naninovel', 'Resources', 'Naninovel', 'Text', 'MonsterQuotes.txt')
 
 
-def yaml_quote(value):
-    """把字串寫成 Unity 會寫的樣子：空的留空、其餘一律雙引號，中文寫成大寫 uXXXX 逃脫碼。
+def save_monster_quote(name, quote):
+    """把一隻怪的圖鑑台詞寫進 MonsterQuotes.txt：有這行就換掉，沒有就接在最後，空的就刪掉。
 
-    跟 save_mob 裡的 esc() 不同：esc() 沒處理反斜線、引號和換行（戰鬥台詞用不到），
-    圖鑑台詞可以換行，所以這裡要處理完整。
+    不能留「代號: 」空著——Naninovel 讀到空值會拿代號本身頂上去，遊戲裡就會顯示檔名。
+    換行寫成 <br>，跟 Notes.txt 一樣（文字檔一行一筆）。
     """
-    if not value:
-        return ''
-    out = ''
-    for ch in value:
-        code = ord(ch)
-        if ch == BS:
-            out += BS + BS
-        elif ch == '"':
-            out += BS + '"'
-        elif ch == NEWLINE:
-            out += BS + 'n'
-        elif ch == chr(13):
+    quote = (quote or '').replace(chr(13), '').strip().replace(NEWLINE, '<br>')
+    lines = []
+    if os.path.isfile(QUOTES_FILE):
+        lines = open(QUOTES_FILE, encoding='utf-8-sig').read().split(NEWLINE)
+    prefix = name + ': '
+    found = False
+    out = []
+    for line in lines:
+        if line.startswith(prefix):
+            if quote and not found:
+                out.append(prefix + quote)
+            found = True
             continue
-        elif code > 0xFFFF:
-            out += (BS + 'U%08X') % code
-        elif code > 126 or code < 32:
-            out += (BS + 'u%04X') % code
-        else:
-            out += ch
-    return '"' + out + '"'
+        out.append(line)
+    if quote and not found:
+        while out and out[-1] == '':
+            out.pop()
+        out.append(prefix + quote)
+    text = NEWLINE.join(out).rstrip(NEWLINE) + NEWLINE
+    with open(QUOTES_FILE, 'w', encoding='utf-8', newline='') as f:
+        f.write(text)
 
 
 class _Slice:
@@ -532,22 +533,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 text = re.sub(r'(?m)^  talk:' + NEWLINE + r'(?:    .*' + NEWLINE + r'?)*', '', text)
                 text = text.rstrip(NEWLINE) + NEWLINE + block
 
-            # ── 圖鑑台詞：一種語言一行，整段重寫 ──
-            # 三格都空、檔案裡也還沒有這段的話就不寫，免得沒動過的怪多出一段空的 diff。
-            if 'codexQuote' in data:
-                quote = data['codexQuote'] or {}
-                pattern = r'(?m)^  codexQuote:' + NEWLINE + r'(?:    .*' + NEWLINE + r'?)*'
-                has_block = re.search(pattern, text) is not None
-                if has_block or any((quote.get(k) or '').strip() for k in QUOTE_LANGS):
-                    block = '  codexQuote:' + NEWLINE
-                    for k in QUOTE_LANGS:
-                        block += '    ' + k + ': ' + yaml_quote(quote.get(k) or '') + NEWLINE
-                    text = re.sub(pattern, '', text)
-                    text = text.rstrip(NEWLINE) + NEWLINE + block
-
             with open(target, 'w', encoding='utf-8', newline='') as f:
                 f.write(text)
             print('  已寫回 ' + name + '.asset')
+
+            # 圖鑑台詞不在 .asset 裡，寫的是 MonsterQuotes.txt
+            if 'codexQuote' in data:
+                save_monster_quote(name, data['codexQuote'])
             self._json({'ok': True})
         except Exception as e:
             print('  怪物存檔失敗：' + str(e))
