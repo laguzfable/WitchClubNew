@@ -71,7 +71,18 @@
 ？？？: 那，重來一次好了。您的名字是？
 @input PlayerName value:玩家
 @stop
+; 說認錯人，結果打的還是上一輪那個名字
+@if SameAsSavedName(PlayerName)
+    @goto .name_same
+@endif
 @goto .name_check
+
+# name_same
+; 打太長的話 PlayerName 還是沒截過的那串，換回上一輪存的
+@restorePlayerName
+？？？: ……明明就是。
+？？？: 算了，就當是剛好同名吧。
+@goto .end_naming
 
 # end_naming
 ; 存一份到 PlayerPrefs：@exitToTitle 會清掉自訂變數，之後從蝕之聖典

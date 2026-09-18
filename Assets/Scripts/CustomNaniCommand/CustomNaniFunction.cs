@@ -41,6 +41,19 @@ public static class CustomNaniFunction
     /// <summary>之前玩過、名字有存起來過沒有。用在序章的「我們是不是見過？」分支。</summary>
     public static bool HasSavedName () => !string.IsNullOrEmpty(PlayerNameStore.Saved);
 
+    /// <summary>
+    /// 說「妳認錯人了」之後，又打了跟上一輪一樣的名字。
+    /// 太長的名字存的是 LimitedName 截過的版本，所以超過 8 字時比截過的。
+    /// </summary>
+    public static bool SameAsSavedName (string name)
+    {
+        var saved = PlayerNameStore.Saved;
+        if (string.IsNullOrEmpty(saved) || string.IsNullOrEmpty(name)) return false;
+        name = name.Trim();
+        if (name == saved) return true;
+        return StrLeng(name) > 8 && LimitedName(name) == saved;
+    }
+
     // ─── 儀式階段 ───────────────────────────────────────────────
     // 閒聊劇本用：@goto .chat3 if:StageNelly()>=2
     // 回傳 0-based 的「卡在第幾場儀式」，0＝還沒做過任何一場。
