@@ -88,7 +88,7 @@ public class AchievementManager : MonoSingleton<AchievementManager>
 
     // 收集類成就
     // ACH_ALL_ENDINGS 由 MarkEndingAndUnlockArena 連動；另外兩個分別由 MonsterCodex.RecordSeen
-    // 和 MonsterCodexPanel（回憶模式打開時）呼叫 CheckCollectionAchievements 檢查。
+    // 和 MonsterCodexView（回憶模式打開時，經 CGGalleryProgress.CheckAchievement）檢查。
     public const string ACH_ALL_ENDINGS      = "ALL_ENDINGS";
     public const string ACH_MONSTER_CODEX_FULL = "MONSTER_CODEX_FULL";
     public const string ACH_CG_GALLERY_FULL    = "CG_GALLERY_FULL";
@@ -119,6 +119,9 @@ public class AchievementManager : MonoSingleton<AchievementManager>
     // 入口，所以掛在這裡就好，不用去改每一份 .nani。
     private void MarkEndingAndUnlockArena(string achievementApiName)
     {
+        // 周目要排在 Mark 前面：還沒有周目紀錄的人是拿 EndingRecord.Count 墊底，
+        // 先 Mark 的話這次的結局會被算兩遍。
+        PlaythroughCounter.OnEndingReached(achievementApiName);
         EndingRecord.Mark(achievementApiName);
 
         if (!EndingRecord.IsEnding(achievementApiName)) return;

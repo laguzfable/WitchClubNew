@@ -38,6 +38,38 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRIPTS = os.path.join(ROOT, 'Assets', 'NaniScripts')
 PORT = 8777
 
+# 圖鑑台詞（MobData.codexQuote）的語言，順序＝寫進 .asset 的順序。
+# 要加語言：這裡、MobData.cs 的 LocalizedLine、檢視器的 QUOTE_LANG 三處一起加。
+QUOTE_LANGS = ('zh', 'en', 'ja')
+
+
+def yaml_quote(value):
+    """把字串寫成 Unity 會寫的樣子：空的留空、其餘一律雙引號，中文寫成大寫 uXXXX 逃脫碼。
+
+    跟 save_mob 裡的 esc() 不同：esc() 沒處理反斜線、引號和換行（戰鬥台詞用不到），
+    圖鑑台詞可以換行，所以這裡要處理完整。
+    """
+    if not value:
+        return ''
+    out = ''
+    for ch in value:
+        code = ord(ch)
+        if ch == BS:
+            out += BS + BS
+        elif ch == '"':
+            out += BS + '"'
+        elif ch == NEWLINE:
+            out += BS + 'n'
+        elif ch == chr(13):
+            continue
+        elif code > 0xFFFF:
+            out += (BS + 'U%08X') % code
+        elif code > 126 or code < 32:
+            out += (BS + 'u%04X') % code
+        else:
+            out += ch
+    return '"' + out + '"'
+
 
 class _Slice:
     """只讓 copyfile 讀到指定長度的那一段。"""
@@ -499,6 +531,19 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     block = '  talk:' + NEWLINE + block
                 text = re.sub(r'(?m)^  talk:' + NEWLINE + r'(?:    .*' + NEWLINE + r'?)*', '', text)
                 text = text.rstrip(NEWLINE) + NEWLINE + block
+
+            # ── 圖鑑台詞：一種語言一行，整段重寫 ──
+            # 三格都空、檔案裡也還沒有這段的話就不寫，免得沒動過的怪多出一段空的 diff。
+            if 'codexQuote' in data:
+                quote = data['codexQuote'] or {}
+                pattern = r'(?m)^  codexQuote:' + NEWLINE + r'(?:    .*' + NEWLINE + r'?)*'
+                has_block = re.search(pattern, text) is not None
+                if has_block or any((quote.get(k) or '').strip() for k in QUOTE_LANGS):
+                    block = '  codexQuote:' + NEWLINE
+                    for k in QUOTE_LANGS:
+                        block += '    ' + k + ': ' + yaml_quote(quote.get(k) or '') + NEWLINE
+                    text = re.sub(pattern, '', text)
+                    text = text.rstrip(NEWLINE) + NEWLINE + block
 
             with open(target, 'w', encoding='utf-8', newline='') as f:
                 f.write(text)

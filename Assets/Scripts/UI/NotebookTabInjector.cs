@@ -10,7 +10,7 @@ namespace Hexe.UI
     /// 把「筆記」分頁按鈕塞進蝕之聖典（BranchMapUI）。
     ///
     /// ★ 為什麼用注入而不是改 prefab ★
-    /// 跟 <see cref="MonsterCodexInjector"/> 同一個理由：BranchMapUI.prefab 的節點插槽
+    /// BranchMapUI.prefab 的節點插槽
     /// 是照書頁美術排好的，多加一顆按鈕就得重新對位。用注入的話版面資料留在程式裡，
     /// 而且 prefab 之後怎麼改都不會把這顆按鈕弄丟。
     ///
@@ -110,7 +110,6 @@ namespace Hexe.UI
         /// <summary>
         /// 聖典沒打開時面板是隱藏的，FindObjectOfType 抓不到，所以用 FindObjectsOfTypeAll；
         /// 但它連專案裡的 prefab 資產也會撈進來，要靠 scene.IsValid() 過濾掉。
-        /// （作法跟 MonsterCodexInjector.FindGalleryPanel 一致。）
         /// </summary>
         static BranchMapUI FindBranchMap ()
         {

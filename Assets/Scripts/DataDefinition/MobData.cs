@@ -36,6 +36,11 @@ public class MobData : ScriptableObject
     [InfoBox("戰鬥中怪物會在這些時機講話。每一格填幾句，實際會隨機挑一句；留空就不講。")]
     public MobTalkLines talk = new MobTalkLines();
 
+    [LabelText("圖鑑台詞")]
+    [Tooltip("回憶模式的怪物圖鑑點開這隻時，立繪上方顯示的一句話。三格都空就不顯示；"
+             + "某個語言沒填會退回中文。一次編全部怪物用 Tools/Witch Club/怪物圖鑑/圖鑑台詞編輯。")]
+    public LocalizedLine codexQuote = new LocalizedLine();
+
     public MobData()
     {
 

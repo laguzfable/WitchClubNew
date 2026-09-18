@@ -4,7 +4,7 @@
 //
 // ★ 為什麼不直接改 Naninovel 的 CGGalleryGridSlot ★
 // 那是套件自帶的檔案，升級版本會被蓋掉。改成掛一個元件在 CG 格子外面，
-// 定時掃一遍現場的格子、該標的標上去——作法比照 MonsterCodexInjector。
+// 定時掃一遍現場的格子、該標的標上去。元件掛在 CGGalleryUI 的 BrowserPanel 上（GalleryLayoutBuilder 放的）。
 //
 // ★ 為什麼要定時掃而不是只在 OnEnable 掃一次 ★
 // CG 格子是分頁的，Naninovel 換頁時會把同一批 slot 重新 Bind 到別的 CG 上，
