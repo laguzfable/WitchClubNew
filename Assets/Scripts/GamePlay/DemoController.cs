@@ -154,7 +154,7 @@ public class DemoController : MonoBehaviour
         await Delay(0.5f); pc.PlayAction(); await Delay(postPlayWait + 2f); await Delay(actGap);
 
         await ShowOutro(
-            Loc("Mei's Challenge Complete!", "魅兒的挑戰完成！", "メルの挑戦クリア！"),
+            Loc("Mel's Challenge Complete!", "梅爾的挑戰完成！", "メルの挑戦クリア！"),
             Loc("Blood Magic Showcase — END", "鮮血魔法展示——結束", "血魔法ショーケース——終了"));
     }
 

@@ -421,8 +421,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             hints = []
             for h in data.get('hints', []):
                 left = int(h.get('left', 0))
-                if not 1 <= left <= 6:
-                    raise ValueError('剩餘夜晚要介於 1～6，收到 ' + str(left))
+                # 0 是合法的：最後一夜跑完之後那一則（劇本裡真的有 @guide left:0，
+                # 見 GuideCommand 的說明「0＝用完了」）。
+                if not 0 <= left <= 6:
+                    raise ValueError('剩餘夜晚要介於 0～6，收到 ' + str(left))
                 lines = [str(x) for x in h.get('lines', []) if str(x).strip()]
                 # 站位整數就寫整數：50.0 跟 50 對遊戲一樣，但每存一次多一個小數點
                 # 會讓 diff 看起來像改過東西

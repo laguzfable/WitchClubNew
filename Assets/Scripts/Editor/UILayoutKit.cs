@@ -13,6 +13,7 @@ public static class UILayoutKit
     /// <summary>兩個畫面共用的素材（底圖、分頁、箭頭、頁碼、返回）都在這裡。</summary>
     public const string SharedSpriteDir = "Assets/Sprites/UI/SaveLoad/";
     public const string GallerySpriteDir = "Assets/Sprites/UI/Gallery/";
+    public const string SettingsSpriteDir = "Assets/Sprites/UI/Settings/";
 
     public static readonly Color Ink = new Color32(74, 52, 48, 255);
     public static readonly Color InkLight = new Color32(120, 95, 80, 255);
@@ -39,10 +40,10 @@ public static class UILayoutKit
         }
     }
 
-    /// <summary>用檔名（不含副檔名）找圖，先找回憶模式專用的，再找共用的。</summary>
+    /// <summary>用檔名（不含副檔名）找圖，先找各畫面專用的，再找共用的。</summary>
     public static Sprite LoadSprite (string name)
     {
-        foreach (var dir in new[] { GallerySpriteDir, SharedSpriteDir })
+        foreach (var dir in new[] { GallerySpriteDir, SettingsSpriteDir, SharedSpriteDir })
         foreach (var ext in new[] { ".png", ".jpg" })
         {
             var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(dir + name + ext);
@@ -207,9 +208,11 @@ public static class UILayoutKit
     }
 
     /// <summary>標題下面那排分頁的容器：橫排置中，只剩一顆時自動置中。</summary>
-    public static void StyleTabBar (RectTransform bar)
+    public static void StyleTabBar (RectTransform bar, int tabs = 2)
     {
-        Place(bar, 610, 151, 700, 70);
+        // 每顆 340 寬、間隔 20，整排置中。
+        var width = tabs * 340 + (tabs - 1) * 20;
+        Place(bar, (1920 - width) / 2f, 151, width, 70);
         var layout = GetOrAdd<HorizontalLayoutGroup>(bar.gameObject);
         layout.spacing = 20;
         layout.childAlignment = TextAnchor.MiddleCenter;

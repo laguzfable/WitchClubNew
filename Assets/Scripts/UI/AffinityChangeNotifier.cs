@@ -16,7 +16,7 @@ public class AffinityChangeNotifier : MonoBehaviour
 
     static readonly Dictionary<string, string> DisplayNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
     {
-        { "Mel", "魅兒" },
+        { "Mel", "梅爾" },
         { "Ved", "薇狄亞" },
         { "Eup", "優菲" },
         { "Nel", "涅莉" },
