@@ -26,6 +26,8 @@ public static class NewGameReset
         "WC/MapSpecialOverride/v1",                      // 地圖特殊事件預約
         "TowerMode.CurrentFloor", "TowerMode.IsActive",  // 女巫競技場的當局狀態
         "TowerMode.EquippedAmulets", "TowerMode.LilyReady",
+        "TowerMode.LastMobSprite", "TowerMode.LastBackground",  // 上一層的怪與背景，避免連續重複
+        "TowerMode.CarriedHP",                           // 第 50 層起帶著走的血量
         "DemoNextScript", "DemoNextLabel",
     };
 

@@ -40,6 +40,13 @@ namespace Hexe.TowerMode
         [Tooltip("每隔幾秒換一句。0 = 只在進入這一頁時挑一次。")]
         [SerializeField] float lineInterval = 0f;
 
+        [Tooltip("走到「不再補血」那一層時，改講這一段（不隨機、也不會被換掉）。留空＝照常隨機。" +
+                 "打贏會直接接下一場，只有這一層會特地停回休息頁，就是為了讓她講完這段。")]
+        [TextArea(2, 4)]
+        [SerializeField] string milestoneLine =
+            "到第五十層啦。從這裡開始我不再幫妳補傷了——" + "\n" +
+            "帶著傷繼續，還是收手，妳自己決定。";
+
         [Header("顯示位置（建議用這個）")]
         [Tooltip("在 Canvas 裡自己放一個 RawImage 拖進來，位置和大小就用 Scene 視圖直接拖拉調，" +
                  "不用進 Play 模式、調完也不會跑掉。留空的話腳本會自己生一個，改用下面那組數值控制。")]
@@ -113,7 +120,7 @@ namespace Hexe.TowerMode
         {
             if (lineLabel == null) return;
 
-            if (lines == null || lines.FindAll(l => !string.IsNullOrWhiteSpace(l)).Count == 0)
+            if (!IsMilestone && (lines == null || lines.FindAll(l => !string.IsNullOrWhiteSpace(l)).Count == 0))
             {
                 lineLabel.gameObject.SetActive(false);
                 return;
@@ -126,8 +133,20 @@ namespace Hexe.TowerMode
             PickLine();
         }
 
+        /// <summary>規則要變的那一層：固定講那一段，不隨機。</summary>
+        bool IsMilestone => !string.IsNullOrWhiteSpace(milestoneLine)
+                            && TowerModeManager.CurrentFloor == TowerModeManager.NoHealFromFloor;
+
         void PickLine()
         {
+            if (IsMilestone)
+            {
+                currentLine = milestoneLine;
+                nextLineAt = float.MaxValue;   // 不要被 lineInterval 換掉
+                RedrawLine();
+                return;
+            }
+
             var candidates = lines.FindAll(l => !string.IsNullOrWhiteSpace(l));
             if (candidates.Count == 0) return;
 

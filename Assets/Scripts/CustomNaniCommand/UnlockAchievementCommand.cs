@@ -26,6 +26,12 @@ public class UnlockAchievementCommand : Command
 
         AchievementManager.Instance.Unlock(AchievementId.Value);
 
+        // 剛剛演完的是哪個結局。@achieve 就寫在結局最後一句之後、@exitToTitle 之前，
+        // 所以在這裡講剛剛好，不用去改 20 份結局腳本。
+        var ending = EndingNames.Describe(AchievementId.Value);
+        if (!string.IsNullOrEmpty(ending))
+            await SystemNotice.InDialogue(ending, token);
+
         // 標題選單那兩顆是系統給的，玩家不會知道自己剛剛開了什麼——
         // 在對話框講一句，而且是在這裡講，不用去改 20 份結局腳本。
         // 這支指令是被劇本 await 的，所以印出來的順序一定在 @achieve 之後、

@@ -35,5 +35,24 @@ public static class SystemNotice
         // reset:true → 自己獨佔一句，不會接在上一句台詞後面變成同一段；
         // author 留空 → 不掛在任何角色名下，玩家一看就知道是系統在講話。
         await new PrintText { Text = text, ResetPrinter = true }.ExecuteAsync(token);
+        await WaitForReaderAsync(token);
+    }
+
+    /// <summary>
+    /// 等玩家點一下。
+    ///
+    /// PrintText 自己不會等：它只是把腳本播放器的「正在等待輸入」旗標打開，真正停下來的是
+    /// 播放器，而且是在指令與指令之間停。一個指令裡連印兩句以上時（例如 @guide 的一整段提示、
+    /// 或 @achieve 先報結局名再報「競技場開放了」），播放器沒機會停，前一句會被後一句洗掉。
+    ///
+    /// 快轉時播放器會主動把旗標關掉，所以不會卡住；沒有對話框可等（旗標根本沒開）時也直接過。
+    /// </summary>
+    static async UniTask WaitForReaderAsync (AsyncToken token)
+    {
+        var player = Engine.GetService<IScriptPlayer>();
+        if (player == null) return;
+
+        while (player.WaitingForInput && token.EnsureNotCanceledOrCompleted())
+            await AsyncUtils.DelayFrameAsync(1);
     }
 }

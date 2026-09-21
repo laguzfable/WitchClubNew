@@ -26,6 +26,11 @@ namespace Hexe.TowerMode
         const string BestFloorKey = "TowerMode.BestFloor";
         const string IsActiveKey = "TowerMode.IsActive";
         const string CurrentFloorKey = "TowerMode.CurrentFloor";
+
+        /// <summary>從這層開始不再每場補滿血，帶著傷繼續打（蘇菲亞會在這層的休息頁解說）。</summary>
+        public const int NoHealFromFloor = 50;
+        const string CarriedHPKey = "TowerMode.CarriedHP";
+        const string LastBackgroundKey = "TowerMode.LastBackground";
         const string SnapshotKeyPrefix = "TowerMode.Snapshot.";
         const string EquippedAmuletsKey = "TowerMode.EquippedAmulets";
         const string AdapterAmuletId = "Adapter";
@@ -165,6 +170,33 @@ namespace Hexe.TowerMode
             var full = !isLose && maxHP > 0f && curHP >= maxHP - 0.01f;
 
             PlayerPrefs.SetInt(LilyReadyKey, full ? 1 : 0);
+
+            // 剩多少血留給下一場（第 50 層起才會用到，但每場都記——第 50 層開打時
+            // 要接的就是第 49 層打完剩下的血）。輸了就不用留，反正要從第一層重來。
+            if (isLose) PlayerPrefs.DeleteKey(CarriedHPKey);
+            else PlayerPrefs.SetFloat(CarriedHPKey, curHP);
+
+            PlayerPrefs.Save();
+        }
+
+        /// <summary>
+        /// 第 <see cref="NoHealFromFloor"/> 層起，這場的血要接著上一場打完剩下的。
+        /// 讀得到值才回 true；讀不到（還沒打過、或剛重來）就照原本滿血開打。
+        /// </summary>
+        public static bool TryGetCarriedHP(out float hp)
+        {
+            hp = 0f;
+            if (!IsActive || CurrentFloor < NoHealFromFloor) return false;
+            if (!PlayerPrefs.HasKey(CarriedHPKey)) return false;
+
+            hp = PlayerPrefs.GetFloat(CarriedHPKey, 0f);
+            return hp > 0f;
+        }
+
+        /// <summary>重來一輪時要清掉，不然會帶著上一輪的殘血開打。</summary>
+        static void ResetCarriedHP()
+        {
+            PlayerPrefs.DeleteKey(CarriedHPKey);
             PlayerPrefs.Save();
         }
 
@@ -182,6 +214,7 @@ namespace Hexe.TowerMode
             SnapshotAndUnlockAllRunes();
             SnapshotAndUnlockAllCardVariants();
             ResetLilyBonus(); // 上一輪最後一場的滿血狀態不能帶進新挑戰的第一場
+            ResetCarriedHP();
 
             IsActive = true;
             CurrentFloor = 1;
@@ -203,6 +236,12 @@ namespace Hexe.TowerMode
             EnsurePoolsLoaded();
             IsActive = true;
             CurrentFloor = PlayerPrefs.GetInt(CurrentFloorKey, 1);
+
+            // 續關也要重開一次符文/卡片。原本只有「開始新挑戰」開，靠的是 PlayerPrefs 裡還留著
+            // 上次開好的值——但那份值只要被清掉過（開新遊戲、進度重置），續關就只剩玩家自己解的，
+            // 競技場會突然變得很難打。快照已經存在的話不會被覆蓋，所以重跑是安全的。
+            SnapshotAndUnlockAllRunes();
+            SnapshotAndUnlockAllCardVariants();
 
             // 「回標題」途中 Naninovel 引擎狀態可能被重置過（RuneActive 這個自訂變數會被打回預設 false），
             // 續關時沒重設回 true 的話，CombatSystem.Init() 讀到 false 會直接把符文系統整組關掉。
@@ -242,6 +281,7 @@ namespace Hexe.TowerMode
             if (isLose)
             {
                 RecordBestFloor();
+                ResetCarriedHP();
                 CurrentFloor = 1; // 死掉重新從第一層開始（跟主動「退出」不一樣，退出不會重置）
                 BackToHub();
                 return;
@@ -258,7 +298,11 @@ namespace Hexe.TowerMode
             }
 
             CurrentFloor++;
-            LoadFloor();
+
+            // 平常打贏直接接下一場，但規則要變的那一層得先停下來——
+            // 不回休息頁的話，蘇菲亞沒機會講「這裡開始不補血了」（見 TowerHubAmbientLive2D）。
+            if (CurrentFloor == NoHealFromFloor) BackToHub();
+            else LoadFloor();
         }
 
         /// <summary>由戰鬥畫面的「退出」按鈕呼叫，放棄本場戰鬥、記錄目前樓層，回到高塔選單頁（本次挑戰不會結束）。</summary>
@@ -417,22 +461,50 @@ namespace Hexe.TowerMode
             return arenaMobData;
         }
 
+        /// <summary>上一層抽到的立繪名。跨場景要留著，所以連 PlayerPrefs 一起存
+        /// （挑戰中途關掉遊戲、下次再接著打，也不會第一場就撞上剛剛那隻）。</summary>
+        const string LastSpriteKey = "TowerMode.LastMobSprite";
+
+        /// <summary>
+        /// 抽一張怪物立繪。玩家眼裡「這層打的是誰」就是這張圖，所以不讓它跟上一層同一張——
+        /// 連續兩層一樣的話，看起來像卡住了。池子只剩一張時就只好重複。
+        /// </summary>
         public static Sprite RollMonsterSprite()
         {
             EnsurePoolsLoaded();
             if (spritePool == null || spritePool.Count == 0) return null;
-            return spritePool[Random.Range(0, spritePool.Count)];
+
+            var last = PlayerPrefs.GetString(LastSpriteKey, "");
+            var picked = spritePool[Random.Range(0, spritePool.Count)];
+            if (spritePool.Count > 1 && picked.name == last)
+            {
+                // 重抽一次就夠：從「除了上一張以外」的那些裡面挑。
+                var index = Random.Range(0, spritePool.Count - 1);
+                for (int i = 0, seen = 0; i < spritePool.Count; i++)
+                {
+                    if (spritePool[i].name == last) continue;
+                    if (seen++ == index) { picked = spritePool[i]; break; }
+                }
+            }
+
+            PlayerPrefs.SetString(LastSpriteKey, picked.name);
+            PlayerPrefs.Save();
+            return picked;
         }
 
         static void LoadFloor()
         {
             EnsurePoolsLoaded();
 
+            // 保險：進戰鬥前再確認符文是全開的。挑戰中途要是有什麼清掉了 PlayerPrefs，
+            // 下一場就會補回來，不用重開挑戰。
+            SnapshotAndUnlockAllRunes();
+
             TutorialController.isTutorial = false;
             TutorialController.isTutorial2 = false;
 
             var monsterId = monsterPool[Random.Range(0, monsterPool.Count)];
-            var bg = BattleBackgrounds[Random.Range(0, BattleBackgrounds.Length)];
+            var bg = RollBackground();
 
             PlayerPrefs.SetString("enemyName", monsterId);
             PlayerPrefs.Save();
@@ -447,6 +519,28 @@ namespace Hexe.TowerMode
             }
 
             SceneManager.LoadScene(CombatSceneName);
+        }
+
+        /// <summary>抽戰鬥背景。跟立繪一樣，不讓它跟上一層同一張。</summary>
+        static string RollBackground()
+        {
+            if (BattleBackgrounds.Length == 0) return "";
+
+            var last = PlayerPrefs.GetString(LastBackgroundKey, "");
+            var picked = BattleBackgrounds[Random.Range(0, BattleBackgrounds.Length)];
+            if (BattleBackgrounds.Length > 1 && picked == last)
+            {
+                var index = Random.Range(0, BattleBackgrounds.Length - 1);
+                for (int i = 0, seen = 0; i < BattleBackgrounds.Length; i++)
+                {
+                    if (BattleBackgrounds[i] == last) continue;
+                    if (seen++ == index) { picked = BattleBackgrounds[i]; break; }
+                }
+            }
+
+            PlayerPrefs.SetString(LastBackgroundKey, picked);
+            PlayerPrefs.Save();
+            return picked;
         }
 
         static async void FinishRun()

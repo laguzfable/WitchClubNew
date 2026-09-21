@@ -44,6 +44,15 @@ public static class RuneEnTranslation
         { "女巫符文",   "Witch Rune" },
         { "百合符文",   "Lily Rune"  },
 
+        // ── 休息頁的蘇菲亞（TowerHubAmbientLive2D 的台詞，整句對整句）──
+        { "又活著回來啦，來喝一杯？", "Back in one piece? Pull up a stool." },
+        { "第幾層了？我數到一半就忘了。", "What floor is it now? I lost count halfway." },
+        { "休息一下吧，塔又不會跑掉。", "Take a breather. The tower isn't going anywhere." },
+        { "這杯我請，下一杯可要記帳囉。", "This one's on me. The next goes on your tab." },
+        { "小心點，上面那些傢伙不好惹。", "Careful up there. The ones above don't play nice." },
+        { "到第五十層啦。從這裡開始我不再幫妳補傷了——\n帶著傷繼續，還是收手，妳自己決定。",
+          "Fiftieth floor, huh. From here on I won't patch you up anymore—\nCarry your wounds up, or call it a day. Your choice." },
+
         // ── Detail panel（右側詳情）────────────────────────
         { "← 選擇一個符文",   "← Select a rune"   },
         { "← 選擇一張卡片",   "← Select a card"   },
@@ -167,6 +176,15 @@ public static class RuneEnTranslation
         { "深淵護符",   "深淵の護符" },
         { "女巫符文",   "魔女のルーン" },
         { "百合符文",   "百合のルーン" },
+
+        // ── 休息頁的蘇菲亞（TowerHubAmbientLive2D 的台詞，整句對整句）──
+        { "又活著回來啦，來喝一杯？", "また生きて戻ったね。一杯どう？" },
+        { "第幾層了？我數到一半就忘了。", "今は何階だっけ？途中で数えるのをやめちゃった。" },
+        { "休息一下吧，塔又不會跑掉。", "少し休みなよ。塔は逃げないんだから。" },
+        { "這杯我請，下一杯可要記帳囉。", "この一杯はおごり。次からはツケにしとくよ。" },
+        { "小心點，上面那些傢伙不好惹。", "気をつけて。上にいる連中は手強いよ。" },
+        { "到第五十層啦。從這裡開始我不再幫妳補傷了——\n帶著傷繼續，還是收手，妳自己決定。",
+          "五十階まで来たね。ここから先は傷を癒してあげない——\n傷を抱えたまま進むか、ここで退くか、自分で決めな。" },
 
         // ── Detail panel（右側詳情）────────────────────────
         { "← 選擇一個符文",   "← ルーンを選択" },
