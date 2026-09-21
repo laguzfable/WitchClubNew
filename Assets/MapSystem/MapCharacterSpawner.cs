@@ -203,8 +203,9 @@ if (MapSpecialOverride.TryGet(c.characterName, out var special))
                         if (c.loop)
                         {
                             eventIdx = 0;
-                            PlayerPrefs.SetInt($"{c.characterName}_DayProgress", 0);
-                            PlayerPrefs.Save();
+                            // 進度存在 StoryProgressManager 的 <角色>_Event_Day，
+                            // 以前這裡寫的是沒人讀的 <角色>_DayProgress，等於沒重置。
+                            StoryProgressManager.Instance.ResetDayProgress(c.characterName);
                             logMsg += $"🔁 {c.characterName} 白天事件重新開始\n";
                         }
                         else
@@ -225,10 +226,38 @@ if (MapSpecialOverride.TryGet(c.characterName, out var special))
                     // ⭐ 夜晚一律不循環（loop 只管白天）
                     // 夜晚是五場儀式，是一條有頭有尾的線，不是可以重複的日常。
                     // 繞回第一場的話，玩家做完全部之後又會被請去做一次「第一次引導」，
-                    // 台詞和進度都對不起來。做完就讓她從夜晚的地圖上消失。
+                    // 台詞和進度都對不起來。
+                    //
+                    // 但「儀式做完了」不等於「這個人沒戲了」——最後一場就是告白場，
+                    // 而主線後面還有好幾個夜晚地圖。直接讓她消失的話，等於答應完就被收走。
+                    // 有設定告白後日常的角色改掛那支劇本（AfterConfession），
+                    // 其餘的維持原本「做完就不出現」。
                     if (eventIdx >= c.nightEvents.Count)
                     {
-                        logMsg += $"⭐ {c.characterName} 五場儀式都做完了，今晚不出現\n";
+                        var afterScript = AfterConfession.ScriptFor(c.characterName);
+                        if (string.IsNullOrEmpty(afterScript))
+                        {
+                            logMsg += $"⭐ {c.characterName} 五場儀式都做完了，今晚不出現\n";
+                            continue;
+                        }
+
+                        // 外觀沿用最後一場儀式那顆 icon，只換掉要播的劇本。
+                        // 掛進 specialEvents，點下去就不會 IncrementNightProgress。
+                        var last = c.nightEvents[c.nightEvents.Count - 1];
+                        var afterEvt = c.specialEvents.Find(e => e.eventName == AfterConfession.EventName);
+                        if (afterEvt == null)
+                        {
+                            afterEvt = new CharacterEvent { eventName = AfterConfession.EventName };
+                            c.specialEvents.Add(afterEvt);
+                        }
+
+                        afterEvt.naninovelScript = afterScript;
+                        afterEvt.animatorController = last.animatorController;
+                        afterEvt.offset = last.offset;
+
+                        count++;
+                        StartCoroutine(CreateCharacterIcon(c, afterEvt));
+                        logMsg += $"💞 {c.characterName} 儀式全走完了 → 告白後的日常 {afterScript}\n";
                         continue;
                     }
 

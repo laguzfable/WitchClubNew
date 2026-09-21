@@ -1,0 +1,33 @@
+; 告白之後的日常。五場 syb_day01～05 都走完之後，西碧兒在地圖上改播這支。
+; 三段隨機挑一段，純粹是甜的，不推進任何進度、不動好感。
+@back bg04
+@stopBgm
+@bgm night
+@spawn hello
+@char syb pos:50
+
+@set sweet_pick=Random(1,3)
+@goto .sweet2 if:sweet_pick==2
+@goto .sweet3 if:sweet_pick==3
+
+西碧兒: 今天這杯不燙唷，我算好妳什麼時候會來。
+西碧兒: ……別露出那種表情。我只是每天都算而已。
+西碧兒: 坐吧。位子我也一直留著。
+@goto .done
+
+# sweet2
+西碧兒: 妳看，這張椅子被妳搬順手了，它現在只認得這個角度。
+西碧兒: 我昨天想把它擺回原位，擺了兩次又搬回來。
+西碧兒: ……習慣這種東西，比咒語難解多了。
+@goto .done
+
+# sweet3
+西碧兒: 有時候我還是會想，什麼都不要辦，就這樣過下去。
+西碧兒: 然後妳就來了，我就又覺得，這樣好像也不錯。
+西碧兒: 嘻嘻。今天先把這杯喝完吧。
+@goto .done
+
+# done
+@hide syb
+@restroom
+@stop

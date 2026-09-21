@@ -22,6 +22,8 @@ public static class RuneEnTranslation
         { "返回",   "Back"    },
 
         // ── Tower hub screen ──────────────────────────────
+        { "獲得符文",   "Rune acquired" },
+        { "獲得新卡片", "New card unlocked" },
         { "更換符文",   "Change Rune" },
         { "更換卡片",   "Change Card" },
         { "護身符",     "Amulet"      },
@@ -155,6 +157,8 @@ public static class RuneEnTranslation
         { "返回",   "戻る"           },
 
         // ── Tower hub screen ──────────────────────────────
+        { "獲得符文",   "ルーンを入手" },
+        { "獲得新卡片", "新しいカードを入手" },
         { "更換符文",   "ルーン変更" },
         { "更換卡片",   "カード変更" },
         { "護身符",     "護符"       },

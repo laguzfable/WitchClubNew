@@ -64,6 +64,14 @@ public static class EndingRecord
     /// <summary>結局是不是全收集了。</summary>
     public static bool AllCollected { get { return Count >= Total; } }
 
+    /// <summary>丟掉記憶體快取，下次查詢重新從 PlayerPrefs 讀。
+    /// 有人繞過這個類別直接動 PlayerPrefs（例如 ProgressResetter 的 DeleteAll）之後要叫一次，
+    /// 不然讀到的還是清掉前的那份。</summary>
+    public static void InvalidateCache()
+    {
+        cache = null;
+    }
+
     /// <summary>除錯用：清空紀錄。</summary>
     public static void Clear()
     {

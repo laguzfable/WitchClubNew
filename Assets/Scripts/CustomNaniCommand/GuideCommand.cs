@@ -4,7 +4,13 @@ using Naninovel;
 using UnityEngine;
 
 /// <summary>
-/// 個人線分歧前的夜晚倒數，由星塵來講。left 包含即將進入的今晚，不計白天地圖。
+/// 個人線分歧前的夜晚倒數，由星塵來講。
+///
+/// ★ 講的時機是「夜晚過完之後」★
+/// 星塵在涅莉覺醒前只出現在玩家的夢裡，所以不能先講話再讓玩家選地圖——
+/// 流程是：夜晚地圖 → 陪人 → 睡下 → 夢裡聽到提醒 → 隔天白天地圖。
+/// 因此 left＝「還剩幾個夜晚」，不含剛過去的那一夜，也不計白天地圖；
+/// 0＝夜晚用完了，下一步就是分歧。
 /// 第三章四夜、第四章分歧前兩夜；改動行程時須同步更新呼叫處與倒數檢查。
 ///
 /// ★ 台詞不在這裡 ★
@@ -23,7 +29,7 @@ public class GuideCommand : Command
     [Serializable]
     public class Hint
     {
-        public int left;            // 算上今晚還剩幾個夜晚
+        public int left;            // 還剩幾個夜晚（不含剛過去的那一夜），0＝用完了
         public string bg;           // 背景，例如 star1；留空＝不動
         public string character;    // 立繪的角色 ID，例如 星塵；留空＝不出立繪
         public string pose;         // 表情／動作，留空＝用預設
@@ -69,9 +75,9 @@ public class GuideCommand : Command
 
     public override async UniTask ExecuteAsync (AsyncToken token = default)
     {
-        if (!Assigned(Left) || Left.Value < 1 || Left.Value > 6)
+        if (!Assigned(Left) || Left.Value < 0 || Left.Value > 5)
         {
-            Debug.LogError("[guide] 分歧前的剩餘夜晚需介於 1～6，並包含今晚。");
+            Debug.LogError("[guide] 分歧前的剩餘夜晚需介於 0～5，且不含剛過去的那一夜。");
             return;
         }
 

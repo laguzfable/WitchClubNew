@@ -1729,7 +1729,8 @@ function jumpToBattle (name, line) {
 // 遊戲（GuideCommand）跟這一頁讀的是同一份，不是抄過來的副本。
 //
 // 每一則可以自己指定背景／立繪／站位／音樂，留空就是不動那一項。
-// 劇本那邊只寫 @guide left:N，N 就是「算上今晚還剩幾個夜晚」。
+// 劇本那邊只寫 @guide left:N，N 就是「還剩幾個夜晚」，不含剛過去的那一夜。
+// 講話的時機是夜晚地圖跑完、睡下之後——星塵在涅莉覺醒前只出現在夢裡。
 let guideDirty = false;
 
 function renderGuide(v) {
@@ -1750,8 +1751,8 @@ function renderGuide(v) {
 
   v.innerHTML =
     '<h2>星塵的提示</h2>' +
-    '<div class="sub">分歧前的六個夜晚，星塵在進地圖之前講的話。' +
-      '劇本裡對應的是 <code>@guide left:N</code>，N＝算上今晚還剩幾個夜晚。' +
+    '<div class="sub">分歧前的六個夜晚，星塵在夜晚地圖跑完、睡下之後講的話（牠只出現在夢裡）。' +
+      '劇本裡對應的是 <code>@guide left:N</code>，N＝還剩幾個夜晚，不含剛過去的那一夜；0＝夜晚用完了。' +
       '台詞裡的 <code>{left}</code> 會換成那個數字；同一個數字放好幾則就會照順序講。</div>' +
 
     '<div class="mobbar">' +
@@ -1775,7 +1776,7 @@ function renderGuide(v) {
 
         '<div class="mobfields" style="margin-bottom:8px">' +
           '<label class="mf"><span>剩餘夜晚</span>' +
-            '<input type="number" min="1" max="6" value="' + h.left + '"' +
+            '<input type="number" min="0" max="5" value="' + h.left + '"' +
             ' onchange="setGuide(' + i + ', &quot;left&quot;, this.value)">' +
             '<i>跟劇本的 left: 對上才會被講到</i></label>' +
 
@@ -1847,7 +1848,7 @@ function addGuideLine(i) {
 
 function addGuide() {
   // 預設就照序章結尾的樣子：星海背景配 stardust，講完收掉
-  GUIDE.hints.push({left: 6, bg: 'star1', character: '', pose: '', pos: 50,
+  GUIDE.hints.push({left: 5, bg: 'star1', character: '', pose: '', pos: 50,
                     // 玩家要到第五章黃線才知道這個聲音叫星塵，這裡跟著序章結尾掛「？？？」
                     bgm: 'stardust', stopAfter: true, lines: ['？？？: ']});
   guideDirty = true; render();
@@ -2449,8 +2450,14 @@ function shotEnd(shotLine) {
 function addTalk(shotLine) {
   const sc = scripts[current];
   const shot = sceneShots(sc).find(s => s.line === shotLine);
-  const last = shot && shot.talks.length ? shot.talks[shot.talks.length - 1] : null;
-  const who = last ? (last.who || '') : '';
+  // 空行也在 talks 裡（為了讓新寫的台詞看得到），但它沒有說話者、也不是「上一句」。
+  // 以前直接拿最後一筆，一幕結尾有空行的話，新台詞就變成沒名字的一行（選不了表情），
+  // 還會被塞到空行後面、跑到 @unlockCardVariant 之類的指令底下。
+  const spoken = shot ? shot.talks.filter(t => t.text) : [];
+  const last = spoken.length ? spoken[spoken.length - 1] : null;
+  // 上一句是旁白的話，名字往前找最近一個有講話的人
+  const speaker = spoken.slice().reverse().find(t => t.who);
+  const who = speaker ? speaker.who : '';
   const at = last ? last.line : shotEnd(shotLine);
 
   sc.lines.splice(at, 0, who ? who + ': ' : '');

@@ -1,0 +1,33 @@
+; 告白之後的日常。五場儀式（含 yellow05 的告白）都走完之後，涅莉在夜晚地圖上改播這支。
+; 三段隨機挑一段，純粹是甜的，不推進任何進度、不動好感。
+@back nelly_night
+@stopBgm
+@bgm night
+@spawn hello
+@char 涅莉 pos:50
+
+@set sweet_pick=Random(1,3)
+@goto .sweet2 if:sweet_pick==2
+@goto .sweet3 if:sweet_pick==3
+
+涅莉: 來來來，陪我喝一杯——啊，妳又露出那個表情了。
+涅莉: 好啦好啦，果汁果汁，我早就準備好妳的份了。
+涅莉: 乾杯！……欸，要看著我的眼睛啦。
+@goto .done
+
+# sweet2
+涅莉: 跟妳說唷，我今天一整天都在想妳。
+涅莉: ……騙妳的啦，哈哈，大概只有半天。
+涅莉: 另外半天在想晚上要煮什麼給妳吃，這樣算不算？
+@goto .done
+
+# sweet3
+涅莉: 噓——小聲一點，大家都睡了。
+涅莉: 偷偷告訴妳，這個時間的走廊是我們兩個的。
+涅莉: 手給我，我帶妳去看月亮最漂亮的那扇窗。
+@goto .done
+
+# done
+@hide 涅莉
+@restroom
+@stop

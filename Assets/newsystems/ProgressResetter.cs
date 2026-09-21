@@ -16,10 +16,16 @@ public class ProgressResetter : MonoBehaviour
     // 可在 Inspector 修改按鍵
     [SerializeField] KeyCode resetKey = KeyCode.F10;
 
+    // 同樣是清進度，但女巫競技場的最高樓層和進場資格留著。
+    [SerializeField] KeyCode resetKeepArenaKey = KeyCode.F9;
+
     void Update()
     {
         if (Input.GetKeyDown(resetKey))
             ResetLocalProgress();
+
+        if (Input.GetKeyDown(resetKeepArenaKey))
+            ResetLocalProgressKeepArena();
     }
 
     /// <summary>
@@ -37,6 +43,45 @@ public class ProgressResetter : MonoBehaviour
         Hexe.UI.TitleMenuUnlockInjector.Refresh(); // 標題選單的蝕之聖典／女巫競技場要立刻縮回去
         Debug.Log("已清除所有 PlayerPrefs 儲存的事件進度");
     }
+
+    /// <summary>
+    /// 除了女巫競技場以外全部清掉。要從頭測劇情、又不想把競技場的進度重跑時用。
+    ///
+    /// ★ 為什麼還要留結局紀錄 ★
+    /// 競技場的入口是「跑過任一結局」才會出現（見 TitleMenuUnlockInjector）。
+    /// 結局紀錄一起清掉的話，標題上那顆按鈕會縮回去，最高樓層留著也進不去。
+    /// 所以這裡連結局紀錄一起保住——它是競技場的鑰匙，不是額外的恩惠。
+    ///
+    /// 其餘一律比照 ResetLocalProgress：圖鑑、回憶CG、符文、卡片型態、事件進度全部歸零。
+    /// </summary>
+    public static void ResetLocalProgressKeepArena()
+    {
+        // 先抄一份要留的，DeleteAll 之後再寫回去。
+        // 一個一個 DeleteKey 的話，之後多一個 key 就會漏清，所以還是整份清掉再還原。
+        //
+        // 只留最高樓層：裝備中的護符、當前樓層那些是「這一局打到哪」，
+        // 清掉等於中止未完成的挑戰，下次進競技場從第一層重開，這是對的。
+        var bestFloor = PlayerPrefs.GetInt(BestFloorKey, 0);
+        var endings = PlayerPrefs.GetString(EndingsKey, "");
+
+        PlayerPrefs.DeleteAll();
+
+        if (bestFloor > 0) PlayerPrefs.SetInt(BestFloorKey, bestFloor);
+        if (!string.IsNullOrEmpty(endings)) PlayerPrefs.SetString(EndingsKey, endings);
+        PlayerPrefs.Save();
+
+        Hexe.UI.MonsterCodex.InvalidateCache();
+        EndingRecord.InvalidateCache();   // 快取要重讀，不然讀到的是清掉前的那份
+        ResetUnlockables();
+        MapSpecialOverride.ClearAll();
+        Hexe.UI.TitleMenuUnlockInjector.Refresh();
+
+        Debug.Log($"[ProgressResetter] 除了女巫競技場以外都清掉了"
+                  + $"（最高樓層 {bestFloor}、結局紀錄 {(string.IsNullOrEmpty(endings) ? 0 : endings.Split('|').Length)} 筆保留）");
+    }
+
+    const string BestFloorKey = "TowerMode.BestFloor";
+    const string EndingsKey   = "WC/Endings/v1";
 
     /// <summary>
     /// 回憶CG（Naninovel 的 unlockable items）。

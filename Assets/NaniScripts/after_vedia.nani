@@ -1,0 +1,33 @@
+; 告白之後的日常。五場儀式（含 green05 的告白）都走完之後，薇狄亞在夜晚地圖上改播這支。
+; 三段隨機挑一段，純粹是甜的，不推進任何進度、不動好感。
+@back vedia_night
+@stopBgm
+@bgm night
+@spawn hello
+@char 薇狄亞 pos:50
+
+@set sweet_pick=Random(1,3)
+@goto .sweet2 if:sweet_pick==2
+@goto .sweet3 if:sweet_pick==3
+
+薇狄亞: 妳來啦。等我一下唷，這盆再澆一點點就好。
+薇狄亞: ……好了。現在我整個人都是妳的了。
+薇狄亞: 咦，我說錯什麼了嗎？妳的耳朵好紅唷。
+@goto .done
+
+# sweet2
+薇狄亞: 今天那朵花，我押在書裡了，等乾了就送妳。
+薇狄亞: 這樣就算它謝了，那一天也還留著。
+薇狄亞: 因為那是妳陪我一起採的那一天呀。
+@goto .done
+
+# sweet3
+薇狄亞: 妳的手好冰。……來，這樣。
+薇狄亞: 不用不好意思，我暖起來很快的。
+薇狄亞: 那，在暖完之前都不可以放開唷。
+@goto .done
+
+# done
+@hide 薇狄亞
+@restroom
+@stop

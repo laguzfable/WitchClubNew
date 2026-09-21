@@ -253,12 +253,15 @@ broom: 我先！
 優菲: 認同！
 @hide 涅莉,優菲
 @stopBgm
-@guide left:2
 @saveMapDayNight isDay:false
 @SaveReturnPoint script:chapter4 label:afterdate5
 @GotoUnityScene sceneName:MapTest
 
 # afterdate5
+; 星塵在涅莉覺醒前只出現在夢裡，所以提醒擺在夜晚過完、睡下之後，倒數＝還剩幾個夜晚（不含剛過去的那一夜）。
+@hideChars
+@guide left:1
+
 @saveMapDayNight isDay:true
 @SaveReturnPoint script:chapter4 label:afterpetday_ch4
 @GotoUnityScene sceneName:MapTest
@@ -455,12 +458,15 @@ syb: 嘻嘻，多得是機會呢。
 優菲: 妳就先好好休息吧，別想太多了。
 @hide 優菲,梅爾
 @stopBgm
-@guide left:1
 @saveMapDayNight isDay:false
 @SaveReturnPoint script:chapter4 label:afterdate6
 @GotoUnityScene sceneName:MapTest
 
 # afterdate6
+
+; 星塵在涅莉覺醒前只出現在夢裡，所以提醒擺在夜晚過完、睡下之後，倒數＝還剩幾個夜晚（不含剛過去的那一夜）。
+@hideChars
+@guide left:0
 
 ; 分歧前的白天。夜晚是儀式（拿符文），白天是約會（補好感），
 ; 而好感決定下一場儀式做不做得成——兩者要交錯著用。
@@ -1047,7 +1053,7 @@ broom: 妳們這些不三不四的人，給我滾出去！！！
 薇狄亞: 但是，今天到底發生了什麼事了……？
 妮可: 新的藥草一次燒太多了吧，僅此而已。
 薇狄亞: 那也不太好吧？抱歉，我都不在場，沒有幫上什麼忙。
-薇狄亞: 我再和西碧爾討論看看能不能把效果調緩一些好了。
+薇狄亞: 我再和西碧兒討論看看能不能把效果調緩一些好了。
 妮可: 我倒覺得妳不用做什麼調整。
 妮可: 反對的人就是想反對啊，不是嗎？
 薇狄亞: 她們變成這樣的……立場了嗎？

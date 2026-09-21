@@ -19,15 +19,18 @@ public class UnlockCardVariantCommand : Command
     [ParameterAlias("ids")]
     public StringParameter IDs;
 
-    public override UniTask ExecuteAsync(AsyncToken token = default)
+    public override async UniTask ExecuteAsync(AsyncToken token = default)
     {
         if (!Assigned(IDs) || string.IsNullOrWhiteSpace(IDs.Value))
         {
             Debug.LogWarning("[unlockCardVariant] 未指定 ids 參數");
-            return UniTask.CompletedTask;
+            return;
         }
 
         var toUnlock = IDs.Value.Split(',');
+
+        // 這次真的是新解鎖的才報，已經有的不吵玩家
+        var fresh = new System.Collections.Generic.List<(ECardElement element, string variant)>();
 
         foreach (var rawID in toUnlock)
         {
@@ -54,6 +57,9 @@ public class UnlockCardVariantCommand : Command
                 list.Add(variant);
                 PlayerPrefs.SetString(key, string.Join(",", list));
                 Debug.Log($"[unlockCardVariant] 解鎖 {element}{variant}（key={key}）");
+
+                if (System.Enum.TryParse<ECardElement>(element, out var parsed))
+                    fresh.Add((parsed, variant));
             }
             else
             {
@@ -66,7 +72,9 @@ public class UnlockCardVariantCommand : Command
 
         PlayerPrefs.Save();
 
-        return UniTask.CompletedTask;
+        // 寫完才報，這樣玩家看到提示的時候，卡片已經真的在身上了
+        foreach (var (element, variant) in fresh)
+            await UnlockNotice.CardVariantAsync(element, variant, token);
     }
 
     // id 例如 "RedA" → 屬性名稱 "Red"（對應 ECardElement 名稱）

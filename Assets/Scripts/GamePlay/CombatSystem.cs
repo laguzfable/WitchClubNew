@@ -856,7 +856,11 @@ void TryUnlockRune(string mobID)
 
     // ✅ 已有解鎖就不重複
     if (!list.Contains(data.runeID))
+    {
         list.Add(data.runeID);
+        // 這裡沒有對話框，所以只排隊，等回到劇本由 @runeNotice 報出來
+        UnlockNotice.QueueRune(data.runeID);
+    }
 
     // ✅ 回寫
     PlayerPrefs.SetString(key, string.Join(",", list));

@@ -1,0 +1,28 @@
+; （草稿，待潤飾）優菲白天第四場：藍龍蝦只潑她，不潑{PlayerName}
+@back bg03
+@stopBgm
+@bgm peace
+@char 優菲 pos:50
+
+優菲: {PlayerName}，你來得正好。幫我看著缸子，我去換水——
+優菲: 呀啊啊！
+@hide 優菲
+@back CG/cg42
+@unlock CG/cg42
+優菲: 牠、牠又來了！整桶水被那兩隻螯打翻了！
+優菲: 你不要笑啊！堂堂學院首席被一隻龍蝦潑成這樣，很難看耶……
+優菲: ……而且牠只潑我。你站得比我還近，一滴都沒濺到。
+@back bg03
+@char 優菲 pos:50
+
+@set affinity_Eup=affinity_Eup+15
+
+優菲: 好啊，你們兩個都欺負我。
+優菲: ……算了。牠那兩隻螯的勁道，我分一點到你的魔杖卡上，你收著。
+
+@unlockCardVariant ids:BlueB
+
+優菲: 那以後換水就交給你了，我去照顧兔子。
+
+@hide 優菲
+@restroom

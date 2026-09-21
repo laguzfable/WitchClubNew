@@ -1,0 +1,33 @@
+; 告白之後的日常。五場儀式（含 red05 的告白）都走完之後，梅爾在夜晚地圖上改播這支。
+; 三段隨機挑一段，純粹是甜的，不推進任何進度、不動好感。
+@back mel_night
+@stopBgm
+@bgm night
+@spawn hello
+@char 梅爾 pos:50
+
+@set sweet_pick=Random(1,3)
+@goto .sweet2 if:sweet_pick==2
+@goto .sweet3 if:sweet_pick==3
+
+梅爾: 幹嘛，看我幹嘛。
+梅爾: ……沒事就不能坐過來一點嗎。
+梅爾: 我是說妳。坐過來啦。
+@goto .done
+
+# sweet2
+梅爾: 這個給妳，別問哪來的。
+梅爾: ……好啦，是我自己做的，很醜我知道。
+梅爾: 妳敢笑我就收回來。……不准拿下來唷。
+@goto .done
+
+# sweet3
+梅爾: 我以前以為，平行線就是平行線。
+梅爾: 現在覺得，只是沒有人肯轉那個彎而已。
+梅爾: 這句話我只說一次。妳忘記了，我也不會再講第二遍。
+@goto .done
+
+# done
+@hide 梅爾
+@restroom
+@stop

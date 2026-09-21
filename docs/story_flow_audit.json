@@ -1,19 +1,19 @@
 {
-  "script_count": 72,
-  "label_count": 471,
-  "reference_count": 598,
+  "script_count": 81,
+  "label_count": 487,
+  "reference_count": 624,
   "issues": [],
   "endings": {
     "ACH_END_01": [
       [
         "chapter5blue",
-        1007
+        1004
       ]
     ],
     "ACH_END_02": [
       [
         "chapter5blue",
-        1060
+        1057
       ]
     ],
     "ACH_END_03": [
@@ -31,31 +31,31 @@
     "ACH_END_05": [
       [
         "chapter4green",
-        409
+        408
       ]
     ],
     "ACH_END_06": [
       [
         "chapter4green",
-        746
+        744
       ]
     ],
     "ACH_END_07": [
       [
         "chapter5yellow",
-        375
+        373
       ]
     ],
     "ACH_END_08": [
       [
         "chapter5yellow",
-        448
+        446
       ]
     ],
     "ACH_END_09": [
       [
         "chapter5yellow",
-        597
+        595
       ]
     ],
     "ACH_END_10": [
@@ -168,10 +168,10 @@
     "characterEventTable.Array.data[3].characterName": "Vedia",
     "characterEventTable.Array.data[4].characterName": "Lilina",
     "characterEventTable.Array.data[5].characterName": "other",
-    "characterEventTable.Array.data[0].dayEvents.Array.size": "3",
-    "characterEventTable.Array.data[1].dayEvents.Array.size": "3",
-    "characterEventTable.Array.data[2].dayEvents.Array.size": "3",
-    "characterEventTable.Array.data[3].dayEvents.Array.size": "3",
+    "characterEventTable.Array.data[0].dayEvents.Array.size": "4",
+    "characterEventTable.Array.data[1].dayEvents.Array.size": "4",
+    "characterEventTable.Array.data[2].dayEvents.Array.size": "4",
+    "characterEventTable.Array.data[3].dayEvents.Array.size": "4",
     "characterEventTable.Array.data[5].dayEvents.Array.size": "0",
     "characterEventTable.Array.data[0].nightEvents.Array.size": "5",
     "characterEventTable.Array.data[1].nightEvents.Array.size": "5",
@@ -210,6 +210,10 @@
     "characterEventTable.Array.data[3].dayEvents.Array.data[0].eventName": "ved_day01",
     "characterEventTable.Array.data[3].dayEvents.Array.data[1].eventName": "ved_day02",
     "characterEventTable.Array.data[3].dayEvents.Array.data[2].eventName": "ved_day03",
+    "characterEventTable.Array.data[0].dayEvents.Array.data[3].eventName": "eup_day04",
+    "characterEventTable.Array.data[1].dayEvents.Array.data[3].eventName": "mel_day04",
+    "characterEventTable.Array.data[2].dayEvents.Array.data[3].eventName": "nel_day04",
+    "characterEventTable.Array.data[3].dayEvents.Array.data[3].eventName": "ved_day04",
     "characterEventTable.Array.data[1].nightEvents.Array.data[0].offset.x": "0",
     "characterEventTable.Array.data[1].nightEvents.Array.data[1].offset.x": "0",
     "characterEventTable.Array.data[1].nightEvents.Array.data[2].offset.x": "0",
@@ -253,6 +257,10 @@
     "characterEventTable.Array.data[3].dayEvents.Array.data[0].naninovelScript": "ved_day01",
     "characterEventTable.Array.data[3].dayEvents.Array.data[1].naninovelScript": "ved_day02",
     "characterEventTable.Array.data[3].dayEvents.Array.data[2].naninovelScript": "ved_day03",
+    "characterEventTable.Array.data[0].dayEvents.Array.data[3].naninovelScript": "eup_day04",
+    "characterEventTable.Array.data[1].dayEvents.Array.data[3].naninovelScript": "mel_day04",
+    "characterEventTable.Array.data[2].dayEvents.Array.data[3].naninovelScript": "nel_day04",
+    "characterEventTable.Array.data[3].dayEvents.Array.data[3].naninovelScript": "ved_day04",
     "characterEventTable.Array.data[0].nightEvents.Array.data[0].naninovelScript": "blue01",
     "characterEventTable.Array.data[0].nightEvents.Array.data[1].naninovelScript": "blue02",
     "characterEventTable.Array.data[0].nightEvents.Array.data[2].naninovelScript": "blue03",
@@ -366,6 +374,181 @@
     "yellow05"
   ],
   "references": [
+    [
+      "after_eupie",
+      10,
+      "goto",
+      "after_eupie",
+      "sweet2"
+    ],
+    [
+      "after_eupie",
+      11,
+      "goto",
+      "after_eupie",
+      "sweet3"
+    ],
+    [
+      "after_eupie",
+      16,
+      "goto",
+      "after_eupie",
+      "done"
+    ],
+    [
+      "after_eupie",
+      22,
+      "goto",
+      "after_eupie",
+      "done"
+    ],
+    [
+      "after_eupie",
+      28,
+      "goto",
+      "after_eupie",
+      "done"
+    ],
+    [
+      "after_mel",
+      10,
+      "goto",
+      "after_mel",
+      "sweet2"
+    ],
+    [
+      "after_mel",
+      11,
+      "goto",
+      "after_mel",
+      "sweet3"
+    ],
+    [
+      "after_mel",
+      16,
+      "goto",
+      "after_mel",
+      "done"
+    ],
+    [
+      "after_mel",
+      22,
+      "goto",
+      "after_mel",
+      "done"
+    ],
+    [
+      "after_mel",
+      28,
+      "goto",
+      "after_mel",
+      "done"
+    ],
+    [
+      "after_nelly",
+      10,
+      "goto",
+      "after_nelly",
+      "sweet2"
+    ],
+    [
+      "after_nelly",
+      11,
+      "goto",
+      "after_nelly",
+      "sweet3"
+    ],
+    [
+      "after_nelly",
+      16,
+      "goto",
+      "after_nelly",
+      "done"
+    ],
+    [
+      "after_nelly",
+      22,
+      "goto",
+      "after_nelly",
+      "done"
+    ],
+    [
+      "after_nelly",
+      28,
+      "goto",
+      "after_nelly",
+      "done"
+    ],
+    [
+      "after_sybil",
+      10,
+      "goto",
+      "after_sybil",
+      "sweet2"
+    ],
+    [
+      "after_sybil",
+      11,
+      "goto",
+      "after_sybil",
+      "sweet3"
+    ],
+    [
+      "after_sybil",
+      16,
+      "goto",
+      "after_sybil",
+      "done"
+    ],
+    [
+      "after_sybil",
+      22,
+      "goto",
+      "after_sybil",
+      "done"
+    ],
+    [
+      "after_sybil",
+      28,
+      "goto",
+      "after_sybil",
+      "done"
+    ],
+    [
+      "after_vedia",
+      10,
+      "goto",
+      "after_vedia",
+      "sweet2"
+    ],
+    [
+      "after_vedia",
+      11,
+      "goto",
+      "after_vedia",
+      "sweet3"
+    ],
+    [
+      "after_vedia",
+      16,
+      "goto",
+      "after_vedia",
+      "done"
+    ],
+    [
+      "after_vedia",
+      22,
+      "goto",
+      "after_vedia",
+      "done"
+    ],
+    [
+      "after_vedia",
+      28,
+      "goto",
+      "after_vedia",
+      "done"
+    ],
     [
       "badend01",
       129,
@@ -585,77 +768,77 @@
     ],
     [
       "blue05",
-      125,
+      126,
       "choice",
       "blue05",
       "b05stay"
     ],
     [
       "blue05",
-      126,
+      127,
       "choice",
       "blue05",
       "b05cry"
     ],
     [
       "blue05",
-      134,
+      135,
       "goto",
       "blue05",
       "b05close"
     ],
     [
       "blue05",
-      140,
+      141,
       "goto",
       "blue05",
       "b05close"
-    ],
-    [
-      "blue05",
-      151,
-      "choice",
-      "blue05",
-      "b05doubt"
     ],
     [
       "blue05",
       152,
       "choice",
       "blue05",
+      "b05doubt"
+    ],
+    [
+      "blue05",
+      153,
+      "choice",
+      "blue05",
       "b05tell"
     ],
     [
       "blue05",
-      159,
+      160,
       "goto",
       "blue05",
       "b05confess"
     ],
     [
       "blue05",
-      163,
+      164,
       "goto",
       "blue05",
       "b05confess"
-    ],
-    [
-      "blue05",
-      177,
-      "choice",
-      "blue05",
-      "b05love"
     ],
     [
       "blue05",
       178,
       "choice",
       "blue05",
+      "b05love"
+    ],
+    [
+      "blue05",
+      179,
+      "choice",
+      "blue05",
       "b05wait"
     ],
     [
       "blue05",
-      189,
+      190,
       "goto",
       "blue05",
       "b05end"
@@ -1054,70 +1237,77 @@
     ],
     [
       "chapter3",
-      269,
+      273,
       "savereturnpoint",
       "chapter3",
       "afterpetday_ch3"
     ],
     [
       "chapter3",
-      374,
+      378,
       "savereturnpoint",
       "chapter3",
       "afterdate2"
     ],
     [
       "chapter3",
-      391,
+      395,
       "choice",
       "chapter3",
       "ved_yes"
     ],
     [
       "chapter3",
-      392,
+      396,
       "choice",
       "chapter3",
       "ved_no"
     ],
     [
       "chapter3",
-      494,
+      504,
+      "savereturnpoint",
+      "chapter3",
+      "afterday_ch3_mid"
+    ],
+    [
+      "chapter3",
+      510,
       "savereturnpoint",
       "chapter3",
       "afterdate3"
     ],
     [
       "chapter3",
-      503,
+      523,
       "savereturnpoint",
       "chapter3",
       "afterday_ch3b"
     ],
     [
       "chapter3",
-      618,
+      638,
       "choice",
       "chapter3",
       "hold"
     ],
     [
       "chapter3",
-      619,
+      639,
       "choice",
       "chapter3",
       "silence"
     ],
     [
       "chapter3",
-      640,
+      660,
       "savereturnpoint",
       "chapter3",
       "afterdate4"
     ],
     [
       "chapter3",
-      644,
+      667,
       "goto",
       "chapter4",
       null
@@ -1180,336 +1370,336 @@
     ],
     [
       "chapter4",
-      262,
+      266,
       "savereturnpoint",
       "chapter4",
       "afterpetday_ch4"
     ],
     [
       "chapter4",
-      458,
+      462,
       "savereturnpoint",
       "chapter4",
       "afterdate6"
     ],
     [
       "chapter4",
-      467,
+      475,
       "savereturnpoint",
       "chapter4",
       "afterday_ch4b"
     ],
     [
       "chapter4",
-      563,
+      571,
       "goto",
       "chapter4",
       "branch_pick"
     ],
     [
       "chapter4",
-      564,
+      572,
       "goto",
       "chapter4",
       "ved_comes_first"
     ],
     [
       "chapter4",
-      567,
+      575,
       "choice",
       "chapter4",
       "ch4eupie"
     ],
     [
       "chapter4",
-      568,
+      576,
       "choice",
       "chapter4",
       "ch4mel"
     ],
     [
       "chapter4",
-      569,
+      577,
       "choice",
       "chapter4",
       "ch4nelly"
     ],
     [
       "chapter4",
-      587,
+      595,
       "goto",
       "chapter4",
       "ch4vedia_go"
-    ],
-    [
-      "chapter4",
-      605,
-      "goto",
-      "chapter4",
-      "ved_check_eupie"
-    ],
-    [
-      "chapter4",
-      606,
-      "goto",
-      "chapter4",
-      "ch4eupie_go"
-    ],
-    [
-      "chapter4",
-      609,
-      "goto",
-      "chapter4",
-      "ved_stop_eupie"
-    ],
-    [
-      "chapter4",
-      610,
-      "goto",
-      "chapter4",
-      "ch4eupie_go"
     ],
     [
       "chapter4",
       613,
       "goto",
       "chapter4",
-      "ved_check_mel"
+      "ved_check_eupie"
     ],
     [
       "chapter4",
       614,
       "goto",
       "chapter4",
-      "ch4mel_go"
+      "ch4eupie_go"
     ],
     [
       "chapter4",
       617,
       "goto",
       "chapter4",
-      "ved_stop_mel"
+      "ved_stop_eupie"
     ],
     [
       "chapter4",
       618,
       "goto",
       "chapter4",
-      "ch4mel_go"
+      "ch4eupie_go"
     ],
     [
       "chapter4",
       621,
       "goto",
       "chapter4",
-      "ved_check_nelly"
+      "ved_check_mel"
     ],
     [
       "chapter4",
       622,
       "goto",
       "chapter4",
-      "ch4nelly_go"
+      "ch4mel_go"
     ],
     [
       "chapter4",
       625,
       "goto",
       "chapter4",
-      "ved_stop_nelly"
+      "ved_stop_mel"
     ],
     [
       "chapter4",
       626,
       "goto",
       "chapter4",
+      "ch4mel_go"
+    ],
+    [
+      "chapter4",
+      629,
+      "goto",
+      "chapter4",
+      "ved_check_nelly"
+    ],
+    [
+      "chapter4",
+      630,
+      "goto",
+      "chapter4",
       "ch4nelly_go"
     ],
     [
       "chapter4",
-      638,
+      633,
+      "goto",
+      "chapter4",
+      "ved_stop_nelly"
+    ],
+    [
+      "chapter4",
+      634,
+      "goto",
+      "chapter4",
+      "ch4nelly_go"
+    ],
+    [
+      "chapter4",
+      646,
       "choice",
       "chapter4",
       "ch4vedia_go"
     ],
     [
       "chapter4",
-      639,
+      647,
       "choice",
       "chapter4",
       "ch4eupie_go"
     ],
     [
       "chapter4",
-      652,
+      660,
       "choice",
       "chapter4",
       "ch4vedia_go"
     ],
     [
       "chapter4",
-      653,
+      661,
       "choice",
       "chapter4",
       "ch4mel_go"
     ],
     [
       "chapter4",
-      666,
+      674,
       "choice",
       "chapter4",
       "ch4vedia_go"
     ],
     [
       "chapter4",
-      667,
+      675,
       "choice",
       "chapter4",
       "ch4nelly_go"
     ],
     [
       "chapter4",
-      677,
+      685,
       "goto",
       "chapter4green",
       null
     ],
     [
       "chapter4",
-      690,
+      698,
       "goto",
       "chapter4red",
       null
     ],
     [
       "chapter4",
-      693,
+      701,
       "goto",
       "chapter4",
       "ch4alone"
     ],
     [
       "chapter4",
-      710,
+      718,
       "goto",
       "chapter5common",
       null
     ],
     [
       "chapter4",
-      714,
+      722,
       "goto",
       "chapter4",
       "ch4nelly_run"
     ],
     [
       "chapter4",
-      718,
+      726,
       "goto",
       "chapter4",
       "ch4alone"
     ],
     [
       "chapter4",
-      797,
+      805,
       "goto",
       "chapter5yellow",
       null
     ],
     [
       "chapter4",
-      801,
+      809,
       "goto",
       "chapter4",
       "ch4eupie_run"
     ],
     [
       "chapter4",
-      807,
+      815,
       "goto",
       "chapter4",
       "ch4alone"
     ],
     [
       "chapter4",
-      852,
+      860,
       "battle",
       "chapter4",
       "ch4bt3"
     ],
     [
       "chapter4",
-      857,
+      865,
       "goto",
       "chapter4",
       "bt3_win"
     ],
     [
       "chapter4",
-      859,
+      867,
       "goto",
       "badend17",
       null
     ],
     [
       "chapter4",
-      937,
+      945,
       "choice",
       "chapter4",
       "bt3_rescue_yes"
     ],
     [
       "chapter4",
-      938,
+      946,
       "choice",
       "chapter4",
       "bt3_rescue_no"
     ],
     [
       "chapter4",
-      943,
+      951,
       "goto",
       "chapter4",
       "bt3_rescue_join"
     ],
     [
       "chapter4",
-      948,
+      956,
       "goto",
       "chapter4",
       "bt3_rescue_join"
     ],
     [
       "chapter4",
-      1063,
+      1071,
       "savereturnpoint",
       "chapter4",
       "afterdate7"
     ],
     [
       "chapter4",
-      1110,
+      1118,
       "savereturnpoint",
       "chapter4",
       "afterdate8"
     ],
     [
       "chapter4",
-      1131,
+      1139,
       "savereturnpoint",
       "chapter4",
       "afterdate9"
     ],
     [
       "chapter4",
-      1157,
+      1165,
       "savereturnpoint",
       "chapter4",
       "afterdate10"
     ],
     [
       "chapter4",
-      1167,
+      1175,
       "goto",
       "chapter5blue",
       null
@@ -1607,308 +1797,308 @@
     ],
     [
       "chapter4green",
-      298,
+      297,
       "savereturnpoint",
       "chapter4green",
       "greennight_v2"
     ],
     [
       "chapter4green",
-      325,
+      324,
       "goto",
       "chapter4green",
       "ritual_day"
     ],
     [
       "chapter4green",
-      348,
+      347,
       "choice",
       "chapter4green",
       "spring_witness"
     ],
     [
       "chapter4green",
-      349,
+      348,
       "choice",
       "chapter4green",
       "spring_praise"
     ],
     [
       "chapter4green",
-      355,
+      354,
       "goto",
       "chapter4green",
       "spring_grief"
     ],
     [
       "chapter4green",
-      360,
+      359,
       "goto",
       "chapter4green",
       "spring_grief"
     ],
     [
       "chapter4green",
-      384,
+      383,
       "choice",
       "chapter4green",
       "spring_plant"
     ],
     [
       "chapter4green",
-      385,
+      384,
       "choice",
       "chapter4green",
       "spring_flower"
     ],
     [
       "chapter4green",
-      390,
+      389,
       "goto",
       "chapter4green",
       "spring_close"
     ],
     [
       "chapter4green",
-      394,
+      393,
       "goto",
       "chapter4green",
       "spring_close"
     ],
     [
       "chapter4green",
-      421,
+      420,
       "choice",
       "chapter4green",
       "sybil_ask"
     ],
     [
       "chapter4green",
-      422,
+      421,
       "choice",
       "chapter4green",
       "sybil_unsure"
     ],
     [
       "chapter4green",
-      427,
+      426,
       "goto",
       "chapter4green",
       "sybil_request"
     ],
     [
       "chapter4green",
-      431,
+      430,
       "goto",
       "chapter4green",
       "sybil_request"
     ],
     [
       "chapter4green",
-      441,
+      440,
       "savereturnpoint",
       "chapter4green",
       "greennight_s1"
     ],
     [
       "chapter4green",
-      454,
+      453,
       "savereturnpoint",
       "chapter4green",
       "greenday_s1"
     ],
     [
       "chapter4green",
-      467,
+      465,
       "savereturnpoint",
       "chapter4green",
       "greennight_s2"
     ],
     [
       "chapter4green",
-      473,
+      471,
       "goto",
       "chapter4green",
       "syb_promise"
     ],
     [
       "chapter4green",
-      496,
+      494,
       "choice",
       "chapter4green",
       "syb_guard"
     ],
     [
       "chapter4green",
-      497,
+      495,
       "choice",
       "chapter4green",
       "let_go"
     ],
     [
       "chapter4green",
-      512,
+      510,
       "choice",
       "chapter4green",
       "promise_visit"
     ],
     [
       "chapter4green",
-      513,
+      511,
       "choice",
       "chapter4green",
       "promise_tease"
     ],
     [
       "chapter4green",
-      518,
+      516,
       "goto",
       "chapter4green",
       "promise_ask"
     ],
     [
       "chapter4green",
-      522,
+      520,
       "goto",
       "chapter4green",
       "promise_ask"
     ],
     [
       "chapter4green",
-      529,
+      527,
       "choice",
       "chapter4green",
       "promise_tea"
     ],
     [
       "chapter4green",
-      530,
+      528,
       "choice",
       "chapter4green",
       "promise_name"
     ],
     [
       "chapter4green",
-      535,
+      533,
       "goto",
       "chapter4green",
       "promise_hold"
     ],
     [
       "chapter4green",
-      539,
+      537,
       "goto",
       "chapter4green",
       "promise_hold"
     ],
     [
       "chapter4green",
-      547,
+      545,
       "goto",
       "chapter4green",
       "syb_seen"
     ],
     [
       "chapter4green",
-      557,
+      555,
       "choice",
       "chapter4green",
       "syb_boundary"
     ],
     [
       "chapter4green",
-      558,
+      556,
       "choice",
       "chapter4green",
       "syb_push"
     ],
     [
       "chapter4green",
-      563,
+      561,
       "goto",
       "badend13",
       null
     ],
     [
       "chapter4green",
-      586,
+      584,
       "goto",
       "syb_end",
       "end1"
     ],
     [
       "chapter4green",
-      595,
+      593,
       "goto",
       "chapter4green",
       "syb_ritual"
     ],
     [
       "chapter4green",
-      611,
+      609,
       "goto",
       "chapter4green",
       "investigate"
     ],
     [
       "chapter4green",
-      616,
+      614,
       "goto",
       "chapter4green",
       "syb_ritual"
     ],
     [
       "chapter4green",
-      635,
+      633,
       "savereturnpoint",
       "chapter4green",
       "greenclue_d1"
     ],
     [
       "chapter4green",
-      642,
+      640,
       "savereturnpoint",
       "chapter4green",
       "greenclue_d2"
     ],
     [
       "chapter4green",
-      649,
+      647,
       "savereturnpoint",
       "chapter4green",
       "greenclue_d3"
     ],
     [
       "chapter4green",
-      654,
+      652,
       "goto",
       "green_farewell",
       "start"
     ],
     [
       "chapter4green",
-      720,
+      718,
       "choice",
       "chapter4green",
       "fire_look"
     ],
     [
       "chapter4green",
-      721,
+      719,
       "choice",
       "chapter4green",
       "fire_hand"
     ],
     [
       "chapter4green",
-      726,
+      724,
       "goto",
       "chapter4green",
       "fire_close"
     ],
     [
       "chapter4green",
-      731,
+      729,
       "goto",
       "chapter4green",
       "fire_close"
@@ -2034,280 +2224,280 @@
     ],
     [
       "chapter5blue",
-      269,
+      268,
       "savereturnpoint",
       "chapter5blue",
       "afterdate20"
     ],
     [
       "chapter5blue",
-      276,
+      274,
       "savereturnpoint",
       "chapter5blue",
       "afterpetday_blue"
     ],
     [
       "chapter5blue",
-      310,
+      308,
       "battle",
       "chapter5blue",
       "ch5bt2"
     ],
     [
       "chapter5blue",
-      391,
+      389,
       "battle",
       "chapter5blue",
       "ch5bt6"
     ],
     [
       "chapter5blue",
-      480,
+      478,
       "choice",
       "chapter5blue",
       "c5b4_a"
     ],
     [
       "chapter5blue",
-      481,
+      479,
       "choice",
       "chapter5blue",
       "c5b4_b"
     ],
     [
       "chapter5blue",
-      486,
+      484,
       "goto",
       "chapter5blue",
       "c5b4_join"
     ],
     [
       "chapter5blue",
-      490,
+      488,
       "goto",
       "chapter5blue",
       "c5b4_join"
     ],
     [
       "chapter5blue",
-      577,
+      575,
       "choice",
       "chapter5blue",
       "toxickiss"
     ],
     [
       "chapter5blue",
-      578,
+      576,
       "choice",
       "chapter5blue",
       "nexttime"
     ],
     [
       "chapter5blue",
-      623,
+      621,
       "goto",
       "chapter5blue",
       "beforefinal_blue"
     ],
     [
       "chapter5blue",
-      639,
+      636,
       "savereturnpoint",
       "chapter5blue",
       "afternight_blue"
     ],
     [
       "chapter5blue",
-      656,
+      653,
       "choice",
       "chapter5blue",
       "eve_visit"
     ],
     [
       "chapter5blue",
-      657,
+      654,
       "choice",
       "chapter5blue",
       "eve_find"
     ],
     [
       "chapter5blue",
-      664,
+      661,
       "goto",
       "chapter5blue",
       "eve_promise"
     ],
     [
       "chapter5blue",
-      670,
+      667,
       "goto",
       "chapter5blue",
       "eve_promise"
     ],
     [
       "chapter5blue",
-      676,
+      673,
       "choice",
       "chapter5blue",
       "eve_remember"
     ],
     [
       "chapter5blue",
-      677,
+      674,
       "choice",
       "chapter5blue",
       "eve_return"
     ],
     [
       "chapter5blue",
-      682,
+      679,
       "goto",
       "chapter5blue",
       "eve_close"
     ],
     [
       "chapter5blue",
-      687,
+      684,
       "goto",
       "chapter5blue",
       "eve_close"
     ],
     [
       "chapter5blue",
-      742,
+      739,
       "battle",
       "chapter5blue",
       "ch5bt_mel"
     ],
     [
       "chapter5blue",
-      797,
+      794,
       "battle",
       "chapter5blue",
       "ch5bt_micha"
     ],
     [
       "chapter5blue",
-      802,
+      799,
       "goto",
       "euphie_end",
       "end1"
     ],
     [
       "chapter5blue",
-      823,
+      820,
       "choice",
       "chapter5blue",
       "player_guards"
     ],
     [
       "chapter5blue",
-      824,
+      821,
       "choice",
       "chapter5blue",
       "nic_sacrifice"
     ],
     [
       "chapter5blue",
-      827,
+      824,
       "goto",
       "badend01",
       null
     ],
     [
       "chapter5blue",
-      905,
+      902,
       "choice",
       "chapter5blue",
       "escape_heard"
     ],
     [
       "chapter5blue",
-      906,
+      903,
       "choice",
       "chapter5blue",
       "escape_cry"
     ],
     [
       "chapter5blue",
-      911,
+      908,
       "goto",
       "chapter5blue",
       "escape_quiet"
     ],
     [
       "chapter5blue",
-      915,
+      912,
       "goto",
       "chapter5blue",
       "escape_quiet"
     ],
     [
       "chapter5blue",
-      962,
+      959,
       "choice",
       "chapter5blue",
       "end_crimson"
     ],
     [
       "chapter5blue",
-      963,
+      960,
       "choice",
       "chapter5blue",
       "end_blue_crown"
     ],
     [
       "chapter5blue",
-      979,
+      976,
       "choice",
       "chapter5blue",
       "crimson_fit"
     ],
     [
       "chapter5blue",
-      980,
+      977,
       "choice",
       "chapter5blue",
       "crimson_name"
     ],
     [
       "chapter5blue",
-      985,
+      982,
       "goto",
       "chapter5blue",
       "crimson_close"
     ],
     [
       "chapter5blue",
-      989,
+      986,
       "goto",
       "chapter5blue",
       "crimson_close"
     ],
     [
       "chapter5blue",
-      1040,
+      1037,
       "choice",
       "chapter5blue",
       "crown_speak"
     ],
     [
       "chapter5blue",
-      1041,
+      1038,
       "choice",
       "chapter5blue",
       "crown_slow"
     ],
     [
       "chapter5blue",
-      1045,
+      1042,
       "goto",
       "chapter5blue",
       "crown_close"
     ],
     [
       "chapter5blue",
-      1049,
+      1046,
       "goto",
       "chapter5blue",
       "crown_close"
@@ -2664,245 +2854,245 @@
     ],
     [
       "chapter5yellow",
-      151,
+      150,
       "savereturnpoint",
       "chapter5yellow",
       "afterdate1"
     ],
     [
       "chapter5yellow",
-      158,
+      156,
       "savereturnpoint",
       "chapter5yellow",
       "afterpetday_yellow"
     ],
     [
       "chapter5yellow",
-      174,
+      172,
       "goto",
       "chapter5yellow",
       "success"
     ],
     [
       "chapter5yellow",
-      189,
+      187,
       "battle",
       "chapter5yellow",
       "ch5yt_micha"
     ],
     [
       "chapter5yellow",
-      201,
+      199,
       "goto",
       "chapter5yellow",
       "micha_win"
     ],
     [
       "chapter5yellow",
-      205,
+      203,
       "goto",
       "chapter5yellow",
       "micha_join"
     ],
     [
       "chapter5yellow",
-      247,
+      245,
       "choice",
       "chapter5yellow",
       "last_voice"
     ],
     [
       "chapter5yellow",
-      248,
+      246,
       "choice",
       "chapter5yellow",
       "last_hand"
     ],
     [
       "chapter5yellow",
-      253,
+      251,
       "goto",
       "chapter5yellow",
       "last_quiet"
     ],
     [
       "chapter5yellow",
-      258,
+      256,
       "goto",
       "chapter5yellow",
       "last_quiet"
     ],
     [
       "chapter5yellow",
-      273,
+      271,
       "choice",
       "chapter5yellow",
       "eclipse_win"
     ],
     [
       "chapter5yellow",
-      274,
+      272,
       "choice",
       "chapter5yellow",
       "eclipse"
     ],
     [
       "chapter5yellow",
-      275,
+      273,
       "choice",
       "chapter5yellow",
       "realworld"
     ],
     [
       "chapter5yellow",
-      291,
+      289,
       "goto",
       "chapter5yellow",
       "eclipse_body"
     ],
     [
       "chapter5yellow",
-      357,
+      355,
       "choice",
       "chapter5yellow",
       "eclipse_return"
     ],
     [
       "chapter5yellow",
-      358,
+      356,
       "choice",
       "chapter5yellow",
       "eclipse_find"
     ],
     [
       "chapter5yellow",
-      363,
+      361,
       "goto",
       "chapter5yellow",
       "eclipse_close"
     ],
     [
       "chapter5yellow",
-      368,
+      366,
       "goto",
       "chapter5yellow",
       "eclipse_close"
     ],
     [
       "chapter5yellow",
-      382,
+      380,
       "goto",
       "chapter5yellow",
       "eclipse"
     ],
     [
       "chapter5yellow",
-      407,
+      405,
       "choice",
       "chapter5yellow",
       "realworld_listen"
     ],
     [
       "chapter5yellow",
-      408,
+      406,
       "choice",
       "chapter5yellow",
       "realworld_honest"
     ],
     [
       "chapter5yellow",
-      413,
+      411,
       "goto",
       "chapter5yellow",
       "realworld_leave"
     ],
     [
       "chapter5yellow",
-      417,
+      415,
       "goto",
       "chapter5yellow",
       "realworld_leave"
     ],
     [
       "chapter5yellow",
-      469,
+      467,
       "choice",
       "chapter5yellow",
       "success_watch"
     ],
     [
       "chapter5yellow",
-      470,
+      468,
       "choice",
       "chapter5yellow",
       "success_miss"
     ],
     [
       "chapter5yellow",
-      475,
+      473,
       "goto",
       "chapter5yellow",
       "success_release"
     ],
     [
       "chapter5yellow",
-      479,
+      477,
       "goto",
       "chapter5yellow",
       "success_release"
     ],
     [
       "chapter5yellow",
-      504,
+      502,
       "choice",
       "chapter5yellow",
       "rescue_answer"
     ],
     [
       "chapter5yellow",
-      505,
+      503,
       "choice",
       "chapter5yellow",
       "rescue_here"
     ],
     [
       "chapter5yellow",
-      510,
+      508,
       "goto",
       "chapter5yellow",
       "rescue_breathe"
     ],
     [
       "chapter5yellow",
-      514,
+      512,
       "goto",
       "chapter5yellow",
       "rescue_breathe"
     ],
     [
       "chapter5yellow",
-      569,
+      567,
       "choice",
       "chapter5yellow",
       "success_remember"
     ],
     [
       "chapter5yellow",
-      570,
+      568,
       "choice",
       "chapter5yellow",
       "success_again"
     ],
     [
       "chapter5yellow",
-      576,
+      574,
       "goto",
       "chapter5yellow",
       "success_farewell"
     ],
     [
       "chapter5yellow",
-      582,
+      580,
       "goto",
       "chapter5yellow",
       "success_farewell"
@@ -4449,14 +4639,14 @@
     ],
     [
       "yellow04",
-      52,
+      53,
       "choice",
       "yellow04",
       "yellow04end"
     ],
     [
       "yellow04",
-      53,
+      54,
       "choice",
       "yellow04",
       "yellow04end"

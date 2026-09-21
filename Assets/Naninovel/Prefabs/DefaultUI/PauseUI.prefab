@@ -357,7 +357,7 @@ RectTransform:
   m_Children:
   - {fileID: 2696364128516685380}
   m_Father: {fileID: 2909044267438651794}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -511,7 +511,7 @@ RectTransform:
   m_Children:
   - {fileID: 2695782771530760664}
   m_Father: {fileID: 2909044267438651794}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -616,7 +616,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2770814937938598304}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce1df12d839e2a64d9bca0f4ccfdde61, type: 3}
+  m_Script: {fileID: 11500000, guid: 1f1c44551bac4eac9505c9c651c7fe07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   disableInteraction: 0
@@ -646,7 +646,7 @@ GameObject:
   - component: {fileID: 7556865614169289555}
   - component: {fileID: 3726322816811502799}
   m_Layer: 5
-  m_Name: TipsButton
+  m_Name: CloseButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -664,14 +664,14 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 8441187554630283742}
-  m_Father: {fileID: 2909044267438651794}
-  m_RootOrder: 2
+  m_Father: {fileID: 6306036017273270216}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 1, y: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 105, y: 150}
+  m_SizeDelta: {x: 40, y: 40}
+  m_Pivot: {x: 1, y: 1}
 --- !u!222 &375611691431833646
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -770,7 +770,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3396493727830563495}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 577b4b1646485bd4788314a481c56958, type: 3}
+  m_Script: {fileID: 11500000, guid: 7b780956db2c46d788417e51002ca226, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   disableInteraction: 0
@@ -805,7 +805,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &389075373465808454
 RectTransform:
   m_ObjectHideFlags: 0
@@ -819,7 +819,7 @@ RectTransform:
   m_Children:
   - {fileID: 3952706664256021276}
   m_Father: {fileID: 2909044267438651794}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1255,7 +1255,7 @@ Canvas:
   m_GameObject: {fileID: 6306036015961478139}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 1
+  m_RenderMode: 0
   m_Camera: {fileID: 0}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
@@ -1352,7 +1352,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 55
 --- !u!1 &6306036017273270223
 GameObject:
   m_ObjectHideFlags: 0
@@ -1385,6 +1385,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2909044267438651794}
+  - {fileID: 357624392977138434}
   m_Father: {fileID: 6306036015961478113}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1464,7 +1465,6 @@ RectTransform:
   m_Children:
   - {fileID: 2267831414495301893}
   - {fileID: 3794424893517017791}
-  - {fileID: 357624392977138434}
   - {fileID: 389075373465808454}
   - {fileID: 2695427073296489810}
   - {fileID: 2696118706286808180}
@@ -1474,7 +1474,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 210, y: 275}
+  m_SizeDelta: {x: 210, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &799972526615816601
 CanvasRenderer:
@@ -1528,7 +1528,7 @@ MonoBehaviour:
   m_Padding:
     m_Left: 0
     m_Right: 0
-    m_Top: 10
+    m_Top: 44
     m_Bottom: 10
   m_ChildAlignment: 4
   m_Spacing: 0
@@ -1705,7 +1705,7 @@ GameObject:
   - component: {fileID: 1848430807549167799}
   - component: {fileID: 5759604299674003272}
   m_Layer: 5
-  m_Name: TipsLabel
+  m_Name: CloseLabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1759,7 +1759,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 7d24045dcfc9abb4b809014e4a26b613, type: 3}
-    m_FontSize: 23
+    m_FontSize: 34
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 2
@@ -1770,7 +1770,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: TIPS
+  m_Text: "\xD7"
 --- !u!114 &5759604299674003272
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1784,8 +1784,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   category: DefaultUI
-  key: ControlPanel.Tips
-  defaultValue: TIPS
+  key: PauseUI.Close
+  defaultValue: "\xD7"
   onValueChanged:
     m_PersistentCalls:
       m_Calls:

@@ -10,7 +10,7 @@ import re
 
 ROOT = Path(__file__).resolve().parents[1]
 STORIES = ROOT / 'Assets/NaniScripts'
-PRODUCTION = re.compile(r'(chapter[0-6](?:red|blue|green|yellow|common)?|badend\d+|(?:blue|red|yellow|green)\d+|(?:eup|mel|nel|ved|syb)_day\d+|chat_\w+|(?:red|green)clue\d+|green_farewell|yellow_guidance|(?:euphie|mel|syb)_end)$')
+PRODUCTION = re.compile(r'(chapter[0-6](?:red|blue|green|yellow|common)?|badend\d+|(?:blue|red|yellow|green)\d+|(?:eup|mel|nel|ved|syb)_day\d+|chat_\w+|after_\w+|(?:red|green)clue\d+|green_farewell|yellow_guidance|(?:euphie|mel|syb)_end)$')
 scripts = {p.stem: p.read_text(encoding='utf-8-sig').splitlines()
            for p in STORIES.glob('*.nani') if PRODUCTION.fullmatch(p.stem)}
 labels = {}

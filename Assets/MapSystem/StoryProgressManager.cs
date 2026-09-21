@@ -47,6 +47,16 @@ public class StoryProgressManager : MonoBehaviour
         PlayerPrefs.Save();
     }
 
+    // 白天事件播完一輪、要從第一個重來時用。
+    // 快取跟 PlayerPrefs 要一起歸零——只改其中一邊的話，下次 IncrementDayProgress
+    // 會從舊值往上加，進度永遠停在「超過清單長度」，每次都被判成要循環，只會重播第一場。
+    public void ResetDayProgress(string characterName)
+    {
+        dayProgress[characterName] = 0;
+        PlayerPrefs.SetInt(characterName + DayKeySuffix, 0);
+        PlayerPrefs.Save();
+    }
+
     // 查詢角色晚上進度
     public int GetNightProgress(string characterName)
     {
